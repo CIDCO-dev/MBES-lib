@@ -4,3 +4,5 @@
 #include "XtfTypesTest.hpp"
 #include "NmeaUtilsTest.hpp"
 #include "SoundVelocityProfileTest.hpp"
+#include "SurveySystemTest.hpp"
+
