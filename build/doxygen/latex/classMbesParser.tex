@@ -1,0 +1,102 @@
+\hypertarget{classMbesParser}{}\section{Référence de la classe Mbes\+Parser}
+\label{classMbesParser}\index{Mbes\+Parser@{Mbes\+Parser}}
+
+
+{\ttfamily \#include $<$Mbes\+Parser.\+hpp$>$}
+
+
+
+Graphe d\textquotesingle{}héritage de Mbes\+Parser\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=248pt]{classMbesParser__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Fonctions membres publiques}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classMbesParser_ac6ef7327a407484a528c0b1c0384db9f}{Mbes\+Parser} ()
+\item 
+virtual \hyperlink{classMbesParser_aa72a4049542622ecebba6aec01a1e763}{$\sim$\+Mbes\+Parser} ()
+\item 
+virtual void \hyperlink{classMbesParser_a10e172520c1ca2b87dab51aef9e57c2a}{parse} (std\+::string filename)
+\item 
+virtual void \hyperlink{classMbesParser_a347e78a8a1369c1ea6e63e7eea474b31}{process\+Attitude} (uint64\+\_\+t micro\+Epoch, double heading, double pitch, double roll)
+\item 
+virtual void \hyperlink{classMbesParser_add86a02726482d3a8e2a8aaf7f4beefa}{process\+Position} (uint64\+\_\+t micro\+Epoch, double longitude, double latitude, double height)
+\item 
+virtual void \hyperlink{classMbesParser_a9c099ea1003fff3c99991c37da1d40a6}{process\+Ping} (uint64\+\_\+t micro\+Epoch, long id, double beam\+Angle, double tilt\+Angle, double two\+Way\+Travel\+Time, uint32\+\_\+t quality, uint32\+\_\+t intensity)
+\item 
+virtual void \hyperlink{classMbesParser_ab6481abeb95b37b435a3bf2d705eba19}{process\+Swath\+Start} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Documentation des constructeurs et destructeur}
+\mbox{\Hypertarget{classMbesParser_ac6ef7327a407484a528c0b1c0384db9f}\label{classMbesParser_ac6ef7327a407484a528c0b1c0384db9f}} 
+\index{Mbes\+Parser@{Mbes\+Parser}!Mbes\+Parser@{Mbes\+Parser}}
+\index{Mbes\+Parser@{Mbes\+Parser}!Mbes\+Parser@{Mbes\+Parser}}
+\subsubsection{\texorpdfstring{Mbes\+Parser()}{MbesParser()}}
+{\footnotesize\ttfamily Mbes\+Parser\+::\+Mbes\+Parser (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classMbesParser_aa72a4049542622ecebba6aec01a1e763}\label{classMbesParser_aa72a4049542622ecebba6aec01a1e763}} 
+\index{Mbes\+Parser@{Mbes\+Parser}!````~Mbes\+Parser@{$\sim$\+Mbes\+Parser}}
+\index{````~Mbes\+Parser@{$\sim$\+Mbes\+Parser}!Mbes\+Parser@{Mbes\+Parser}}
+\subsubsection{\texorpdfstring{$\sim$\+Mbes\+Parser()}{~MbesParser()}}
+{\footnotesize\ttfamily virtual Mbes\+Parser\+::$\sim$\+Mbes\+Parser (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+\subsection{Documentation des fonctions membres}
+\mbox{\Hypertarget{classMbesParser_a10e172520c1ca2b87dab51aef9e57c2a}\label{classMbesParser_a10e172520c1ca2b87dab51aef9e57c2a}} 
+\index{Mbes\+Parser@{Mbes\+Parser}!parse@{parse}}
+\index{parse@{parse}!Mbes\+Parser@{Mbes\+Parser}}
+\subsubsection{\texorpdfstring{parse()}{parse()}}
+{\footnotesize\ttfamily virtual void Mbes\+Parser\+::parse (\begin{DoxyParamCaption}\item[{std\+::string}]{filename }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Réimplémentée dans \hyperlink{classKongsbergParser_af7c31817a75fc4d153945f35f08b9d99}{Kongsberg\+Parser}.
+
+\mbox{\Hypertarget{classMbesParser_a347e78a8a1369c1ea6e63e7eea474b31}\label{classMbesParser_a347e78a8a1369c1ea6e63e7eea474b31}} 
+\index{Mbes\+Parser@{Mbes\+Parser}!process\+Attitude@{process\+Attitude}}
+\index{process\+Attitude@{process\+Attitude}!Mbes\+Parser@{Mbes\+Parser}}
+\subsubsection{\texorpdfstring{process\+Attitude()}{processAttitude()}}
+{\footnotesize\ttfamily virtual void Mbes\+Parser\+::process\+Attitude (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{micro\+Epoch,  }\item[{double}]{heading,  }\item[{double}]{pitch,  }\item[{double}]{roll }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Réimplémentée dans \hyperlink{classKongsbergParser_aa241961b762eb4fed4702a337573d46d}{Kongsberg\+Parser}.
+
+\mbox{\Hypertarget{classMbesParser_a9c099ea1003fff3c99991c37da1d40a6}\label{classMbesParser_a9c099ea1003fff3c99991c37da1d40a6}} 
+\index{Mbes\+Parser@{Mbes\+Parser}!process\+Ping@{process\+Ping}}
+\index{process\+Ping@{process\+Ping}!Mbes\+Parser@{Mbes\+Parser}}
+\subsubsection{\texorpdfstring{process\+Ping()}{processPing()}}
+{\footnotesize\ttfamily virtual void Mbes\+Parser\+::process\+Ping (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{micro\+Epoch,  }\item[{long}]{id,  }\item[{double}]{beam\+Angle,  }\item[{double}]{tilt\+Angle,  }\item[{double}]{two\+Way\+Travel\+Time,  }\item[{uint32\+\_\+t}]{quality,  }\item[{uint32\+\_\+t}]{intensity }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Réimplémentée dans \hyperlink{classXtfParser_ae8932c52b4030f14acd8b4419037c3eb}{Xtf\+Parser}.
+
+\mbox{\Hypertarget{classMbesParser_add86a02726482d3a8e2a8aaf7f4beefa}\label{classMbesParser_add86a02726482d3a8e2a8aaf7f4beefa}} 
+\index{Mbes\+Parser@{Mbes\+Parser}!process\+Position@{process\+Position}}
+\index{process\+Position@{process\+Position}!Mbes\+Parser@{Mbes\+Parser}}
+\subsubsection{\texorpdfstring{process\+Position()}{processPosition()}}
+{\footnotesize\ttfamily virtual void Mbes\+Parser\+::process\+Position (\begin{DoxyParamCaption}\item[{uint64\+\_\+t}]{micro\+Epoch,  }\item[{double}]{longitude,  }\item[{double}]{latitude,  }\item[{double}]{height }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Réimplémentée dans \hyperlink{classKongsbergParser_a692580461f3e6d8f822cb84cf3ed6a3c}{Kongsberg\+Parser}, et \hyperlink{classXtfParser_abbb02ef84a6f01696fb1f6ed23d2bb5f}{Xtf\+Parser}.
+
+\mbox{\Hypertarget{classMbesParser_ab6481abeb95b37b435a3bf2d705eba19}\label{classMbesParser_ab6481abeb95b37b435a3bf2d705eba19}} 
+\index{Mbes\+Parser@{Mbes\+Parser}!process\+Swath\+Start@{process\+Swath\+Start}}
+\index{process\+Swath\+Start@{process\+Swath\+Start}!Mbes\+Parser@{Mbes\+Parser}}
+\subsubsection{\texorpdfstring{process\+Swath\+Start()}{processSwathStart()}}
+{\footnotesize\ttfamily virtual void Mbes\+Parser\+::process\+Swath\+Start (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+La documentation de cette classe a été générée à partir du fichier suivant \+:\begin{DoxyCompactItemize}
+\item 
+src/datagrams/\hyperlink{MbesParser_8hpp}{Mbes\+Parser.\+hpp}\end{DoxyCompactItemize}

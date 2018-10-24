@@ -1,0 +1,5 @@
+<map id="XtfParser" name="XtfParser">
+<area shape="rect" id="node2" href="$classMbesParser.html" title="MbesParser" alt="" coords="5,95,97,121"/>
+<area shape="rect" id="node3" href="$structXtfFileHeader.html" title="XtfFileHeader" alt="" coords="121,95,224,121"/>
+<area shape="rect" id="node4" href="$structXtfChanInfo.html" title="Description des datagrammes pour le format XTF Référence: Triton Imaging, Inc. " alt="" coords="127,5,219,32"/>
+</map>
