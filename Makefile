@@ -1,6 +1,6 @@
 CC=g++
 OPTIONS=-Wall -std=c++0x
-
+INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
 root=$(shell pwd)
@@ -18,9 +18,7 @@ default:
 
 test: default
 	mkdir -p $(test_exec_dir)
-	$(CC) $(OPTIONS) -o $(test_exec_dir)/tests test/main.cpp
-
-run-test: clean test
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp
 	mkdir -p $(test_result_dir)
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
