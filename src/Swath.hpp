@@ -1,10 +1,10 @@
 /*
- * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+ * Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
 /* 
  * File:   Swath.hpp
- * Author: jordan
+ * Author: jordan,glm
  *
  * Created on September 14, 2018, 2:39 PM
  */
@@ -19,11 +19,10 @@
 class Swath {
 public:
 
-    const std::vector<Ping *>* pings;
+    const std::vector<Ping *>* pings = NULL;
     const unsigned int beamCount;
 
-    Swath(std::vector<Ping*>* pings) :
-    pings(pings), beamCount(pings->size()) {
+    Swath(std::vector<Ping*>* pings) : pings(pings), beamCount(pings->size()) {
     }
 
     ~Swath() {
@@ -33,10 +32,8 @@ public:
 
         delete pings;
     };
-    
+
     friend std::ostream& operator<<(std::ostream& os, const Swath& obj) {
-        // Write obj to stream
-        
         for(unsigned int i=0; i<obj.beamCount; i++) {
             os << *((*obj.pings)[i]) << std::endl;
         }
