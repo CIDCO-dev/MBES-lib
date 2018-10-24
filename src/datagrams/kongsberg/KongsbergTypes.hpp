@@ -1,0 +1,7 @@
+#ifndef KONGSBERGTYPES_HPP
+#define KONGSBERGTYPES_HPP
+
+
+
+
+#endif // KONGSBERGTYPES_HPP
