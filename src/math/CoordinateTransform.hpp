@@ -1,10 +1,10 @@
 /*
- * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+ * Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
 /* 
  * File:   CoordinateTransform.hpp
- * Author: jordan
+ * Author: glm,jordan
  *
  * Created on September 13, 2018, 3:39 PM
  */
@@ -22,31 +22,26 @@ public:
     static constexpr double a = 6378137.0;
     static constexpr double e2 = 0.081819190842622 * 0.081819190842622;
 
-    static Eigen::Vector3d* getPositionInNavigationFrame(const Position & position, Eigen::Matrix3d & navDCM, Eigen::Vector3d & originTRF) {
+    static void getPositionInNavigationFrame(Eigen::Vector3d & positionInNavigationFrame,const Position & positionGeographic, Eigen::Matrix3d & navDCM, Eigen::Vector3d & originECEF) {
+        Eigen::Vector3d positionECEF;
+	getPositionInTerrestialReferenceFrame(positionECEF,positionGeographic);
 
-        Eigen::Vector3d* positionTRF = getPositionInTerrestialReferenceFrame(position);
-        Eigen::Vector3d positionVector = navDCM * (*positionTRF - originTRF);
-        delete positionTRF;
+        Eigen::Vector3d positionVector = navDCM * (positionECEF - originECEF);
 
-        Eigen::Vector3d* positionInNavigationFrame = new Eigen::Vector3d();
-        *positionInNavigationFrame << positionVector(0), positionVector(1), positionVector(2);
-
-        return positionInNavigationFrame;
+        positionInNavigationFrame << positionVector(0), positionVector(1), positionVector(2);
     };
 
-    static Eigen::Vector3d * getPositionInTerrestialReferenceFrame(const Position & position) {
+    static void getPositionInTerrestialReferenceFrame(Eigen::Vector3d & positionECEF,const Position & position) {
         double N = a / (sqrt(1 - e2 * position.slat * position.slat));
         double xTRF = (N + position.ellipsoidalHeight) * position.clat * position.clon;
         double yTRF = (N + position.ellipsoidalHeight) * position.clat * position.slon;
         double zTRF = (N * (1 - e2) + position.ellipsoidalHeight) * position.slat;
 
-        Eigen::Vector3d * positionInTerrestialReferenceFrame = new Eigen::Vector3d();
-        *positionInTerrestialReferenceFrame << xTRF, yTRF, zTRF;
-
-        return positionInTerrestialReferenceFrame;
+        positionECEF << xTRF, yTRF, zTRF;
     };
 
-    static Eigen::Matrix3d * getTerrestialToLocalGeodeticReferenceFrameMatrix(Position & position) {
+
+    static void getTerrestialToLocalGeodeticReferenceFrameMatrix(Eigen::Matrix3d & trf2lgf,Position & position) {
         double m00 = -position.slat*position.clon;
         double m01 = -position.slat*position.slon;
         double m02 = position.clat;
@@ -59,13 +54,10 @@ public:
         double m21 = -position.clat*position.slon;
         double m22 = -position.slat;
 
-        Eigen::Matrix3d * terrestialToLocalGeodeticReferenceFrameMatrix = new Eigen::Matrix3d();
-        *terrestialToLocalGeodeticReferenceFrameMatrix <<
+        trf2lgf <<
                 m00, m01, m02,
                 m10, m11, m12,
                 m20, m21, m22;
-
-        return terrestialToLocalGeodeticReferenceFrameMatrix;
     };
 };
 

@@ -4,7 +4,7 @@
 
 /* 
  * File:   CoordinateTransformTest.cpp
- * Author: jordan
+ * Author: glm,jordan
  *
  */
 
@@ -14,29 +14,28 @@
 #include "../src/Position.hpp"
 
 TEST_CASE("Coordinate Transform Test") {
-    
+
     // prime meridian, equator, on ellipsoid
     Position testPosition(0, 0, 0);
-    
-    Eigen::Vector3d * testPositionInTRF = CoordinateTransform::getPositionInTerrestialReferenceFrame(testPosition);
-    Eigen::Vector3d expectedPositionInTRF;
-    expectedPositionInTRF << 6378137.0 , 0, 0;
-    
+
+    Eigen::Vector3d testPositionECEF;
+    CoordinateTransform::getPositionInTerrestialReferenceFrame(testPositionECEF,testPosition);
+
+    Eigen::Vector3d expectedPositionECEF;
+    expectedPositionECEF << 6378137.0 , 0, 0;
+
     double positionPrecision = 0.00000001;
-    REQUIRE( testPositionInTRF->isApprox(expectedPositionInTRF, positionPrecision) );
-    delete testPositionInTRF;
-    
+
+    REQUIRE( testPositionECEF.isApprox(expectedPositionECEF, positionPrecision) );
+
     // North Pole on ellipsoid
     Position northPole(90, 0, 0);
-    Eigen::Vector3d * northPoleInTRF = CoordinateTransform::getPositionInTerrestialReferenceFrame(northPole);
-    
-    Eigen::Vector3d expectedNorthPoleInTRF;
-    expectedNorthPoleInTRF << 0, 0, 6356752.3142; // WGS 84 polar semi-minor axis
-    
+    Eigen::Vector3d northPoleECEF;
+    CoordinateTransform::getPositionInTerrestialReferenceFrame(northPoleECEF,northPole);
+
+    Eigen::Vector3d expectedNorthPoleECEF;
+    expectedNorthPoleECEF << 0, 0, 6356752.3142; // WGS 84 polar semi-minor axis
+
     double northPolePrecision = 0.00000001;
-    REQUIRE( northPoleInTRF->isApprox(expectedNorthPoleInTRF, northPolePrecision) );
-    delete northPoleInTRF;
-    
-    
-    
+    REQUIRE( northPoleECEF.isApprox(expectedNorthPoleECEF, northPolePrecision) );
 }
