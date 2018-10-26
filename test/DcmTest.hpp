@@ -4,7 +4,7 @@
 
 /* 
  * File:   DcmTest.cpp
- * Author: jordan
+ * Author: glm,jordan
  *
  */
 
@@ -19,20 +19,20 @@ TEST_CASE("Direction Cosine Matrix Test") {
 
     Eigen::Vector3d testVector = Eigen::Vector3d::Ones();
 
-    Eigen::Matrix3d* dcmFromSineCosineTest = DCM::getDcm(0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
-    REQUIRE(dcmFromSineCosineTest->isIdentity());
-    delete dcmFromSineCosineTest;
+    Eigen::Matrix3d dcmIdentity;
+    DCM::getDcm(dcmIdentity,0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
+    REQUIRE(dcmIdentity.isIdentity());
 
     const Attitude attitudeZero(0, 0, 0);
-    Eigen::Matrix3d* dcmFromAttitudeTest = DCM::getDcm(attitudeZero);
-    REQUIRE(dcmFromAttitudeTest->isIdentity());
-    delete dcmFromAttitudeTest;
+    Eigen::Matrix3d dcmAttitudeZero;
+    DCM::getDcm(dcmAttitudeZero,attitudeZero);
+    REQUIRE(dcmAttitudeZero.isIdentity());
 
     // roll 180 degrees
     const Attitude attitudeRoll(180, 0, 0);
-    Eigen::Matrix3d* dcmFromAttitudeRollTest = DCM::getDcm(attitudeRoll);
-    Eigen::Vector3d testRollVector = (*dcmFromAttitudeRollTest) * testVector;
-    delete dcmFromAttitudeRollTest;
+    Eigen::Matrix3d dcmFromAttitudeRollTest;
+    DCM::getDcm(dcmFromAttitudeRollTest,attitudeRoll);
+    Eigen::Vector3d testRollVector = dcmFromAttitudeRollTest * testVector;
 
     double testRollPrecision = 0.000000001;
     REQUIRE(abs(testRollVector(0) - 1.0) < testRollPrecision);
@@ -41,9 +41,9 @@ TEST_CASE("Direction Cosine Matrix Test") {
 
     // pitch 180 degrees
     const Attitude attitudePitch(0, 180, 0);
-    Eigen::Matrix3d* dcmFromAttitudePitchTest = DCM::getDcm(attitudePitch);
-    Eigen::Vector3d testPitchVector = (*dcmFromAttitudePitchTest) * testVector;
-    delete dcmFromAttitudePitchTest;
+    Eigen::Matrix3d dcmFromAttitudePitchTest;
+    DCM::getDcm(dcmFromAttitudePitchTest,attitudePitch);
+    Eigen::Vector3d testPitchVector = dcmFromAttitudePitchTest * testVector;
 
     double testPitchPrecision = 0.000000001;
     REQUIRE(abs(testPitchVector(0) - -1.0) < testPitchPrecision);
@@ -52,9 +52,9 @@ TEST_CASE("Direction Cosine Matrix Test") {
 
     // heading 180 degrees
     const Attitude attitudeHeading(0, 0, 180);
-    Eigen::Matrix3d* dcmFromAttitudeHeadingTest = DCM::getDcm(attitudeHeading);
-    Eigen::Vector3d testHeadingVector = (*dcmFromAttitudeHeadingTest) * testVector;
-    delete dcmFromAttitudeHeadingTest;
+    Eigen::Matrix3d dcmFromAttitudeHeadingTest;
+    DCM::getDcm(dcmFromAttitudeHeadingTest,attitudeHeading);
+    Eigen::Vector3d testHeadingVector = dcmFromAttitudeHeadingTest * testVector;
 
     double testHeadingPrecision = 0.000000001;
     REQUIRE(abs(testHeadingVector(0) - -1.0) < testHeadingPrecision);
@@ -68,16 +68,16 @@ TEST_CASE("Direction Cosine Matrix Test") {
     double pitch = randomVect(1) * 180;
     double heading = abs(randomVect(2))*2 * 360;
     const Attitude attitudeRandom(roll, pitch, heading);
-    Eigen::Matrix3d* dcmFromAttitudeRandomTest = DCM::getDcm(attitudeRandom);
+    Eigen::Matrix3d dcmFromAttitudeRandomTest;
+    DCM::getDcm(dcmFromAttitudeRandomTest,attitudeRandom);
 
     Eigen::Matrix3d dcmFromEulerAngles;
     dcmFromEulerAngles = Eigen::AngleAxisd(heading*D2R, Eigen::Vector3d::UnitZ())
       * Eigen::AngleAxisd(pitch*D2R, Eigen::Vector3d::UnitY())
       * Eigen::AngleAxisd(roll*D2R, Eigen::Vector3d::UnitX());
-    
+
     double randomPrecision = 0.000000001;
-    Eigen::Matrix3d dcmDifferences = *dcmFromAttitudeRandomTest - dcmFromEulerAngles;
+    Eigen::Matrix3d dcmDifferences = dcmFromAttitudeRandomTest - dcmFromEulerAngles;
     dcmDifferences = dcmDifferences.cwiseAbs();
     REQUIRE(dcmDifferences.maxCoeff() < randomPrecision);
-    delete dcmFromAttitudeRandomTest;
 }

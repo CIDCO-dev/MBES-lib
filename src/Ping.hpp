@@ -32,7 +32,7 @@ public:
     const double twoWayTravelTime;
     const double alongTrackAngle; // emission angle
     const double acrossTrackAngle; // reception angle
-    
+
     /*Trigonometry is stored to prevent redundant recalculations*/
     const double sA; // alpha = kappa = alongTrackAngle = emission angle = tilt angle
     const double cA;

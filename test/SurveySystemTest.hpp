@@ -110,3 +110,5 @@ TEST_CASE("Reading non-existing file") {
 
     REQUIRE(!params.readFile("/non/existant/file"));
 }
+
+//TODO: test case with a few invalid values
