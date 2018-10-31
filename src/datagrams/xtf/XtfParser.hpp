@@ -6,7 +6,7 @@
 #include <string.h>
 #include <cstdio>
 #include "XtfTypes.hpp"
-#include "../MbesParser.hpp"
+#include "../DatagramParser.hpp"
 #include "../../utils/TimeUtils.hpp"
 
 #define MAGIC_NUMBER 123
@@ -15,23 +15,14 @@
 /**
  * @author Guillaume Morissette
  *
- * Lit un fichier XTF et appelle un ensemble de callbacks pour chacun des types de datagrammes
- * Par defaut, les callbacks ne font qu'imprimer les informations de celui-ci. Une application 
- * pourra surcharger celles-ci afin d'effectuer des operations specialisees.
  */
-class XtfParser : public MbesParser{
+class XtfParser : public DatagramParser{
 	public:
-		XtfParser();
+		XtfParser(DatagramProcessor & processor);
 		~XtfParser();
 
 		void parse(std::string & filename);
 		int getTotalNumberOfChannels();
-
-	        //Interface methods
-	        void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity);
-	        void processAttitude(uint64_t microEpoch,float heading,float pitch,float roll);
-	        void processPosition(uint64_t microEpoch,double longitude,double latitude,double height);
-	        void processSwathStart(double soundVelocity);
 
 	protected:
 		void processPacketHeader(XtfPacketHeader & hdr);
@@ -43,7 +34,7 @@ class XtfParser : public MbesParser{
 		XtfFileHeader fileHeader;
 };
 
-XtfParser::XtfParser(){
+XtfParser::XtfParser(DatagramProcessor & processor):DatagramParser(processor){
 
 }
 
@@ -243,30 +234,9 @@ void XtfParser::processPacketHeader(XtfPacketHeader & hdr){
 */
 }
 
-void XtfParser::processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
-
-    /*
-	printf("------------\n");
-	printf("PING\n");
-	printf("ID: %u\n",ping.Id);
-	printf("Intensity: %lf\n",ping.Intensity);
-	printf("Quality: %u\n",ping.Quality);
-	printf("TWTT: %lf\n",ping.TwoWayTravelTime);
-	printf("DeltaTime: %lf\n",ping.DeltaTime);
-	printf("BeamAngle: %lf\n",ping.BeamAngle);
-	printf("TiltAngle: %lf\n",ping.TiltAngle);
-	printf("------------\n");
-    */
-}
-
 void XtfParser::processPingHeader(XtfPingHeader & hdr){
-    processSwathStart(hdr.SoundVelocity);
+    processor.processSwathStart(hdr.SoundVelocity);
 }
-
-void XtfParser::processSwathStart(double soundVelocity){
-
-}
-
 
 void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 
@@ -281,39 +251,31 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 			microEpoch = build_time(attitude->Year,attitude->Month,attitude->Day,attitude->Hour,attitude->Minutes,attitude->Seconds,attitude->Milliseconds,0);
 		}
 
-        	processAttitude(microEpoch,attitude->Heading,attitude->Pitch,attitude->Roll);
+        	processor.processAttitude(microEpoch,attitude->Heading,attitude->Pitch,attitude->Roll);
 	}
 	else if(hdr.HeaderType==XTF_HEADER_Q_MULTIBEAM){
 		XtfPingHeader * pingHdr = (XtfPingHeader*) packet;
 
 		processPingHeader(*pingHdr);
 
-        //printf("%d Pings\n",hdr.NumChansToFollow);
+	        //printf("%d Pings\n",hdr.NumChansToFollow);
 
 		XtfQpsMbEntry * ping = (XtfQpsMbEntry*) ((uint8_t*)packet + sizeof(XtfPingHeader));
 
-        uint64_t microEpoch = build_time(pingHdr->Year,pingHdr->Month,pingHdr->Day,pingHdr->Hour,pingHdr->Minute,pingHdr->Second,pingHdr->HSeconds * 10,0);
+	        uint64_t microEpoch = build_time(pingHdr->Year,pingHdr->Month,pingHdr->Day,pingHdr->Hour,pingHdr->Minute,pingHdr->Second,pingHdr->HSeconds * 10,0);
 
 		for(unsigned int i = 0;i < hdr.NumChansToFollow;i++){
-            processPing(microEpoch,ping[i].Id,ping[i].BeamAngle,ping[i].TiltAngle,ping[i].TwoWayTravelTime,ping[i].Quality,ping[i].Intensity);
+            		processor.processPing(microEpoch,ping[i].Id,ping[i].BeamAngle,ping[i].TiltAngle,ping[i].TwoWayTravelTime,ping[i].Quality,ping[i].Intensity);
 		}
 	}
 	else if(hdr.HeaderType==XTF_HEADER_POSITION){
 		XtfPosRawNavigation* position = (XtfPosRawNavigation*)packet;
-        uint64_t microEpoch = build_time(position->Year,position->Month,position->Day,position->Hour,position->Minutes,position->Seconds,position->MicroSeconds/1000,position->MicroSeconds%1000);
-        processPosition(microEpoch,position->RawXcoordinate,position->RawYcoordinate,position->RawAltitude);
+        	uint64_t microEpoch = build_time(position->Year,position->Month,position->Day,position->Hour,position->Minutes,position->Seconds,position->MicroSeconds/1000,position->MicroSeconds%1000);
+        	processor.processPosition(microEpoch,position->RawXcoordinate,position->RawYcoordinate,position->RawAltitude);
 	}
 	else{
 		printf("Unknown packet type: %d\n",hdr.HeaderType);
 	}
-}
-
-void XtfParser::processAttitude(uint64_t microEpoch,float heading,float pitch,float roll){
-	//printf("ATTITUDE: %lu %.04f %.04f %.04f\n",microEpoch,heading,pitch,roll);
-}
-
-void XtfParser::processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
-    //printf("POSITION: %lu %.08f %.08f\n",microEpoch,latitude,longitude,height);
 }
 
 #endif
