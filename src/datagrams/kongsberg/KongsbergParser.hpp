@@ -7,23 +7,23 @@
 #include <iostream>
 #include <cmath>
 
-#include "../MbesParser.hpp"
+#include "../DatagramParser.hpp"
 #include "../../utils/NmeaUtils.hpp"
 #include "../../utils/TimeUtils.hpp"
 
 #define STX 0x02
-#define ETX 0x03https://blog.github.com/2016-02-01-working-with-submodules/
+#define ETX 0x03
 
 #pragma pack(1)
 typedef struct{
-    uint32_t        size; //Size is computed starting from STX, so it excludes this one
-	unsigned char	stx;
-	unsigned char	type;
-    uint16_t        modelNumber;
-    uint32_t        date;
-    uint32_t        time;
-    uint16_t        counter;
-    uint16_t        serialNumber;
+    uint32_t        	size; //Size is computed starting from STX, so it excludes this one
+    unsigned char	stx;
+    unsigned char	type;
+    uint16_t        	modelNumber;
+    uint32_t        	date;
+    uint32_t        	time;
+    uint16_t        	counter;
+    uint16_t        	serialNumber;
 } KongsbergHeader;
 #pragma pack()
 
@@ -31,11 +31,11 @@ typedef struct{
 #pragma pack(1)
 typedef struct{
     uint16_t NumEntries;
-    uint16_t deltaTime; //time in milliseconds since record start
-    int16_t  roll;    //in 0.01 degrees
-    int16_t  pitch;   //in 0.01 degrees
-    int16_t  heave;   //in cm
-    int16_t  heading; //in 0.01 degrees
+    uint16_t deltaTime; 	//time in milliseconds since record start
+    int16_t  roll;    		//in 0.01 degrees
+    int16_t  pitch;   		//in 0.01 degrees
+    int16_t  heave;   		//in cm
+    int16_t  heading; 		//in 0.01 degrees
 } KongsbergAttitudeEntry;
 #pragma pack()
 
@@ -58,29 +58,28 @@ typedef struct{
 
 
 
-class KongsbergParser : public MbesParser{
+class KongsbergParser : public DatagramParser{
         public:
-        KongsbergParser();
-        ~KongsbergParser();
+	        KongsbergParser(DatagramProcessor & processor);
+	        ~KongsbergParser();
 
-        //interface methods
-        void parse(std::string filename);
-        void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll);
-        void processPosition(uint64_t microEpoch,double longitude,double latitude,double height);
+	        //interface methods
+	        void parse(std::string & filename);
 
         private:
-        void processDatagram(KongsbergHeader & hdr,unsigned char * datagram);
-        void processDepth(KongsbergHeader & hdr,unsigned char * datagram);
-        void processWaterHeight(KongsbergHeader & hdr,unsigned char * datagram);
-        void processAttitudeDatagram(KongsbergHeader & hdr,unsigned char * datagram);
-        void processPositionDatagram(KongsbergHeader & hdr,unsigned char * datagram);
-        void processQualityFactor(KongsbergHeader & hdr,unsigned char * datagram);
-        void processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram);
 
-        long convertTime(long datagramDate,long datagramTime);
+	        void processDatagram(KongsbergHeader & hdr,unsigned char * datagram);
+	        void processDepth(KongsbergHeader & hdr,unsigned char * datagram);
+	        void processWaterHeight(KongsbergHeader & hdr,unsigned char * datagram);
+	        void processAttitudeDatagram(KongsbergHeader & hdr,unsigned char * datagram);
+	        void processPositionDatagram(KongsbergHeader & hdr,unsigned char * datagram);
+	        void processQualityFactor(KongsbergHeader & hdr,unsigned char * datagram);
+	        void processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram);
+
+	        long convertTime(long datagramDate,long datagramTime);
 };
 
-KongsbergParser::KongsbergParser(){
+KongsbergParser::KongsbergParser(DatagramProcessor & processor):DatagramParser(processor){
 
 }
 
@@ -88,7 +87,7 @@ KongsbergParser::~KongsbergParser(){
 
 }
 
-void KongsbergParser::parse(std::string filename){
+void KongsbergParser::parse(std::string & filename){
 	FILE * file = fopen(filename.c_str(),"rb");
 
 	if(file){
@@ -126,6 +125,7 @@ void KongsbergParser::parse(std::string filename){
 
 void KongsbergParser::processDatagram(KongsbergHeader & hdr,unsigned char * datagram){
 
+/*
 	printf("-------------------------------------\n");
 	printf("Datagram has %d bytes\n",hdr.size);
         printf("Datagram type: %c\n",hdr.type);
@@ -134,6 +134,7 @@ void KongsbergParser::processDatagram(KongsbergHeader & hdr,unsigned char * data
         printf("Seconds since midnight: %d\n",hdr.time);
         printf("Counter: %d\n",hdr.counter);
         printf("Serial number: %d\n",hdr.serialNumber);
+*/
 
 	switch(hdr.type){
 		case 'A':
@@ -144,25 +145,25 @@ void KongsbergParser::processDatagram(KongsbergHeader & hdr,unsigned char * data
 			processDepth(hdr,datagram);
         	break;
 
-        case 'E':
-            //process echosounder data
-            //processDepth(hdr,datagram);
-        break;
+	        case 'E':
+        	    //process echosounder data
+        	    //processDepth(hdr,datagram);
+        	break;
 
-        case 'O':
-            //processQualityFactor(hdr,datagram);
-        break;
+        	case 'O':
+        	    //processQualityFactor(hdr,datagram);
+        	break;
 
-        case 'P':
-            processPositionDatagram(hdr,datagram);
-        break;
+        	case 'P':
+      		      processPositionDatagram(hdr,datagram);
+        	break;
 
 		case 'h':
-            //processWaterHeight(hdr,datagram);
+        	     //processWaterHeight(hdr,datagram);
 		break;
 
 		case 'Y':
-            //processSeabedImageData(hdr,datagram);
+        	     //processSeabedImageData(hdr,datagram);
 		break;
 
 		default:
@@ -170,7 +171,7 @@ void KongsbergParser::processDatagram(KongsbergHeader & hdr,unsigned char * data
 		break;
 	}
 
-    printf("-------------------------------------\n");
+        printf("-------------------------------------\n");
 }
 
 void KongsbergParser::processDepth(KongsbergHeader & hdr,unsigned char * datagram){
@@ -189,7 +190,7 @@ void KongsbergParser::processAttitudeDatagram(KongsbergHeader & hdr,unsigned cha
     uint64_t microEpoch = convertTime(hdr.date,hdr.time);
 
     for(unsigned int i = 0;i<nEntries;i++){
-        processAttitude(microEpoch + p[i].deltaTime * 1000,(double)p[i].heading/(double)100,(double)p[i].pitch/(double)100,(double)p[i].roll/(double)100);
+        processor.processAttitude(microEpoch + p[i].deltaTime * 1000,(double)p[i].heading/(double)100,(double)p[i].pitch/(double)100,(double)p[i].roll/(double)100);
     }
 }
 
@@ -200,12 +201,6 @@ long KongsbergParser::convertTime(long datagramDate,long datagramTime){
 
     return build_time(year,month,day,datagramTime);
 }
-
-void KongsbergParser::processAttitude(uint64_t microEpoch, double heading, double pitch, double roll){
-    printf("A %lu %lf %lf %lf\n",microEpoch,heading,pitch,roll);
-}
-
-
 
 void KongsbergParser::processPositionDatagram(KongsbergHeader & hdr,unsigned char * datagram){
         KongsbergPositionDatagram * p = (KongsbergPositionDatagram*) datagram;
@@ -237,7 +232,7 @@ void KongsbergParser::processPositionDatagram(KongsbergHeader & hdr,unsigned cha
         }
 
         if(!std::isnan(height)){
-            processPosition(microEpoch,longitude,latitude,height);
+            processor.processPosition(microEpoch,longitude,latitude,height);
         }
 }
 
@@ -248,10 +243,5 @@ void KongsbergParser::processQualityFactor(KongsbergHeader & hdr,unsigned char *
 void KongsbergParser::processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram){
 	//printf("TODO: parse Seabed Image Data\n");
 }
-
-void KongsbergParser::processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
-
-}
-
 
 #endif
