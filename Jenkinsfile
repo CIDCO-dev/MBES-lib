@@ -61,9 +61,9 @@ pipeline {
 		archiveArtifacts('build\\bin\\datagram-dump.exe')
             }
 	  post {
-	     always {
-		junit 'build\\test-reports\\*.xml'
-	     }
+	     //always {
+		//junit 'build\\test-reports\\*.xml'
+	     //}
 	     failure{
       		   timeout(time: 10, unit: 'SECONDS'){
 		     bat "ssh jenkins@192.168.0.105 /var/lib/jenkins/Scripts/Call_Close_A_VM.sh windows-x64-C++"
