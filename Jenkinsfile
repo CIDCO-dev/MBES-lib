@@ -20,7 +20,7 @@ pipeline {
         stage('STAR VM'){
     	    agent { label 'master'}
             steps {
-              sh "ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Start_A_VM.sh windows-x64-C++"
+              sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Start_A_VM.sh windows-x64-C++'
             }
         }	
 
@@ -66,7 +66,7 @@ pipeline {
         stage('STOP VM'){
     	    agent { label 'master'}
             steps {
-              sh "ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Close_A_VM.sh windows-x64-C++"
+              sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Close_A_VM.sh windows-x64-C++'
             }
         }	
 
