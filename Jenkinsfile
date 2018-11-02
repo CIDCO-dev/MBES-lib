@@ -20,7 +20,9 @@ pipeline {
         stage('STAR VM'){
     	    agent { label 'master'}
             steps {
+      		   timeout(time: 10, unit: 'SECONDS'){
               sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Start_A_VM.sh windows-x64-C++'
+		   }
             }
         }	
 
@@ -29,6 +31,21 @@ pipeline {
             steps {
               sh "make test"
             }
+	  post {
+	     always {
+		junit 'build\\test-reports\\*.xml'
+	     }
+	     failure{
+      		   timeout(time: 10, unit: 'SECONDS'){
+              sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Close_A_VM.sh windows-x64-C++'
+		   }
+	     }
+	     aborted{
+      		   timeout(time: 10, unit: 'SECONDS'){
+              sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Close_A_VM.sh windows-x64-C++'
+		   }
+	     }
+	  }
         }
 
         stage('DOCUMENTATION'){
@@ -39,7 +56,7 @@ pipeline {
         }
 
         stage('BUILD WINDOWS 10 AND TEST'){
-          agent { label 'windows-x64-2'}
+          agent { label 'windows10-x64-2'}
           steps {
 		bat "Scripts\\change_makefile_name.bat"
       		//compile
