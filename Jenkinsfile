@@ -41,6 +41,7 @@ pipeline {
         stage('BUILD WINDOWS 10 AND TEST'){
           agent { label 'windows-x64-2'}
           steps {
+		bat "Scripts\\change_makefile_name.bat"
       		//compile
 		bat "make test"
 		archiveArtifacts('build\\bin\\datagram-dump.exe')

@@ -34,16 +34,29 @@ class DatagramPrinter : public DatagramProcessor{
 		}
 
                 void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
-			printf("A %lu %.10lf %.10lf %.10lf\n",microEpoch,heading,pitch,roll);
-		};
+#ifdef _WIN32
+					printf("A %I64u %.10lf %.10lf %.10lf\n", microEpoch, heading, pitch, roll);
+					
+#elif __GNUC__
+					printf("A %lu %.10lf %.10lf %.10lf\n", microEpoch, heading, pitch, roll);
+#endif
+				};
 
                 void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
-			printf("P %lu %.12lf %.12lf %.12lf\n",microEpoch,longitude,latitude,height);
-		};
+#ifdef _WIN32
+					printf("P %I64u %.12lf %.12lf %.12lf\n", microEpoch, longitude, latitude, height);
+#elif __GNUC__
+					printf("P %lu %.12lf %.12lf %.12lf\n", microEpoch, longitude, latitude, height);
+#endif				
+				};
 
                 void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
-			printf("X %lu %lu %.10lf %.10lf %.10f %u %u\n",microEpoch,id,beamAngle,tiltAngle,twoWayTravelTime,quality,intensity);
-		};
+#ifdef _WIN32
+					printf("X %I64u %lu %.10lf %.10lf %.10f %u %u\n", microEpoch, id, beamAngle, tiltAngle, twoWayTravelTime, quality, intensity);
+#elif __GNUC__
+					printf("X %lu %lu %.10lf %.10lf %.10f %u %u\n", microEpoch, id, beamAngle, tiltAngle, twoWayTravelTime, quality, intensity);
+#endif				
+				};
 
                 void processSwathStart(){
 
