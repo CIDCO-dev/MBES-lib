@@ -32,12 +32,12 @@ pipeline {
               sh "make test"
             }
 	  post {
-	     failure{
+	     aborted{
       		   timeout(time: 10, unit: 'SECONDS'){
               sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Close_A_VM.sh windows-x64-C++'
 		   }
 	     }
-	     aborted{
+	     failure{
       		   timeout(time: 10, unit: 'SECONDS'){
               sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Close_A_VM.sh windows-x64-C++'
 		   }
@@ -65,12 +65,12 @@ pipeline {
 	     //always {
 		//junit 'build\\test-reports\\*.xml'
 	     //}
-	     failure{
+	     aborted{
       		   timeout(time: 10, unit: 'SECONDS'){
 		     bat "ssh jenkins@192.168.0.105 /var/lib/jenkins/Scripts/Call_Close_A_VM.sh windows-x64-C++"
 		   }
 	     }
-	     aborted{
+	     failure{
       		   timeout(time: 10, unit: 'SECONDS'){
 		     bat "ssh jenkins@192.168.0.105 /var/lib/jenkins/Scripts/Call_Close_A_VM.sh windows-x64-C++"
 		   }
