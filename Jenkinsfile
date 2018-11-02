@@ -57,7 +57,6 @@ pipeline {
           steps {
 		bat "Scripts\\change_makefile_name.bat"
       		//compile
-		bat "make clean"
 		bat "make test"
 		archiveArtifacts('build\\bin\\datagram-dump.exe')
             }
