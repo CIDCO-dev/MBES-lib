@@ -88,16 +88,16 @@ pipeline {
             agent { label 'master'}
             steps {
               sh 'make'
-              sh 'mkdir -p $binMasterPublishDir'
-              sh 'cp -r build/bin/datagram-dump $binMasterPublishDir/$exec_name'
             }
         }
 
         stage('PUBLISH ON SERVER'){
             agent { label 'master'}
             steps {
+              sh 'mkdir -p $binMasterPublishDir'
               sh 'mkdir -p $binWinx64PublishDir'
-              sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/windows-x64/datagram-dump.exe  $binWinx64PublishDir/$exec_name.exe'
+              sh 'cp -r build/bin/datagram-dump $binMasterPublishDir/$exec_name'
+              sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/datagram-dump.exe  $binWinx64PublishDir/$exec_name.exe'
             }
         }
     }
