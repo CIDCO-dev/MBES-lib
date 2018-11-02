@@ -2,7 +2,9 @@
 #define TIMEUTILS_HPP
 
 #include <cstring>
-
+#ifdef _WIN32
+#include <ctime>
+#endif
 /**
  * Returns epoch in microseconds since Jan 1 1970
  */
