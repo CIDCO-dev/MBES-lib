@@ -8,6 +8,7 @@
 
 #include "../datagrams/kongsberg/KongsbergParser.hpp"
 #include "../datagrams/xtf/XtfParser.hpp"
+#include "../datagrams/s7k/S7kParser.hpp"
 #include <iostream>
 #include <string>
 #include "../utils/StringUtils.hpp"
@@ -70,8 +71,8 @@ int main (int argc , char ** argv ){
 		else if(ends_with(fileName.c_str(),".xtf")){
 			parser = new XtfParser(printer);
 		}
-		else if(ends_with(fileName.c_str(),".sk7")){
-			//TODO
+		else if(ends_with(fileName.c_str(),".s7k")){
+                        parser = new S7kParser(printer);
 		}
 		else{
 			throw "Unknown extension";
