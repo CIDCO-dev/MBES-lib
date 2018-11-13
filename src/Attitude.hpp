@@ -19,6 +19,8 @@
 class Attitude {
 public:
 
+    Attitude(){};
+
     Attitude(const double rollDegrees, const double pitchDegrees, const double headingDegrees) :
 	    roll(roll),
 	    pitch(pitch),
