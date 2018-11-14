@@ -17,7 +17,6 @@
 #include <iomanip>
 
 #pragma pack(1)
-
 typedef struct {
     uint16_t Year;
     uint16_t Day;
@@ -37,7 +36,6 @@ std::ostream& operator<<(std::ostream& os, const S7kTime& time) {
 }
 
 #pragma pack(1)
-
 typedef struct { // pp 13-14
     uint16_t ProtocolVersion;
     uint16_t Offset;
@@ -84,7 +82,6 @@ std::ostream& operator<<(std::ostream& os, const S7kDataRecordFrame& drf) {
 }
 
 #pragma pack(1)
-
 typedef struct { // pp 102-103
     uint64_t FileIdentifier[2];
     uint16_t VersionNumber;
@@ -115,7 +112,6 @@ std::ostream& operator<<(std::ostream& os, const S7kFileHeader& fh) {
 }
 
 #pragma pack(1)
-
 typedef struct { // p. 103
     uint32_t DeviceIdentifier;
     uint16_t SystemEnumerator;
@@ -129,7 +125,6 @@ std::ostream& operator<<(std::ostream& os, const S7kFileHeaderRecordDatum& fhrd)
 }
 
 #pragma pack(1)
-
 typedef struct { // p. 103
     uint32_t Size;
     uint64_t Offset;
@@ -142,7 +137,6 @@ std::ostream& operator<<(std::ostream& os, const S7kFileHeaderOptionalData& fhod
 }
 
 #pragma pack(1)
-
 typedef struct { // pp 25-26
     uint32_t DatumIdentifier;
     float Latency;
@@ -169,6 +163,64 @@ std::ostream& operator<<(std::ostream& os, const S7kPosition& pos) {
             << "PositioningMethod: " << pos.PositioningMethod << std::endl
             << "Latency: " << pos.Latency << std::endl;
 }
+
+#pragma pack(1)
+typedef struct { // p. 30
+    uint8_t DepthDescriptor;
+    uint8_t CorrectionFlag;
+    uint16_t Reserved;
+    float Depth; // in meters positive towards greater depth
+} S7kDepth;
+#pragma pack()
+
+std::ostream& operator<<(std::ostream& os, const S7kDepth& depth) {
+    return os << "DepthDescriptor: " << depth.DepthDescriptor << std::endl
+            << "CorrectionFlag: " << depth.CorrectionFlag << std::endl
+            << "Reserved: " << depth.Reserved << std::endl
+            << "Depth: " << depth.Depth << std::endl;
+}
+
+#pragma pack(1)
+typedef struct { // pp 35-36
+    uint8_t VerticalReference;
+    double Latitude; // radians -west
+    double Longitude; // radians
+    float HorizontalPositionAccuracy; // meters
+    float VesselHeight; // vessel reference point above vertical reference in meters
+    float HeightAccuracy; // meters
+    float SpeedOverGround; // m/s
+    float CourseOverGround; // radians
+    float Heading; // radians
+} S7kNavigation;
+#pragma pack()
+
+std::ostream& operator<<(std::ostream& os, const S7kNavigation& nav) {
+    return os << "VerticalReference: " << nav.VerticalReference << std::endl
+            << "Latitude: " << nav.Latitude << std::endl
+            << "Longitude: " << nav.Longitude << std::endl
+            << "HorizontalPositionAccuracy: " << nav.HorizontalPositionAccuracy << std::endl
+            << "VesselHeight: " << nav.VesselHeight << std::endl
+            << "HeightAccuracy: " << nav.HeightAccuracy << std::endl
+            << "SpeedOverGround: " << nav.SpeedOverGround << std::endl
+            << "CourseOverGround: " << nav.CourseOverGround << std::endl
+            << "Heading: " << nav.Heading << std::endl;
+}
+
+#pragma pack(1)
+typedef struct { // pp 35-36
+    uint8_t NumberOfAttitudeDataSets;
+} S7kAttitudeRTH;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct { // pp 35-36
+    uint16_t TimeDifferenceFromRecordTimeStamp; // in milliseconds
+    float roll;
+    float pitch;
+    float heave;
+    float heading;
+} S7kAttitudeRD;
+#pragma pack()
 
 
 
