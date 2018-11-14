@@ -1,24 +1,18 @@
 /*
- *  Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+ * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
-#ifndef MAIN_CPP
-#define MAIN_CPP
 
-#include <getopt.h>
-
-#include "../datagrams/kongsberg/KongsbergParser.hpp"
-#include "../datagrams/xtf/XtfParser.hpp"
-#include "../datagrams/s7k/S7kParser.hpp"
 #include <iostream>
 #include <string>
+#include "../datagrams/s7k/S7kParser.hpp"
 #include "../utils/StringUtils.hpp"
 
 void printUsage(){
 	std::cerr << "\n\
   NAME\n\n\
-     datagram-dump - lit un fichier multibeam et le transforme en format texte (ASCII)\n\n\
+     record-histogram - lit un fichier .s7k et compte le nombre datagrams pour chaque type de datagram inclus \n\n\
   SYNOPSIS\n \
-	   datagram-dump fichier\n\n\
+	   record-histogram fichier\n\n\
   DESCRIPTION\n\n \
   Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
@@ -51,9 +45,8 @@ class DatagramPrinter : public DatagramProcessor{
 		};
 };
 
-
 int main (int argc , char ** argv ){
-	DatagramParser * parser = NULL;
+	S7kParser * parser = NULL;
 	DatagramPrinter  printer;
 
 	if(argc != 2){
@@ -65,20 +58,14 @@ int main (int argc , char ** argv ){
 	try{
 		std::cerr << "Decoding " << fileName << std::endl;
 
-		if(ends_with(fileName.c_str(),".all")){
-			parser = new KongsbergParser(printer);
-		}
-		else if(ends_with(fileName.c_str(),".xtf")){
-			parser = new XtfParser(printer);
-		}
-		else if(ends_with(fileName.c_str(),".s7k")){
+		if(ends_with(fileName.c_str(),".s7k")){
                         parser = new S7kParser(printer);
 		}
 		else{
 			throw "Unknown extension";
 		}
 
-		parser->parse(fileName);
+		parser->packetHistogram(fileName);
 	}
 	catch(const char * error){
 		std::cerr << "Error whille parsing " << fileName << ": " << error << std::endl;
@@ -87,6 +74,3 @@ int main (int argc , char ** argv ){
 
 	if(parser) delete parser;
 }
-
-
-#endif
