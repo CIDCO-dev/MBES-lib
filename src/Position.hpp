@@ -18,29 +18,47 @@
 
 class Position {
 public:
-    // WGS84 position
-    const double latitude;
-    const double longitude;
-    const double ellipsoidalHeight;
-
-    /*Trigonometry is stored to prevent redundant recalculations*/
-    const double slat;
-    const double clat;
-    const double slon;
-    const double clon;
 
     Position(double latitude, double longitude, double ellipsoidalHeight) :
-    latitude(latitude),
-    longitude(longitude),
-    ellipsoidalHeight(ellipsoidalHeight),
-    slat(sin(latitude * D2R)),
-    clat(cos(latitude * D2R)),
-    slon(sin(longitude * D2R)),
-    clon(cos(longitude * D2R)) {
-    };
+    	latitude(latitude),
+    	longitude(longitude),
+    	ellipsoidalHeight(ellipsoidalHeight),
+    	slat(sin(latitude * D2R)),
+    	clat(cos(latitude * D2R)),
+    	slon(sin(longitude * D2R)),
+    	clon(cos(longitude * D2R)) 
+     {};
 
     ~Position() {
     };
+
+    uint64_t getMicroEpoch()		{ return microEpoch; }
+    void     setMicroEpoch(uint64_t e)	{ microEpoch = e;}
+
+    double   getLatitude()		{ return latitude; }
+    void     setLatitude(double l)	{ latitude = l; slat=sin(latitude * D2R); clat=cos(latitude * D2R)}
+
+    double   getLongitude()		{ return longitude; }
+    void     setLongitude(double l)     { longitude = l; slon=sin(longitude * D2R);clon(cos(longitude * D2R)}
+
+    double   getEllipsoidalHeight()     	{ return ellipsoidalHeight; }
+    void     setEllipsoidalHeight(double h) 	{ ellipsoidalHeight = h;}
+
+private:
+    uint64_t microEpoch;
+
+    // WGS84 position
+    double latitude;
+    double longitude;
+    double ellipsoidalHeight;
+
+    /*Trigonometry is stored to prevent redundant recalculations*/
+    double slat;
+    double clat;
+    double slon;
+    double clon;
+
+
 
     friend std::ostream& operator<<(std::ostream& os, const Position& obj) {
         return os << "Latitude: " << obj.latitude << std::endl << "Longitude: " << obj.longitude << std::endl << "Ellipsoidal Height: " << obj.ellipsoidalHeight << std::endl;
