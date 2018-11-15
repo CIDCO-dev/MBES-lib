@@ -156,11 +156,10 @@ void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char 
 }
 
 uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
-    //TODO: extract number of MICROSECONDS since january 1st 1970
-    
     long microSeconds = drf.Timestamp.Seconds*1e6;
 
-    uint64_t res = build_time(drf.Timestamp.Year, drf.Timestamp.Day, drf.Timestamp.Hours, drf.Timestamp.Minutes, microSeconds);
+    //yday is 1-366 in s7k's, shift by 1 to 0-365
+    uint64_t res = build_time(drf.Timestamp.Year, drf.Timestamp.Day - 1, drf.Timestamp.Hours, drf.Timestamp.Minutes, microSeconds);
 
     return res;
 }
