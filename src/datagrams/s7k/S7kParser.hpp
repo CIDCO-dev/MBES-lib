@@ -159,7 +159,7 @@ uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
     long microSeconds = drf.Timestamp.Seconds*1e6;
 
     //yday is 1-366 in s7k's, shift by 1 to 0-365
-    uint64_t res = build_time(drf.Timestamp.Year, drf.Timestamp.Day - 1, drf.Timestamp.Hours, drf.Timestamp.Minutes, microSeconds);
+    uint64_t res = build_time(drf.Timestamp.Year, drf.Timestamp.Day, drf.Timestamp.Hours, drf.Timestamp.Minutes, microSeconds);
 
     return res;
 }
