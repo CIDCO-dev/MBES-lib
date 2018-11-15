@@ -49,6 +49,9 @@ uint64_t build_time(int year,int month,int day,long timeInMilliseconds){
  * Returns epoch in microseconds since Jan 1 1970
  *
  * Time includes hours and minutes since midnight
+ * yday : 0-365
+ * hour: 0-23
+ * minute: 0-59
  */
 uint64_t build_time(int year,int yday, int hour, int minutes, long timeInMicroSeconds){
     struct tm t;
@@ -57,7 +60,7 @@ uint64_t build_time(int year,int yday, int hour, int minutes, long timeInMicroSe
     t.tm_sec=0;
     t.tm_min=minutes;
     t.tm_hour=hour;
-    t.tm_yday=yday;
+    t.tm_mday=yday; //hack around the C-standard: use "January 244th" since yday is an output parameter
     t.tm_year=year - 1900;
 
     uint64_t res = mktime(&t)*1000000 + timeInMicroSeconds;
