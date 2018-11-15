@@ -138,6 +138,9 @@ void XtfParser::parse(std::string & filename){
 
 		fclose(file);
 	}
+	else{
+		throw "File not found";
+	}
 }
 
 int XtfParser::getTotalNumberOfChannels(){
