@@ -32,5 +32,13 @@ doc:
 
 clean:
 	rm -rf build
+	
+histogram:
+	mkdir -p $(exec_dir)
+	$(CC) $(OPTIONS) -o $(exec_dir)/record-histogram src/examples/record-histogram.cpp
+	
+t7:
+	mkdir -p $(exec_dir)
+	$(CC) $(OPTIONS) -o $(exec_dir)/t7 src/examples/testS7k.cpp
 
 .PHONY: all test clean doc

@@ -1,2 +1,4 @@
-build
 build/
+
+nbproject/*
+!nbproject/project.xml
