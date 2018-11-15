@@ -17,7 +17,7 @@ uint64_t build_time(int year,int month,int day,int hour,int minutes,int seconds,
 	t.tm_hour=hour;
 	t.tm_mday=day;
 	t.tm_mon=month;
-	t.tm_year=year;
+	t.tm_year=year - 1900;
 
 	uint64_t res = mktime(&t)*1000000 + millis * 1000 + microseconds;
 
@@ -38,7 +38,7 @@ uint64_t build_time(int year,int month,int day,long timeInMilliseconds){
     t.tm_hour=0;
     t.tm_mday=day;
     t.tm_mon=month;
-    t.tm_year=year;
+    t.tm_year=year - 1900;
 
     uint64_t res = mktime(&t)*1000000 + timeInMilliseconds * 1000;
 
@@ -58,7 +58,7 @@ uint64_t build_time(int year,int yday, int hour, int minutes, long timeInMicroSe
     t.tm_min=minutes;
     t.tm_hour=hour;
     t.tm_yday=yday;
-    t.tm_year=year;
+    t.tm_year=year - 1900;
 
     uint64_t res = mktime(&t)*1000000 + timeInMicroSeconds;
 
