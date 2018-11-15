@@ -34,6 +34,6 @@ clean:
 	rm -rf build
 
 s7k-datagrams: default
-	./build/bin/datagram-dump test/data/s7k/20141016_150519_FJ-Saucier.s7k | grep "Type"|cut -d " " -f 2|sort|uniq
+	./build/bin/datagram-dump test/data/s7k/20141016_150519_FJ-Saucier.s7k | grep "Type"|cut -d " " -f 2|sort|uniq -c
 
 .PHONY: all test clean doc
