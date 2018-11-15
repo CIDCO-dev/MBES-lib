@@ -1,4 +1,4 @@
 build/
 
+nbproject
 nbproject/*
-!nbproject/project.xml

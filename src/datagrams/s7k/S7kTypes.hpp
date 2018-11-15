@@ -4,7 +4,7 @@
 
 /* 
  * File:   S7kTypes.hpp
- * Author: jordan
+ * Author: glm,jordan
  *
  * Created on November 1, 2018, 11:59 AM
  */
@@ -15,6 +15,8 @@
 #include <stdint.h>
 #include <iostream>
 #include <iomanip>
+
+#define SYNC_PATTERN 0x0000FFFF
 
 #pragma pack(1)
 typedef struct {

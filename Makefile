@@ -32,13 +32,8 @@ doc:
 
 clean:
 	rm -rf build
-	
-histogram:
-	mkdir -p $(exec_dir)
-	$(CC) $(OPTIONS) -o $(exec_dir)/record-histogram src/examples/record-histogram.cpp
-	
-t7:
-	mkdir -p $(exec_dir)
-	$(CC) $(OPTIONS) -o $(exec_dir)/t7 src/examples/testS7k.cpp
+
+s7k-datagrams: default
+	./build/bin/datagram-dump test/data/s7k/20141016_150519_FJ-Saucier.s7k | grep "Type"|cut -d " " -f 2|sort|uniq
 
 .PHONY: all test clean doc

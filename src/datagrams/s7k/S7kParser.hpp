@@ -2,19 +2,18 @@
  * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
-/* 
+/*
  * File:   S7kParser.hpp
- * Author: jordan
+ * Author: glm,jordan
  *
  * Created on November 1, 2018, 4:30 PM
  */
 
 
-
 #ifndef S7KPARSER_HPP
 #define S7KPARSER_HPP
 
-#include <fstream>
+#include <cstdio>
 #include "../DatagramParser.hpp"
 #include "S7kTypes.hpp"
 
@@ -24,15 +23,15 @@ public:
     ~S7kParser();
 
     void parse(std::string & filename);
-    void packetHistogram(std::string & filename);
-    void test(std::string & filename);
+
+protected:
+    void processDataRecordFrame(S7kDataRecordFrame & drf);
+    void processAttitudeDatagram(S7kDataRecordFrame & drf,unsigned char * data);
+    void processPositionDatagram(S7kDataRecordFrame & drf,unsigned char * data);
 
 private:
-
-    void readS7kFileHeader(std::ifstream & input, uint32_t OptionalDataIdentifier);
-    bool hasValidChecksum(std::ifstream & input, S7kDataRecordFrame & drf, uint8_t* bytes, uint32_t numBytes);
-
-
+    uint32_t computeChecksum(S7kDataRecordFrame * drf,unsigned char * data);
+    uint64_t extractMicroEpoch(S7kDataRecordFrame & drf);
 };
 
 S7kParser::S7kParser(DatagramProcessor & processor) : DatagramParser(processor) {
@@ -43,174 +42,126 @@ S7kParser::~S7kParser() {
 
 }
 
+/*
+	The wise programmer is told about Tao and follows it.
+        The average programmer is told about Tao and searches for it.
+        The foolish programmer is told about Tao and laughs at it.
+        If it were not for laughter, there would be no Tao.
+*/
+
 void S7kParser::parse(std::string & filename) {
-    
-    
-    std::ifstream input;
-    input.open(filename, std::ios::binary);
+    FILE * file = fopen(filename.c_str(),"rb");
 
-    if (!input) {
-        std::cerr << "Couldn't read " << filename << std::endl;
-    } else {
+    if(file){
+	S7kDataRecordFrame drf;
 
-        S7kDataRecordFrame drf;
+        while(!feof(file)) {
 
-        while (input.peek() != EOF) {
-            std::ifstream::streampos drfStart = input.tellg();
-            input.read((char*) &drf, sizeof (drf));
-            std::ifstream::streampos drfEnd = input.tellg();
+	    //Read the DRF
+            int nbItemsRead = fread(&drf, sizeof (S7kDataRecordFrame),1,file);
 
-            uint32_t numBytes = drf.Size - 4;
-            uint8_t entireDataRecordFrameExceptChecksum[numBytes];
-            input.seekg(drfStart);
-            input.read((char*) &entireDataRecordFrameExceptChecksum, numBytes);
-            
-            
+	    //Check that we read the required amount of data
+            if(nbItemsRead == 1){
 
-            if (hasValidChecksum(input, drf, entireDataRecordFrameExceptChecksum, numBytes)) {
-                std::cout << "Valid checksum" << std::endl;
-                std::ifstream::streampos nextDRF = input.tellg();
-                
-                if (drf.RecordTypeIdentifier == 7200) {
-                    input.seekg(drfEnd);
-                    readS7kFileHeader(input, drf.OptionalDataIdentifier);
-                    
-                } else {
-                    // this packet type isn't implemented
+	        //Sanity check on the DRF
+	        if(drf.SyncPattern == SYNC_PATTERN){
+			processDataRecordFrame(drf);
 
+			int dataSectionSize = drf.Size - sizeof(S7kDataRecordFrame); // includes checksum
+			unsigned char * data = (unsigned char*) malloc(dataSectionSize);
+
+			//Now read in the data section and the checksum
+			nbItemsRead = fread(data,dataSectionSize,1,file);
+
+			//We can haz data
+			if(nbItemsRead == 1){
+
+				//Verify it
+				uint32_t checksum =*((uint32_t*) &data[dataSectionSize-sizeof(uint32_t)]  );
+				uint32_t computedChecksum = computeChecksum(&drf,data);
+
+				if(checksum == computedChecksum){
+
+					//Process data according to record type
+					if(drf.RecordTypeIdentifier == 1016){
+						//Attitude
+						processAttitudeDatagram(drf,data);
+					}
+					else if(drf.RecordTypeIdentifier == 1003){
+						//Position
+						processPositionDatagram(drf,data);
+					}
+					//TODO: process pings and other stuff
+				}
+				else{
+					printf("Checksum error\n");
+					//Checksum error...lets ignore the packet for now
+					//throw "Checksum error";
+					continue;
+				}
+			}
+
+			free(data);
                 }
-                
-                input.seekg(nextDRF);
-            } else {
-                continue;
-            }
+		else{
+		   throw "Couldn't find sync pattern";
+		}
+	    }
+            //Negative items mean something went wrong
+	    else if(nbItemsRead < 0){
+                throw "Read error";
+	    }
+
+            //zero bytes means EOF. Nothing to do
         }
     }
-
-    input.close();
-    
-    
+    else{
+	throw "File not found";
+    }
 }
 
-void S7kParser::readS7kFileHeader(std::ifstream & input, uint32_t OptionalDataIdentifier) {
-    /* RecordTypeIdentifier == 7200 */
-    S7kFileHeader fileHeader;
-    input.read((char*) &fileHeader, sizeof (fileHeader));
+void S7kParser::processDataRecordFrame(S7kDataRecordFrame & drf){
+    //TODO: remove later, leave derived classes decide what to do
+    printf("--------------------\n");
+    printf("%d-%03d %02d:%02d:%f\n",drf.Timestamp.Year,drf.Timestamp.Day,drf.Timestamp.Hours,drf.Timestamp.Minutes,drf.Timestamp.Seconds);
+    printf("Type: %d\n",drf.RecordTypeIdentifier);
+    printf("Bytes: %d\n",drf.Size);
+    printf("--------------------\n");
+}
 
-    uint32_t N = fileHeader.NumberOfDevices;
-    S7kFileHeaderRecordDatum data[N];
-    input.read((char*) &data, N * sizeof (data));
-    for (uint32_t i = 0; i < N; i++) {
-        std::cout << data[i] << std::endl;
-    }
+uint32_t S7kParser::computeChecksum(S7kDataRecordFrame * drf,unsigned char * data){
+        uint32_t checksum = 0;
 
-    if (OptionalDataIdentifier == 7300) {
-        S7kFileHeaderOptionalData catalogInformation;
-        input.read((char*) &catalogInformation, sizeof (catalogInformation));
-    }
-};
+	unsigned int dataSize = drf->Size - sizeof(S7kDataRecordFrame) - sizeof(uint32_t); //exclude checksum
 
-bool S7kParser::hasValidChecksum(std::ifstream & input, S7kDataRecordFrame & drf, uint8_t* bytes, uint32_t numBytes) {
-    if (drf.Flags == 1 || drf.Flags == 32769) {
-        uint32_t checksum;
-        input.read((char*) &checksum, sizeof (checksum));
+        for(unsigned int i = 0; i< sizeof(S7kDataRecordFrame);i++){
+	    checksum += (unsigned char) ((unsigned char*)drf)[i];
+	}
 
-        uint32_t calculatedChecksum = 0;
-
-        for (uint32_t i = 0; i < numBytes; i++) {
-            calculatedChecksum += (unsigned char) bytes[i];
+        for (unsigned int i = 0; i < dataSize; i++) {
+            checksum += (unsigned char) data[i];
         }
 
-        if (calculatedChecksum == checksum) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+	return checksum;
+}
 
-    return true;
-};
+void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf,unsigned char * data){
+   uint64_t timestamp = extractMicroEpoch(drf);
 
-void S7kParser::packetHistogram(std::string & filename) {
-    int numberOfRecordTypes = 88000; // see page 20-21 of s7k data format
-    
-    int usedRecordIdentifiers[numberOfRecordTypes];
-    for(int i=0; i<numberOfRecordTypes; i++) {
-        usedRecordIdentifiers[i]=0;
-    }
-    
-    std::ifstream input;
-    input.open(filename, std::ios::binary);
+  //TODO: normalize data to fit the format of DataProcessor, then call DataProcessor's processAttitude()
+}
 
-    if (!input) {
-        std::cerr << "Couldn't read " << filename << std::endl;
-    } else {
+void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf,unsigned char * data){
+   uint64_t timestamp = extractMicroEpoch(drf);
 
-        S7kDataRecordFrame dataRecordFrame;
+   //TODO: normalize data to fit the format of DataProcessor, then call DataProcessor's processPosition()
+}
 
-        while (input.peek() != EOF) {
-            // Read dataRecordFrame and save initial and final stream positions
-            std::ifstream::streampos dataRecordFrameStart = input.tellg();
-            input.read((char*) &dataRecordFrame, sizeof (dataRecordFrame));
-            
-            uint32_t numBytes = dataRecordFrame.Size;
-            uint8_t entireDataRecordFrame[numBytes];
-            input.seekg(dataRecordFrameStart);
-            input.read((char*) &entireDataRecordFrame, numBytes);
-            
-            usedRecordIdentifiers[dataRecordFrame.RecordTypeIdentifier]++;
-        }
-    }
+uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf){
+   //TODO: extract number of MICROSECONDS since january 1st 1970
+   return 42;
+}
 
-    input.close();
-    
-    
-    for(int i=0; i<numberOfRecordTypes; i++) {
-        if(usedRecordIdentifiers[i]!=0) {
-            std::cout << i << ": " << usedRecordIdentifiers[i] << std::endl;
-        }
-    }
-};
-
-void S7kParser::test(std::string & filename) {
-    std::ifstream input;
-    input.open(filename, std::ios::binary);
-
-    if (!input) {
-        std::cerr << "Couldn't read " << filename << std::endl;
-    } else {
-
-        S7kDataRecordFrame dataRecordFrame;
-
-        while (input.peek() != EOF) {
-            // Read dataRecordFrame and save initial and final stream positions
-            std::ifstream::streampos dataRecordFrameStart = input.tellg();
-            input.read((char*) &dataRecordFrame, sizeof (dataRecordFrame));
-            std::ifstream::streampos dataRecordFrameEnd = input.tellg();
-            
-            uint32_t numBytes = dataRecordFrame.Size;
-            uint8_t entireDataRecordFrame[numBytes];
-            input.seekg(dataRecordFrameStart);
-            input.read((char*) &entireDataRecordFrame, numBytes);
-            std::ifstream::streampos nextDataRecordFrame = input.tellg();
-            
-            if(dataRecordFrame.RecordTypeIdentifier == 1016) {
-                
-                std::cout << dataRecordFrame << std::endl;
-                input.seekg(dataRecordFrameEnd);
-                
-                S7kAttitudeRTH attitudeHeader;
-                input.read((char*) &attitudeHeader, sizeof (attitudeHeader));
-                
-                std::cout << "attitudeHeader.NumberOfAttitudeDataSets: " << attitudeHeader.NumberOfAttitudeDataSets << std::endl;
-                
-                input.seekg(nextDataRecordFrame);
-            }
-        }
-    }
-
-    input.close();
-};
 
 #endif /* S7KPARSER_HPP */
 
