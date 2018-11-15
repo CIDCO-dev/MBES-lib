@@ -56,6 +56,8 @@ int main (int argc , char ** argv ){
 	DatagramParser * parser = NULL;
 	DatagramPrinter  printer;
 
+	setenv("TZ", "UTC", 1);
+
 	if(argc != 2){
 		printUsage();
 	}
