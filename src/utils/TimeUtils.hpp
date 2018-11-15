@@ -45,4 +45,24 @@ uint64_t build_time(int year,int month,int day,long timeInMilliseconds){
     return res;
 }
 
+/**
+ * Returns epoch in microseconds since Jan 1 1970
+ *
+ * Time includes hours and minutes since midnight
+ */
+uint64_t build_time(int year,int yday, int hour, int minutes, long timeInMicroSeconds){
+    struct tm t;
+    memset(&t,0,sizeof(struct tm));
+
+    t.tm_sec=0;
+    t.tm_min=minutes;
+    t.tm_hour=hour;
+    t.tm_yday=yday;
+    t.tm_year=year;
+
+    uint64_t res = mktime(&t)*1000000 + timeInMicroSeconds;
+
+    return res;
+}
+
 #endif
