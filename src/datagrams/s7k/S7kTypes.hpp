@@ -216,7 +216,7 @@ typedef struct { // pp 35-36
 
 #pragma pack(1)
 typedef struct { // pp 35-36
-    uint16_t TimeDifferenceFromRecordTimeStamp; // in milliseconds
+    uint16_t timeDifferenceFromRecordTimeStamp; // in milliseconds
     float roll;
     float pitch;
     float heave;
@@ -224,6 +224,32 @@ typedef struct { // pp 35-36
 } S7kAttitudeRD;
 #pragma pack()
 
+#pragma pack(1)
+typedef struct { // pp 75-76
+    uint64_t sonarId;
+    uint32_t pingNumber;
+    uint16_t multiPingSequence;
+    uint32_t numberOfDetectionPoints;
+    uint32_t dataFieldSize;
+    uint8_t detectionAlgorithm;
+    uint32_t flags;
+    float samplingRate;
+    float transmissionAngle;
+    uint32_t reserved[16];
+} S7kRawDetectionDataRTH;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct { // pp 76-77
+    uint16_t beamDescriptor;
+    float detectionPoint;
+    float receptionAngle;
+    uint32_t flags;
+    uint32_t quality;
+    float uncertainty;
+    float signalStrength;
+} S7kRawDetectionDataRD;
+#pragma pack()
 
 
 
