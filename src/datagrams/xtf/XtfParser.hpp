@@ -251,7 +251,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 			microEpoch = attitude->SourceEpoch * 1000000 + attitude->EpochMicroseconds;
 		}
 		else{
-			microEpoch = build_time(attitude->Year,attitude->Month,attitude->Day,attitude->Hour,attitude->Minutes,attitude->Seconds,attitude->Milliseconds,0);
+			microEpoch = build_time(attitude->Year,attitude->Month-1,attitude->Day,attitude->Hour,attitude->Minutes,attitude->Seconds,attitude->Milliseconds,0);
 		}
 
         	processor.processAttitude(microEpoch,attitude->Heading,attitude->Pitch,attitude->Roll);
@@ -265,7 +265,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 
 		XtfQpsMbEntry * ping = (XtfQpsMbEntry*) ((uint8_t*)packet + sizeof(XtfPingHeader));
 
-	        uint64_t microEpoch = build_time(pingHdr->Year,pingHdr->Month,pingHdr->Day,pingHdr->Hour,pingHdr->Minute,pingHdr->Second,pingHdr->HSeconds * 10,0);
+	        uint64_t microEpoch = build_time(pingHdr->Year,pingHdr->Month-1,pingHdr->Day,pingHdr->Hour,pingHdr->Minute,pingHdr->Second,pingHdr->HSeconds * 10,0);
 
 		for(unsigned int i = 0;i < hdr.NumChansToFollow;i++){
             		processor.processPing(microEpoch,ping[i].Id,ping[i].BeamAngle,ping[i].TiltAngle,ping[i].TwoWayTravelTime,ping[i].Quality,ping[i].Intensity);
@@ -273,7 +273,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 	}
 	else if(hdr.HeaderType==XTF_HEADER_POSITION){
 		XtfPosRawNavigation* position = (XtfPosRawNavigation*)packet;
-        	uint64_t microEpoch = build_time(position->Year,position->Month,position->Day,position->Hour,position->Minutes,position->Seconds,position->MicroSeconds/1000,position->MicroSeconds%1000);
+        	uint64_t microEpoch = build_time(position->Year,position->Month-1,position->Day,position->Hour,position->Minutes,position->Seconds,position->MicroSeconds/1000,position->MicroSeconds%1000);
         	processor.processPosition(microEpoch,position->RawXcoordinate,position->RawYcoordinate,position->RawAltitude);
 	}
 	else{
