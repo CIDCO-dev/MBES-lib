@@ -27,27 +27,27 @@ public:
     	clat(cos(latitude * D2R)),
     	slon(sin(longitude * D2R)),
     	clon(cos(longitude * D2R)) 
-     {};
+     {}
 
     ~Position() {
-    };
+    }
 
-    uint64_t getMicroEpoch()		{ return microEpoch; };
-    void     setMicroEpoch(uint64_t e)	{ microEpoch = e;};
+    uint64_t getMicroEpoch()		{ return microEpoch; }
+    void     setMicroEpoch(uint64_t e)	{ microEpoch = e;}
 
-    double   getLatitude()		{ return latitude; };
-    void     setLatitude(double l)	{ latitude = l; slat=sin(latitude * D2R); clat=cos(latitude * D2R)};
+    double   getLatitude()		{ return latitude; }
+    void     setLatitude(double l)	{ latitude = l; slat=sin(latitude * D2R); clat=cos(latitude * D2R);}
 
-    double   getLongitude()		{ return longitude; };
-    void     setLongitude(double l)     { longitude = l; slon=sin(longitude * D2R);clon(cos(longitude * D2R)};
+    double   getLongitude()		{ return longitude; }
+    void     setLongitude(double l)     { longitude = l; slon=sin(longitude * D2R);clon=cos(longitude * D2R);}
 
-    double   getEllipsoidalHeight()     	{ return ellipsoidalHeight; };
-    void     setEllipsoidalHeight(double h) 	{ ellipsoidalHeight = h;};
+    double   getEllipsoidalHeight()     	{ return ellipsoidalHeight; }
+    void     setEllipsoidalHeight(double h) 	{ ellipsoidalHeight = h;}
     
-    double   getSlat()		{ return slat; };
-    double   getSlon()		{ return slon; };
-    double   getClat()		{ return clat; };
-    double   getClon()		{ return clon; };
+    double   getSlat()		{ return slat; }
+    double   getSlon()		{ return slon; }
+    double   getClat()		{ return clat; }
+    double   getClon()		{ return clon; }
 
 private:
     uint64_t microEpoch;
@@ -65,7 +65,7 @@ private:
 
     friend std::ostream& operator<<(std::ostream& os, const Position& obj) {
         return os << "Latitude: " << obj.latitude << std::endl << "Longitude: " << obj.longitude << std::endl << "Ellipsoidal Height: " << obj.ellipsoidalHeight << std::endl;
-    };
+    }
 };
 
 #endif /* POSITION_HPP */

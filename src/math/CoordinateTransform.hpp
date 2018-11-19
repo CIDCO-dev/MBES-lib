@@ -13,6 +13,7 @@
 #define COORDINATETRANSFORM_HPP
 
 #include "../Position.hpp"
+#include "../utils/Constants.hpp"
 #include <Eigen/Dense>
 
 class CoordinateTransform {
@@ -25,22 +26,20 @@ public:
     static constexpr double b = a * (1-f); // semi-minor axis
     static constexpr double epsilon = e2 / (1.0 - e2); // second eccentricity squared
 
-    static void getPositionInNavigationFrame(Eigen::Vector3d & positionInNavigationFrame, const Position & positionGeographic, Eigen::Matrix3d & navDCM, Eigen::Vector3d & originECEF) {
+    static void getPositionInNavigationFrame(Eigen::Vector3d & positionInNavigationFrame, Position & positionGeographic, Eigen::Matrix3d & navDCM, Eigen::Vector3d & originECEF) {
         Eigen::Vector3d positionECEF;
-        getPositionInTerrestialReferenceFrame(positionECEF, positionGeographic);
+        getPositionECEF(positionECEF, positionGeographic);
 
         Eigen::Vector3d positionVector = navDCM * (positionECEF - originECEF);
 
         positionInNavigationFrame << positionVector(0), positionVector(1), positionVector(2);
     };
 
-    static void getPositionECEF(Eigen::Vector3d & positionECEF, const Position & position) {
+    static void getPositionECEF(Eigen::Vector3d & positionECEF, Position & position) {
         double N = a / (sqrt(1 - e2 * position.getSlat() * position.getSlat()));
-        double xTRF = (N + position.ellipsoidalHeight) * position.getClat() * position.getClon();
-        double yTRF = (N + position.ellipsoidalHeight) * position.getClat() * position.getSlon();
-        double zTRF = (N * (1 - e2) + position.ellipsoidalHeight) * position.getSlat();
-
-
+        double xTRF = (N + position.getEllipsoidalHeight()) * position.getClat() * position.getClon();
+        double yTRF = (N + position.getEllipsoidalHeight()) * position.getClat() * position.getSlon();
+        double zTRF = (N * (1 - e2) + position.getEllipsoidalHeight()) * position.getSlat();
 
         positionECEF << xTRF, yTRF, zTRF;
     };
@@ -51,10 +50,10 @@ public:
         double z = positionInNavigationFrame(2);
 
         // Bowring (1985) algorithm
-        p2 = x * x + y*y;
-        r2 = p2 + z*z;
-        p = std::sqrt(p2);
-        r = std::sqrt(r2);
+        double p2 = x * x + y*y;
+        double r2 = p2 + z*z;
+        double p = std::sqrt(p2);
+        double r = std::sqrt(r2);
 
         double tanu = (1 - f) * (z / p) * (1 + epsilon * b / r);
         double tan2u = tanu * tanu;
@@ -80,8 +79,8 @@ public:
         double latitude = std::atan(tanlat);
         double height = p * coslat + z * sinlat - a * sqrt(1.0 - e2 * sin2lat);
         
-        positionGeographic.setLatitude(latitude);
-        positionGeographic.setLongitude(longitude);
+        positionGeographic.setLatitude(latitude*R2D);
+        positionGeographic.setLongitude(longitude*R2D);
         positionGeographic.setEllipsoidalHeight(height);
     }
 

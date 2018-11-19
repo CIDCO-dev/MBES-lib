@@ -25,12 +25,12 @@ public:
 
     static void georeference(Eigen::Vector3d & outputVector,Ping & ping, Eigen::Vector3d & leverArm, Eigen::Vector3d & rayInNavigationFrame, Eigen::Vector3d & origin, Eigen::Matrix3d & navDCM) {
         Eigen::Matrix3d imuToNavigationFrameAtTransmission;
-        DCM::getDcm(imuToNavigationFrameAtTransmission,*(ping.transmissionAttitude));
+        DCM::getDcm(imuToNavigationFrameAtTransmission,*ping.getTransmissionAttitude());
 
         Eigen::Vector3d rayInNavFrame = rayInNavigationFrame + imuToNavigationFrameAtTransmission * leverArm;
 
         Eigen::Vector3d positionReferencePoint;
-	CoordinateTransform::getPositionInNavigationFrame(positionReferencePoint,*(ping.transmissionPosition), navDCM, origin);
+        CoordinateTransform::getPositionInNavigationFrame(positionReferencePoint,*ping.getTransmissionPosition(), navDCM, origin);
 
         Eigen::Vector3d rayFromAntenna = positionReferencePoint + rayInNavFrame;
 
@@ -39,10 +39,10 @@ public:
 
     static void calculateLaunchVector(Eigen::Vector3d & outputVector,Ping & ping, Eigen::Matrix3d & boresight) {
         Eigen::Vector3d launchVectorInSonarFrame;
-        launchVectorInSonarFrame << ping.sA, ping.cA * ping.sB, ping.cA * ping.cB;
+        launchVectorInSonarFrame << ping.getSA(), ping.getCA()*ping.getSB(), ping.getCA()*ping.getCB();
 
         Eigen::Matrix3d imuToNavigationFrame;
-        DCM::getDcmRollAtReceptionPitchHeadingAtEmission(imuToNavigationFrame,*(ping.receptionAttitude), *(ping.transmissionAttitude));
+        DCM::getDcmRollAtReceptionPitchHeadingAtEmission(imuToNavigationFrame,*ping.getReceptionAttitude(), *ping.getTransmissionAttitude());
         Eigen::Vector3d launchVectorInNavigationFrame = imuToNavigationFrame * (boresight * launchVectorInSonarFrame);
 
         outputVector << launchVectorInNavigationFrame(0), launchVectorInNavigationFrame(1), launchVectorInNavigationFrame(2);

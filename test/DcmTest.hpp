@@ -13,7 +13,6 @@
 #include <Eigen/Dense>
 #include "../src/Attitude.hpp"
 #include <cmath>
-#include <random>
 
 TEST_CASE("Direction Cosine Matrix Test") {
 
@@ -78,4 +77,4 @@ TEST_CASE("Direction Cosine Matrix Test") {
     Eigen::Matrix3d dcmDifferences = dcmFromAttitudeRandomTest - dcmFromEulerAngles;
     dcmDifferences = dcmDifferences.cwiseAbs();
     REQUIRE(dcmDifferences.maxCoeff() < randomPrecision);
-}
+};

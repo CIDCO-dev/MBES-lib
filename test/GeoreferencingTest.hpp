@@ -9,6 +9,7 @@
  * Created on September 14, 2018, 11:44 AM
  */
 
+
 #include "catch.hpp"
 #include "../src/SoundVelocityProfile.hpp"
 #include "../src/Ping.hpp"
@@ -32,25 +33,4 @@ TEST_CASE("Georeferencing Test") {
 
     double straightDownPrecision = 0.000000001;
     REQUIRE(rayStraightDown.isApprox(expectedRayStraightDown, straightDownPrecision));
-
-    // Obtain boresight
-    SurveySystem params;
-    REQUIRE(params.readFile("test/data/metadata/TestMetaData.txt"));
-
-    //Attitude* boresightAttitude = params.getBoresightPatchTest();
-
-    // TODO: create a ping
-
-    //Obtain boresight DCM matrix
-    //Eigen::Matrix3d* dcmBoresight = DCM::getDcm(*boresightAttitude);
-
-    //TODO: Obtain launch vector for this ping
-    //Eigen::Vector3d* launchVector = Georeferencing::calculateLaunchVector(*ping, *dcmBoresight);
-
-    //Test is bogus
-    REQUIRE(false);
-
-    // clean up
-    //delete launchVector;
-    //delete dcmBoresight;
 }
