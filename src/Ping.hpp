@@ -18,38 +18,39 @@
 #include "Position.hpp"
 
 class Ping {
+    
+    double transmissionTimestamp;
+    Position* transmissionPosition = NULL;
+    Attitude* transmissionAttitude = NULL;
 
-public:
-    const double transmissionTimestamp;
-    const Position* transmissionPosition = NULL;
-    const Attitude* transmissionAttitude = NULL;
+    double receptionTimestamp;
+    Position* receptionPosition = NULL;
+    Attitude* receptionAttitude = NULL;
 
-    const double receptionTimestamp;
-    const Position* receptionPosition = NULL;
-    const Attitude* receptionAttitude = NULL;
-
-    const double surfaceSoundSpeed;
-    const double twoWayTravelTime;
-    const double alongTrackAngle; // emission angle
-    const double acrossTrackAngle; // reception angle
+    double surfaceSoundSpeed;
+    double twoWayTravelTime;
+    double alongTrackAngle; // emission angle
+    double acrossTrackAngle; // reception angle
 
     /*Trigonometry is stored to prevent redundant recalculations*/
-    const double sA; // alpha = kappa = alongTrackAngle = emission angle = tilt angle
-    const double cA;
+    double sA; // alpha = kappa = alongTrackAngle = emission angle = tilt angle
+    double cA;
 
-    const double sB; // beta = zeta = acrossTrackAngle = reception angle = beam angle
-    const double cB;
+    double sB; // beta = zeta = acrossTrackAngle = reception angle = beam angle
+    double cB; 
 
-    Ping(const double transmissionTimestamp,
-            const Position* transmissionPosition,
-            const Attitude* transmissionAttitude,
-            const double receptionTimestamp,
-            const Position* receptionPosition,
-            const Attitude* receptionAttitude,
-            const double surfaceSoundSpeed,
-            const double twoWayTravelTime,
-            const double alongTrackAngle,
-            const double acrossTrackAngle) :
+public:
+    
+    Ping(double transmissionTimestamp,
+            Position* transmissionPosition,
+            Attitude* transmissionAttitude,
+            double receptionTimestamp,
+            Position* receptionPosition,
+            Attitude* receptionAttitude,
+            double surfaceSoundSpeed,
+            double twoWayTravelTime,
+            double alongTrackAngle,
+            double acrossTrackAngle) :
     transmissionTimestamp(transmissionTimestamp),
     transmissionPosition(transmissionPosition),
     transmissionAttitude(transmissionAttitude),
@@ -64,7 +65,7 @@ public:
     cA(cos(alongTrackAngle*D2R)),
     sB(sin(acrossTrackAngle*D2R)),
     cB(cos(acrossTrackAngle*D2R)){
-    };
+    }
 
     ~Ping() {
         if (transmissionAttitude) {
@@ -82,7 +83,63 @@ public:
         if (receptionPosition) {
             delete receptionPosition;
         }
-    };
+    }
+    
+    double getAcrossTrackAngle() {
+        return acrossTrackAngle;
+    }
+
+    double getAlongTrackAngle() {
+        return alongTrackAngle;
+    }
+
+    double getCA() {
+        return cA;
+    }
+
+    double getCB() {
+        return cB;
+    }
+
+    Attitude* getReceptionAttitude() {
+        return receptionAttitude;
+    }
+
+    Position* getReceptionPosition() {
+        return receptionPosition;
+    }
+
+    double getReceptionTimestamp() {
+        return receptionTimestamp;
+    }
+
+    double getSA() {
+        return sA;
+    }
+
+    double getSB() {
+        return sB;
+    }
+
+    double getSurfaceSoundSpeed() {
+        return surfaceSoundSpeed;
+    }
+
+    Attitude* getTransmissionAttitude() {
+        return transmissionAttitude;
+    }
+
+    Position* getTransmissionPosition() {
+        return transmissionPosition;
+    }
+
+    double getTransmissionTimestamp() {
+        return transmissionTimestamp;
+    }
+
+    double getTwoWayTravelTime() {
+        return twoWayTravelTime;
+    }
 
     static Ping* build(
             double transmissionTimestamp,
@@ -114,7 +171,7 @@ public:
                 twoWayTravelTime,
                 alongTrackAngle,
                 acrossTrackAngle);
-    };
+    }
 
     friend std::ostream& operator<<(std::ostream& os, const Ping& obj) {
 
@@ -128,7 +185,7 @@ public:
                 << "Two way travel time: " << obj.twoWayTravelTime << std::endl
                 << "Along track angle: " << obj.alongTrackAngle << std::endl
                 << "Across track angle: " << obj.acrossTrackAngle << std::endl;
-    };
+    }
 };
 
 

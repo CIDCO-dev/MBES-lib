@@ -17,24 +17,31 @@
 #include "Ping.hpp"
 
 class Swath {
+private:
+    std::vector<Ping *>* pings = NULL;
+
 public:
 
-    const std::vector<Ping *>* pings = NULL;
-    const unsigned int beamCount;
-
-    Swath(std::vector<Ping*>* pings) : pings(pings), beamCount(pings->size()) {
+    Swath(std::vector<Ping*>* pings) : pings(pings) {
     }
 
     ~Swath() {
-        for(unsigned int i=0; i<beamCount; i++) {
-            delete (*pings)[i];
+        if (pings != NULL) {
+            for (unsigned int i = 0; i < pings->size(); i++) {
+                delete (*pings)[i];
+            }
+
+            delete pings;
         }
+    }
 
-        delete pings;
-    };
+    std::vector<Ping*>* getPings() {
+        return pings;
+    }
 
+    
     friend std::ostream& operator<<(std::ostream& os, const Swath& obj) {
-        for(unsigned int i=0; i<obj.beamCount; i++) {
+        for (unsigned int i = 0; i < (*obj.pings).size(); i++) {
             os << *((*obj.pings)[i]) << std::endl;
         }
         return os;
