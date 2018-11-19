@@ -18,12 +18,12 @@
 class DCM {
 public:
 
-    static void getDcmRollAtReceptionPitchHeadingAtEmission(Eigen::Matrix3d & outputMatrix,const Attitude & receptionAttitude, const Attitude & transmissionAttitude) {
-        return getDcm(outputMatrix,receptionAttitude.sr, receptionAttitude.cr, transmissionAttitude.sp, transmissionAttitude.cp, transmissionAttitude.sh, transmissionAttitude.ch);
+    static void getDcmRollAtReceptionPitchHeadingAtEmission(Eigen::Matrix3d & outputMatrix, Attitude & receptionAttitude, Attitude & transmissionAttitude) {
+        return getDcm(outputMatrix,receptionAttitude.getSr(), receptionAttitude.getCr(), transmissionAttitude.getSp(), transmissionAttitude.getCp(), transmissionAttitude.getSh(), transmissionAttitude.getCh());
     };
 
-    static void getDcm(Eigen::Matrix3d & outputMatrix,const Attitude & attitude) {
-        return getDcm(outputMatrix,attitude.sr, attitude.cr, attitude.sp, attitude.cp, attitude.sh, attitude.ch);
+    static void getDcm(Eigen::Matrix3d & outputMatrix, Attitude & attitude) {
+        return getDcm(outputMatrix,attitude.getSr(), attitude.getCr(), attitude.getSp(), attitude.getCp(), attitude.getSh(), attitude.getCh());
     };
 
     static void getDcm(Eigen::Matrix3d & outputMatrix,double sr, double cr, double sp, double cp, double sh, double ch) {

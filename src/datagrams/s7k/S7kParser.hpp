@@ -17,6 +17,7 @@
 #include "../DatagramParser.hpp"
 #include "S7kTypes.hpp"
 #include "../../utils/TimeUtils.hpp"
+#include "../../utils/Constants.hpp"
 
 class S7kParser : public DatagramParser {
 public:
@@ -29,6 +30,7 @@ protected:
     void processDataRecordFrame(S7kDataRecordFrame & drf);
     void processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char * data);
     void processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+    void processPing(S7kDataRecordFrame & drf, unsigned char * data);
 
 private:
     uint32_t computeChecksum(S7kDataRecordFrame * drf, unsigned char * data);
@@ -36,6 +38,7 @@ private:
 };
 
 S7kParser::S7kParser(DatagramProcessor & processor) : DatagramParser(processor) {
+    
 
 }
 
@@ -82,7 +85,8 @@ void S7kParser::parse(std::string & filename) {
                         uint32_t computedChecksum = computeChecksum(&drf, data);
 
                         if (checksum == computedChecksum) {
-
+                            
+                            
                             //Process data according to record type
                             if (drf.RecordTypeIdentifier == 1016) {
                                 //Attitude
@@ -90,6 +94,8 @@ void S7kParser::parse(std::string & filename) {
                             } else if (drf.RecordTypeIdentifier == 1003) {
                                 //Position
                                 processPositionDatagram(drf, data);
+                            } else if(drf.RecordTypeIdentifier == 7027) {
+                                processPing(drf, data);
                             }
                             //TODO: process pings and other stuff
                         } else {
@@ -104,7 +110,7 @@ void S7kParser::parse(std::string & filename) {
                 } else {
                     throw "Couldn't find sync pattern";
                 }
-            }                //Negative items mean something went wrong
+            }//Negative items mean something went wrong
             else if (nbItemsRead < 0) {
                 throw "Read error";
             }
@@ -120,8 +126,6 @@ void S7kParser::processDataRecordFrame(S7kDataRecordFrame & drf) {
     //TODO: remove later, leave derived classes decide what to do
     printf("--------------------\n");
     printf("%d-%03d %02d:%02d:%f\n", drf.Timestamp.Year, drf.Timestamp.Day, drf.Timestamp.Hours, drf.Timestamp.Minutes, drf.Timestamp.Seconds);
-    std::cout << extractMicroEpoch(drf) << std::endl;
-    std::cout << "drf.Timestamp.Seconds: " << drf.Timestamp.Seconds << std::endl;
     printf("Type: %d\n", drf.RecordTypeIdentifier);
     printf("Bytes: %d\n", drf.Size);
     printf("--------------------\n");
@@ -144,21 +148,58 @@ uint32_t S7kParser::computeChecksum(S7kDataRecordFrame * drf, unsigned char * da
 }
 
 void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
-    uint64_t timestamp = extractMicroEpoch(drf);
-
-    //TODO: normalize data to fit the format of DataProcessor, then call DataProcessor's processAttitude()
+    uint64_t microEpoch = extractMicroEpoch(drf);
+    
+    uint8_t nEntries = ((uint8_t*)data)[0];
+    
+    S7kAttitudeRD *entry = (S7kAttitudeRD*)(data+1);
+    
+    for(unsigned int i = 0;i<nEntries;i++){
+        processor.processAttitude(microEpoch + entry[i].timeDifferenceFromRecordTimeStamp * 1000,
+                (double)entry[i].heading*R2D,
+                (double)entry[i].pitch*R2D,
+                (double)entry[i].roll*R2D);
+    }
 }
 
 void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
-    uint64_t timestamp = extractMicroEpoch(drf);
+    uint64_t microEpoch = extractMicroEpoch(drf);
 
     //TODO: normalize data to fit the format of DataProcessor, then call DataProcessor's processPosition()
+    S7kPosition *position = (S7kPosition*) data;
+    
+    if(position->DatumIdentifier == 0 && position->PositioningMethod == 0) {
+        // only process WGS84, ignore grid coordinates
+        
+        
+        processor.processPosition(microEpoch, (double)position->LongitudeOrEasting * R2D, (double)position->LatitudeOrNorthing * R2D, (double)position->Height);
+    }
+}
+
+void S7kParser::processPing(S7kDataRecordFrame & drf, unsigned char * data) {
+    long microEpoch = extractMicroEpoch(drf);
+    
+    S7kRawDetectionDataRTH *ping = (S7kRawDetectionDataRTH*) data;
+    uint32_t nEntries = ping->numberOfDetectionPoints;
+    
+    double tiltAngle = ping->transmissionAngle*R2D;
+    double samplingRate = ping->samplingRate;
+    
+    
+    
+    for(unsigned int i = 0;i<nEntries;i++) {
+        
+        S7kRawDetectionDataRD *beam = (S7kRawDetectionDataRD*)(data+sizeof(S7kRawDetectionDataRTH) + i*ping->dataFieldSize); 
+        double twoWayTravelTime = (double)beam->detectionPoint / samplingRate; // see Appendix F p. 190
+        
+        double intensity = ping->dataFieldSize > 22 ? beam->signalStrength : 0; //see p. 79-80
+        processor.processPing(microEpoch,(long)beam->beamDescriptor,(double)beam->receptionAngle*R2D,tiltAngle,twoWayTravelTime,beam->quality,intensity);
+    }
 }
 
 uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
-    long microSeconds = drf.Timestamp.Seconds*1e6;
+    long microSeconds = drf.Timestamp.Seconds * 1e6;
 
-    //yday is 1-366 in s7k's, shift by 1 to 0-365
     uint64_t res = build_time(drf.Timestamp.Year, drf.Timestamp.Day, drf.Timestamp.Hours, drf.Timestamp.Minutes, microSeconds);
 
     return res;
