@@ -101,8 +101,8 @@ TEST_CASE("Reading metadata from original MSPAC") {
     double attitudeAccuracyPrecision = 0.000000001;
     double testPitchRollAccuracy = 0.050*D2R;
     Attitude* acc = params.getAttitudeAccuracy();
-    REQUIRE(abs(acc->roll*D2R-testPitchRollAccuracy) < attitudeAccuracyPrecision);
-    REQUIRE(abs(acc->pitch*D2R-testPitchRollAccuracy) < attitudeAccuracyPrecision);
+    REQUIRE(abs(acc->getRoll()*D2R-testPitchRollAccuracy) < attitudeAccuracyPrecision);
+    REQUIRE(abs(acc->getPitch()*D2R-testPitchRollAccuracy) < attitudeAccuracyPrecision);
 }
 
 TEST_CASE("Reading non-existing file") {

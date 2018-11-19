@@ -22,9 +22,9 @@ public:
     Attitude(){};
 
     Attitude(const double rollDegrees, const double pitchDegrees, const double headingDegrees) :
-	    roll(roll),
-	    pitch(pitch),
-	    heading(heading),
+	    roll(rollDegrees),
+	    pitch(pitchDegrees),
+	    heading(headingDegrees),
 	    sr(sin(roll*D2R)),
 	    cr(cos(roll*D2R)),
 	    sp(sin(pitch*D2R)),
@@ -66,7 +66,7 @@ public:
         ch=cos(heading*D2R);
     }
 
-    void getMicroEpoch(){ return microEpoch;}
+    uint64_t getMicroEpoch(){ return microEpoch;}
 
     void setMicroEpoch(uint64_t microEpoch){
 	this->microEpoch = microEpoch;

@@ -19,7 +19,7 @@ TEST_CASE("Coordinate Transform Test") {
     Position testPosition(0, 0, 0);
 
     Eigen::Vector3d testPositionECEF;
-    CoordinateTransform::getPositionInTerrestialReferenceFrame(testPositionECEF,testPosition);
+    CoordinateTransform::getPositionECEF(testPositionECEF,testPosition);
 
     Eigen::Vector3d expectedPositionECEF;
     expectedPositionECEF << 6378137.0 , 0, 0;
@@ -31,11 +31,26 @@ TEST_CASE("Coordinate Transform Test") {
     // North Pole on ellipsoid
     Position northPole(90, 0, 0);
     Eigen::Vector3d northPoleECEF;
-    CoordinateTransform::getPositionInTerrestialReferenceFrame(northPoleECEF,northPole);
+    CoordinateTransform::getPositionECEF(northPoleECEF,northPole);
 
     Eigen::Vector3d expectedNorthPoleECEF;
     expectedNorthPoleECEF << 0, 0, 6356752.3142; // WGS 84 polar semi-minor axis
 
     double northPolePrecision = 0.00000001;
     REQUIRE( northPoleECEF.isApprox(expectedNorthPoleECEF, northPolePrecision) );
+}
+
+TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
+    Position testPosition(48, -68, 10);
+    std::cout << "testPosition:" << std::endl;
+    std::cout << testPosition << std::endl;
+    
+    Eigen::Vector3d testPositionECEF;
+    CoordinateTransform::getPositionECEF(testPositionECEF,testPosition);
+    
+    Position expectedPosition(0,0,0);
+    CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
+    
+    std::cout << "expectedPosition:" << std::endl;
+    std::cout << expectedPosition << std::endl;
 }

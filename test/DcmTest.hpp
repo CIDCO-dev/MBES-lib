@@ -23,13 +23,13 @@ TEST_CASE("Direction Cosine Matrix Test") {
     DCM::getDcm(dcmIdentity,0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
     REQUIRE(dcmIdentity.isIdentity());
 
-    const Attitude attitudeZero(0, 0, 0);
+    Attitude attitudeZero(0, 0, 0);
     Eigen::Matrix3d dcmAttitudeZero;
     DCM::getDcm(dcmAttitudeZero,attitudeZero);
     REQUIRE(dcmAttitudeZero.isIdentity());
 
     // roll 180 degrees
-    const Attitude attitudeRoll(180, 0, 0);
+    Attitude attitudeRoll(180, 0, 0);
     Eigen::Matrix3d dcmFromAttitudeRollTest;
     DCM::getDcm(dcmFromAttitudeRollTest,attitudeRoll);
     Eigen::Vector3d testRollVector = dcmFromAttitudeRollTest * testVector;
@@ -40,7 +40,7 @@ TEST_CASE("Direction Cosine Matrix Test") {
     REQUIRE(abs(testRollVector(2) - -1.0) < testRollPrecision);
 
     // pitch 180 degrees
-    const Attitude attitudePitch(0, 180, 0);
+    Attitude attitudePitch(0, 180, 0);
     Eigen::Matrix3d dcmFromAttitudePitchTest;
     DCM::getDcm(dcmFromAttitudePitchTest,attitudePitch);
     Eigen::Vector3d testPitchVector = dcmFromAttitudePitchTest * testVector;
@@ -51,7 +51,7 @@ TEST_CASE("Direction Cosine Matrix Test") {
     REQUIRE(abs(testPitchVector(2) - -1.0) < testPitchPrecision);
 
     // heading 180 degrees
-    const Attitude attitudeHeading(0, 0, 180);
+    Attitude attitudeHeading(0, 0, 180);
     Eigen::Matrix3d dcmFromAttitudeHeadingTest;
     DCM::getDcm(dcmFromAttitudeHeadingTest,attitudeHeading);
     Eigen::Vector3d testHeadingVector = dcmFromAttitudeHeadingTest * testVector;
@@ -62,12 +62,10 @@ TEST_CASE("Direction Cosine Matrix Test") {
     REQUIRE(abs(testHeadingVector(2) - 1.0) < testHeadingPrecision);
 
     // random attitude
-    std::srand((unsigned int) time(0));
-    Eigen::Vector3d randomVect = Eigen::Vector3d::Random();
-    double roll = randomVect(0) * 180;
-    double pitch = randomVect(1) * 180;
-    double heading = abs(randomVect(2))*2 * 360;
-    const Attitude attitudeRandom(roll, pitch, heading);
+    double roll = 24.357;
+    double pitch = 36.54;
+    double heading = 157.43;
+    Attitude attitudeRandom(roll, pitch, heading);
     Eigen::Matrix3d dcmFromAttitudeRandomTest;
     DCM::getDcm(dcmFromAttitudeRandomTest,attitudeRandom);
 

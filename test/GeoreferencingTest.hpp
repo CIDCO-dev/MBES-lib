@@ -53,4 +53,4 @@ TEST_CASE("Georeferencing Test") {
     // clean up
     //delete launchVector;
     //delete dcmBoresight;
-};
+}
