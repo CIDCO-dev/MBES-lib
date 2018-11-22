@@ -18,6 +18,7 @@
 #include "S7kTypes.hpp"
 #include "../../utils/TimeUtils.hpp"
 #include "../../utils/Constants.hpp"
+#include <list>
 
 class S7kParser : public DatagramParser {
 public:
@@ -30,28 +31,27 @@ protected:
     void processDataRecordFrame(S7kDataRecordFrame & drf);
     void processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char * data);
     void processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data);
-    void processPing(S7kDataRecordFrame & drf, unsigned char * data);
+    void processPingDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+    void processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned char * data);
 
 private:
     uint32_t computeChecksum(S7kDataRecordFrame * drf, unsigned char * data);
     uint64_t extractMicroEpoch(S7kDataRecordFrame & drf);
+
+
+    //TODO: we map the ping # to a surface sound speed. might be a good idea to take all sonar settings for that Swath instead of just the surface sound speed
+    //FIXME: This hack uses the fact that before a ping packet, we get a sonar settings packet. Therefore, the last settings packet will always contain the . You can double-check this behavior by checking th sequence numbers
+    //Use a map instead
+    std::list<double> soundVelocities;  //TODO: we map the ping # to a surface sound speed. might be a good idea to take all sonar settings for that Swath instead of just the surface sound speed
 };
 
 S7kParser::S7kParser(DatagramProcessor & processor) : DatagramParser(processor) {
-    
 
 }
 
 S7kParser::~S7kParser() {
 
 }
-
-/*
-        The wise programmer is told about Tao and follows it.
-        The average programmer is told about Tao and searches for it.
-        The foolish programmer is told about Tao and laughs at it.
-        If it were not for laughter, there would be no Tao.
- */
 
 void S7kParser::parse(std::string & filename) {
     FILE * file = fopen(filename.c_str(), "rb");
@@ -85,19 +85,27 @@ void S7kParser::parse(std::string & filename) {
                         uint32_t computedChecksum = computeChecksum(&drf, data);
 
                         if (checksum == computedChecksum) {
-                            
-                            
+
                             //Process data according to record type
                             if (drf.RecordTypeIdentifier == 1016) {
                                 //Attitude
                                 processAttitudeDatagram(drf, data);
-                            } else if (drf.RecordTypeIdentifier == 1003) {
+                            }
+			    else if (drf.RecordTypeIdentifier == 1003) {
                                 //Position
                                 processPositionDatagram(drf, data);
-                            } else if(drf.RecordTypeIdentifier == 7027) {
-                                processPing(drf, data);
                             }
-                            //TODO: process pings and other stuff
+			    else if(drf.RecordTypeIdentifier == 7027) {
+                                //Ping
+				processPingDatagram(drf, data);
+                            }
+			    else if(drf.RecordTypeIdentifier == 7000){
+				//Sonar settings
+				processSonarSettingsDatagram(drf,data);
+			    }
+
+                            //TODO: process other stuff
+
                         } else {
                             printf("Checksum error\n");
                             //Checksum error...lets ignore the packet for now
@@ -148,12 +156,10 @@ uint32_t S7kParser::computeChecksum(S7kDataRecordFrame * drf, unsigned char * da
 }
 
 void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
-    uint64_t microEpoch = extractMicroEpoch(drf);
-    
-    uint8_t nEntries = ((uint8_t*)data)[0];
-    
+    uint64_t microEpoch  = extractMicroEpoch(drf);
+    uint8_t  nEntries    = ((uint8_t*)data)[0];
     S7kAttitudeRD *entry = (S7kAttitudeRD*)(data+1);
-    
+
     for(unsigned int i = 0;i<nEntries;i++){
         processor.processAttitude(microEpoch + entry[i].timeDifferenceFromRecordTimeStamp * 1000,
                 (double)entry[i].heading*R2D,
@@ -162,36 +168,42 @@ void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char 
     }
 }
 
+void S7kParser::processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned char * data){
+    S7kSonarSettings * settings = (S7kSonarSettings*)data;
+
+    soundVelocities.push_back(settings->soundVelocity);
+
+    //soundVelocities.insert( std::make_pair<int,double>((int)settings->sequentialNumber,settings->soundVelocity) );   //settings->sequentialNumber,settings->soundVelocity)  );
+}
+
 void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
     uint64_t microEpoch = extractMicroEpoch(drf);
-
-    //TODO: normalize data to fit the format of DataProcessor, then call DataProcessor's processPosition()
     S7kPosition *position = (S7kPosition*) data;
-    
+
+    // only process WGS84, ignore grid coordinates
     if(position->DatumIdentifier == 0 && position->PositioningMethod == 0) {
-        // only process WGS84, ignore grid coordinates
-        
-        
         processor.processPosition(microEpoch, (double)position->LongitudeOrEasting * R2D, (double)position->LatitudeOrNorthing * R2D, (double)position->Height);
     }
 }
 
-void S7kParser::processPing(S7kDataRecordFrame & drf, unsigned char * data) {
+void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
     long microEpoch = extractMicroEpoch(drf);
-    
+
     S7kRawDetectionDataRTH *ping = (S7kRawDetectionDataRTH*) data;
     uint32_t nEntries = ping->numberOfDetectionPoints;
-    
+
     double tiltAngle = ping->transmissionAngle*R2D;
     double samplingRate = ping->samplingRate;
-    
-    
-    
+
+    double surfaceSoundVelocity = soundVelocities.front();
+
+    soundVelocities.pop_front();
+
+    processor.processSwathStart(surfaceSoundVelocity);
+
     for(unsigned int i = 0;i<nEntries;i++) {
-        
-        S7kRawDetectionDataRD *beam = (S7kRawDetectionDataRD*)(data+sizeof(S7kRawDetectionDataRTH) + i*ping->dataFieldSize); 
+        S7kRawDetectionDataRD *beam = (S7kRawDetectionDataRD*)(data+sizeof(S7kRawDetectionDataRTH) + i*ping->dataFieldSize);
         double twoWayTravelTime = (double)beam->detectionPoint / samplingRate; // see Appendix F p. 190
-        
         double intensity = ping->dataFieldSize > 22 ? beam->signalStrength : 0; //see p. 79-80
         processor.processPing(microEpoch,(long)beam->beamDescriptor,(double)beam->receptionAngle*R2D,tiltAngle,twoWayTravelTime,beam->quality,intensity);
     }

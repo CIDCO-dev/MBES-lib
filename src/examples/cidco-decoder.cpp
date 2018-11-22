@@ -16,58 +16,65 @@
 void printUsage(){
 	std::cerr << "\n\
   NAME\n\n\
-     s7k2cidco - lit un fichier s7k et le transforme en format cidco (ASCII)\n\n\
+     cidco-decoder - lit un fichier MBES et le transforme en format cidco (ASCII)\n\n\
   SYNOPSIS\n \
-	   datagram-dump fichier\n\n\
+	   cidco-decoder fichier\n\n\
   DESCRIPTION\n\n \
-  Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
+  Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
 }
 
 class DatagramPrinter : public DatagramProcessor{
-    
+
         private:
                 FILE *headingFile = NULL;
                 FILE *pitchRollFile = NULL;
                 FILE *positionFile = NULL;
                 FILE *multibeamFile = NULL;
-                
-                uint64_t currentMicroEpoch = 0;
-    
-    
+
+		uint64_t currentMicroEpoch;
+		std::stringstream pingLine;
+		int	    nbBeams = 0;
 	public:
 		DatagramPrinter(){
                     headingFile = fopen("Heading.txt","w");
                     pitchRollFile = fopen("PitchRoll.txt","w");
                     positionFile = fopen("AntPosition.txt","w");
                     multibeamFile = fopen("Multibeam.txt","w");
+
+		   pingLine.precision(10);
 		}
 
 		~DatagramPrinter(){
+		    //last pingLine didnt get printed
+                    fprintf(multibeamFile,"%s\n",pingLine.str().c_str());
+
                     fclose(headingFile);
                     fclose(pitchRollFile);
                     fclose(positionFile);
                     fclose(multibeamFile);
 		}
-                
-                
 
                 void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
-                    //CIDCO file format separates these 2...
-			fprintf(pitchRollFile, "A %lu %.10lf %.10lf\n",microEpoch,pitch,roll);
-                        fprintf(headingFile, "A %lu %.10lf\n",microEpoch,heading);
+                	//CIDCO file format separates these 2...
+			fprintf(pitchRollFile, "%lu %.10lf %.10lf\n",microEpoch,pitch,roll);
+                        fprintf(headingFile, "%lu %.10lf\n",microEpoch,heading);
 		};
 
                 void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
-			fprintf(positionFile, "A %lu %.10lf %.10lf %.10lf\n",microEpoch,latitude,longitude,height);
+			fprintf(positionFile, "%lu %.10lf %.10lf %.10lf\n",microEpoch,latitude,longitude,height);
 		};
 
                 void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
-                    
+			currentMicroEpoch = microEpoch;
+			nbBeams++;
+			pingLine << twoWayTravelTime << " " << beamAngle << " " << tiltAngle;
 		};
 
-                void processSwathStart(){
-
+                void processSwathStart(double surfaceSoundSpeed){
+			fprintf(multibeamFile,"%lu %0.7f %s\n",currentMicroEpoch, surfaceSoundSpeed,pingLine.str().c_str());
+			pingLine.str(std::string());
+			nbBeams=0;
 		};
 };
 

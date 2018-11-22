@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+ * Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
 /* 
@@ -217,10 +217,10 @@ typedef struct { // pp 35-36
 #pragma pack(1)
 typedef struct { // pp 35-36
     uint16_t timeDifferenceFromRecordTimeStamp; // in milliseconds
-    float roll;
-    float pitch;
-    float heave;
-    float heading;
+    float    roll;
+    float    pitch;
+    float    heave;
+    float    heading;
 } S7kAttitudeRD;
 #pragma pack()
 
@@ -231,10 +231,10 @@ typedef struct { // pp 75-76
     uint16_t multiPingSequence;
     uint32_t numberOfDetectionPoints;
     uint32_t dataFieldSize;
-    uint8_t detectionAlgorithm;
+    uint8_t  detectionAlgorithm;
     uint32_t flags;
-    float samplingRate;
-    float transmissionAngle;
+    float    samplingRate;
+    float    transmissionAngle;
     uint32_t reserved[16];
 } S7kRawDetectionDataRTH;
 #pragma pack()
@@ -242,16 +242,65 @@ typedef struct { // pp 75-76
 #pragma pack(1)
 typedef struct { // pp 76-77
     uint16_t beamDescriptor;
-    float detectionPoint;
-    float receptionAngle;
+    float    detectionPoint;
+    float    receptionAngle;
     uint32_t flags;
     uint32_t quality;
-    float uncertainty;
-    float signalStrength;
+    float    uncertainty;
+    float    signalStrength;
 } S7kRawDetectionDataRD;
 #pragma pack()
 
+#pragma pack(1)
+typedef struct { //pp 40-41
+    uint64_t sonarId;
+    uint32_t sequentialNumber;
+    uint16_t multiPingSequence;
+    float    frequency;
+    float    sampleRate;
+    float    receiverBandwidth;
+    float    txPulseWidth;
+    uint32_t txPulseTypeIndentifier;
+    uint32_t txPulseEnvelopeIndentifier;
+    float    txPulseEnvelopeParameter;
+    uint16_t txPulseMode;
+    uint16_t txPulseReserved;
+    float    maxPingRate;
+    float    pingPeriod;
+    float    rangeSelection;
+    float    powerSelection;
+    float    gainSelection;
+    uint32_t controlFlags;
+    uint32_t projectorIdentifier;
+    float    projectorBeamSteeringAngleVertical;
+    float    projectorBeamSteeringAngleHorizontal;
+    float    projectorBeam3dbBeamWidthVertical;
+    float    projectorBeam3dbBeamWidthHorizontal;
+    float    projectorBeamFocalPoint;
+    uint32_t projectorBeamWeightingWindowType;
+    float    projectorBeamWeightingWindowParameter;
+    uint32_t transmitFlags;
+    uint32_t hydrophoneIdentifier;
+    uint32_t receiveBeamWeightingWindow;
+    float    receiveBeamWeightingParameter;
+    uint32_t receiveFlags;
+    float    receiveBeamWidth;
+    float    bottomDetectionFilterMinRange;
+    float    bottomDetectionFilterMaxRange;
+    float    bottomDetectionFilterMinDepth;
+    float    bottomDetectionFilterMaxDepth;
+    float    absorption;
+    float    soundVelocity;
+    float    spreading;
+    uint16_t reserved;
+} S7kSonarSettings;
 
+
+typedef struct{
+    float  soundVelocity;
+    float  temperature;
+    float  pressure;
+} S7kSoundVelocity;
 
 #endif /* S7KTYPES_HPP */
 

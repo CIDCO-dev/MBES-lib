@@ -1,5 +1,5 @@
 CC=g++
-OPTIONS=-Wall -std=c++0x
+OPTIONS=-Wall -std=c++11
 INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
@@ -15,6 +15,7 @@ test_result_dir=build/test-report
 default:
 	mkdir -p $(exec_dir)
 	$(CC) $(OPTIONS) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
+	$(CC) $(OPTIONS) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 
 test: default
 	mkdir -p $(test_exec_dir)
