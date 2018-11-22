@@ -46,7 +46,7 @@ class DatagramPrinter : public DatagramProcessor{
 			printf("X %lu %lu %.10lf %.10lf %.10f %u %u\n",microEpoch,id,beamAngle,tiltAngle,twoWayTravelTime,quality,intensity);
 		};
 
-                void processSwathStart(){
+                void processSwathStart(double surfaceSoundSpeed){
 
 		};
 };
