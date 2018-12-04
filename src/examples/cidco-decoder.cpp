@@ -72,7 +72,7 @@ class DatagramPrinter : public DatagramProcessor{
 		};
 
                 void processSwathStart(double surfaceSoundSpeed){
-			fprintf(multibeamFile,"%lu %0.7f %s\n",currentMicroEpoch, surfaceSoundSpeed,pingLine.str().c_str());
+			fprintf(multibeamFile,"%lu %d %0.7f %s\n",currentMicroEpoch,nbBeams, surfaceSoundSpeed,pingLine.str().c_str());
 			pingLine.str(std::string());
 			nbBeams=0;
 		};
