@@ -57,12 +57,12 @@ class DatagramPrinter : public DatagramProcessor{
 
                 void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
                 	//CIDCO file format separates these 2...
-			fprintf(pitchRollFile, "%lu %.10lf %.10lf\n",microEpoch,pitch,roll);
-                        fprintf(headingFile, "%lu %.10lf\n",microEpoch,heading);
+			fprintf(pitchRollFile, "%lu %.10lf %.10lf\n",epoch2daySeconds(microEpoch),pitch,roll);
+                        fprintf(headingFile, "%lu %.10lf\n",epoch2daySeconds(microEpoch),heading);
 		};
 
                 void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
-			fprintf(positionFile, "%lu %.10lf %.10lf %.10lf\n",microEpoch,latitude,longitude,height);
+			fprintf(positionFile, "%lu %.10lf %.10lf %.10lf\n",epoch2daySeconds(microEpoch),latitude,longitude,height);
 		};
 
                 void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
@@ -73,13 +73,17 @@ class DatagramPrinter : public DatagramProcessor{
 
                 void processSwathStart(double surfaceSoundSpeed){
 			if(nbBeams > 0){
-				fprintf(multibeamFile,"%lu %d %0.7f %s\n",currentMicroEpoch,nbBeams, surfaceSoundSpeed,pingLine.str().c_str());
+				fprintf(multibeamFile,"%lu %d %0.7f %s\n",epoch2daySeconds(currentMicroEpoch),nbBeams, surfaceSoundSpeed,pingLine.str().c_str());
 			}
 			pingLine.str(std::string());
 			nbBeams=0;
 		};
-};
 
+		long epoch2daySeconds(long microEpoch){
+			return (microEpoch / 1000000) % (60 * 60 *24);
+		}
+
+};
 
 int main (int argc , char ** argv ){
 	DatagramParser * parser = NULL;
