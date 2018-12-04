@@ -172,8 +172,6 @@ void S7kParser::processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned 
     memcpy(settingsCopy,settings,sizeof(S7kSonarSettings));
 
     pingSettings.push_back(settingsCopy);
-
-    printf("Ding: %u  (%.7f)\n",settingsCopy->sequentialNumber,settingsCopy->soundVelocity);
 }
 
 void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
@@ -235,4 +233,3 @@ uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
 
 
 #endif /* S7KPARSER_HPP */
-
