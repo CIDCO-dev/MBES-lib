@@ -68,7 +68,7 @@ class DatagramPrinter : public DatagramProcessor{
                 void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
 			currentMicroEpoch = microEpoch;
 			nbBeams++;
-			pingLine << twoWayTravelTime << " " << beamAngle << " " << tiltAngle;
+			pingLine << twoWayTravelTime << " " << beamAngle << " " << tiltAngle << " ";
 		};
 
                 void processSwathStart(double surfaceSoundSpeed){
