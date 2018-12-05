@@ -1,17 +1,16 @@
-﻿/*
+/*
  *  Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 #ifndef MAIN_CPP
 #define MAIN_CPP
-
-#include "../datagrams/kongsberg/KongsbergParser.hpp"
+ #include <getopt.h>
+ #include "../datagrams/kongsberg/KongsbergParser.hpp"
 #include "../datagrams/xtf/XtfParser.hpp"
 #include "../datagrams/s7k/S7kParser.hpp"
 #include <iostream>
 #include <string>
 #include "../utils/StringUtils.hpp"
-
-void printUsage(){
+ void printUsage(){
 	std::cerr << "\n\
   NAME\n\n\
      cidco-decoder - lit un fichier MBES et le transforme en format cidco (ASCII)\n\n\
@@ -21,16 +20,13 @@ void printUsage(){
   Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
 }
-
-class DatagramPrinter : public DatagramProcessor{
-
-        private:
+ class DatagramPrinter : public DatagramProcessor{
+         private:
                 FILE *headingFile = NULL;
                 FILE *pitchRollFile = NULL;
                 FILE *positionFile = NULL;
                 FILE *multibeamFile = NULL;
-
-		uint64_t          currentMicroEpoch;
+ 		uint64_t          currentMicroEpoch;
                 double            currentSurfaceSoundSpeed;
 		std::stringstream pingLine;
 		int	          nbBeams = 0;
@@ -40,74 +36,54 @@ class DatagramPrinter : public DatagramProcessor{
                     pitchRollFile = fopen("PitchRoll.txt","w");
                     positionFile = fopen("AntPosition.txt","w");
                     multibeamFile = fopen("Multibeam.txt","w");
-
-                    pingLine.precision(10);
+                     pingLine.precision(10);
 		}
-
-		~DatagramPrinter(){
+ 		~DatagramPrinter(){
 		    //last pingLine didnt get printed
                     fprintf(multibeamFile,"%.6f %d %0.7f %s\n",microEpoch2daySeconds(currentMicroEpoch),nbBeams, currentSurfaceSoundSpeed,pingLine.str().c_str());
-
-	            fclose(headingFile);
+ 	            fclose(headingFile);
                     fclose(pitchRollFile);
                     fclose(positionFile);
                     fclose(multibeamFile);
 		}
-
-                void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
+                 void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
                 	//CIDCO file format separates these 2...
 			fprintf(pitchRollFile, "%.6f %.10lf %.10lf\n",microEpoch2daySeconds(microEpoch),pitch,roll);
                         fprintf(headingFile, "%.6f %.10lf\n",microEpoch2daySeconds(microEpoch),heading);
 		};
-
-                void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
+                 void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
 			fprintf(positionFile, "%.6f %.10lf %.10lf %.10lf\n",microEpoch2daySeconds(microEpoch),latitude,longitude,height);
 		};
-
-                void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
+                 void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
 			currentMicroEpoch = microEpoch;
 			nbBeams++;
 			pingLine << twoWayTravelTime << " " << beamAngle << " " << tiltAngle << " ";
 		};
-
-                void processSwathStart(double surfaceSoundSpeed){
+                 void processSwathStart(double surfaceSoundSpeed){
 			currentSurfaceSoundSpeed = surfaceSoundSpeed;
-
-			if(nbBeams > 0){
+ 			if(nbBeams > 0){
 				fprintf(multibeamFile,"%.6f %d %0.7f %s\n",microEpoch2daySeconds(currentMicroEpoch),nbBeams, surfaceSoundSpeed,pingLine.str().c_str());
 				pingLine.str(std::string());
 				nbBeams=0;
 			}
 		};
-
-		double microEpoch2daySeconds(long microEpoch){
+ 		double microEpoch2daySeconds(long microEpoch){
 			long microsInDay = 1000000L * 60L * 60L * 24L;
 			return (double)(microEpoch % microsInDay)  / (double)1000000;
 		}
-
-};
-
-int main (int argc , char ** argv ){
+ };
+ int main (int argc , char ** argv ){
 	DatagramParser * parser = NULL;
 	DatagramPrinter  printer;
-
-#ifdef __GNU__
 	setenv("TZ", "UTC", 1);
-#endif
-#ifdef _WIN32
-	putenv("TZ");
-#endif
 
-	if(argc != 2){
+ 	if(argc != 2){
 		printUsage();
 	}
-
-	std::string fileName(argv[1]);
-
-	try{
+ 	std::string fileName(argv[1]);
+ 	try{
 		std::cerr << "Decoding " << fileName << std::endl;
-
-		if(ends_with(fileName.c_str(),".all")){
+ 		if(ends_with(fileName.c_str(),".all")){
 			parser = new KongsbergParser(printer);
 		}
 		else if(ends_with(fileName.c_str(),".xtf")){
@@ -119,16 +95,11 @@ int main (int argc , char ** argv ){
 		else{
 			throw "Unknown extension";
 		}
-
-		parser->parse(fileName);
+ 		parser->parse(fileName);
 	}
 	catch(const char * error){
 		std::cerr << "Error whille parsing " << fileName << ": " << error << std::endl;
 	}
-
-
-	if(parser) delete parser;
+ 	if(parser) delete parser;
 }
-
-
 #endif
