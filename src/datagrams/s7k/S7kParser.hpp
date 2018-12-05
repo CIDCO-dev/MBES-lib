@@ -38,11 +38,8 @@ private:
     uint32_t computeChecksum(S7kDataRecordFrame * drf, unsigned char * data);
     uint64_t extractMicroEpoch(S7kDataRecordFrame & drf);
 
-
-    //TODO: we map the ping # to a surface sound speed. might be a good idea to take all sonar settings for that Swath instead of just the surface sound speed
-    //FIXME: This hack uses the fact that before a ping packet, we get a sonar settings packet. Therefore, the last settings packet will always contain the . You can double-check this behavior by checking th sequence numbers
-    //Use a map instead
-    std::list<double> soundVelocities;  //TODO: we map the ping # to a surface sound speed. might be a good idea to take all sonar settings for that Swath instead of just the surface sound speed
+    //TODO Use a map instead
+    std::list<S7kSonarSettings *> pingSettings;
 };
 
 S7kParser::S7kParser(DatagramProcessor & processor) : DatagramParser(processor) {
@@ -171,9 +168,10 @@ void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char 
 void S7kParser::processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned char * data){
     S7kSonarSettings * settings = (S7kSonarSettings*)data;
 
-    soundVelocities.push_back(settings->soundVelocity);
+    S7kSonarSettings * settingsCopy = (S7kSonarSettings *)malloc(sizeof(S7kSonarSettings));
+    memcpy(settingsCopy,settings,sizeof(S7kSonarSettings));
 
-    //soundVelocities.insert( std::make_pair<int,double>((int)settings->sequentialNumber,settings->soundVelocity) );   //settings->sequentialNumber,settings->soundVelocity)  );
+    pingSettings.push_back(settingsCopy);
 }
 
 void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
@@ -189,23 +187,39 @@ void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char 
 void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
     long microEpoch = extractMicroEpoch(drf);
 
-    S7kRawDetectionDataRTH *ping = (S7kRawDetectionDataRTH*) data;
-    uint32_t nEntries = ping->numberOfDetectionPoints;
+    S7kRawDetectionDataRTH *swath = (S7kRawDetectionDataRTH*) data;
 
-    double tiltAngle = ping->transmissionAngle*R2D;
-    double samplingRate = ping->samplingRate;
+    uint32_t nEntries = swath->numberOfDetectionPoints;
 
-    double surfaceSoundVelocity = soundVelocities.front();
+    double tiltAngle = swath->transmissionAngle*R2D;
+    double samplingRate = swath->samplingRate;
 
-    soundVelocities.pop_front();
+    S7kSonarSettings * settings = NULL;
 
-    processor.processSwathStart(surfaceSoundVelocity);
+    for(auto i=pingSettings.begin();i!=pingSettings.end();i++){
+	if((*i)->sequentialNumber==swath->pingNumber){
+		settings = (*i);
+                pingSettings.remove((*i));
+		break;
+	}
+    }
 
-    for(unsigned int i = 0;i<nEntries;i++) {
-        S7kRawDetectionDataRD *beam = (S7kRawDetectionDataRD*)(data+sizeof(S7kRawDetectionDataRTH) + i*ping->dataFieldSize);
-        double twoWayTravelTime = (double)beam->detectionPoint / samplingRate; // see Appendix F p. 190
-        double intensity = ping->dataFieldSize > 22 ? beam->signalStrength : 0; //see p. 79-80
-        processor.processPing(microEpoch,(long)beam->beamDescriptor,(double)beam->receptionAngle*R2D,tiltAngle,twoWayTravelTime,beam->quality,intensity);
+    if(settings){
+	double surfaceSoundVelocity = settings->soundVelocity;
+
+	processor.processSwathStart(surfaceSoundVelocity);
+
+	for(unsigned int i = 0;i<nEntries;i++) {
+		S7kRawDetectionDataRD *ping = (S7kRawDetectionDataRD*)(data+sizeof(S7kRawDetectionDataRTH) + i*swath->dataFieldSize);
+		double twoWayTravelTime = (double)ping->detectionPoint / samplingRate; // see Appendix F p. 190
+		double intensity = swath->dataFieldSize > 22 ? ping->signalStrength : 0; //see p. 79-80
+		processor.processPing(microEpoch,(long)ping->beamDescriptor,(double)ping->receptionAngle*R2D,tiltAngle,twoWayTravelTime,ping->quality,intensity);
+        }
+
+        free(settings);
+    }
+    else{
+	fprintf(stderr,"No settings for ping #%d\n",swath->pingNumber);
     }
 }
 
@@ -219,4 +233,3 @@ uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
 
 
 #endif /* S7KPARSER_HPP */
-
