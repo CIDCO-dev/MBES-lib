@@ -19,7 +19,7 @@ default:
 
 test: default
 	mkdir $(test_exec_dir)
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test\\bin &&cl ..\\..\\..\\test\main.cpp /EHsc /Fetests.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test\\bin &&cl ..\\..\\..\\test\main.cpp $(INCLUDES) /EHsc /Fetests.exe
 	mkdir $(test_result_dir)
 	mkdir $(test_work_dir)
 	cd $(test_work_dir)
