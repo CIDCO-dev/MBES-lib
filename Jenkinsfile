@@ -32,6 +32,9 @@ pipeline {
               sh "make test"
             }
 	  post {
+	     always {
+		junit 'build/test-report/*.xml'
+	     }
 	     aborted{
       		   timeout(time: 10, unit: 'SECONDS'){
               sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Close_A_VM.sh windows-x64-C++'
@@ -59,11 +62,12 @@ pipeline {
       		//compile
 		bat "make test"
 		archiveArtifacts('build\\bin\\datagram-dump.exe')
+		archiveArtifacts('build\\bin\\cidco-decoder.exe')
             }
 	  post {
-	     //always {
-		//junit 'build\\test-reports\\*.xml'
-	     //}
+	     always {
+		junit 'build\\test-report\\*.xml'
+	     }
 	     aborted{
       		   timeout(time: 10, unit: 'SECONDS'){
 		     bat "ssh jenkins@192.168.0.105 /var/lib/jenkins/Scripts/Call_Close_A_VM.sh windows-x64-C++"
@@ -97,7 +101,9 @@ pipeline {
               sh 'mkdir -p $binMasterPublishDir'
               sh 'mkdir -p $binWinx64PublishDir'
               sh 'cp -r build/bin/datagram-dump $binMasterPublishDir/$exec_name'
+	      sh 'cp -r build/bin/cidco-decoder $binMasterPublishDir/cidco-decoder-$version'
               sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/datagram-dump.exe  $binWinx64PublishDir/$exec_name.exe'
+              sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/cidco-decoder.exe  $binWinx64PublishDir/cidco-decoder-$version.exe'
             }
         }
     }
