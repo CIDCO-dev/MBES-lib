@@ -15,6 +15,7 @@ test_result_dir=build\test-report
 default:
 	mkdir $(exec_dir)
 	$(CC) $(OPTIONS) -o $(exec_dir)\datagram-dump src\examples\datagram-dump.cpp
+	$(CC) $(OPTIONS) -o $(exec_dir)\cidco-decoder src\examples\cidco-decoder.cpp
 
 test: default
 	mkdir $(test_exec_dir)
