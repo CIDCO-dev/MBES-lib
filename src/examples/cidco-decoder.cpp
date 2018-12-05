@@ -4,8 +4,6 @@
 #ifndef MAIN_CPP
 #define MAIN_CPP
 
-#include <getopt.h>
-
 #include "../datagrams/kongsberg/KongsbergParser.hpp"
 #include "../datagrams/xtf/XtfParser.hpp"
 #include "../datagrams/s7k/S7kParser.hpp"
