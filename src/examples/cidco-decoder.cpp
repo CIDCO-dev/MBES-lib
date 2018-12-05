@@ -75,7 +75,13 @@
  int main (int argc , char ** argv ){
 	DatagramParser * parser = NULL;
 	DatagramPrinter  printer;
+
+#ifdef __GNU__
 	setenv("TZ", "UTC", 1);
+#endif
+#ifdef _WIN32
+	putenv("TZ");
+#endif
 
  	if(argc != 2){
 		printUsage();
