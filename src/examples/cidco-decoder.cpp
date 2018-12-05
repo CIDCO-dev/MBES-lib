@@ -1,10 +1,8 @@
-/*
+﻿/*
  *  Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 #ifndef MAIN_CPP
 #define MAIN_CPP
-
-#include <getopt.h>
 
 #include "../datagrams/kongsberg/KongsbergParser.hpp"
 #include "../datagrams/xtf/XtfParser.hpp"
@@ -93,7 +91,12 @@ int main (int argc , char ** argv ){
 	DatagramParser * parser = NULL;
 	DatagramPrinter  printer;
 
+#ifdef __GNU__
 	setenv("TZ", "UTC", 1);
+#endif
+#ifdef _WIN32
+	putenv("TZ");
+#endif
 
 	if(argc != 2){
 		printUsage();
