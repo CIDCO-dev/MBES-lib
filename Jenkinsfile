@@ -33,7 +33,7 @@ pipeline {
             }
 	  post {
 	     always {
-		junit 'build/test-reports/*.xml'
+		junit 'build/test-report/*.xml'
 	     }
 	     aborted{
       		   timeout(time: 10, unit: 'SECONDS'){
@@ -66,7 +66,7 @@ pipeline {
             }
 	  post {
 	     always {
-		junit 'build\\test-reports\\*.xml'
+		junit 'build\\test-report\\*.xml'
 	     }
 	     aborted{
       		   timeout(time: 10, unit: 'SECONDS'){
