@@ -67,8 +67,8 @@
 				nbBeams=0;
 			}
 		};
- 		double microEpoch2daySeconds(long microEpoch){
-			long microsInDay = 1000000L * 60L * 60L * 24L;
+ 		double microEpoch2daySeconds(uint64_t microEpoch){
+			uint64_t microsInDay = (uint64_t)1000000L *  (uint64_t)60L *  (uint64_t)60L *  (uint64_t)24L;
 			return (double)(microEpoch % microsInDay)  / (double)1000000;
 		}
  };
@@ -80,7 +80,7 @@
 	setenv("TZ", "UTC", 1);
 #endif
 #ifdef _WIN32
-	putenv("TZ");
+	_putenv("TZ");
 #endif
 
  	if(argc != 2){
