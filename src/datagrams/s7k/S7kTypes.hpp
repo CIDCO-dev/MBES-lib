@@ -294,13 +294,43 @@ typedef struct { //pp 40-41
     float    spreading;
     uint16_t reserved;
 } S7kSonarSettings;
+#pragma pack()
 
-
+#pragma pack(1)
 typedef struct{
     float  soundVelocity;
     float  temperature;
     float  pressure;
 } S7kSoundVelocity;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct{
+    float    frequency;
+    uint8_t  soundVelocitySource;	/* 0=Not computed, 1=CTD,2=User computed*/
+    uint8_t  soundVelocityAlgorithm; 	/* 0=Not computed,1=Chen Millero, 2=Del Grosso*/
+    uint8_t  conductivityFlag; 		/* 0=Conductivity,1=salinity*/
+    uint8_t  pressureFlag; 		/* 0=pressure, 1=Depth*/
+    uint8_t  positionFlag; 		/* 0= invalid position fields, 1=valid position fields*/
+    uint8_t  sampleContentValidity;  	/* Bits set if measurement is valid. Bit 0: Conductivity, Bit 1: Water temperature, Bit 2: Pressure/Depth, Bit 3: Sound Velocity, Bit 4: Absorption */
+    uint16_t reserved;
+    double   latitude; 			/* WGS84, in radians */
+    double   longitude;			/* WGS84, in radians */
+    float    sampleRate;
+    uint32_t nbSamples;
+} S7kCtdRTH;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct{
+    float conductivitySalinity;  /* in S/m or ppt */
+    float waterTemperature;      /* in Celsius */
+    float pressureDepth;         /* in Pascal or meters */
+    float soundVelocity;         /* in meters/seconds */
+    float absorption;            /* in dB/kilometer */
+} S7kCtdRD;
+#pragma pack()
+
 
 #endif /* S7KTYPES_HPP */
 

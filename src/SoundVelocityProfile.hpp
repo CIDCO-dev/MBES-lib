@@ -17,6 +17,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cmath>
+#include <vector>
 
 class SoundVelocityProfile {
 public:
@@ -43,14 +45,26 @@ public:
 
     bool readFile(const std::string fileName, double draft);
 
+    bool loadFromLists(std::vector<double> & depths,std::vector<double> & speeds,double draft);
+
+    double getLatitude() 	 { return latitude; }
+    void   setLatitude(double l) { latitude=l;}
+
+    double getLongitude()	 { return longitude;}
+    void   setLongitude(double l){ longitude=l;}
+
 private:
     unsigned int size;
     Eigen::VectorXd depth;
     Eigen::VectorXd soundSpeed;
     Eigen::VectorXd gradient;
+
+    double latitude;
+    double longitude;
 };
 
 SoundVelocityProfile::SoundVelocityProfile() {
+    longitude = latitude = nan("");
 };
 
 SoundVelocityProfile::~SoundVelocityProfile() {
@@ -89,6 +103,11 @@ bool SoundVelocityProfile::readFile(const std::string fileName, double draft) {
         }
 
     }
+
+    return loadFromLists(depths,speeds,draft);
+}
+
+bool SoundVelocityProfile::loadFromLists(std::vector<double> & depths,std::vector<double> & speeds,double draft){
 
     if ((depths.size() != speeds.size()) && depths.size() < 2) {
         std::cerr << "Invalid sound speed data file" << std::endl;

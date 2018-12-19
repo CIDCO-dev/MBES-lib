@@ -14,8 +14,8 @@ test_result_dir=build/test-report
 
 default:
 	mkdir -p $(exec_dir)
-	$(CC) $(OPTIONS) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
-	$(CC) $(OPTIONS) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 
 test: default
 	mkdir -p $(test_exec_dir)
@@ -33,6 +33,7 @@ doc:
 
 clean:
 	rm -rf build
+	rm *.txt || true
 
 s7k-datagrams: default
 	./build/bin/datagram-dump test/data/s7k/20141016_150519_FJ-Saucier.s7k | grep "Type"|cut -d " " -f 2|sort|uniq -c

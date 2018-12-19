@@ -1,12 +1,13 @@
 #ifndef DATAGRAMPROCESSOR_HPP
 #define DATAGRAMPROCESSOR_HPP
 
-
+#include "../SoundVelocityProfile.hpp"
 
 /**
  * @author Guillaume Morissette
  * Fournit des methodes virtuelles pour le traitement des contenus des datagrammes de sonar
  */
+
 
 class DatagramProcessor{
 	public:
@@ -32,7 +33,10 @@ class DatagramProcessor{
 		* Tilt angle: POSITIVE forward, NEGATIVE backward
 		*/
                 virtual void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){};
+
                 virtual void processSwathStart(double surfaceSoundSpeed){};
+
+		virtual void processSoundVelocityProfile(SoundVelocityProfile * svp){};
 };
 
 

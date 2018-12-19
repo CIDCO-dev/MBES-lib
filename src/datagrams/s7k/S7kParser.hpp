@@ -19,6 +19,7 @@
 #include "../../utils/TimeUtils.hpp"
 #include "../../utils/Constants.hpp"
 #include <list>
+#include "../../SoundVelocityProfile.hpp"
 
 class S7kParser : public DatagramParser {
 public:
@@ -33,6 +34,7 @@ protected:
     void processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data);
     void processPingDatagram(S7kDataRecordFrame & drf, unsigned char * data);
     void processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+    void processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data);
 
 private:
     uint32_t computeChecksum(S7kDataRecordFrame * drf, unsigned char * data);
@@ -100,7 +102,10 @@ void S7kParser::parse(std::string & filename) {
 				//Sonar settings
 				processSonarSettingsDatagram(drf,data);
 			    }
-
+			    else if(drf.RecordTypeIdentifier == 1010){
+				//CTD
+                                processCtdDatagram(drf,data);
+                            }
                             //TODO: process other stuff
 
                         } else {
@@ -231,5 +236,24 @@ uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
     return res;
 }
 
+void S7kParser::processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data){
+        S7kCtdRTH * ctd = (S7kCtdRTH*) data;
 
+	SoundVelocityProfile * svp = new SoundVelocityProfile();
+
+	if(ctd->positionFlag){
+		svp->setLongitude(ctd->longitude);
+		svp->setLatitude(ctd->latitude);
+	}
+
+	
+
+	processSoundVelocityProfile(svp);
+}
+
+void S7kParser::processSoundVelocityProfile(SoundVelocityProfile * svp){
+
+
+	delete svp;
+}
 #endif /* S7KPARSER_HPP */
