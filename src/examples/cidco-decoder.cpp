@@ -36,7 +36,7 @@
                     pitchRollFile = fopen("PitchRoll.txt","w");
                     positionFile = fopen("AntPosition.txt","w");
                     multibeamFile = fopen("Multibeam.txt","w");
-                     pingLine.precision(10);
+                    pingLine.precision(10);
 		}
  		~DatagramPrinter(){
 		    //last pingLine didnt get printed
@@ -62,7 +62,8 @@
                  void processSwathStart(double surfaceSoundSpeed){
 			currentSurfaceSoundSpeed = surfaceSoundSpeed;
  			if(nbBeams > 0){
-				fprintf(multibeamFile,"%.6f %d %0.7f %s\n",microEpoch2daySeconds(currentMicroEpoch),nbBeams, surfaceSoundSpeed,pingLine.str().c_str());
+				std::string cleanPingLine = trim(pingLine.str());
+				fprintf(multibeamFile,"%.6f %d %0.7f %s\n",microEpoch2daySeconds(currentMicroEpoch),nbBeams, surfaceSoundSpeed,cleanPingLine.c_str());
 				pingLine.str(std::string());
 				nbBeams=0;
 			}
