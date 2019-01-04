@@ -36,6 +36,9 @@ class DatagramProcessor{
 
                 virtual void processSwathStart(double surfaceSoundSpeed){};
 
+		/*
+                 * Processes a sound velocity profile, from a SSP profiler or CTD profiler
+		 */
 		virtual void processSoundVelocityProfile(SoundVelocityProfile * svp){};
 };
 

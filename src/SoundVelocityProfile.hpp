@@ -45,8 +45,6 @@ public:
 
     bool readFile(const std::string fileName, double draft);
 
-    bool loadFromLists(std::vector<double> & depths,std::vector<double> & speeds,double draft);
-
     double getLatitude() 	 { return latitude; }
     void   setLatitude(double l) { latitude=l;}
 
@@ -61,6 +59,8 @@ private:
 
     double latitude;
     double longitude;
+
+    int draftIndex = -1;
 };
 
 SoundVelocityProfile::SoundVelocityProfile() {
@@ -77,9 +77,11 @@ bool SoundVelocityProfile::readFile(const std::string fileName, double draft) {
 
     // Open file
     int lineCounter = 0;
-    int draftIndex = -1;
     std::string line;
     std::ifstream inputFile(fileName);
+    int draftIndex = -1;
+
+
 
     if (!inputFile) {
         std::cerr << "Couldn't read SVP file: " << fileName << std::endl;
@@ -103,11 +105,6 @@ bool SoundVelocityProfile::readFile(const std::string fileName, double draft) {
         }
 
     }
-
-    return loadFromLists(depths,speeds,draft);
-}
-
-bool SoundVelocityProfile::loadFromLists(std::vector<double> & depths,std::vector<double> & speeds,double draft){
 
     if ((depths.size() != speeds.size()) && depths.size() < 2) {
         std::cerr << "Invalid sound speed data file" << std::endl;

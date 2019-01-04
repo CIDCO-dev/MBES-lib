@@ -246,14 +246,9 @@ void S7kParser::processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data
 		svp->setLatitude(ctd->latitude);
 	}
 
-	
+	//TODO: get CTD data into svp
 
-	processSoundVelocityProfile(svp);
+	processor.processSoundVelocityProfile(svp);
 }
 
-void S7kParser::processSoundVelocityProfile(SoundVelocityProfile * svp){
-
-
-	delete svp;
-}
 #endif /* S7KPARSER_HPP */
