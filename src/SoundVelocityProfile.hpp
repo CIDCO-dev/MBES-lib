@@ -17,6 +17,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cmath>
+#include <vector>
 
 class SoundVelocityProfile {
 public:
@@ -43,14 +45,26 @@ public:
 
     bool readFile(const std::string fileName, double draft);
 
+    double getLatitude() 	 { return latitude; }
+    void   setLatitude(double l) { latitude=l;}
+
+    double getLongitude()	 { return longitude;}
+    void   setLongitude(double l){ longitude=l;}
+
 private:
     unsigned int size;
     Eigen::VectorXd depth;
     Eigen::VectorXd soundSpeed;
     Eigen::VectorXd gradient;
+
+    double latitude;
+    double longitude;
+
+    int draftIndex = -1;
 };
 
 SoundVelocityProfile::SoundVelocityProfile() {
+    longitude = latitude = nan("");
 };
 
 SoundVelocityProfile::~SoundVelocityProfile() {
@@ -63,9 +77,11 @@ bool SoundVelocityProfile::readFile(const std::string fileName, double draft) {
 
     // Open file
     int lineCounter = 0;
-    int draftIndex = -1;
     std::string line;
     std::ifstream inputFile(fileName);
+    int draftIndex = -1;
+
+
 
     if (!inputFile) {
         std::cerr << "Couldn't read SVP file: " << fileName << std::endl;
