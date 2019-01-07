@@ -40,7 +40,7 @@
 		}
  		~DatagramPrinter(){
 		    //last pingLine didnt get printed
-                    fprintf(multibeamFile,"%.6f %d %0.7f %s\n",microEpoch2daySeconds(currentMicroEpoch),nbBeams, currentSurfaceSoundSpeed,pingLine.str().c_str());
+                    fprintf(multibeamFile,"%.6f %d %0.7f%s\n",microEpoch2daySeconds(currentMicroEpoch),nbBeams, currentSurfaceSoundSpeed,pingLine.str().c_str());
  	            fclose(headingFile);
                     fclose(pitchRollFile);
                     fclose(positionFile);
@@ -57,7 +57,7 @@
                  void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
 			currentMicroEpoch = microEpoch;
 			nbBeams++;
-			pingLine << twoWayTravelTime << " " << beamAngle << " " << tiltAngle << " ";
+			pingLine << " " << twoWayTravelTime << " " << beamAngle << " " << tiltAngle;
 		};
                  void processSwathStart(double surfaceSoundSpeed){
 			currentSurfaceSoundSpeed = surfaceSoundSpeed;
