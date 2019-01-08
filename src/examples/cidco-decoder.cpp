@@ -40,7 +40,7 @@
 		}
  		~DatagramPrinter(){
 		    //last pingLine didnt get printed
-                    fprintf(multibeamFile,"%.6f %d %0.7f%s\n",microEpoch2daySeconds(currentMicroEpoch),nbBeams, currentSurfaceSoundSpeed,pingLine.str().c_str());
+                    fprintf(multibeamFile,"%.6f %0.7f %d%s\n",microEpoch2daySeconds(currentMicroEpoch),nbBeams, currentSurfaceSoundSpeed,pingLine.str().c_str());
  	            fclose(headingFile);
                     fclose(pitchRollFile);
                     fclose(positionFile);
@@ -63,7 +63,7 @@
 			currentSurfaceSoundSpeed = surfaceSoundSpeed;
  			if(nbBeams > 0){
 				std::string cleanPingLine = trim(pingLine.str());
-				fprintf(multibeamFile,"%.6f %d %0.7f %s\n",microEpoch2daySeconds(currentMicroEpoch),nbBeams, surfaceSoundSpeed,cleanPingLine.c_str());
+				fprintf(multibeamFile,"%.6f %0.7f %d%s\n",microEpoch2daySeconds(currentMicroEpoch),nbBeams, surfaceSoundSpeed,cleanPingLine.c_str());
 				pingLine.str(std::string());
 				nbBeams=0;
 			}
