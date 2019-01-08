@@ -40,7 +40,8 @@
 		}
  		~DatagramPrinter(){
 		    //last pingLine didnt get printed
-                    fprintf(multibeamFile,"%.6f %0.7f %d%s\n",microEpoch2daySeconds(currentMicroEpoch), currentSurfaceSoundSpeed, nbBeams,pingLine.str().c_str());
+                    fprintf(multibeamFile,"%.6f\t%0.7f\t%d%s\r\n",microEpoch2daySeconds(currentMicroEpoch), currentSurfaceSoundSpeed, nbBeams,pingLine.str().c_str());
+		    
  	            fclose(headingFile);
                     fclose(pitchRollFile);
                     fclose(positionFile);
@@ -48,22 +49,23 @@
 		}
                  void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
                 	//CIDCO file format separates these 2...
-			fprintf(pitchRollFile, "%.6f %.10lf %.10lf\n",microEpoch2daySeconds(microEpoch),pitch,roll);
-                        fprintf(headingFile, "%.6f %.10lf\n",microEpoch2daySeconds(microEpoch),heading);
+			fprintf(pitchRollFile, "%.6f\t%.10lf\t%.10lf\r\n",microEpoch2daySeconds(microEpoch),pitch,roll);
+                        fprintf(headingFile, "%.6f\t%.10lf\r\n",microEpoch2daySeconds(microEpoch),heading);
 		};
                  void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
-			fprintf(positionFile, "%.6f %.10lf %.10lf %.10lf\n",microEpoch2daySeconds(microEpoch),latitude,longitude,height);
+			fprintf(positionFile, "%.6f\t%.10lf\t%.10lf\t%.10lf\r\n",microEpoch2daySeconds(microEpoch),latitude,longitude,height);
+
 		};
                  void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
 			currentMicroEpoch = microEpoch;
 			nbBeams++;
-			pingLine << " " << twoWayTravelTime << " " << beamAngle << " " << tiltAngle;
+			pingLine << "\t" << twoWayTravelTime << "\t" << beamAngle << "\t" << tiltAngle;
 		};
                  void processSwathStart(double surfaceSoundSpeed){
 			currentSurfaceSoundSpeed = surfaceSoundSpeed;
  			if(nbBeams > 0){
 				std::string cleanPingLine = trim(pingLine.str());
-				fprintf(multibeamFile,"%.6f %0.7f %d%s\n",microEpoch2daySeconds(currentMicroEpoch), surfaceSoundSpeed, nbBeams, cleanPingLine.c_str());
+				fprintf(multibeamFile,"%.6f\t%0.7f\t%d\t%s\r\n",microEpoch2daySeconds(currentMicroEpoch), surfaceSoundSpeed, nbBeams, cleanPingLine.c_str());
 				pingLine.str(std::string());
 				nbBeams=0;
 			}
