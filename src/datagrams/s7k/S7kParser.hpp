@@ -190,7 +190,7 @@ void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char 
 }
 
 void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
-    long microEpoch = extractMicroEpoch(drf);
+    uint64_t microEpoch = extractMicroEpoch(drf);
 
     S7kRawDetectionDataRTH *swath = (S7kRawDetectionDataRTH*) data;
 
