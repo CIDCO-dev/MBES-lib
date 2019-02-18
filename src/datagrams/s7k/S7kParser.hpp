@@ -134,11 +134,12 @@ void S7kParser::parse(std::string & filename) {
 
 void S7kParser::processDataRecordFrame(S7kDataRecordFrame & drf) {
     //TODO: remove later, leave derived classes decide what to do
-    printf("--------------------\n");
+/*    printf("--------------------\n");
     printf("%d-%03d %02d:%02d:%f\n", drf.Timestamp.Year, drf.Timestamp.Day, drf.Timestamp.Hours, drf.Timestamp.Minutes, drf.Timestamp.Seconds);
     printf("Type: %d\n", drf.RecordTypeIdentifier);
     printf("Bytes: %d\n", drf.Size);
     printf("--------------------\n");
+*/
 }
 
 uint32_t S7kParser::computeChecksum(S7kDataRecordFrame * drf, unsigned char * data) {
@@ -241,19 +242,25 @@ void S7kParser::processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data
 
 	SoundVelocityProfile * svp = new SoundVelocityProfile();
 
-	if(ctd->positionFlag){
-		svp->setLongitude(ctd->longitude);
-		svp->setLatitude(ctd->latitude);
+	if( 
+		ctd->sampleContentValidity & 0x0C //depth & sound velocity OK
+		&&
+		ctd->pressureFlag == 1 //depth
+          ){
+		//Get position if available
+		if(ctd->positionFlag){
+			svp->setLongitude(ctd->longitude);
+			svp->setLatitude(ctd->latitude);
+		}
+
+		//Get SVP samples
+		S7kCtdRD * rd = (S7kCtdRD *) (((unsigned char *)ctd) + sizeof(S7kCtdRTH));
+		for(unsigned int i = 0;i < ctd->nbSamples;i++  ){
+			svp->add(rd[i].pressureDepth,rd[i].soundVelocity);
+		}
+
+		processor.processSoundVelocityProfile(svp);
 	}
-
-	
-
-	processSoundVelocityProfile(svp);
 }
 
-void S7kParser::processSoundVelocityProfile(SoundVelocityProfile * svp){
-
-
-	delete svp;
-}
 #endif /* S7KPARSER_HPP */
