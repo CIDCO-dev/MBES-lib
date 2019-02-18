@@ -14,15 +14,16 @@ test_result_dir=build\test-report
 
 default:
 	mkdir $(exec_dir)
-	$(CC) $(OPTIONS) -o $(exec_dir)\datagram-dump src\examples\datagram-dump.cpp
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-dump.cpp /EHsc /Fedatagram-dump.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\cidco-decoder.cpp /EHsc /Fecidco-decoder.exe
 
 test: default
 	mkdir $(test_exec_dir)
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)\tests test\main.cpp
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test\\bin &&cl ..\\..\\..\\test\main.cpp $(INCLUDES) /EHsc /Fetests.exe
 	mkdir $(test_result_dir)
 	mkdir $(test_work_dir)
 	cd $(test_work_dir)
-	$(test_exec_dir)\tests
+	$(test_exec_dir)\tests -r junit -o $(test_result_dir)\mbes-lib-test-report.xml
 
 doc:
 	rm -rf build\doxygen

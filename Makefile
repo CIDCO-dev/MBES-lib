@@ -23,7 +23,7 @@ test: default
 	mkdir -p $(test_result_dir)
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
-	$(root)/$(test_exec_dir)/tests
+	$(root)/$(test_exec_dir)/tests -r junit -o $(test_result_dir)/mbes-lib-test-report.xml
 
 doc:
 	rm -rf build/doxygen
