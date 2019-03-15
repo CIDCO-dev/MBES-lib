@@ -1,3 +1,8 @@
+/*
+ * @author Guillaume Labbe-Morissette
+ */
+
+
 #ifndef KONGSBERG_CPP
 #define KONGSBERG_CPP
 
@@ -11,6 +16,7 @@
 #include "../../utils/NmeaUtils.hpp"
 #include "../../utils/TimeUtils.hpp"
 #include "KongsbergTypes.hpp"
+
 
 class KongsbergParser : public DatagramParser{
         public:
@@ -29,8 +35,10 @@ class KongsbergParser : public DatagramParser{
 	        void processPositionDatagram(KongsbergHeader & hdr,unsigned char * datagram);
 	        void processQualityFactor(KongsbergHeader & hdr,unsigned char * datagram);
 	        void processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram);
+		void processSoundSpeedProfile(KongsbergHeader & hdr,unsigned char * datagram);
 
 	        long convertTime(long datagramDate,long datagramTime);
+
 };
 
 KongsbergParser::KongsbergParser(DatagramProcessor & processor):DatagramParser(processor){
@@ -118,6 +126,10 @@ void KongsbergParser::processDatagram(KongsbergHeader & hdr,unsigned char * data
         	     //processWaterHeight(hdr,datagram);
 		break;
 
+		case 'U':
+			processSoundSpeedProfile(hdr,datagram);
+		break;
+
 		case 'Y':
         	     //processSeabedImageData(hdr,datagram);
 		break;
@@ -146,6 +158,47 @@ void KongsbergParser::processAttitudeDatagram(KongsbergHeader & hdr,unsigned cha
     for(unsigned int i = 0;i<nEntries;i++){
         processor.processAttitude(microEpoch + p[i].deltaTime * 1000,(double)p[i].heading/(double)100,(double)p[i].pitch/(double)100,(double)p[i].roll/(double)100);
     }
+}
+
+/*
+#pragma pack(1)
+typedef struct{
+    uint32_t            profileDate; //Date = year*10000 + month*100 + day
+    uint32_t            profileTime; //Time since midnight in seconds
+    uint16_t            nbEntries;
+    uint16_t            depthResolution; //in cm
+} KongsbergSoundSpeedProfile;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct{
+    uint32_t            depth; 
+    uint32_t            soundSpeed; //in dm/s
+} KongsbergSoundSpeedProfileEntry;
+#pragma pack()
+
+
+*/
+
+void KongsbergParser::processSoundSpeedProfile(KongsbergHeader & hdr,unsigned char * datagram){
+    SoundVelocityProfile * svp = new SoundVelocityProfile();
+
+    KongsbergSoundSpeedProfile * ssp = (KongsbergSoundSpeedProfile*) datagram;
+
+    uint64_t microEpoch = convertTime(ssp->profileDate,ssp->profileTime);
+
+    KongsbergSoundSpeedProfileEntry * entry = (KongsbergSoundSpeedProfileEntry*)((unsigned char*)(&ssp->depthResolution)+sizeof(uint16_t));
+
+    printf("Resolution (cm): %d\n",ssp->depthResolution);
+
+    for(unsigned int i = 0;i< ssp->nbEntries;i++){
+	double depth = (double)entry[i].depth / ((double)100 / (double)ssp->depthResolution );
+	double soundSpeed = (double) entry[i].soundSpeed / (double) 10; //speed is in dm/s
+
+	svp->add(depth,soundSpeed);
+    }
+
+    processor.processSoundVelocityProfile(svp);
 }
 
 long KongsbergParser::convertTime(long datagramDate,long datagramTime){
