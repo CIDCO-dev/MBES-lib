@@ -14,6 +14,13 @@ class DatagramProcessor{
 		DatagramProcessor(){};
 		virtual ~DatagramProcessor(){};
 
+
+		/*
+                 * Datagrams either use numerical IDs or characters
+                 */
+		virtual void processDatagramTag(int id){};
+
+
 		/* Convention for attitude angles
 		 *
 		 * Pitch: Positive value is nose up
@@ -40,6 +47,8 @@ class DatagramProcessor{
                  * Processes a sound velocity profile, from a SSP profiler or CTD profiler
 		 */
 		virtual void processSoundVelocityProfile(SoundVelocityProfile * svp){};
+
+
 };
 
 

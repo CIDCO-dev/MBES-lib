@@ -16,4 +16,12 @@
 #include "../src/SoundVelocityProfile.hpp"
 #include "../src/utils/Exception.hpp"
 
+TEST_CASE("Writing to SVP file"){
+	//TODO: test prototype
+	REQUIRE(1==2);
+};
 
+TEST_CASE("Get speeds/depths"){
+	//TODO: test prototype
+	REQUIRE(1==2);
+}

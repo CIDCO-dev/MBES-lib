@@ -7,4 +7,3 @@
 #include "SurveySystemTest.hpp"
 #include "DcmTest.hpp"
 #include "CoordinateTransformTest.hpp"
-#include "GeoreferencingTest.hpp"

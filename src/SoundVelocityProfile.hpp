@@ -27,6 +27,9 @@ public:
 
     ~SoundVelocityProfile();
 
+
+    void write(std::string & filename);
+
     unsigned int getSize() {
         return size;
     };
@@ -39,13 +42,19 @@ public:
 
     void   add(double depth,double soundSpeed);
 
+    Eigen::VectorXd & getDepths();
+    Eigen::VectorXd & getSpeeds();
+
 private:
     unsigned int size;
 
     double latitude;
     double longitude;
 
-   std::vector<std::pair<double,double>> samples;
+    Eigen::VectorXd depths;
+    Eigen::VectorXd speeds;
+
+    std::vector<std::pair<double,double>> samples;
 };
 
 SoundVelocityProfile::SoundVelocityProfile() {
@@ -57,6 +66,49 @@ SoundVelocityProfile::~SoundVelocityProfile() {
 
 void SoundVelocityProfile::add(double depth,double soundSpeed){
 	samples.push_back(std::make_pair(depth,soundSpeed));
+}
+
+void SoundVelocityProfile::write(std::string & filename){
+	std::ofstream out(filename);
+
+	if(out.is_open()){
+		//TODO: write proper date and lat/lon
+		out << "[SVP_VERSION_2]" << "\r\n";
+		out << filename << "\r\n";
+		out << "Section 2000-307 18:59:00 43:04:40 -070:42:42 This time and coordinates are wrong" << "\r\n"; //FIXME: put date as yyyy-ddd hh:mm:ss dd:mm:ss (lat) dd:mm:ss (lon)
+
+		for(auto i=samples.begin();i!=samples.end();i++){
+			out << (*i).first << " " << (*i).second << "\r\n";
+		}
+
+		out.close();
+	}
+}
+
+Eigen::VectorXd & SoundVelocityProfile::getDepths(){
+	//lazy load internal vector
+	if((unsigned int)depths.size() != samples.size()){
+		depths.resize(samples.size());
+
+		for(unsigned int i = 0;i<samples.size();i++){
+			depths(i)=samples[i].first;
+		}
+	}
+
+	return depths;
+}
+
+Eigen::VectorXd & SoundVelocityProfile::getSpeeds(){
+	//lazy load internal vector
+	if((unsigned int)speeds.size() != samples.size()){
+		speeds.resize(samples.size());
+
+		for(unsigned int i=0;i<samples.size();i++){
+			speeds(i)=samples[i].second;
+		}
+	}
+
+	return speeds;
 }
 
 #endif /* SOUNDVELOCITYPROFILE_HPP */
