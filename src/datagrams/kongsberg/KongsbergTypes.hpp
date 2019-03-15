@@ -46,5 +46,20 @@ typedef struct{
 } KongsbergPositionDatagram;
 #pragma pack()
 
+#pragma pack(1)
+typedef struct{
+    uint32_t            profileDate; //Date = year*10000 + month*100 + day
+    uint32_t            profileTime; //Time since midnight in seconds
+    uint16_t            nbEntries;
+    uint16_t            depthResolution; //in cm
+} KongsbergSoundSpeedProfile;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct{
+    uint32_t            depth;
+    uint32_t            soundSpeed; //in dm/s
+} KongsbergSoundSpeedProfileEntry;
+#pragma pack()
 
 #endif // KONGSBERGTYPES_HPP
