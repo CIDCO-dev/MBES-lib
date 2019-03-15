@@ -1,2 +1,0 @@
-  - [décodeur en python](https://github.com/oysstu/pyxtf)
-  - [xtf data format](https://woodshole.er.usgs.gov/operations/sfmapping/sonar_xtf.htm)
