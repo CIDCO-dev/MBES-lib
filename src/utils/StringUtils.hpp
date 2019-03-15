@@ -5,6 +5,10 @@
 #include <string>
 #include <algorithm>
 
+#ifdef _WIN32
+#include <cctype>
+#endif
+
 int ends_with(const char * str, const char * suffix) {
 
         if( str == NULL || suffix == NULL )
