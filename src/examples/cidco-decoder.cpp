@@ -30,6 +30,8 @@
                 double            currentSurfaceSoundSpeed;
 		std::stringstream pingLine;
 		int	          nbBeams = 0;
+		int		  svpCount = 0;
+
 	public:
 		DatagramPrinter(){
                     headingFile = fopen("Heading.txt","w");
@@ -46,20 +48,24 @@
                     fclose(positionFile);
                     fclose(multibeamFile);
 		}
-                 void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
+
+                void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
                 	//CIDCO file format separates these 2...
 			fprintf(pitchRollFile, "%.6f %.10lf %.10lf\n",microEpoch2daySeconds(microEpoch),pitch,roll);
                         fprintf(headingFile, "%.6f %.10lf\n",microEpoch2daySeconds(microEpoch),heading);
 		};
-                 void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
+
+                void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
 			fprintf(positionFile, "%.6f %.10lf %.10lf %.10lf\n",microEpoch2daySeconds(microEpoch),latitude,longitude,height);
 		};
-                 void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
+
+                void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
 			currentMicroEpoch = microEpoch;
 			nbBeams++;
 			pingLine << twoWayTravelTime << " " << beamAngle << " " << tiltAngle << " ";
 		};
-                 void processSwathStart(double surfaceSoundSpeed){
+
+                void processSwathStart(double surfaceSoundSpeed){
 			currentSurfaceSoundSpeed = surfaceSoundSpeed;
  			if(nbBeams > 0){
 				std::string cleanPingLine = trim(pingLine.str());
@@ -68,10 +74,25 @@
 				nbBeams=0;
 			}
 		};
+
+		void processSoundVelocityProfile(SoundVelocityProfile * svp){
+			std::stringstream filename;
+
+			filename << "SVP-" <<svpCount << ".svp";
+
+			std::string f= filename.str();
+
+			svp->write(f);
+
+			svpCount++;
+
+			std::cout << "Writing to " << filename.str() << std::endl;
+		}
+
  		double microEpoch2daySeconds(uint64_t microEpoch){
 			uint64_t microsInDay = (uint64_t)1000000L *  (uint64_t)60L *  (uint64_t)60L *  (uint64_t)24L;
 			return (double)(microEpoch % microsInDay)  / (double)1000000;
-		}
+		};
  };
  int main (int argc , char ** argv ){
 	DatagramParser * parser = NULL;

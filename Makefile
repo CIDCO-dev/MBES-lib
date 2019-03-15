@@ -34,6 +34,7 @@ doc:
 clean:
 	rm -rf build
 	rm *.txt || true
+	rm *.svp || true
 
 s7k-datagrams: default
 	./build/bin/datagram-dump test/data/s7k/20141016_150519_FJ-Saucier.s7k | grep "Type"|cut -d " " -f 2|sort|uniq -c
