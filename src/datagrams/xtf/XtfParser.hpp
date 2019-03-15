@@ -242,6 +242,7 @@ void XtfParser::processPingHeader(XtfPingHeader & hdr){
 }
 
 void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
+	processor.processDatagramTag(hdr.HeaderType);
 
 	if(hdr.HeaderType==XTF_HEADER_ATTITUDE){
 		uint64_t microEpoch = 0;

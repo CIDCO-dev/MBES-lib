@@ -84,8 +84,9 @@ void S7kParser::parse(std::string & filename) {
                         uint32_t computedChecksum = computeChecksum(&drf, data);
 
                         if (checksum == computedChecksum) {
+                            processor.processDatagramTag(drf.RecordTypeIdentifier);
 
-                            //Process data according to record type
+			    //Process data according to record type
                             if (drf.RecordTypeIdentifier == 1016) {
                                 //Attitude
                                 processAttitudeDatagram(drf, data);

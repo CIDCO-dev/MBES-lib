@@ -14,9 +14,9 @@
 void printUsage(){
 	std::cerr << "\n\
   NAME\n\n\
-     datagram-dump - lit un fichier binaire et le transforme en format texte (ASCII)\n\n\
+     datagram-list - liste les datagrammes contenus dans un fichier binaire\n\n\
   SYNOPSIS\n \
-	   datagram-dump fichier\n\n\
+	   datagram-list fichier\n\n\
   DESCRIPTION\n\n \
   Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
@@ -32,21 +32,9 @@ class DatagramPrinter : public DatagramProcessor{
 
 		}
 
-                void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
-			printf("A %lu %.10lf %.10lf %.10lf\n",microEpoch,heading,pitch,roll);
-		};
-
-                void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
-			printf("P %lu %.12lf %.12lf %.12lf\n",microEpoch,longitude,latitude,height);
-		};
-
-                void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
-			printf("X %lu %lu %.10lf %.10lf %.10f %u %u\n",microEpoch,id,beamAngle,tiltAngle,twoWayTravelTime,quality,intensity);
-		};
-
-                void processSwathStart(double surfaceSoundSpeed){
-
-		};
+		void processDatagramTag(int tag){
+			printf("%d\n",tag);
+		}
 };
 
 

@@ -16,6 +16,7 @@ default:
 	mkdir -p $(exec_dir)
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
 
 test: default
 	mkdir -p $(test_exec_dir)
@@ -36,7 +37,7 @@ clean:
 	rm *.txt || true
 	rm *.svp || true
 
-s7k-datagrams: default
-	./build/bin/datagram-dump test/data/s7k/20141016_150519_FJ-Saucier.s7k | grep "Type"|cut -d " " -f 2|sort|uniq -c
+datagram-list: default
+	./build/bin/datagram-list test/data/s7k/20141016_150519_FJ-Saucier.s7k|sort|uniq -c
 
 .PHONY: all test clean doc
