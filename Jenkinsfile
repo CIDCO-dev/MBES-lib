@@ -16,16 +16,6 @@ pipeline {
 
     agent none
     stages {
-
-        stage('STAR VM'){
-    	    agent { label 'master'}
-            steps {
-      		   timeout(time: 10, unit: 'SECONDS'){
-              sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Start_A_VM.sh windows-x64-C++'
-		   }
-            }
-        }	
-
         stage('TEST MASTER'){
             agent { label 'master'}
             steps {
@@ -34,16 +24,6 @@ pipeline {
 	  post {
 	     always {
 		junit 'build/test-report/*.xml'
-	     }
-	     aborted{
-      		   timeout(time: 10, unit: 'SECONDS'){
-              sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Close_A_VM.sh windows-x64-C++'
-		   }
-	     }
-	     failure{
-      		   timeout(time: 10, unit: 'SECONDS'){
-              sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Close_A_VM.sh windows-x64-C++'
-		   }
 	     }
 	  }
         }
@@ -68,24 +48,7 @@ pipeline {
 	     always {
 		junit 'build\\test-report\\*.xml'
 	     }
-	     aborted{
-      		   timeout(time: 10, unit: 'SECONDS'){
-		     bat "ssh jenkins@192.168.0.105 /var/lib/jenkins/Scripts/Call_Close_A_VM.sh windows-x64-C++"
-		   }
-	     }
-	     failure{
-      		   timeout(time: 10, unit: 'SECONDS'){
-		     bat "ssh jenkins@192.168.0.105 /var/lib/jenkins/Scripts/Call_Close_A_VM.sh windows-x64-C++"
-		   }
-	     }
 	  }
-        }
-
-        stage('STOP VM'){
-    	    agent { label 'master'}
-            steps {
-              sh 'ssh hugo@192.168.0.219 "bash -s" < /var/lib/jenkins/Scripts/Close_A_VM.sh windows-x64-C++'
-            }
         }	
 
         stage('BUILD MASTER'){
