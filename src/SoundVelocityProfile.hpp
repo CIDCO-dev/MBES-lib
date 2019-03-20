@@ -40,13 +40,18 @@ public:
     double getLongitude()	 { return longitude;}
     void   setLongitude(double l){ longitude=l;}
 
-    void   add(double depth,double soundSpeed);
+    uint64_t getTimestamp(){ return microEpoch;};
+    void     setTimestamp(uint64_t t) { microEpoch=t;};
+
+    void     add(double depth,double soundSpeed);
 
     Eigen::VectorXd & getDepths();
     Eigen::VectorXd & getSpeeds();
 
 private:
     unsigned int size;
+
+    uint64_t  microEpoch; //timestamp
 
     double latitude;
     double longitude;

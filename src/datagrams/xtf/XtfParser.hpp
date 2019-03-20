@@ -255,7 +255,13 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 			microEpoch = build_time(attitude->Year,attitude->Month-1,attitude->Day,attitude->Hour,attitude->Minutes,attitude->Seconds,attitude->Milliseconds,0);
 		}
 
-        	processor.processAttitude(microEpoch,attitude->Heading,attitude->Pitch,attitude->Roll);
+        	processor.processAttitude(
+			microEpoch,
+			attitude->Heading,
+			(attitude->Pitch < 0) ? attitude->Pitch + 360 : attitude->Pitch,
+			(attitude->Roll  < 0) ? attitude->Roll  + 360 : attitude->Pitch
+		);
+
 	}
 	else if(hdr.HeaderType==XTF_HEADER_Q_MULTIBEAM){
 		XtfPingHeader * pingHdr = (XtfPingHeader*) packet;

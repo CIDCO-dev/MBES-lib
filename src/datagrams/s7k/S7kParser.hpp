@@ -165,10 +165,16 @@ void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char 
     S7kAttitudeRD *entry = (S7kAttitudeRD*)(data+1);
 
     for(unsigned int i = 0;i<nEntries;i++){
-        processor.processAttitude(microEpoch + entry[i].timeDifferenceFromRecordTimeStamp * 1000,
-                (double)entry[i].heading*R2D,
-                (double)entry[i].pitch*R2D,
-                (double)entry[i].roll*R2D);
+	double heading = (double)entry[i].heading*R2D;
+	double pitch   = (double)entry[i].pitch*R2D;
+	double roll    = (double)entry[i].roll*R2D;
+
+        processor.processAttitude(
+		microEpoch + entry[i].timeDifferenceFromRecordTimeStamp * 1000,
+                heading,
+                (pitch<0)?pitch+360:pitch,
+                (roll<0)?roll+360:roll
+	);
     }
 }
 
@@ -243,7 +249,11 @@ void S7kParser::processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data
 
 	SoundVelocityProfile * svp = new SoundVelocityProfile();
 
-	if( 
+	uint64_t timestamp = extractMicroEpoch(drf);
+
+	svp->setTimestamp(timestamp);
+
+	if(
 		ctd->sampleContentValidity & 0x0C //depth & sound velocity OK
 		&&
 		ctd->pressureFlag == 1 //depth

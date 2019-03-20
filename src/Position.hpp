@@ -19,8 +19,9 @@
 class Position {
 public:
 
-    Position(double latitude, double longitude, double ellipsoidalHeight) :
-    	latitude(latitude),
+    Position(uint64_t microEpoch,double latitude, double longitude, double ellipsoidalHeight) :
+    	timestamp(microEpoch),
+	latitude(latitude),
     	longitude(longitude),
     	ellipsoidalHeight(ellipsoidalHeight),
     	slat(sin(latitude * D2R)),
@@ -32,8 +33,8 @@ public:
     ~Position() {
     }
 
-    uint64_t getMicroEpoch()		{ return microEpoch; }
-    void     setMicroEpoch(uint64_t e)	{ microEpoch = e;}
+    uint64_t getTimestamp()		{ return timestamp; }
+    void     setTimestamp(uint64_t e)	{ timestamp = e;}
 
     double   getLatitude()		{ return latitude; }
     void     setLatitude(double l)	{ latitude = l; slat=sin(latitude * D2R); clat=cos(latitude * D2R);}
@@ -50,7 +51,7 @@ public:
     double   getClon()		{ return clon; }
 
 private:
-    uint64_t microEpoch;
+    uint64_t timestamp;
 
     // WGS84 position
     double latitude;
