@@ -37,15 +37,19 @@ public:
     ~Attitude() {
     };
 
-    double getRoll()   { return roll;}
+    double getRoll()        { return roll;}
+    double getRollRadians() { return roll * D2R;}
     double getSr()     { return sr;}
     double getCr()     { return cr;}
 
-    double getPitch()  { return pitch;}
+    double getPitch()        { return pitch;}
+    double getPitchRadians() { return pitch * D2R;}
+
     double getSp()     { return sp;}
     double getCp()     { return cp;}
 
-    double getHeading(){ return heading;}
+    double getHeading()        { return heading;}
+    double getHeadingRadians() { return heading * D2R;}
     double getSh()     { return sh;}
     double getCh()     { return ch;}
 
@@ -79,9 +83,10 @@ public:
 
 private:
     uint64_t  timestamp;
-    double    roll;
-    double    pitch;
-    double    heading;
+
+    double    roll;    //in degrees
+    double    pitch;   //in degrees
+    double    heading; //in degrees
 
     /*Trigonometry is stored to prevent redundant recalculations*/
     double sr;
