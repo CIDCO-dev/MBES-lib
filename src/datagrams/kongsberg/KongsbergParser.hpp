@@ -149,14 +149,23 @@ void KongsbergParser::processWaterHeight(KongsbergHeader & hdr,unsigned char * d
 }
 
 void KongsbergParser::processAttitudeDatagram(KongsbergHeader & hdr,unsigned char * datagram){
-    uint16_t nEntries = ((uint16_t*)datagram)[0];
-
-    KongsbergAttitudeEntry * p = (KongsbergAttitudeEntry*)datagram + 1;
-
     uint64_t microEpoch = convertTime(hdr.date,hdr.time);
 
+    uint16_t nEntries = ((uint16_t*)datagram)[0];
+
+    KongsbergAttitudeEntry * p = (KongsbergAttitudeEntry*) ((unsigned char*)datagram + sizeof(uint16_t));
+
     for(unsigned int i = 0;i<nEntries;i++){
-        processor.processAttitude(microEpoch + p[i].deltaTime * 1000,(double)p[i].heading/(double)100,(double)p[i].pitch/(double)100,(double)p[i].roll/(double)100);
+	double heading = (double)p[i].heading/(double)100;
+	double pitch   = (double)p[i].pitch/(double)100;
+	double roll    = (double)p[i].roll/(double)100;
+
+        processor.processAttitude(
+		microEpoch + p[i].deltaTime * 1000,
+		heading,
+		(pitch<0)?pitch+360:pitch,
+		(roll<0)?roll+360:roll
+        );
     }
 }
 
@@ -168,6 +177,8 @@ void KongsbergParser::processSoundSpeedProfile(KongsbergHeader & hdr,unsigned ch
     uint64_t microEpoch = convertTime(ssp->profileDate,ssp->profileTime);
 
     KongsbergSoundSpeedProfileEntry * entry = (KongsbergSoundSpeedProfileEntry*)((unsigned char*)(&ssp->depthResolution)+sizeof(uint16_t));
+
+    svp->setTimestamp(microEpoch);
 
     for(unsigned int i = 0;i< ssp->nbEntries;i++){
 	double depth = (double)entry[i].depth / ((double)100 / (double)ssp->depthResolution );

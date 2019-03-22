@@ -21,11 +21,11 @@ class DatagramProcessor{
 		virtual void processDatagramTag(int id){};
 
 
-		/* Convention for attitude angles
-		 *
-		 * Pitch: Positive value is nose up
-		 * Roll: Positive value is roll to starboard (right)
-		 * Heading: gyro (magnetic north)
+		/* Convention for attitude angles (in degrees)
+		 * 
+		 * Pitch: Positive value is nose up (0 to 360)
+		 * Roll: Positive value is roll to starboard (right) (0 to 360)
+		 * Heading: gyro (magnetic north) (NORMALIZED TO 0 to 360)
 		 */
                 virtual void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){};
 
@@ -34,7 +34,7 @@ class DatagramProcessor{
 
 
 		/**
-		* Convention for ping angles
+		* Convention for ping angles (in degrees)
 		* NED
 		* Beam angle: NEGATIVE to port (left) side, nadir is 0 degrees, POSITIVE to starboard (right) side
 		* Tilt angle: POSITIVE forward, NEGATIVE backward
@@ -46,7 +46,7 @@ class DatagramProcessor{
 		/*
                  * Processes a sound velocity profile, from a SSP profiler or CTD profiler
 		 */
-		virtual void processSoundVelocityProfile(SoundVelocityProfile * svp){};
+		virtual void processSoundVelocityProfile(SoundVelocityProfile * svp){ delete svp;};
 
 
 };

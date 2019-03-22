@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+ * Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
 /*
  * File:   Attitude.hpp
- * Author: jordan
+ * Author: glm,jordan
  *
  * Created on September 13, 2018, 3:28 PM
  */
@@ -21,7 +21,8 @@ public:
 
     Attitude(){};
 
-    Attitude(const double rollDegrees, const double pitchDegrees, const double headingDegrees) :
+    Attitude(uint64_t microEpoch,double rollDegrees,double pitchDegrees,double headingDegrees) :
+	    timestamp(microEpoch),
 	    roll(rollDegrees),
 	    pitch(pitchDegrees),
 	    heading(headingDegrees),
@@ -30,21 +31,25 @@ public:
 	    sp(sin(pitch*D2R)),
 	    cp(cos(pitch*D2R)),
 	    sh(sin(heading*D2R)),
-	    ch(cos(heading*D2R)) 
+	    ch(cos(heading*D2R))
     {};
 
     ~Attitude() {
     };
 
-    double getRoll()   { return roll;}
+    double getRoll()        { return roll;}
+    double getRollRadians() { return roll * D2R;}
     double getSr()     { return sr;}
     double getCr()     { return cr;}
 
-    double getPitch()  { return pitch;}
+    double getPitch()        { return pitch;}
+    double getPitchRadians() { return pitch * D2R;}
+
     double getSp()     { return sp;}
     double getCp()     { return cp;}
 
-    double getHeading(){ return heading;}
+    double getHeading()        { return heading;}
+    double getHeadingRadians() { return heading * D2R;}
     double getSh()     { return sh;}
     double getCh()     { return ch;}
 
@@ -66,10 +71,10 @@ public:
         ch=cos(heading*D2R);
     }
 
-    uint64_t getMicroEpoch(){ return microEpoch;}
+    uint64_t getTimestamp(){ return timestamp;}
 
-    void setMicroEpoch(uint64_t microEpoch){
-	this->microEpoch = microEpoch;
+    void setTimestamp(uint64_t microEpoch){
+	this->timestamp = microEpoch;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Attitude& obj) {
@@ -77,10 +82,11 @@ public:
     };
 
 private:
-    uint64_t  microEpoch;
-    double    roll;
-    double    pitch;
-    double    heading;
+    uint64_t  timestamp;
+
+    double    roll;    //in degrees
+    double    pitch;   //in degrees
+    double    heading; //in degrees
 
     /*Trigonometry is stored to prevent redundant recalculations*/
     double sr;

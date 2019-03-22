@@ -4,7 +4,7 @@
 
 /*
  * File:   Ping.hpp
- * Author: jordan
+ * Author: glm,jordan
  *
  * Created on September 14, 2018, 10:10 AM
  */
@@ -18,45 +18,41 @@
 #include "Position.hpp"
 
 class Ping {
-    
-    double transmissionTimestamp;
-    Position* transmissionPosition = NULL;
-    Attitude* transmissionAttitude = NULL;
-
-    double receptionTimestamp;
-    Position* receptionPosition = NULL;
-    Attitude* receptionAttitude = NULL;
+private:
+    uint64_t timestamp; //in microseconds since epoch
+    uint64_t id;
+    uint32_t quality;
+    uint32_t intensity;
 
     double surfaceSoundSpeed;
     double twoWayTravelTime;
-    double alongTrackAngle; // emission angle
-    double acrossTrackAngle; // reception angle
+    double alongTrackAngle;  // In degrees, AKA emission angle, alpha, kappa or tilt angle
+    double acrossTrackAngle; // In degrees, AKA reception angle, beta, zeta, beam angle
+
 
     /*Trigonometry is stored to prevent redundant recalculations*/
-    double sA; // alpha = kappa = alongTrackAngle = emission angle = tilt angle
+    double sA;
     double cA;
 
-    double sB; // beta = zeta = acrossTrackAngle = reception angle = beam angle
-    double cB; 
+    double sB;
+    double cB;
 
 public:
-    
-    Ping(double transmissionTimestamp,
-            Position* transmissionPosition,
-            Attitude* transmissionAttitude,
-            double receptionTimestamp,
-            Position* receptionPosition,
-            Attitude* receptionAttitude,
-            double surfaceSoundSpeed,
-            double twoWayTravelTime,
-            double alongTrackAngle,
-            double acrossTrackAngle) :
-    transmissionTimestamp(transmissionTimestamp),
-    transmissionPosition(transmissionPosition),
-    transmissionAttitude(transmissionAttitude),
-    receptionTimestamp(receptionTimestamp),
-    receptionPosition(receptionPosition),
-    receptionAttitude(receptionAttitude),
+    Ping(
+	uint64_t microEpoch,
+	long     id,
+	uint32_t quality,
+	uint32_t intensity,
+
+        double surfaceSoundSpeed,
+        double twoWayTravelTime,
+        double alongTrackAngle,
+        double acrossTrackAngle
+    ):
+    timestamp(microEpoch),
+    id(id),
+    quality(quality),
+    intensity(intensity),
     surfaceSoundSpeed(surfaceSoundSpeed),
     twoWayTravelTime(twoWayTravelTime),
     alongTrackAngle(alongTrackAngle),
@@ -68,23 +64,9 @@ public:
     }
 
     ~Ping() {
-        if (transmissionAttitude) {
-            delete transmissionAttitude;
-        }
 
-        if (transmissionPosition) {
-            delete transmissionPosition;
-        }
-
-        if (receptionAttitude) {
-            delete receptionAttitude;
-        }
-
-        if (receptionPosition) {
-            delete receptionPosition;
-        }
     }
-    
+
     double getAcrossTrackAngle() {
         return acrossTrackAngle;
     }
@@ -101,91 +83,30 @@ public:
         return cB;
     }
 
-    Attitude* getReceptionAttitude() {
-        return receptionAttitude;
+    double getTimestamp() {
+        return timestamp;
     }
 
-    Position* getReceptionPosition() {
-        return receptionPosition;
-    }
-
-    double getReceptionTimestamp() {
-        return receptionTimestamp;
-    }
-
-    double getSA() {
-        return sA;
+    double getSA(){
+	return sA;
     }
 
     double getSB() {
         return sB;
     }
 
-    double getSurfaceSoundSpeed() {
-        return surfaceSoundSpeed;
-    }
-
-    Attitude* getTransmissionAttitude() {
-        return transmissionAttitude;
-    }
-
-    Position* getTransmissionPosition() {
-        return transmissionPosition;
-    }
-
-    double getTransmissionTimestamp() {
-        return transmissionTimestamp;
+    double getSurfaceSoundSpeed(){
+	return surfaceSoundSpeed;
     }
 
     double getTwoWayTravelTime() {
         return twoWayTravelTime;
     }
 
-    static Ping* build(
-            double transmissionTimestamp,
-            double transmissionLatitude,
-            double transmissionLongitude,
-            double transmissionEllipsoidHeight,
-            double transmissionRoll,
-            double transmissionPitch,
-            double transmissionHeading,
-            double receptionTimestamp,
-            double receptionLatitude,
-            double receptionLongitude,
-            double receptionEllipsoidHeight,
-            double receptionRoll,
-            double receptionPitch,
-            double receptionHeading,
-            double surfaceSoundSpeed,
-            double twoWayTravelTime,
-            double alongTrackAngle,
-            double acrossTrackAngle) {
+    uint32_t getQuality() { return quality;}
 
-        return new Ping(transmissionTimestamp,
-                new Position(transmissionLatitude, transmissionLongitude, transmissionEllipsoidHeight),
-                new Attitude(transmissionRoll, transmissionPitch, transmissionHeading),
-                receptionTimestamp,
-                new Position(receptionLatitude, receptionLongitude, receptionEllipsoidHeight),
-                new Attitude(receptionRoll, receptionPitch, receptionHeading),
-                surfaceSoundSpeed,
-                twoWayTravelTime,
-                alongTrackAngle,
-                acrossTrackAngle);
-    }
+    uint32_t getIntensity() { return intensity;}
 
-    friend std::ostream& operator<<(std::ostream& os, const Ping& obj) {
-
-        return os << "Transmission timestamp: " << obj.transmissionTimestamp << std::endl
-                << "Transmission position: " << std::endl << *obj.transmissionPosition
-                << "Transmission attitude: " << std::endl << *obj.transmissionAttitude
-                << "Reception timestamp: " << obj.receptionTimestamp << std::endl
-                << "Reception position: " << std::endl << *obj.receptionPosition
-                << "Reception attitude: " << std::endl << *obj.receptionAttitude
-                << "Surface speed of sound: " << obj.surfaceSoundSpeed << std::endl
-                << "Two way travel time: " << obj.twoWayTravelTime << std::endl
-                << "Along track angle: " << obj.alongTrackAngle << std::endl
-                << "Across track angle: " << obj.acrossTrackAngle << std::endl;
-    }
 };
 
 

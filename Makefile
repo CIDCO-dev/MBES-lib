@@ -17,6 +17,7 @@ default:
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
 
 test: default
 	mkdir -p $(test_exec_dir)
@@ -25,6 +26,14 @@ test: default
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
 	$(root)/$(test_exec_dir)/tests -r junit -o $(test_result_dir)/mbes-lib-test-report.xml
+
+test-quick: default
+	mkdir -p $(test_exec_dir)
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp
+	mkdir -p $(test_result_dir)
+	mkdir -p $(test_work_dir)
+	cd $(test_work_dir)
+	$(root)/$(test_exec_dir)/tests
 
 doc:
 	rm -rf build/doxygen

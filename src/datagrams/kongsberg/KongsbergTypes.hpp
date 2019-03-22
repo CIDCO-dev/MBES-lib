@@ -20,12 +20,12 @@ typedef struct{
 
 #pragma pack(1)
 typedef struct{
-    uint16_t NumEntries;
-    uint16_t deltaTime;         //time in milliseconds since record start
-    int16_t  roll;              //in 0.01 degrees
-    int16_t  pitch;             //in 0.01 degrees
-    int16_t  heave;             //in cm
-    int16_t  heading;           //in 0.01 degrees
+    uint16_t  deltaTime;         //time in milliseconds since record start
+    int16_t   sensorStatus;
+    int16_t   roll;              //in 0.01 degrees
+    int16_t   pitch;             //in 0.01 degrees
+    int16_t   heave;             //in cm
+    uint16_t  heading;           //in 0.01 degrees
 } KongsbergAttitudeEntry;
 #pragma pack()
 
