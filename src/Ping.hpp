@@ -103,6 +103,10 @@ public:
         return twoWayTravelTime;
     }
 
+    uint32_t getQuality() { return quality;}
+
+    uint32_t getIntensity() { return intensity;}
+
 };
 
 

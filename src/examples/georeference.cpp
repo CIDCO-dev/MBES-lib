@@ -115,12 +115,11 @@ class DatagramGeoreferencer : public DatagramProcessor{
 				Eigen::Vector3d georeferencedPing;
 				Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm);
 
-				std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << std::endl;
+				std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << (*i).getQuality()  << " " << (*i).getIntensity() << std::endl;
 
 				delete interpolatedAttitude;
 				delete interpolatedPosition;
 			}
-
 		};
 
 	private:
