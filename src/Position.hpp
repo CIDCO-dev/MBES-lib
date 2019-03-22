@@ -44,7 +44,7 @@ public:
 
     double   getEllipsoidalHeight()     	{ return ellipsoidalHeight; }
     void     setEllipsoidalHeight(double h) 	{ ellipsoidalHeight = h;}
-    
+
     double   getSlat()		{ return slat; }
     double   getSlon()		{ return slon; }
     double   getClat()		{ return clat; }

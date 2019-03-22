@@ -192,9 +192,9 @@ bool SurveySystem::readFile(const std::string & fileName) {
         echosounderTransmitterPosition << MBES_X, MBES_Y, -MBES_Z;
         echosounderReceivererPosition << MBES_RX, MBES_RY, -MBES_RZ;
 
-        boresightPatchTest = new Attitude(Patch_Roll, Patch_Pitch, Patch_Heading);
+        boresightPatchTest = new Attitude(0,Patch_Roll, Patch_Pitch, Patch_Heading);
 
-        attitudeAccuracy = new Attitude(PitchRollAcc, PitchRollAcc, HeadingAcc);
+        attitudeAccuracy = new Attitude(0,PitchRollAcc, PitchRollAcc, HeadingAcc);
 
         positionAccuracy << PosHorAcc, PosHorAcc, PosVerAcc;
 

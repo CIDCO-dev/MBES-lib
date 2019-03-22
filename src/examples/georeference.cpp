@@ -13,6 +13,8 @@
 #include "../Ping.hpp"
 #include "../Attitude.hpp"
 #include "../math/Interpolation.hpp"
+#include "../Georeferencing.hpp"
+#include "../SoundVelocityProfileFactory.hpp"
 
 void printUsage(){
 	std::cerr << "\n\
@@ -35,7 +37,6 @@ class DatagramGeoreferencer : public DatagramProcessor{
 
 		}
 
-
                 void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
 			attitudes.push_back(Attitude(microEpoch,roll,pitch,heading));
                 };
@@ -51,6 +52,10 @@ class DatagramGeoreferencer : public DatagramProcessor{
                 void processSwathStart(double surfaceSoundSpeed){
 			currentSurfaceSoundSpeed = surfaceSoundSpeed;
                 };
+
+		void processSoundVelocityProfile(SoundVelocityProfile * svp){
+			svps.push_back(svp);
+		}
 
 		void georeference(){
 			//interpolate attitudes and positions around pings
@@ -80,13 +85,37 @@ class DatagramGeoreferencer : public DatagramProcessor{
 				Position & beforePosition = positions[positionIndex];
 				Position & afterPosition  = positions[positionIndex+1];
 
-				std::cout << beforeAttitude << std::endl;
-				std::cout << afterAttitude << std::endl;
-
 				Attitude * interpolatedAttitude = Interpolator::interpolateAttitude(beforeAttitude,afterAttitude,(*i).getTimestamp());
 				Position * interpolatedPosition = Interpolator::interpolatePosition(beforePosition,afterPosition,(*i).getTimestamp());
 
-				//TODO: georef
+				//get SVP for this ping
+				SoundVelocityProfile * svp = NULL;
+
+				if(svps.size() == 1){
+					svp = svps[0];
+				}
+				else{
+					if(svps.size() > 0){
+						//TODO: use a strategy (nearest by time, nearest by location, etc)
+						std::cerr << "Multiple SVP mode not yet implemented" << std::endl;
+						exit(1);
+					}
+					else{
+						//use default model
+						//TODO: allow different models to be used with command line switches
+						svp = SoundVelocityProfileFactory::buildSaltWaterModel();
+					}
+				}
+
+				//TODO: Get leverArm from the data or command line
+				Eigen::Vector3d leverArm;
+				leverArm << 0,0,0;
+
+				//georeference
+				Eigen::Vector3d georeferencedPing;
+				Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm);
+
+				std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << std::endl;
 
 				delete interpolatedAttitude;
 				delete interpolatedPosition;
@@ -95,11 +124,11 @@ class DatagramGeoreferencer : public DatagramProcessor{
 		};
 
 	private:
-		double 			currentSurfaceSoundSpeed;
-		std::vector<Ping> 	pings;
-		std::vector<Position> 	positions;
-		std::vector<Attitude> 	attitudes;
-
+		double 					currentSurfaceSoundSpeed;
+		std::vector<Ping> 			pings;
+		std::vector<Position> 			positions;
+		std::vector<Attitude> 			attitudes;
+		std::vector<SoundVelocityProfile*>  	svps;
 
 };
 
@@ -138,6 +167,10 @@ int main (int argc , char ** argv ){
 
 		parser->parse(fileName);
 
+
+		std::cout << std::setprecision(6);
+		std::cout << std::fixed;
+
 		printer.georeference();
 	}
 	catch(const char * error){
@@ -147,6 +180,5 @@ int main (int argc , char ** argv ){
 
 	if(parser) delete parser;
 }
-
 
 #endif

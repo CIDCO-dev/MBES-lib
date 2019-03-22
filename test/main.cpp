@@ -5,5 +5,4 @@
 #include "NmeaUtilsTest.hpp"
 #include "SoundVelocityProfileTest.hpp"
 #include "SurveySystemTest.hpp"
-#include "DcmTest.hpp"
 #include "CoordinateTransformTest.hpp"

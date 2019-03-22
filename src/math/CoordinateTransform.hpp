@@ -2,7 +2,7 @@
  * Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
-/* 
+/*
  * File:   CoordinateTransform.hpp
  * Author: glm,jordan
  *
@@ -65,20 +65,19 @@ public:
         double sinu = tanu * cosu;
         double sin2u = 1.0 - cos2u;
         double sin3u = sin2u * sinu;
-        
+
         double tanlat = (z + epsilon * b * sin3u) / (p - e2 * a * cos3u);
-        
         double tan2lat = tanlat * tanlat;
-        double cos2lat = 1.0 / (1.0 + tan2lat); 
+        double cos2lat = 1.0 / (1.0 + tan2lat);
         double sin2lat = 1.0 - cos2lat;
-        
-        double coslat = std::sqrt(cos2lat); 
+
+        double coslat = std::sqrt(cos2lat);
         double sinlat = tanlat * coslat;
-        
+
         double longitude = std::atan2(y, x);
         double latitude = std::atan(tanlat);
         double height = p * coslat + z * sinlat - a * sqrt(1.0 - e2 * sin2lat);
-        
+
         positionGeographic.setLatitude(latitude*R2D);
         positionGeographic.setLongitude(longitude*R2D);
         positionGeographic.setEllipsoidalHeight(height);
@@ -102,7 +101,48 @@ public:
                 m10, m11, m12,
                 m20, m21, m22;
     };
+
+    /**
+    * Rotation matrix from neutral/zero position to the given attitude
+    */
+    static void getDCM(Eigen::Matrix3d & outputMatrix,Attitude & attitude){
+        outputMatrix <<         attitude.getCh()*attitude.getCp(),   attitude.getCh()*attitude.getSp()*attitude.getSr()-attitude.getCr()*attitude.getSh(), attitude.getCh()*attitude.getCr()*attitude.getSp()+attitude.getSr()*attitude.getSh(),
+                                attitude.getCp()*attitude.getSh(),   attitude.getCh()*attitude.getCr()+attitude.getSp()*attitude.getSr()*attitude.getSh(), attitude.getSh()*attitude.getCr()*attitude.getSp()-attitude.getCh()*attitude.getSr(),
+                                -attitude.getSp(),          attitude.getCp()*attitude.getSr(),        attitude.getCr()*attitude.getCp();
+    }
+
+
+    /**
+     * NED Tangent plane at position to WGS84 ECEF
+     */
+    static void ned2ecef(Eigen::Matrix3d & outputMatrix,Position & position){
+
+        outputMatrix << -position.getClon()*position.getSlat(),-position.getSlon(),-position.getClat()*position.getClon(),
+                        -position.getSlat()*position.getSlon(),position.getClon(),-position.getClat()*position.getSlon(),
+                         position.getClat(),0,-position.getSlat();
+
+    }
+
+
+    /**
+     * Converts spherical coordinates to cartesian
+     */
+    static void spherical2cartesian(Eigen::Vector3d & outputVector,double theta,double phi,double r){
+	outputVector(0) = r * sin(D2R*theta)*cos(D2R*phi);
+	outputVector(1) = r * sin(D2R*theta)*sin(D2R*phi);
+	outputVector(2) = r * cos(D2R*theta);
+    }
+
+    /**
+     * Converts sonar coordinates (alpha,beta,r) to cartesian (NED)
+     */
+     static void sonar2cartesian(Eigen::Vector3d & outputVector,double alphaDegrees,double betaDegrees,double r){
+        //FIXME: This is just for quick testing purposes and assumes a null tilt angle
+
+        outputVector(0)=0;
+        outputVector(1)=(r/sin(D2R*(double)90)) * sin(D2R*betaDegrees);
+        outputVector(2)=(r/sin(D2R*(double)90)) * sin(D2R*((double)90-betaDegrees));
+     }
 };
 
 #endif /* COORDINATETRANSFORM_HPP */
-

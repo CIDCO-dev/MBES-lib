@@ -2,7 +2,7 @@
  * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
-/* 
+/*
  * File:   SoundVelocityProfileTest.cpp
  * Author: jordan
  *
@@ -25,3 +25,4 @@ TEST_CASE("Get speeds/depths"){
 	//TODO: test prototype
 	REQUIRE(1==2);
 }
+

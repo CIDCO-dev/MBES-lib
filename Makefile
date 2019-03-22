@@ -27,6 +27,14 @@ test: default
 	cd $(test_work_dir)
 	$(root)/$(test_exec_dir)/tests -r junit -o $(test_result_dir)/mbes-lib-test-report.xml
 
+test-quick: default
+	mkdir -p $(test_exec_dir)
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp
+	mkdir -p $(test_result_dir)
+	mkdir -p $(test_work_dir)
+	cd $(test_work_dir)
+	$(root)/$(test_exec_dir)/tests
+
 doc:
 	rm -rf build/doxygen
 	mkdir -p build/doxygen
