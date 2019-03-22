@@ -1,6 +1,6 @@
 CC=g++
 OPTIONS=-Wall #-std=c++0x
-INCLUDES=-IC:\Users\Hugo\Library\eigen
+INCLUDES=-IC:\Users\cidco\Library\eigen
 VERSION=0.1.0
 
 root=$(shell pwd)
