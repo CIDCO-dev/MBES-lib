@@ -43,13 +43,16 @@ pipeline {
 		bat "make test"
 		archiveArtifacts('build\\bin\\datagram-dump.exe')
 		archiveArtifacts('build\\bin\\cidco-decoder.exe')
+    archiveArtifacts('build\\bin\\datagram-list.exe')
+    archiveArtifacts('build\\bin\\georeference.exe')
+
             }
 	  post {
 	     always {
 		junit 'build\\test-report\\*.xml'
 	     }
 	  }
-        }	
+        }
 
         stage('BUILD MASTER'){
             agent { label 'master'}
@@ -64,9 +67,13 @@ pipeline {
               sh 'mkdir -p $binMasterPublishDir'
               sh 'mkdir -p $binWinx64PublishDir'
               sh 'cp -r build/bin/datagram-dump $binMasterPublishDir/$exec_name'
-	      sh 'cp -r build/bin/cidco-decoder $binMasterPublishDir/cidco-decoder-$version'
+	            sh 'cp -r build/bin/cidco-decoder $binMasterPublishDir/cidco-decoder-$version'
+              sh 'cp -r build/bin/datagram-list $binMasterPublishDir/datagram-list-$version'
+              sh 'cp -r build/bin/georeference $binMasterPublishDir/georeference-$version'
               sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/datagram-dump.exe  $binWinx64PublishDir/$exec_name.exe'
               sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/cidco-decoder.exe  $binWinx64PublishDir/cidco-decoder-$version.exe'
+              sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/datagram-list.exe  $binWinx64PublishDir/datagram-list-$version.exe'
+              sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/georeference.exe  $binWinx64PublishDir/georeference-$version.exe'
             }
         }
     }

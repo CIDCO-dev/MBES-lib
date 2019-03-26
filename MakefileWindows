@@ -1,6 +1,6 @@
 CC=g++
 OPTIONS=-Wall #-std=c++0x
-INCLUDES=-IC:\Users\Hugo\Library\eigen
+INCLUDES=-IC:\Users\cidco\Library\eigen
 VERSION=0.1.0
 
 root=$(shell pwd)
@@ -16,6 +16,8 @@ default:
 	mkdir $(exec_dir)
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-dump.cpp $(INCLUDES) /EHsc /Fedatagram-dump.exe
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\cidco-decoder.cpp $(INCLUDES) /EHsc /Fecidco-decoder.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-list.cpp $(INCLUDES) /EHsc /Fedatagram-list.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\georeference.cpp $(INCLUDES) /EHsc /Fegeoreference.exe
 
 test: default
 	mkdir $(test_exec_dir)
