@@ -23,3 +23,9 @@ Dumps position,attitude and ping data in a single ASCII stream. Lines with posit
 
 Lists the internal IDs of the packets found inside a binary datagram. Useful for reverse-engineering packet types.
 
+
+### georeference
+
+Converts a binary file to a 3D point cloud in the WGS84 cartesian frame
+
+
