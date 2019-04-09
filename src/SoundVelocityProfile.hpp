@@ -4,7 +4,7 @@
 
 /*
  * File:   SoundVelocityProfile.h
- * Author: glm,jordan
+ * Author: glm,jordan, emilegagne
  *
  * Created on August 22, 2018, 10:30 AM
  */
@@ -20,59 +20,122 @@
 #include <cmath>
 #include <vector>
 
+/*!
+ * \brief Classe de Vélocité de son
+ */
 class SoundVelocityProfile {
 public:
 
+    /**Crée une vélocité*/
     SoundVelocityProfile();
 
+    /**Détruit la vélocité*/
     ~SoundVelocityProfile();
 
 
+    /**
+     * Écrit les informations de la vélocité dans un fichier
+     * 
+     * @param filename nom du fichier à écrire
+     */
     void write(std::string & filename);
 
+    /**Retourne la valeur size*/
     unsigned int getSize() {
         return size;
     };
 
+    /**Retourne la latitude de la vélocité*/
     double getLatitude() 	 { return latitude; }
+    
+    /**
+     * Change la latitude de la vélocité
+     * 
+     * @param l nouvelle latitude
+     */
     void   setLatitude(double l) { latitude=l;}
 
+    /**Retourne la longitude de la vélocité*/
     double getLongitude()	 { return longitude;}
+    
+    /**
+     * Change la longitude de la véloncité
+     * 
+     * @param l nouvelle longitude
+     */
     void   setLongitude(double l){ longitude=l;}
 
+    /**Retourne la valeur temps de la vélocité*/
     uint64_t getTimestamp(){ return microEpoch;};
+    
+    /**
+     * Change la valeur temps de la vélocité
+     * 
+     * @param t nouvelle valeur temps
+     */
     void     setTimestamp(uint64_t t) { microEpoch=t;};
-
+    
+    /**
+     * Ajoute ajoute une valeur dans le vecteur depths et speeds
+     * 
+     * @param depth valeur à ajouter dans le vecteur depths
+     * @param soundSpeed valeur à ajouter dans le vecteur speeds
+     */
     void     add(double depth,double soundSpeed);
 
+    /**Retourne le vecteur depths*/
     Eigen::VectorXd & getDepths();
+    
+    /**Retourne le vecteur speeds*/
     Eigen::VectorXd & getSpeeds();
 
 private:
+    
+    /**valeur taille de la vélocité*/
     unsigned int size;
 
+    /**valeur temps calculé depuis janvier 1970 (micro-seconde)*/
     uint64_t  microEpoch; //timestamp
 
+    /**valeur de la latitude de la vélocité*/
     double latitude;
+    
+    /**valeur de la longitude de la vélocité*/
     double longitude;
 
+    /**vecteurs contenant les depth*/
     Eigen::VectorXd depths;
+    
+    /**vecteurs contenant les speed*/
     Eigen::VectorXd speeds;
 
     std::vector<std::pair<double,double>> samples;
 };
 
+/**Crée une vélocité*/
 SoundVelocityProfile::SoundVelocityProfile() {
     longitude = latitude = nan("");
 };
 
+/**Détruit la vélocité*/
 SoundVelocityProfile::~SoundVelocityProfile() {
 };
 
+/**
+     * Ajoute ajoute une valeur dans le vecteur depths et speeds
+     * 
+     * @param depth valeur à ajouter dans le vecteur depths
+     * @param soundSpeed valeur à ajouter dans le vecteur speeds
+     */
 void SoundVelocityProfile::add(double depth,double soundSpeed){
 	samples.push_back(std::make_pair(depth,soundSpeed));
 }
 
+/**
+     * Écrit les informations de la vélocité dans un fichier
+     * 
+     * @param filename nom du fichier à écrire
+     */
 void SoundVelocityProfile::write(std::string & filename){
 	std::ofstream out(filename);
 
@@ -90,6 +153,7 @@ void SoundVelocityProfile::write(std::string & filename){
 	}
 }
 
+/**Retourne le vecteur depths*/
 Eigen::VectorXd & SoundVelocityProfile::getDepths(){
 	//lazy load internal vector
 	if((unsigned int)depths.size() != samples.size()){
@@ -103,6 +167,7 @@ Eigen::VectorXd & SoundVelocityProfile::getDepths(){
 	return depths;
 }
 
+/**Retourne le vecteur speeds*/
 Eigen::VectorXd & SoundVelocityProfile::getSpeeds(){
 	//lazy load internal vector
 	if((unsigned int)speeds.size() != samples.size()){
