@@ -28,7 +28,7 @@ public:
      * @param microEpoch time value calculated since January 1970 (micro-second)
      * @param latitude the latitude of the position
      * @param longitude the longitude of the position
-     * @param ellipsoidalHeight the height of the position
+     * @param ellipsoidalHeight the ellipsoidal height of the position
      */
     Position(uint64_t microEpoch,double latitude, double longitude, double ellipsoidalHeight) :
     	timestamp(microEpoch),
@@ -75,20 +75,20 @@ public:
      */
     void     setLongitude(double l)     { longitude = l; slon=sin(longitude * D2R);clon=cos(longitude * D2R);}
 
-    /**Return the heigh of the position*/
+    /**Return the ellipsoidal heigh of the position*/
     double   getEllipsoidalHeight()     	{ return ellipsoidalHeight; }
     
     /**
-     * Change the heigh of the position
+     * Change the ellipsoidal heigh of the position
      * 
-     * @param h the new height
+     * @param h the new ellipsoidal height
      */
     void     setEllipsoidalHeight(double h) 	{ ellipsoidalHeight = h;}
 
-    /**Return the sinus value of the latitude*/
+    /**Return the sine value of the latitude*/
     double   getSlat()		{ return slat; }
     
-    /**Return the sinus value of the longitude*/
+    /**Return the sine value of the longitude*/
     double   getSlon()		{ return slon; }
     
     /**Return the cosine value of the latitude*/
@@ -110,18 +110,18 @@ private:
     /**The longitude of the position*/
     double longitude;
     
-    /**The height of the position*/
+    /**The ellipsoidal height of the position*/
     double ellipsoidalHeight;
 
     /*Trigonometry is stored to prevent redundant recalculations*/
     
-    /**Sinus value of the latitude*/
+    /**Sine value of the latitude*/
     double slat;
     
     /**Cosine value of the latitude*/
     double clat;
     
-    /**Sinus value of the longitude*/
+    /**Sine value of the longitude*/
     double slon;
     
     /**Cosine value of the longitude*/
