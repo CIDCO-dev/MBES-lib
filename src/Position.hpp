@@ -17,18 +17,18 @@
 #include <cmath>
 
 /*!
- * \brief Classe d'une position
+ * \brief Position class
  */
 class Position {
 public:
 
     /**
-     * Crée une position
+     * Create a position
      * 
-     * @param microEpoch valeur de temps calculé depuis janvier 1970
-     * @param latitude la latitude de la position
-     * @param longitude la longitude de la position
-     * @param ellipsoidalHeight l'hauteur de la position
+     * @param microEpoch time value calculated since January 1970 (micro-second)
+     * @param latitude the latitude of the position
+     * @param longitude the longitude of the position
+     * @param ellipsoidalHeight the height of the position
      */
     Position(uint64_t microEpoch,double latitude, double longitude, double ellipsoidalHeight) :
     	timestamp(microEpoch),
@@ -41,97 +41,97 @@ public:
     	clon(cos(longitude * D2R)) 
      {}
 
-    /**Détruit la position*/
+    /**Destroy the position*/
     ~Position() {
     }
 
-    /**Retourne la valeur temps de la position*/
+    /**Return the timestamp of the position*/
     uint64_t getTimestamp()		{ return timestamp; }
     
     /**
-     * Change la valeur temps de la position
+     * Change the timestamp of the position
      * 
-     * @param e nouvelle valeur temps
+     * @param e the new timestamp value
      */
     void     setTimestamp(uint64_t e)	{ timestamp = e;}
 
-    /**Retourne la latitude de la position*/
+    /**Return the latitude of the position*/
     double   getLatitude()		{ return latitude; }
     
     /**
-     * Change la latitude de la position
+     * Change the latitude of the position
      * 
-     * @param l nouvelle latitude
+     * @param l the new latitude
      */
     void     setLatitude(double l)	{ latitude = l; slat=sin(latitude * D2R); clat=cos(latitude * D2R);}
 
-    /**Retourne la longitude de la position*/
+    /**Return the longitude of the position*/
     double   getLongitude()		{ return longitude; }
     
     /**
-     * Change la longitude de la position
+     * Change the longitude of the position
      * 
-     * @param l nouvelle longitude
+     * @param l the new longitude
      */
     void     setLongitude(double l)     { longitude = l; slon=sin(longitude * D2R);clon=cos(longitude * D2R);}
 
-    /**Retourne la hauteur de la position*/
+    /**Return the heigh of the position*/
     double   getEllipsoidalHeight()     	{ return ellipsoidalHeight; }
     
     /**
-     * Change la hauteur de la position
+     * Change the heigh of the position
      * 
-     * @param h nouvelle hauteur
+     * @param h the new height
      */
     void     setEllipsoidalHeight(double h) 	{ ellipsoidalHeight = h;}
 
-    /**Retourne la valeur sinus de la latitude*/
+    /**Return the sinus value of the latitude*/
     double   getSlat()		{ return slat; }
     
-    /**Retourne la valeur sinus de la longitude*/
+    /**Return the sinus value of the longitude*/
     double   getSlon()		{ return slon; }
     
-    /**Retourne la valeur cosinus de la latitude*/
+    /**Return the cosine value of the latitude*/
     double   getClat()		{ return clat; }
     
-    /**Retourne la valeur cosinus de la longitude*/
+    /**Return the cosine value of the longitude*/
     double   getClon()		{ return clon; }
 
 private:
     
-    /**Valeur temps de la position*/
+    /**Timestamp value of the position (micro-second)*/
     uint64_t timestamp;
 
     // WGS84 position
     
-    /**La latitude de la position*/
+    /**The latitude of the position*/
     double latitude;
     
-    /**La longitude de la position*/
+    /**The longitude of the position*/
     double longitude;
     
-    /**L'hauteur de la position*/
+    /**The height of the position*/
     double ellipsoidalHeight;
 
     /*Trigonometry is stored to prevent redundant recalculations*/
     
-    /**Valeur sinus de la latitude*/
+    /**Sinus value of the latitude*/
     double slat;
     
-    /**Valeur cosinus de la latitude*/
+    /**Cosine value of the latitude*/
     double clat;
     
-    /**Valeur sinus de la longitude*/
+    /**Sinus value of the longitude*/
     double slon;
     
-    /**Valeur cosinus de la longitude*/
+    /**Cosine value of the longitude*/
     double clon;
 
     /**
-     * Crée une chaine de caractère sur les informations d'une position
+     * Return a text value who contain the informations of the position
      * 
-     * @param os chaine de caractère où les informations doivent être placées
-     * @param obj position où les informations doivent être obtenues
+     * @param os the text value who most contain the informations of the position
+     * @param obj the position that we need to get the informations
      */
     friend std::ostream& operator<<(std::ostream& os, const Position& obj) {
         return os << "Latitude: " << obj.latitude << std::endl << "Longitude: " << obj.longitude << std::endl << "Ellipsoidal Height: " << obj.ellipsoidalHeight << std::endl;
