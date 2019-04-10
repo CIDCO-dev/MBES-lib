@@ -49,13 +49,13 @@ private:
 
 
     /*Trigonometry is stored to prevent redundant recalculations*/
-    /**Sinus value of the along track angle*/
+    /**Sine value of the along track angle*/
     double sA;
     
     /**Cosine value of the along track angle*/
     double cA;
 
-    /**Sinus value of the across track angle*/
+    /**Sine value of the across track angle*/
     double sB;
     
     /**Cosine value of the across track angle*/
@@ -130,12 +130,12 @@ public:
         return timestamp;
     }
 
-    /**Return the sinus value of the along track angle*/
+    /**Return the sine value of the along track angle*/
     double getSA(){
 	return sA;
     }
 
-    /**Return the sinus value of the across track angle*/
+    /**Return the sine value of the across track angle*/
     double getSB() {
         return sB;
     }
