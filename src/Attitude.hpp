@@ -23,18 +23,18 @@ class Attitude {
 public:
     
     /**
-     * Create a attitude
+     * Create an attitude
      */
 
     Attitude(){};
     
     /**
-     * Create a attitude
+     * Create an attitude
      * 
      * @param microEpoch  number of micro-second calculated since January 1970 (micro-second)
-     * @param rollDegrees the value of the angle between two rolls (degrees)
-     * @param pitchDegrees the value of the angle who determine how the boat is incline (degrees)
-     * @param headingDegrees the value of the angle who determine where the boat is heading (degrees)
+     * @param rollDegrees the angle value of the roll movement of the boat (degrees)
+     * @param pitchDegrees the angle value of the pitch movement of the boat (degrees)
+     * @param headingDegrees the angle value of the yaw movement of the boat (degrees)
      */
 
     Attitude(uint64_t microEpoch,double rollDegrees,double pitchDegrees,double headingDegrees) :
@@ -57,46 +57,46 @@ public:
     ~Attitude() {
     };
 
-    /**Return the angle roll*/
+    /**Return the roll angle*/
     double getRoll()        { return roll;}
     
-    /**Return the radian angle of roll*/
+    /**Return the radian of the roll angle*/
     double getRollRadians() { return roll * D2R;}
     
-    /**Return the sinus value of the angle roll*/
+    /**Return the sine value of the roll angle*/
     double getSr()     { return sr;}
     
-    /**Return the cosine value of the angle roll*/
+    /**Return the cosine value of the roll angle*/
     double getCr()     { return cr;}
 
-    /**Return the angle pitch*/
+    /**Return the pitch angle*/
     double getPitch()        { return pitch;}
     
-    /**Return the radian angle of pitch*/
+    /**Return the radian the pitch angle*/
     double getPitchRadians() { return pitch * D2R;}
 
-    /**Return the sinus value of the angle pitch*/
+    /**Return the sine value of the pitch angle*/
     double getSp()     { return sp;}
     
-    /**Return the cosine value of the angle pitch*/
+    /**Return the cosine value of the pitch angle*/
     double getCp()     { return cp;}
 
-    /**Return the angle heading*/
+    /**Return the heading angle*/
     double getHeading()        { return heading;}
     
-    /**Return the radian angle of heading*/
+    /**Return the radian of the heading angle*/
     double getHeadingRadians() { return heading * D2R;}
     
-    /**Return the sinus value of the angle heading*/
+    /**Return the sine value of the heading angle*/
     double getSh()     { return sh;}
     
-    /**Return the cosine value of the angle heading*/
+    /**Return the cosine value of the heading angle*/
     double getCh()     { return ch;}
 
     /**
-     * Change the angle roll and his values sinus and cosine
+     * Change the roll angle and his values sine and cosine
      * 
-     * @param roll the new angle roll
+     * @param roll the new roll angle
      */
     void setRoll(double roll){
 	this->roll = roll;
@@ -105,9 +105,9 @@ public:
     }
 
     /**
-     * Change the angle pitch and his values sinus and cosine
+     * Change the pitch angle and his values sine and cosine
      * 
-     * @param pitch the new angle pitch
+     * @param pitch the new pitch angle
      */
     void setPitch(double pitch){
 	this->pitch=pitch; 
@@ -116,9 +116,9 @@ public:
     }
 
     /**
-     * Change the angle heading and his values sinus and cosine
+     * Change the heading angle and his values sine and cosine
      * 
-     * @param heading the new angle heading
+     * @param heading the new heading angle
      */
     void setHeading(double heading){
 	this->heading=heading;
@@ -153,33 +153,33 @@ private:
     /**Number of micro-second calculated since January 1970 (micro-second)*/
     uint64_t  timestamp;
 
-    /**Value of the angle between two rolls (degrees)*/
+    /**The angle value of the roll movement of the boat (degrees)*/
     double    roll;    //in degrees
     
-    /**Value of the angle who determine how the boat is incline (degrees)*/
+    /**The angle value of the pitch movement of the boat (degrees)*/
     double    pitch;   //in degrees
     
-    /**Value of the angle who determine where the boat is heading (degrees)*/
+    /**The angle value of the yaw movement of the boat (degrees)*/
     double    heading; //in degrees
 
     /*Trigonometry is stored to prevent redundant recalculations*/
     
-    /**Sinus value of the angle roll*/
+    /**Sine value of the roll angle*/
     double sr;
     
-    /**Cosine value of the angle roll*/
+    /**Cosine value of the roll angle*/
     double cr;
 
-    /**Sinus value of the angle pitch*/
+    /**Sine value of the pitch angle*/
     double sp;
     
-    /**Cosine value of the angle pitch*/
+    /**Cosine value of the pitch angle*/
     double cp;
 
-    /**Sinus value of the angle heading*/
+    /**Sine value of the heading angle*/
     double sh;
     
-    /**Cosine value of the angle heading*/
+    /**Cosine value of the heading angle*/
     double ch;
 };
 
