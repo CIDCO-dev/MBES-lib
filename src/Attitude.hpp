@@ -17,24 +17,24 @@
 #include <cmath>
 
 /*!
- *  \brief Classe d'altitude.
+ *  \brief Attitude class.
  */
 class Attitude {
 public:
     
     /**
-     * Crée une altitude
+     * Create a attitude
      */
 
     Attitude(){};
     
     /**
-     * Crée une altitude
+     * Create a attitude
      * 
-     * @param microEpoch  nombre de micro-seconde depuis janvier 1970 (micro-seconde)
-     * @param rollDegrees la valeur entre deux rollies (degrés)
-     * @param pitchDegrees la valeur en degrés qui détermine comment le bâteau penche (degrés)
-     * @param headingDegrees détermine en degrés la direction où le bâteau pointe (degrés)
+     * @param microEpoch  number of micro-second calculated since January 1970 (micro-second)
+     * @param rollDegrees the value of the angle between two rolls (degrees)
+     * @param pitchDegrees the value of the angle who determine how the boat is incline (degrees)
+     * @param headingDegrees the value of the angle who determine where the boat is heading (degrees)
      */
 
     Attitude(uint64_t microEpoch,double rollDegrees,double pitchDegrees,double headingDegrees) :
@@ -51,52 +51,52 @@ public:
     {};
     
     /**
-     * Détruit l'altitude
+     * Destroy the attitude 
      */
     
     ~Attitude() {
     };
 
-    /**Retourne l'angle roll*/
+    /**Return the angle roll*/
     double getRoll()        { return roll;}
     
-    /**Retourne l'angle roll en radian*/
+    /**Return the radian angle of roll*/
     double getRollRadians() { return roll * D2R;}
     
-    /**Retourne la valeur sinus de l'angle roll*/
+    /**Return the sinus value of the angle roll*/
     double getSr()     { return sr;}
     
-    /**Retourne la valeur cosinus de l'angle roll */
+    /**Return the cosine value of the angle roll*/
     double getCr()     { return cr;}
 
-    /**Retourne l'angle pitch*/
+    /**Return the angle pitch*/
     double getPitch()        { return pitch;}
     
-    /**Retourne l'angle pitch en radian*/
+    /**Return the radian angle of pitch*/
     double getPitchRadians() { return pitch * D2R;}
 
-    /**Retourne la valeur sinus de l'angle pitch*/
+    /**Return the sinus value of the angle pitch*/
     double getSp()     { return sp;}
     
-    /**Retourne la valeur cosinus de l'angle pitch*/
+    /**Return the cosine value of the angle pitch*/
     double getCp()     { return cp;}
 
-    /**Retourne l'angle heading*/
+    /**Return the angle heading*/
     double getHeading()        { return heading;}
     
-    /**Retourne l'angle heading en radian*/
+    /**Return the radian angle of heading*/
     double getHeadingRadians() { return heading * D2R;}
     
-    /**Retourne la valeur sinus de l'angle heading*/
+    /**Return the sinus value of the angle heading*/
     double getSh()     { return sh;}
     
-    /**Retourne la valeur cosinus de l'angle heading*/
+    /**Return the cosine value of the angle heading*/
     double getCh()     { return ch;}
 
     /**
-     * Change l'angle roll et ses valeur sinus et cosinus selon l'angle reçu en paramètre
+     * Change the angle roll and his values sinus and cosine
      * 
-     * @param roll nouvelle angle roll
+     * @param roll the new angle roll
      */
     void setRoll(double roll){
 	this->roll = roll;
@@ -105,9 +105,9 @@ public:
     }
 
     /**
-     * Change l'angle pitch et ses valeur sinus et cosinus selon l'angle reçu en paramètre
+     * Change the angle pitch and his values sinus and cosine
      * 
-     * @param pitch nouvelle angle pitch
+     * @param pitch the new angle pitch
      */
     void setPitch(double pitch){
 	this->pitch=pitch; 
@@ -116,9 +116,9 @@ public:
     }
 
     /**
-     * Change l'angle heading et ses valeur sinus et cosinus selon l'angle reçu en paramètre
+     * Change the angle heading and his values sinus and cosine
      * 
-     * @param heading nouvelle angle heading
+     * @param heading the new angle heading
      */
     void setHeading(double heading){
 	this->heading=heading;
@@ -126,23 +126,23 @@ public:
         ch=cos(heading*D2R);
     }
 
-    /**Retourne le temps en micro-seconde de l'altitude*/
+    /**Return the time stamp of the attitude*/
     uint64_t getTimestamp(){ return timestamp;}
 
     /**
-     * Change la valeur timestamp pour la valeur temps reçu en paramètre
+     * Change the value timestamp
      *
-     * @param microEpoch nouvelle valeur temps de timestamp
+     * @param microEpoch the new timestamp
      */
     void setTimestamp(uint64_t microEpoch){
 	this->timestamp = microEpoch;
     }
 
     /**
-     * Retourne une chaine de caractère donnant les angles d'un altitude
+     * Return a text value with the informations of the attitude
      * 
-     * @param os chaine de caractères dont il faut ajouter l'information
-     * @param obj l'altitude que l'on cherche à avoir l'information
+     * @param os text value who most contain the information
+     * @param obj the attitude that we need to get the information
      */
     friend std::ostream& operator<<(std::ostream& os, const Attitude& obj) {
         return os << "Roll: " << obj.roll << std::endl << "Pitch: " << obj.pitch << std::endl << "Heading: " << obj.heading << std::endl;
@@ -150,36 +150,36 @@ public:
 
 private:
     
-    /**Valeur de temps en micro-seconde calculé depuis janvier 1970 (micro-seconde)*/
+    /**Number of micro-second calculated since January 1970 (micro-second)*/
     uint64_t  timestamp;
 
-    /**Un angle entre deux rollies (degrés)*/
+    /**Value of the angle between two rolls (degrees)*/
     double    roll;    //in degrees
     
-    /**Un angle qui détermine comment le bâteau penche (degrés)*/
+    /**Value of the angle who determine how the boat is incline (degrees)*/
     double    pitch;   //in degrees
     
-    /**Un angle qui détermine en degrés la direction où le bâteau pointe (degrés)*/
+    /**Value of the angle who determine where the boat is heading (degrees)*/
     double    heading; //in degrees
 
     /*Trigonometry is stored to prevent redundant recalculations*/
     
-    /**Valeur sinus de l'angle roll*/
+    /**Sinus value of the angle roll*/
     double sr;
     
-    /**Valeur cosinus de l'angle roll*/
+    /**Cosine value of the angle roll*/
     double cr;
 
-    /**Valeur sinus de l'angle pitch*/
+    /**Sinus value of the angle pitch*/
     double sp;
     
-    /**Valeur cosinus de l'angle pitch*/
+    /**Cosine value of the angle pitch*/
     double cp;
 
-    /**Valeur sinus de l'angle heading*/
+    /**Sinus value of the angle heading*/
     double sh;
     
-    /**Valeur cosinus de l'angle heading*/
+    /**Cosine value of the angle heading*/
     double ch;
 };
 
