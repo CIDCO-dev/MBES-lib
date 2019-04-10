@@ -18,62 +18,62 @@
 #include "Position.hpp"
 
 /*!
- * \brief Classe d'un ping contenant la vitesse du son, le temps de déplacement, l'angle qui passe au long et l'angle qui passe à travers
+ * \brief Ping class
  */
 class Ping {
 private:
     
-    /**Valeur de temps calculé depuis janvier 1970 (micro-seconde)*/
+    /**Time value calculated since January 1970 (micro-second)*/
     uint64_t timestamp; //in microseconds since epoch
     
-    /**Valeur identifiant le ping*/
+    /**Value of the identification of the ping*/
     uint64_t id;
     
-    /**Valeur de la qualité du ping*/
+    /**Value of the quality of the ping*/
     uint32_t quality;
     
-    /**Valeur de l'intensité du ping*/
+    /**Value of the intensity of the ping*/
     uint32_t intensity;
 
-    /**Valeur de la vitesse du son d'une surface*/
+    /**The sound speed value of the surface*/
     double surfaceSoundSpeed;
     
-    /**Valeur du temps de transition entre les deux points*/
+    /**Time value of transition between two points (micro-second)*/
     double twoWayTravelTime;
     
-    /**Valeur de l'angle qui passe au long*/
+    /**Value of the angle who pass along the track (degrees)*/
     double alongTrackAngle;  // In degrees, AKA emission angle, alpha, kappa or tilt angle
     
-    /**Valeur de l'angle qui passe à travers*/
+    /**Value of the angle who pass across the track (degrees)*/
     double acrossTrackAngle; // In degrees, AKA reception angle, beta, zeta, beam angle
 
 
     /*Trigonometry is stored to prevent redundant recalculations*/
-    /**Valeur sinus de l'angle qui passe au long*/
+    /**Sinus value of the along track angle*/
     double sA;
     
-    /**Valeur cosinus de l'angle qui passe au long*/
+    /**Cosine value of the along track angle*/
     double cA;
 
-    /**Valeur sinus de l'angle qui passe à travers*/
+    /**Sinus value of the across track angle*/
     double sB;
     
-    /**Valeur cosinus de l'angle qui passe à travers*/
+    /**Cosine value of the across track angle*/
     double cB;
 
 public:
     
     /**
-     * Crée le ping
+     * Create the ping
      * 
-     * @param microEpoch valeur temps du ping
-     * @param id identifiant du ping
-     * @param quality qualité du ping
-     * @param intensity intensité du ping
-     * @param surfaceSoundSpeed vitesse du son de la surface du ping
-     * @param twoWayTravelTime durée de la transition entre les deux points 
-     * @param alongTrackAngle angle qui passe au long
-     * @param acrossTrackAngle angle qui passe à travers
+     * @param microEpoch timestamp value of the ping
+     * @param id identification of the ping
+     * @param quality quality of the ping
+     * @param intensity intensity of the ping
+     * @param surfaceSoundSpeed the sound speed of the surface
+     * @param twoWayTravelTime time value of the transition between
+     * @param alongTrackAngle Angle who pass along the track
+     * @param acrossTrackAngle Angle who across the track
      */
     Ping(
 	uint64_t microEpoch,
@@ -100,60 +100,60 @@ public:
     cB(cos(acrossTrackAngle*D2R)){
     }
 
-    /** Détruit le ping*/
+    /** Destroy the ping*/
     ~Ping() {
 
     }
 
-    /**Retourne l'angle passant à travers*/
+    /**Return the across track angle*/
     double getAcrossTrackAngle() {
         return acrossTrackAngle;
     }
 
-    /**Retourne l'angle passant au long*/
+    /**Return the along track angle*/
     double getAlongTrackAngle() {
         return alongTrackAngle;
     }
 
-    /**Retourne le cosinus de l'angle passant au long*/
+    /**Return the cosine value of the along track angle*/
     double getCA() {
         return cA;
     }
 
-    /**Retourne le cosinus de l'angle passant à travers*/
+    /**Return the cosine value of the across track angle*/
     double getCB() {
         return cB;
     }
 
-    /**Retourne la valeur temps du ping*/
+    /**Return the timestamp of the ping*/
     double getTimestamp() {
         return timestamp;
     }
 
-    /**Retourne le sinus de l'angle passant au long*/
+    /**Return the sinus value of the along track angle*/
     double getSA(){
 	return sA;
     }
 
-    /**Retourne le sinus de l'angle passant à travers*/
+    /**Return the sinus value of the across track angle*/
     double getSB() {
         return sB;
     }
 
-    /**Retourne la vitesse du son d'une surface*/
+    /**Return the sound speed of the surface*/
     double getSurfaceSoundSpeed(){
 	return surfaceSoundSpeed;
     }
 
-    /**Retourne le temps de transition entre deux points*/
+    /**Return the time value of the transition between two points*/
     double getTwoWayTravelTime() {
         return twoWayTravelTime;
     }
 
-    /**Retourne la qualité du ping*/
+    /**Return the quality of the ping*/
     uint32_t getQuality() { return quality;}
 
-    /**Retourne l'intensité du ping*/
+    /**Return the intensity of the ping*/
     uint32_t getIntensity() { return intensity;}
 
 };
