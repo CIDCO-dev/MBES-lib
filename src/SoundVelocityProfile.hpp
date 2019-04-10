@@ -21,120 +21,121 @@
 #include <vector>
 
 /*!
- * \brief Classe de Vélocité de son
+ * \brief Sound velocity class
  */
 class SoundVelocityProfile {
 public:
 
-    /**Crée une vélocité*/
+    /**Create a velocity*/
     SoundVelocityProfile();
 
-    /**Détruit la vélocité*/
+    /**Destroy a velocity*/
     ~SoundVelocityProfile();
 
 
     /**
-     * Écrit les informations de la vélocité dans un fichier
+     * Write the informations of the velocity in a file
      * 
-     * @param filename nom du fichier à écrire
+     * @param filename the name of the file that will be use to write
      */
     void write(std::string & filename);
 
-    /**Retourne la valeur size*/
+    /**Return the size of the velocity*/
     unsigned int getSize() {
         return size;
     };
 
-    /**Retourne la latitude de la vélocité*/
+    /**Return the latitude of the velocity*/
     double getLatitude() 	 { return latitude; }
     
     /**
-     * Change la latitude de la vélocité
+     * Change the latitude of the velocity
      * 
-     * @param l nouvelle latitude
+     * @param l the new latitude
      */
     void   setLatitude(double l) { latitude=l;}
 
-    /**Retourne la longitude de la vélocité*/
+    /**Return the longitude of the velocity*/
     double getLongitude()	 { return longitude;}
     
     /**
-     * Change la longitude de la véloncité
+     * Change the longitude of the velocity
      * 
-     * @param l nouvelle longitude
+     * @param l the new longitude of the velocity
      */
     void   setLongitude(double l){ longitude=l;}
 
-    /**Retourne la valeur temps de la vélocité*/
+    /**Return the timestamp of the velocity*/
     uint64_t getTimestamp(){ return microEpoch;};
     
     /**
-     * Change la valeur temps de la vélocité
+     * Change the timestamp of the velocity
      * 
-     * @param t nouvelle valeur temps
+     * @param t the new timestamp
      */
     void     setTimestamp(uint64_t t) { microEpoch=t;};
     
     /**
-     * Ajoute ajoute une valeur dans le vecteur depths et speeds
+     * Add a new value in the vector depths and speeds
      * 
-     * @param depth valeur à ajouter dans le vecteur depths
-     * @param soundSpeed valeur à ajouter dans le vecteur speeds
+     * @param depth value to add in depths
+     * @param soundSpeed value to add in speeds
      */
     void     add(double depth,double soundSpeed);
 
-    /**Retourne le vecteur depths*/
+    /**Return the vector depths*/
     Eigen::VectorXd & getDepths();
     
-    /**Retourne le vecteur speeds*/
+    /**Return the vector speeds*/
     Eigen::VectorXd & getSpeeds();
 
 private:
     
-    /**valeur taille de la vélocité*/
+    /**value of the velocity size*/
     unsigned int size;
 
-    /**valeur temps calculé depuis janvier 1970 (micro-seconde)*/
+    /**timestamp value of the velocity (micro-seconde)*/
     uint64_t  microEpoch; //timestamp
 
-    /**valeur de la latitude de la vélocité*/
+    /**latitude value of the velocity*/
     double latitude;
     
-    /**valeur de la longitude de la vélocité*/
+    /**longitude value of the velocity*/
     double longitude;
 
-    /**vecteurs contenant les depth*/
+    /**vector who contain the dephts of the velocity*/
     Eigen::VectorXd depths;
     
-    /**vecteurs contenant les speed*/
+    /**vector who contain the speeds of the velocity*/
     Eigen::VectorXd speeds;
 
+    /**vector who contain the depths and the speeds*/
     std::vector<std::pair<double,double>> samples;
 };
 
-/**Crée une vélocité*/
+/**Create the velocity*/
 SoundVelocityProfile::SoundVelocityProfile() {
     longitude = latitude = nan("");
 };
 
-/**Détruit la vélocité*/
+/**Destroy the velocity*/
 SoundVelocityProfile::~SoundVelocityProfile() {
 };
 
-/**
-     * Ajoute ajoute une valeur dans le vecteur depths et speeds
+     /**
+     * Add a new value in the vector depths and speeds
      * 
-     * @param depth valeur à ajouter dans le vecteur depths
-     * @param soundSpeed valeur à ajouter dans le vecteur speeds
+     * @param depth value to add in depths
+     * @param soundSpeed value to add in speeds
      */
 void SoundVelocityProfile::add(double depth,double soundSpeed){
 	samples.push_back(std::make_pair(depth,soundSpeed));
 }
 
-/**
-     * Écrit les informations de la vélocité dans un fichier
+     /**
+     * Write the informations of the velocity in a file
      * 
-     * @param filename nom du fichier à écrire
+     * @param filename the name of the file that will be use to write
      */
 void SoundVelocityProfile::write(std::string & filename){
 	std::ofstream out(filename);
@@ -153,7 +154,7 @@ void SoundVelocityProfile::write(std::string & filename){
 	}
 }
 
-/**Retourne le vecteur depths*/
+/**Return the vector depths*/
 Eigen::VectorXd & SoundVelocityProfile::getDepths(){
 	//lazy load internal vector
 	if((unsigned int)depths.size() != samples.size()){
@@ -167,7 +168,7 @@ Eigen::VectorXd & SoundVelocityProfile::getDepths(){
 	return depths;
 }
 
-/**Retourne le vecteur speeds*/
+/**Return the vector speeds*/
 Eigen::VectorXd & SoundVelocityProfile::getSpeeds(){
 	//lazy load internal vector
 	if((unsigned int)speeds.size() != samples.size()){
