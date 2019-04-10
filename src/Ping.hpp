@@ -73,7 +73,7 @@ public:
      * @param surfaceSoundSpeed the sound speed of the surface
      * @param twoWayTravelTime time value of the transition between
      * @param alongTrackAngle Angle who pass along the track
-     * @param acrossTrackAngle Angle who across the track
+     * @param acrossTrackAngle Angle who pass across the track
      */
     Ping(
 	uint64_t microEpoch,
