@@ -29,7 +29,7 @@ public:
      * @param position the position of the georeference
      * @param ping the ping of the georeference
      * @param svp the song velocity of the georeference
-     * @param leverArm vector of the leverArm who goes from the GPS to the acoustic
+     * @param leverArm vector of the leverArm who goes from the reference point to the transmitter 
      * 
      */
     static void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm) {
