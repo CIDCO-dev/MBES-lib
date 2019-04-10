@@ -24,7 +24,7 @@ public:
     /**
      * Create a georeferencing
      * 
-     * @param georeferencedPing vector who give the georeference of a ping
+     * @param georeferencedPing vector of a ping georeferenced
      * @param attitude the attitude of the georeference
      * @param position the position of the georeference
      * @param ping the ping of the georeference
