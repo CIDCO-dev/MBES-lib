@@ -4,7 +4,7 @@
 
 /*
  * File:   Georeferencing.hpp
- * Author: glm,jordan
+ * Author: glm,jordan, emilegagne
  *
  * Created on October 2, 2018, 9:39 AM
  */
@@ -15,10 +15,23 @@
 #include <Eigen/Dense>
 #include "math/CoordinateTransform.hpp"
 #include "Raytracing.hpp"
-
+/*!
+ * \brief Georeferencing class
+ */
 class Georeferencing{
 public:
 
+    /**
+     * Create a georeferencing
+     * 
+     * @param georeferencedPing vector of a ping georeferenced
+     * @param attitude the attitude of the georeference
+     * @param position the position of the georeference
+     * @param ping the ping of the georeference
+     * @param svp the song velocity of the georeference
+     * @param leverArm vector of the leverArm who goes from the reference point to the transmitter 
+     * 
+     */
     static void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm) {
 	//Compute transform matrixes
         Eigen::Matrix3d ned2ecef;
