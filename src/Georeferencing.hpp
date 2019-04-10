@@ -16,20 +16,20 @@
 #include "math/CoordinateTransform.hpp"
 #include "Raytracing.hpp"
 /*!
- * \brief Class de géoréférencement
+ * \brief Georeferencing class
  */
 class Georeferencing{
 public:
 
     /**
-     * Crée une géoréférence
+     * Create a georeferencing
      * 
-     * @param georeferencedPing vecteur donnant la géoréférence d'un ping
-     * @param attitude l'altitude de la géoréférence
-     * @param position la position de la géoréférence
-     * @param ping le ping de la géoréférence
-     * @param svp la vélocité sonore de la géoréférence
-     * @param leverArm vecteur du leverArm qui part du GPS vers l'acoustick
+     * @param georeferencedPing vector who give the georeference of a ping
+     * @param attitude the attitude of the georeference
+     * @param position the position of the georeference
+     * @param ping the ping of the georeference
+     * @param svp the song velocity of the georeference
+     * @param leverArm vector of the leverArm who goes from the GPS to the acoustic
      * 
      */
     static void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm) {
