@@ -31,8 +31,8 @@ public:
     /**
      * Create an attitude
      * 
-     * @param microEpoch  number of micro-second calculated since January 1970 (micro-second)
-     * @param rollDegrees the angle value of the roll movement of the boat (degrees)
+     * @param microEpoch  number of micro-seconds since January 1st 1970
+     * @param rollDegrees the roll angle of the boat in degrees w.r.t the navigation frame
      * @param pitchDegrees the angle value of the pitch movement of the boat (degrees)
      * @param headingDegrees the angle value of the yaw movement of the boat (degrees)
      */
