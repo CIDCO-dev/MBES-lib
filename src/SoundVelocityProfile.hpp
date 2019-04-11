@@ -197,7 +197,7 @@ void SoundVelocityProfile::add (double depth,double soundSpeed){
 }
 
      /**
-     * Write the informations of the sound velocity in a file
+     * Write the information of the sound velocity in a file
      * 
      * @param filename the name of the file that will be use to write
      */
