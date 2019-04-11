@@ -192,7 +192,7 @@ SoundVelocityProfile::~SoundVelocityProfile() {
      * @param depth value to add in depths
      * @param soundSpeed value to add in speeds
      */
-void SoundVelocityProfile::add(double depth,double soundSpeed){
+void SoundVelocityProfile::add (double depth,double soundSpeed){
 	samples.push_back(std::make_pair(depth,soundSpeed));
 }
 
