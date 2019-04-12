@@ -208,7 +208,6 @@ public:
      */
     uint64_t readTime(std::string & row)
     {
-        row.erase(0,8);
         int year = std::atoi(row.substr(0, row.find("-"))); 
         row.erase(0,row.find("-")+1);
         year = year - 1900;
@@ -367,6 +366,7 @@ void SoundVelocityProfile::read(std::string filename)
             {
                 if (i==2)
                 {
+                    row.erase(0,8);
                     microEpoch = readTime(row);
                     latitude = readLatLong(row);
                     longitude = readLatLong(row);
