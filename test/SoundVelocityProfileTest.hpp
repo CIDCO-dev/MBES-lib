@@ -80,7 +80,8 @@ TEST_CASE("Read the sound velocity profile longitude")
 }
 
 TEST_CASE("Get speeds/depths"){
-	//TODO: test prototype
-	REQUIRE(1==2);
+    SoundVelocityProfile svp = SoundVelocityProfile(0,0,0);
+    svp.add(0,0);
+    REQUIRE((svp.getDephs()(0) == 0)&&(svp.getSpeeds()(0) == 0));
 }
 
