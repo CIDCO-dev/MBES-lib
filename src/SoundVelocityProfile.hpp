@@ -161,18 +161,13 @@ public:
      */
     uint64_t readTime(std::string & row)
     {
-        std::string text;
-        int year = std::atoi(row.substr(0, row.find("-")).c_str()); 
-        row.erase(0,row.find("-")+1);
-        year = year - 1900;
-        int yday = std::atoi(row.substr(0, row.find(" ")).c_str());
-        yday = yday-1;
+        int year;
+        int yday;
+        int hour;
+        int minute;
+        int second;
+        std::sscanf(row,"%d%d%d%d%d",&year,&yday,&hour,&minute,&second);
         row.erase(0,row.find(" ")+1);
-        int hour = std::atoi(row.substr(0, row.find(":")).c_str());
-        row.erase(0,row.find(":")+1);
-        int minute = std::atoi(row.substr(0, row.find(":")).c_str());
-        row.erase(0,row.find(":")+1);
-        int second = std::atoi(row.substr(0, row.find(" ")).c_str());
         row.erase(0,row.find(" ")+1);
         uint64_t nbrM = 0;
         nbrM = nbrM+year;
@@ -194,13 +189,12 @@ public:
     {
         std::string direction = row.substr(0, row.find(" "));
         row.erase(0,row.find(" ")+1);
-        double degrees = std::atof(row.substr(0,row.find(":")).c_str());
-        row.erase(0,row.find(":")+1);
-        double minutel = std::atof(row.substr(0,row.find(":")).c_str());
-        row.erase(0,row.find(":")+1);
-        double secondl = std::atof(row.substr(0,row.find(" ")).c_str());
+        double degrees;
+        double minute;
+        double second;
+        std::sscanf(row, "%d%d%d",&degrees,&minute,&second);
         row.erase(0,row.find(" ")+1);
-        double value = secondl/60 + minutel;
+        double value = second/60 + minute;
         value = value/60 + degrees;
         if ((direction.compare("South") == 0)||(direction.compare("West")==0))
         {
