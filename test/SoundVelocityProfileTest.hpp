@@ -19,18 +19,65 @@
 /**Test the writing and the reading of a SVP file*/
 TEST_CASE("Writing to SVP file"){
 	//TODO: test prototype
+    SoundVelocityProfile svpW = SoundVelocityProfile(0,0,0);
+    svpW.add(0,0);
+    svpW.write("test");
+    SoundVelocityProfile svpR = SoundVelocityProfile(1,1,1);
+    svpR.add(1,1);
+    svpR.read("test");
+    REQUIRE(svpW == svpR);
+}
+
+/**Test the conversion of microEpoch into text with the format yyyy-ddd hh:mm:ss*/
+TEST_CASE("Test the julianTime method")
+{
+  SoundVelocityProfile svp = SoundVelocityProfile(0,0,0);
+  std::string cont = svp.julianTime();
+  REQUIRE(cont.compare("1900-1 0:0:0")==0);
+}
+
+/**Test the conversion of the latitude into text with the format direction dd:mm:ss*/
+TEST_CASE("Test the latFormat method")
+{
+  SoundVelocityProfile svp = SoundVelocityProfile(0,0,0);
+  std::string cont = svp.latFormat(svp.getLatitude());
+  REQUIRE(cont.compare("North 0:0:0")==0);
+}
+
+/**Test the conversion of the longitude into text with the format direction dd:mm:ss*/
+TEST_CASE("Test the longFormat method")
+{
+  SoundVelocityProfile svp = SoundVelocityProfile(0,0,0);
+  std::string cont = svp.longFormat(svp.getLongitude());
+  REQUIRE(cont.compare("East 0:0:0")==0);
+}
+
+/**Test the reading of the sound velocity profile timestamp*/
+TEST_CASE("Read the sound velocity profile time")
+{
     SoundVelocityProfile svp = SoundVelocityProfile(0,0,0);
-    svp.add(0,0);
-    svp.write("test");
-    std::string cont;
-    std::string contAttendu;
-    contAttendu << "[SVP_VERSION_2]" << "\r\n";
-    contAttendu << "test" << "\r\n";
-    contAttendu << "Section " << "0-0 0:0:0" << " " << "0:0:0" << " " << "0:0:0" << "\r\n" ;
-    contAttendu << "0 0";
-    cont = svp.read("test");
-	REQUIRE(contAttendu = cont);
-};
+    std::string text = "1900-1 0:0:0 text";
+    uint64_t time = svp.readTime(text);
+    REQUIRE((time==0)&&(text.compare("text")==0));
+}
+
+/**Test the reading of the sound velocity profile latitude*/
+TEST_CASE("Read the sound velocity profile latitude")
+{
+    SoundVelocityProfile svp = SoundVelocityProfile(0,0,0);
+    std::string text = "South 1:0:0 text";
+    double lat = svp.readLatLong(text);
+    REQUIRE((lat==(-1))&&(text=="text"));
+}
+
+/**Test the reading of the sound velocity profile longitude*/
+TEST_CASE("Read the sound velocity profile longitude")
+{
+    SoundVelocityProfile svp = SoundVelocityProfile(0,0,0);
+    std::string text = "West 1:0:0 text";
+    double lon = svp.readLatLong(text);
+    REQUIRE((lon==(-1))&&(text=="text"));
+}
 
 TEST_CASE("Get speeds/depths"){
 	//TODO: test prototype
