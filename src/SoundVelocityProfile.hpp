@@ -221,11 +221,12 @@ public:
         int second = std::atoi(row.substr(0, row.find(" ")));
         row.erase(0,row.find(" ")+1);
         uint64_t nbrM = 0;
-        nbrM = nbrM+(second*1000000);
-        nbrM = nbrM+(minute*60*1000000);
-        nbrM = nbrM+(hour*60*60*1000000);
-        nbrM = nbrM+(yday*24*60*60*1000000);
-        nbrM = nbrM+(year*365*24*60*60*1000000);
+        nbrM = nbrM+year;
+        nbrM = nbrM*365 + yday;
+        nbrM = nbrM*24 + hour;
+        nbrM = nbrM*60 + minute;
+        nbrM = nbrM*60 + second;
+        nbrM = nbrM*1000000;
         return nbrM;
     }
     
@@ -302,6 +303,7 @@ SoundVelocityProfile::SoundVelocityProfile(uint64_t timestamp, double platitude,
     microEpoch = timestamp;
     latitude = platitude;
     longitude = plongitude;
+    samples = std::vector<std::pair<double,double>>();
     //longitude = latitude = nan("");
 };
 
@@ -393,7 +395,7 @@ void SoundVelocityProfile::read(std::string filename)
 /**Return the vector depths*/
 Eigen::VectorXd & SoundVelocityProfile::getDepths(){
 	//lazy load internal vector
-	if((unsigned int)depths.size() != samples.size()){
+	if((unsigned int)depths.rows() != samples.size()){
 		depths.resize(samples.size());
 
 		for(unsigned int i = 0;i<samples.size();i++){
@@ -407,7 +409,7 @@ Eigen::VectorXd & SoundVelocityProfile::getDepths(){
 /**Return the vector speeds*/
 Eigen::VectorXd & SoundVelocityProfile::getSpeeds(){
 	//lazy load internal vector
-	if((unsigned int)speeds.size() != samples.size()){
+	if((unsigned int)speeds.rows() != samples.size()){
 		speeds.resize(samples.size());
 
 		for(unsigned int i=0;i<samples.size();i++){
