@@ -20,18 +20,19 @@
 #include <cmath>
 #include <vector>
 #include <ctime>
+#include <string>
 
 /*!
- * \brief Sound velocity class
+ * \brief Sound velocity profile class
  */
 class SoundVelocityProfile {
 public:
 
     /**Create a sound velocity
      * 
-     * @param timestamp timestamp of the sound velocity
-     * @param platitude latitude of the sound velocity
-     * @param plongitude longitude of the sound velocity
+     * @param timestamp timestamp of the sound velocity profile
+     * @param platitude latitude of the sound velocity profile
+     * @param plongitude longitude of the sound velocity profile
      */
     SoundVelocityProfile(uint64_t timestamp, double platitude, double plongitude);
 
@@ -40,41 +41,71 @@ public:
 
 
     /**
-     * Write the informations of the sound velocity in a file
+     * Write the informations of the sound velocity profile in a file
      * 
      * @param filename the name of the file that will be use to write
      */
     void write(std::string & filename); 
     
     /**
-     * Read a file who contains the informations of a sound velocity
+     * Read a file who contains the information of a sound velocity profile
      * 
      * @param filename the name of the that will use to read
      */
-    std::string read(std::string filename);
+    void read(std::string filename);
     
     /**
      * Return the timestamp in julian time format (yyyy-ddd hh:mm:ss) 
      */
-    std::stringstream julianTime();
+    std::string julianTime();
+    
+    /**
+     * Return the latitude in text form
+     * 
+     * @param value the latitude
+     */
+    std::string latFormat(double value);
+    
+    /**
+     * Return the longitude in text form
+     * 
+     * @param value the longitude
+     */
+    std::string longFormat(double value);
+    
+    /**
+     * Read a row of text who contains the timestamp of the song velocity profile 
+     * and return it in microsecond
+     * 
+     * @param row the row who must be read
+     */
+    uint64_t readTime(std::string & row);
+    
+    /**
+     * Read a row of text who contains the latitude or longitude of 
+     * the song velocity  profile and return it in double
+     * 
+     * @param row the row who must be read 
+     */
+    double readLatLong(std::string & row);
     
     /**
      * Return the latitude or the longitude in format dd:mm:ss
      * 
      * @param value the latitude or longitude to convert
      */
-    std::stringstream latlongFormat(double value);
+    std::string latlongFormat(double value, std::string direction);
 
-    /**Return the size of the sound velocity*/
+    /**Return the size of the sound velocity profile*/
     unsigned int getSize() {
         return size;
     };
 
-    /**Return the latitude of the sound velocity*/
+    /**Return the latitude of the sound velocity profile*/
     double getLatitude() 	 { return latitude; }
     
     /**
-     * Change the latitude of the sound velocity
+     * Change the latitude of the sound velocity profile
      * 
      * @param l the new latitude
      */
@@ -84,9 +115,9 @@ public:
     double getLongitude()	 { return longitude;}
     
     /**
-     * Change the longitude of the sound velocity
+     * Change the longitude of the sound velocity profile
      * 
-     * @param l the new longitude of the sound velocity
+     * @param l the new longitude of the sound velocity profile
      */
     void   setLongitude(double l){ longitude=l;}
 
@@ -94,7 +125,7 @@ public:
     uint64_t getTimestamp(){ return microEpoch;};
     
     /**
-     * Change the timestamp of the sound velocity
+     * Change the timestamp of the sound velocity profile
      * 
      * @param t the new timestamp
      */
@@ -103,15 +134,53 @@ public:
     /**
      * Return the timestamp in julian time format (yyyy-ddd hh:mm:ss) 
      */
-    std::stringstream julianTime()
+    std::string julianTime()
     {
         time_t date = time(microEpoch);
                 struct tm * timeinfo;
                 time (&date)
                 timeinfo = localtime (&date);
                 std::stringstream ssDate;
-                ssDate << timeinfo->tm_year+1990 << "-" << timeinfo->tm_yday+1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
-                return ssDate;
+                ssDate << timeinfo->tm_year+1900 << "-" << timeinfo->tm_yday+1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
+                return ssDate.str();
+    }
+    
+    /**
+     * Return the latitude in text form
+     * 
+     * @param value the latitude
+     */
+    std::string latFormat(double value)
+    {
+        std::string direction;
+        if (value<0)
+        {
+            direction = "South";
+        }
+        else
+        {
+            direction = "North";
+        }
+        return latlongFormat(value,direction);
+    }
+    
+    /**
+     * Return the longitude in text form
+     * 
+     * @param value the longitude
+     */
+    std::string longFormat(double value)
+    {
+        std::string direction;
+        if (value<0)
+        {
+            direction = "West";
+        }
+        else
+        {
+            direction = "East";
+        }
+        return latlongFormat(value,direction);
     }
     
     /**
@@ -119,7 +188,7 @@ public:
      * 
      * @param value the latitude or longitude to convert
      */
-    std::stringstream latlongFormat(double value)
+    std::string latlongFormat(double value, std::string direction)
     {
         std::stringstream ss;
                 value = std::abs(value);
@@ -127,8 +196,63 @@ public:
                 value = (value - degrees) * 60;
                 double minutes = std::trunc(value);
                 double second = (value - minutes) * 60;
-                ss << degrees << ":" << minutes << ":" << second;
-                return ss;
+                ss << direction << " " << degrees << ":" << minutes << ":" << second;
+                return ss.str();
+    }
+    
+    /**
+     * Read a row of text who contains the timestamp of the song velocity profile 
+     * and return it in microsecond
+     * 
+     * @param row the row who must be read
+     */
+    uint64_t readTime(std::string & row)
+    {
+        row.erase(0,8);
+        int year = std::atoi(row.substr(0, row.find("-"))); 
+        row.erase(0,row.find("-")+1);
+        year = year - 1900;
+        int yday = std::atoi(row.substr(0, row.find(" ")));
+        yday = yday-1;
+        row.erase(0,row.find(" ")+1);
+        int hour = std::atoi(row.substr(0, row.find(":")));
+        row.erase(0,row.find(":")+1);
+        int minute = std::atoi(row.substr(0, row.find(":")));
+        row.erase(0,row.find(":")+1);
+        int second = std::atoi(row.substr(0, row.find(" ")));
+        row.erase(0,row.find(" ")+1);
+        uint64_t nbrM = 0;
+        nbrM = nbrM+(second*1000000);
+        nbrM = nbrM+(minute*60*1000000);
+        nbrM = nbrM+(hour*60*60*1000000);
+        nbrM = nbrM+(yday*24*60*60*1000000);
+        nbrM = nbrM+(year*365*24*60*60*1000000);
+        return nbrM;
+    }
+    
+    /**
+     * Read a row of text who contains the latitude or longitude of 
+     * the song velocity  profile and return it in double
+     * 
+     * @param row the row who must be read 
+     */
+    double readLatLong(std::string & row)
+    {
+        std::string direction = row.substr(0, row.find(" "));
+        row.erase(0,row.find(" ")+1);
+        double degrees = std::atof(row.substr(0,row.find(":")));
+        row.erase(0,row.find(":")+1);
+        double minutel = std::atof(row.substr(0,row.find(":")));
+        row.erase(0,row.find(":")+1);
+        double secondl = std::atof(row.substr(0,row.substr(" ")));
+        row.erase(0,row.substr(" ")+1);
+        double value = secondl/60 + minutel;
+        value = value/60 + degrees;
+        if ((direction.compare("South") == 0)||(direction.compare("West")==0))
+        {
+            value = -value;
+        }
+        return value;
     }
     
     /**
@@ -147,33 +271,33 @@ public:
 
 private:
     
-    /**value of the sound velocity size*/
+    /**value of the sound velocity profile size*/
     unsigned int size;
 
-    /**timestamp value of the sound velocity (micro-second)*/
+    /**timestamp value of the sound velocity profile (micro-second)*/
     uint64_t  microEpoch; //timestamp
 
-    /**latitude value of the sound velocity*/
+    /**latitude value of the sound velocity profile*/
     double latitude;
     
-    /**longitude value of the sound velocity*/
+    /**longitude value of the sound velocity profile*/
     double longitude;
 
-    /**vector who contain the dephts of the sound velocity*/
+    /**vector who contain the dephts of the sound velocity profile*/
     Eigen::VectorXd depths;
     
-    /**vector who contain the speeds of the sound velocity*/
+    /**vector who contain the speeds of the sound velocity profile*/
     Eigen::VectorXd speeds;
 
     /**vector who contain the depths and the speeds*/
     std::vector<std::pair<double,double>> samples;
 };
 
-/**Create a sound velocity
+/**Create a sound velocity profile
      * 
-     * @param timestamp timestamp of the sound velocity
-     * @param platitude latitude of the sound velocity
-     * @param plongitude longitude of the sound velocity
+     * @param timestamp timestamp of the sound velocity profile
+     * @param platitude latitude of the sound velocity profile
+     * @param plongitude longitude of the sound velocity profile
      */
 SoundVelocityProfile::SoundVelocityProfile(uint64_t timestamp, double platitude, double plongitude) {
     microEpoch = timestamp;
@@ -197,7 +321,7 @@ void SoundVelocityProfile::add (double depth,double soundSpeed){
 }
 
      /**
-     * Write the information of the sound velocity in a file
+     * Write the information of the sound velocity profile in a file
      * 
      * @param filename the name of the file that will be use to write
      */
@@ -206,28 +330,29 @@ void SoundVelocityProfile::write(std::string & filename){
 
 	if(out.is_open()){
 		//TODO: write proper date and lat/lon
-                std::stringstream ssDate;
-                ssDate = julianTime();
-                std::stringstream sslat;
-                sslat = latlongFormat(latitude);
-                std::stringstream sslong;
-                sslong = latlongFormat(longitude);
+                std::string sDate;
+                sDate = julianTime();
+                std::string slat;
+                slat = latlongFormat(latitude);
+                std::string slong;
+                slong = latlongFormat(longitude);
 		out << "[SVP_VERSION_2]" << "\r\n";
 		out << filename << "\r\n";
-                out << "Section " << ssDate.str() << " " << sslat.str() << " " << sslong.str() << "\r\n" ;//FIXME: put date as yyyy-ddd hh:mm:ss dd:mm:ss (lat) dd:mm:ss (lon)
+                out << "Section " << sDate << " " << slat << " " << slong << " \r\n" ;//FIXME: put date as yyyy-ddd hh:mm:ss dd:mm:ss (lat) dd:mm:ss (lon)
 		for(unsigned int i=0;i<samples.size();i++){
-			out << samples[i].first << " " << samples[i].second << "\r\n";
+			out << samples[i].first << " " << samples[i].second << " \r\n";
 		}
 		out.close();
 	}
 }
 
 /**
-     * Read a file who contains the informations of a sound velocity
+     * Read a file who contains the information of a sound velocity profile
+     * and change the values to fit with the information
      * 
      * @param filename the name of the that will use to read
      */
-std::string read(std::string filename)
+void SoundVelocityProfile::read(std::string filename)
 {
     std::ifstream inFile;
     inFile.open(filename);
@@ -235,17 +360,34 @@ std::string read(std::string filename)
     std::string cont;
     if(inFile)
     {
+        int i = 0;
         while (inFile >> row)
         {
-            cont = cont + row;
+            if (i>1)
+            {
+                if (i==2)
+                {
+                    microEpoch = readTime(row);
+                    latitude = readLatLong(row);
+                    longitude = readLatLong(row);
+                    samples = std::vector<std::pair<double,double>>();
+                }
+                else
+                {
+                    double deph = atof(row.substr(0,row.find(" ")));
+                    row.erase(0,row.find(" ")+1);
+                    double speed = atof(row.substr(0,row.find(" ")));
+                    samples = add(deph,speed);
+                }
+            }
+            i = i+1;
         }
     }
     else
     {
-        cont = "Error: file not found";
+       //Not sure how we should warn the user about the file not found
     }
     inFile.close();
-    return cont;
 }
 
 /**Return the vector depths*/
