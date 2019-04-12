@@ -28,13 +28,8 @@
 class SoundVelocityProfile {
 public:
 
-    /**Create a sound velocity
-     * 
-     * @param timestamp timestamp of the sound velocity profile
-     * @param platitude latitude of the sound velocity profile
-     * @param plongitude longitude of the sound velocity profile
-     */
-    SoundVelocityProfile(uint64_t timestamp, double platitude, double plongitude);
+    /**Create a sound velocity*/
+    SoundVelocityProfile();
 
     /**Destroy a sound velocity*/
     ~SoundVelocityProfile();
@@ -54,48 +49,6 @@ public:
      */
     void read(std::string filename);
     
-    /**
-     * Return the timestamp in julian time format (yyyy-ddd hh:mm:ss) 
-     */
-    std::string julianTime();
-    
-    /**
-     * Return the latitude in text form
-     * 
-     * @param value the latitude
-     */
-    std::string latFormat(double value);
-    
-    /**
-     * Return the longitude in text form
-     * 
-     * @param value the longitude
-     */
-    std::string longFormat(double value);
-    
-    /**
-     * Read a row of text who contains the timestamp of the song velocity profile 
-     * and return it in microsecond
-     * 
-     * @param row the row who must be read
-     */
-    uint64_t readTime(std::string & row);
-    
-    /**
-     * Read a row of text who contains the latitude or longitude of 
-     * the song velocity  profile and return it in double
-     * 
-     * @param row the row who must be read 
-     */
-    double readLatLong(std::string & row);
-    
-    /**
-     * Return the latitude or the longitude in format dd:mm:ss
-     * 
-     * @param value the latitude or longitude to convert
-     */
-    std::string latlongFormat(double value, std::string direction);
-
     /**Return the size of the sound velocity profile*/
     unsigned int getSize() {
         return size;
@@ -136,9 +89,9 @@ public:
      */
     std::string julianTime()
     {
-        time_t date = time(microEpoch);
+        time_t date = static_cast<time_t>(microEpoch/1000);
                 struct tm * timeinfo;
-                time (&date)
+                time (&date);
                 timeinfo = localtime (&date);
                 std::stringstream ssDate;
                 ssDate << timeinfo->tm_year+1900 << "-" << timeinfo->tm_yday+1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
@@ -208,17 +161,18 @@ public:
      */
     uint64_t readTime(std::string & row)
     {
-        int year = std::atoi(row.substr(0, row.find("-"))); 
+        std::string text;
+        int year = std::atoi(row.substr(0, row.find("-")).c_str()); 
         row.erase(0,row.find("-")+1);
         year = year - 1900;
-        int yday = std::atoi(row.substr(0, row.find(" ")));
+        int yday = std::atoi(row.substr(0, row.find(" ")).c_str());
         yday = yday-1;
         row.erase(0,row.find(" ")+1);
-        int hour = std::atoi(row.substr(0, row.find(":")));
+        int hour = std::atoi(row.substr(0, row.find(":")).c_str());
         row.erase(0,row.find(":")+1);
-        int minute = std::atoi(row.substr(0, row.find(":")));
+        int minute = std::atoi(row.substr(0, row.find(":")).c_str());
         row.erase(0,row.find(":")+1);
-        int second = std::atoi(row.substr(0, row.find(" ")));
+        int second = std::atoi(row.substr(0, row.find(" ")).c_str());
         row.erase(0,row.find(" ")+1);
         uint64_t nbrM = 0;
         nbrM = nbrM+year;
@@ -240,12 +194,12 @@ public:
     {
         std::string direction = row.substr(0, row.find(" "));
         row.erase(0,row.find(" ")+1);
-        double degrees = std::atof(row.substr(0,row.find(":")));
+        double degrees = std::atof(row.substr(0,row.find(":")).c_str());
         row.erase(0,row.find(":")+1);
-        double minutel = std::atof(row.substr(0,row.find(":")));
+        double minutel = std::atof(row.substr(0,row.find(":")).c_str());
         row.erase(0,row.find(":")+1);
-        double secondl = std::atof(row.substr(0,row.substr(" ")));
-        row.erase(0,row.substr(" ")+1);
+        double secondl = std::atof(row.substr(0,row.find(" ")).c_str());
+        row.erase(0,row.find(" ")+1);
         double value = secondl/60 + minutel;
         value = value/60 + degrees;
         if ((direction.compare("South") == 0)||(direction.compare("West")==0))
@@ -299,12 +253,8 @@ private:
      * @param platitude latitude of the sound velocity profile
      * @param plongitude longitude of the sound velocity profile
      */
-SoundVelocityProfile::SoundVelocityProfile(uint64_t timestamp, double platitude, double plongitude) {
-    microEpoch = timestamp;
-    latitude = platitude;
-    longitude = plongitude;
-    samples = std::vector<std::pair<double,double>>();
-    //longitude = latitude = nan("");
+SoundVelocityProfile::SoundVelocityProfile() {
+    longitude = latitude = nan("");
 };
 
 /**Destroy the sound velocity*/
@@ -334,9 +284,9 @@ void SoundVelocityProfile::write(std::string & filename){
                 std::string sDate;
                 sDate = julianTime();
                 std::string slat;
-                slat = latlongFormat(latitude);
+                slat = latFormat(latitude);
                 std::string slong;
-                slong = latlongFormat(longitude);
+                slong = longFormat(longitude);
 		out << "[SVP_VERSION_2]" << "\r\n";
 		out << filename << "\r\n";
                 out << "Section " << sDate << " " << slat << " " << slong << " \r\n" ;//FIXME: put date as yyyy-ddd hh:mm:ss dd:mm:ss (lat) dd:mm:ss (lon)
@@ -376,10 +326,10 @@ void SoundVelocityProfile::read(std::string filename)
                 }
                 else
                 {
-                    double deph = atof(row.substr(0,row.find(" ")));
+                    double deph = atof(row.substr(0,row.find(" ")).c_str());
                     row.erase(0,row.find(" ")+1);
-                    double speed = atof(row.substr(0,row.find(" ")));
-                    samples = add(deph,speed);
+                    double speed = atof(row.substr(0,row.find(" ")).c_str());
+                    add(deph,speed);
                 }
             }
             i = i+1;
@@ -395,7 +345,7 @@ void SoundVelocityProfile::read(std::string filename)
 /**Return the vector depths*/
 Eigen::VectorXd & SoundVelocityProfile::getDepths(){
 	//lazy load internal vector
-	if((unsigned int)depths.rows() != samples.size()){
+	if((unsigned int)depths.size() != samples.size()){
 		depths.resize(samples.size());
 
 		for(unsigned int i = 0;i<samples.size();i++){
@@ -409,7 +359,7 @@ Eigen::VectorXd & SoundVelocityProfile::getDepths(){
 /**Return the vector speeds*/
 Eigen::VectorXd & SoundVelocityProfile::getSpeeds(){
 	//lazy load internal vector
-	if((unsigned int)speeds.rows() != samples.size()){
+	if((unsigned int)speeds.size() != samples.size()){
 		speeds.resize(samples.size());
 
 		for(unsigned int i=0;i<samples.size();i++){
