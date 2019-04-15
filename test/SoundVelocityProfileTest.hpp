@@ -64,7 +64,7 @@ TEST_CASE("Test the longFormat method")
   REQUIRE(cont.compare("East 0:0:0")==0);
 }
 
-/**Test the reading of the sound velocity profile*/
+/**Test the reading of the sound velocity profile timestamp, latitude and longitude*/
 TEST_CASE("Read the sound velocity profile time, latitude, longitude")
 {
     SoundVelocityProfile svp = SoundVelocityProfile();
