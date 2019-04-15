@@ -140,6 +140,7 @@ public:
      * Return the latitude or the longitude in format dd:mm:ss
      * 
      * @param value the latitude or longitude to convert
+     * @param direction direction(N,W,E,S) of the latitude or longitude
      */
     std::string latlongFormat(double value, std::string direction)
     {
@@ -250,12 +251,7 @@ private:
     std::vector<std::pair<double,double>> samples;
 };
 
-/**Create a sound velocity profile
-     * 
-     * @param timestamp timestamp of the sound velocity profile
-     * @param platitude latitude of the sound velocity profile
-     * @param plongitude longitude of the sound velocity profile
-     */
+    /**Create a sound velocity profile*/
 SoundVelocityProfile::SoundVelocityProfile() {
     longitude = latitude = nan("");
 };
