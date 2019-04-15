@@ -25,7 +25,8 @@ TEST_CASE("Writing to SVP file"){
     svpW.write(file);
     SoundVelocityProfile svpR = SoundVelocityProfile();
     svpR.add(1,1);
-    svpR.read(file);
+    bool valide (svpR.read(file));
+    REQUIRE(valide);
     REQUIRE(svpW.getTimestamp() == svpR.getTimestamp());
     REQUIRE(svpW.getLatitude() == svpR.getLatitude());
     REQUIRE(svpW.getLongitude() == svpR.getLongitude());
@@ -57,34 +58,19 @@ TEST_CASE("Test the longFormat method")
   REQUIRE(cont.compare("East 0:0:0")==0);
 }
 
-/**Test the reading of the sound velocity profile timestamp*/
-TEST_CASE("Read the sound velocity profile time")
+/**Test the reading of the sound velocity profile*/
+TEST_CASE("Read the sound velocity profile time, latitude, longitude")
 {
     SoundVelocityProfile svp = SoundVelocityProfile();
-    std::string text = "1900-1 0:0:0 text";
-    uint64_t time = svp.readTime(text);
+    std::string text = "Section 1900-1 0:0:0 South 1:0:0 West 1:0:0";
+    uint64_t time = 0;
+    double lat = 0;
+    double lon = 0;
+    bool valide = svp.readTimeLatLong(text,time,lat,lon);
+    REQUIRE(valide);
     REQUIRE(time==0);
-    REQUIRE(text.compare("text")==0);
-}
-
-/**Test the reading of the sound velocity profile latitude*/
-TEST_CASE("Read the sound velocity profile latitude")
-{
-    SoundVelocityProfile svp = SoundVelocityProfile();
-    std::string text = "South 1:0:0 text";
-    double lat = svp.readLatLong(text);
-    REQUIRE(lat==(-1));
-    REQUIRE(text=="text");
-}
-
-/**Test the reading of the sound velocity profile longitude*/
-TEST_CASE("Read the sound velocity profile longitude")
-{
-    SoundVelocityProfile svp = SoundVelocityProfile();
-    std::string text = "West 1:0:0 text";
-    double lon = svp.readLatLong(text);
-    REQUIRE(lon==(-1));
-    REQUIRE(text=="text");
+    REQUIRE(lat==-1);
+    REQUIRE(lon==-1);
 }
 
 /**Test if the SoundVelocityProfile class can get the depths and the speeds*/
