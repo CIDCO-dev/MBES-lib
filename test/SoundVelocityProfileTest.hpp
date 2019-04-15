@@ -20,8 +20,11 @@
 TEST_CASE("Writing to SVP file"){
 	//TODO: test prototype
     SoundVelocityProfile svpW = SoundVelocityProfile();
+    svpW.setTimestamp(0);
+    svpW.setLatitude(-1);
+    svpW.setLongitude(-1);
     svpW.add(0,0);
-    std::string file = "test";
+    std::string file = "test.txt";
     svpW.write(file);
     SoundVelocityProfile svpR = SoundVelocityProfile();
     svpR.add(1,1);
@@ -38,14 +41,16 @@ TEST_CASE("Writing to SVP file"){
 TEST_CASE("Test the julianTime method")
 {
   SoundVelocityProfile svp = SoundVelocityProfile();
+  svp.setTimestamp(0);
   std::string cont = svp.julianTime();
-  REQUIRE(cont.compare("1900-1 0:0:0")==0);
+  REQUIRE(cont.compare("1970-1 0:0:0")==0);
 }
 
 /**Test the conversion of the latitude into text with the format direction dd:mm:ss*/
 TEST_CASE("Test the latFormat method")
 {
   SoundVelocityProfile svp = SoundVelocityProfile();
+  svp.setLatitude(0);
   std::string cont = svp.latFormat(svp.getLatitude());
   REQUIRE(cont.compare("North 0:0:0")==0);
 }
@@ -54,6 +59,7 @@ TEST_CASE("Test the latFormat method")
 TEST_CASE("Test the longFormat method")
 {
   SoundVelocityProfile svp = SoundVelocityProfile();
+  svp.setLongitude(0);
   std::string cont = svp.longFormat(svp.getLongitude());
   REQUIRE(cont.compare("East 0:0:0")==0);
 }
@@ -62,7 +68,7 @@ TEST_CASE("Test the longFormat method")
 TEST_CASE("Read the sound velocity profile time, latitude, longitude")
 {
     SoundVelocityProfile svp = SoundVelocityProfile();
-    std::string text = "Section 1900-1 0:0:0 South 1:0:0 West 1:0:0";
+    std::string text = "Section 1970-1 0:0:0 South 1:0:0 West 1:0:0";
     uint64_t time = 0;
     double lat = 0;
     double lon = 0;
@@ -76,8 +82,8 @@ TEST_CASE("Read the sound velocity profile time, latitude, longitude")
 /**Test if the SoundVelocityProfile class can get the depths and the speeds*/
 TEST_CASE("Get speeds/depths"){
     SoundVelocityProfile svp = SoundVelocityProfile();
-    svp.add(0,0);
-    REQUIRE(svp.getDepths()(0) == 0);
-    REQUIRE(svp.getSpeeds()(0) == 0);
+    svp.add(4,5);
+    REQUIRE(svp.getDepths()(0) == 4);
+    REQUIRE(svp.getSpeeds()(0) == 5);
 }
 
