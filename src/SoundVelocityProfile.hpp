@@ -44,10 +44,11 @@ public:
     
     /**
      * Read a file who contains the information of a sound velocity profile
+     * return true if the reading has been made successfully
      * 
      * @param filename the name of the that will use to read
      */
-    void read(std::string filename);
+    bool read(std::string filename);
     
     /**Return the size of the sound velocity profile*/
     unsigned int getSize() {
@@ -152,55 +153,62 @@ public:
                 ss << direction << " " << degrees << ":" << minutes << ":" << second;
                 return ss.str();
     }
-    
+
     /**
-     * Read a row of text who contains the timestamp of the song velocity profile 
-     * and return it in microsecond
+     * Read a row of text who contains the timestamp, the latitude and longitude of 
+     * the song velocity  profile and return true if the reading has been made successfully
      * 
-     * @param row the row who must be read
+     * @param row the row who must be read 
+     * @param nbrM value of the timestamp we get after the reading
+     * @param lat value of the latitude we get after the reading
+     * @param lon value of the longitude we get after the reading
      */
-    uint64_t readTime(std::string & row)
+    bool readTimeLatLong(std::string & row,uint64_t &nbrM,double &lat, double &lon)
     {
+        char latdirection;
+        double latdegrees;
+        double latminute;
+        double latsecond;
+        char londirection;
+        double londegrees;
+        double lonminute;
+        double lonsecond;
         int year;
         int yday;
         int hour;
         int minute;
         int second;
-        std::sscanf(row.c_str(),"%d%d%d%d%d",&year,&yday,&hour,&minute,&second);
-        row.erase(0,row.find(" ")+1);
-        row.erase(0,row.find(" ")+1);
-        uint64_t nbrM = 0;
-        nbrM = nbrM+year;
-        nbrM = nbrM*365 + yday;
-        nbrM = nbrM*24 + hour;
-        nbrM = nbrM*60 + minute;
-        nbrM = nbrM*60 + second;
-        nbrM = nbrM*1000000;
-        return nbrM;
-    }
-    
-    /**
-     * Read a row of text who contains the latitude or longitude of 
-     * the song velocity  profile and return it in double
-     * 
-     * @param row the row who must be read 
-     */
-    double readLatLong(std::string & row)
-    {
-        std::string direction = row.substr(0, row.find(" "));
-        row.erase(0,row.find(" ")+1);
-        double degrees;
-        double minute;
-        double second;
-        std::sscanf(row.c_str(), "%d%d%d",&degrees,&minute,&second);
-        row.erase(0,row.find(" ")+1);
-        double value = second/60 + minute;
-        value = value/60 + degrees;
-        if ((direction.compare("South") == 0)||(direction.compare("West")==0))
+        if (std::sscanf(row.c_str(), "Section %d-%d %d:%d:%d %5s %lf:%lf:%lf %4s %lf:%lf:%lf",
+                &year,&yday,&hour,&minute,&second,&latdirection,&latdegrees,&latminute,&latsecond,
+                &londirection,&londegrees,&lonminute,&lonsecond)==13)
         {
-            value = -value;
+            nbrM = nbrM+year;
+            nbrM = nbrM*365 + yday;
+            nbrM = nbrM*24 + hour;
+            nbrM = nbrM*60 + minute;
+            nbrM = nbrM*60 + second;
+            nbrM = nbrM*1000000;
+            lat = latsecond/60 + latminute;
+            lat = lat/60 + latdegrees;
+            std::string sdirection;
+            sdirection = latdirection;
+            if (sdirection.compare("South") == 0)
+            {
+                lat = -lat;
+            }
+            lon = lonsecond/60 + lonminute;
+            lon = lon/60 + londegrees;
+            sdirection = londirection;
+            if (sdirection.compare("West") == 0)
+            {
+                lon = -lon;
+            }
+            return true;
         }
-        return value;
+        else
+        {
+            return false;   
+        }
     }
     
     /**
@@ -293,37 +301,53 @@ void SoundVelocityProfile::write(std::string & filename){
 
 /**
      * Read a file who contains the information of a sound velocity profile
-     * and change the values to fit with the information
+     * return true if the reading has been made successfully
      * 
      * @param filename the name of the that will use to read
      */
-void SoundVelocityProfile::read(std::string filename)
+bool SoundVelocityProfile::read(std::string filename)
 {
     std::ifstream inFile;
     inFile.open(filename);
     std::string row;
     std::string cont;
+    bool valide = true;
     if(inFile)
     {
         int i = 0;
-        while (inFile >> row)
+        while ((inFile >> row)&&(valide))
         {
             if (i>1)
             {
                 if (i==2)
                 {
-                    row.erase(0,8);
-                    microEpoch = readTime(row);
-                    latitude = readLatLong(row);
-                    longitude = readLatLong(row);
+                    uint64_t ms = 0;
+                    double lat = 0;
+                    double lon = 0;
+                    if(readTimeLatLong(row,ms,lat,lon))
+                    {
+                        microEpoch = ms;
+                        latitude = lat;
+                        longitude = lon;
+                    }
+                    else
+                    {
+                        valide = false;
+                    }
                     samples = std::vector<std::pair<double,double>>();
                 }
                 else
                 {
-                    double deph = atof(row.substr(0,row.find(" ")).c_str());
-                    row.erase(0,row.find(" ")+1);
-                    double speed = atof(row.substr(0,row.find(" ")).c_str());
-                    add(deph,speed);
+                    double deph;
+                    double speed;
+                    if (std::sscanf(row.c_str(), "%lf %lf",&deph,&speed)==2)
+                    {
+                        add(deph,speed);
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
             }
             i = i+1;
@@ -331,9 +355,10 @@ void SoundVelocityProfile::read(std::string filename)
     }
     else
     {
-       //Not sure how we should warn the user about the file not found
+        valide = false;
     }
     inFile.close();
+    return valide;
 }
 
 /**Return the vector depths*/
