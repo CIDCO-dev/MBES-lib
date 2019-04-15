@@ -90,12 +90,11 @@ public:
      */
     std::string julianTime()
     {
-        time_t date = static_cast<time_t>(microEpoch/1000);
+        time_t date = microEpoch/1000000 + 18000;
                 struct tm * timeinfo;
-                time (&date);
                 timeinfo = localtime (&date);
                 std::stringstream ssDate;
-                ssDate << timeinfo->tm_year+1900 << "-" << timeinfo->tm_yday+1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
+                ssDate << timeinfo->tm_year + 1900 << "-" << timeinfo->tm_yday + 1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
                 return ssDate.str();
     }
     
@@ -165,11 +164,11 @@ public:
      */
     bool readTimeLatLong(std::string & row, uint64_t &nbrM,double &lat, double &lon)
     {
-        char latdirection;
+        char latdirection[5];
         double latdegrees;
         double latminute;
         double latsecond;
-        char londirection;
+        char londirection[4];
         double londegrees;
         double lonminute;
         double lonsecond;
@@ -179,9 +178,11 @@ public:
         int minute;
         int second;
         if (std::sscanf(row.c_str(), "Section %d-%d %d:%d:%d %5s %lf:%lf:%lf %4s %lf:%lf:%lf",
-                &year,&yday,&hour,&minute,&second,&latdirection,&latdegrees,&latminute,&latsecond,
-                &londirection,&londegrees,&lonminute,&lonsecond)==13)
+                &year,&yday,&hour,&minute,&second,latdirection,&latdegrees,&latminute,&latsecond,
+                londirection,&londegrees,&lonminute,&lonsecond)==13)
         {
+            year = year-1970;
+            yday = yday-1;
             nbrM = nbrM+year;
             nbrM = nbrM*365 + yday;
             nbrM = nbrM*24 + hour;
@@ -279,8 +280,8 @@ void SoundVelocityProfile::add (double depth,double soundSpeed){
      * @param filename the name of the file that will be use to write
      */
 void SoundVelocityProfile::write(std::string & filename){
-	std::ofstream out(filename);
-
+	std::ofstream out;
+        out.open(filename);
 	if(out.is_open()){
 		//TODO: write proper date and lat/lon
                 std::string sDate;
@@ -315,7 +316,7 @@ bool SoundVelocityProfile::read(std::string filename)
     if(inFile)
     {
         int i = 0;
-        while ((inFile >> row)&&(valide))
+        while ((std::getline(inFile,row))&&(valide))
         {
             if (i>1)
             {
@@ -346,7 +347,7 @@ bool SoundVelocityProfile::read(std::string filename)
                     }
                     else
                     {
-                        return false;
+                        valide = false;
                     }
                 }
             }
