@@ -166,7 +166,7 @@ public:
         int hour;
         int minute;
         int second;
-        std::sscanf(row,"%d%d%d%d%d",&year,&yday,&hour,&minute,&second);
+        std::sscanf(row.c_str(),"%d%d%d%d%d",&year,&yday,&hour,&minute,&second);
         row.erase(0,row.find(" ")+1);
         row.erase(0,row.find(" ")+1);
         uint64_t nbrM = 0;
@@ -192,7 +192,7 @@ public:
         double degrees;
         double minute;
         double second;
-        std::sscanf(row, "%d%d%d",&degrees,&minute,&second);
+        std::sscanf(row.c_str(), "%d%d%d",&degrees,&minute,&second);
         row.erase(0,row.find(" ")+1);
         double value = second/60 + minute;
         value = value/60 + degrees;
