@@ -163,7 +163,7 @@ public:
      * @param lat value of the latitude we get after the reading
      * @param lon value of the longitude we get after the reading
      */
-    bool readTimeLatLong(std::string & row,uint64_t &nbrM,double &lat, double &lon)
+    bool readTimeLatLong(std::string & row, uint64_t &nbrM,double &lat, double &lon)
     {
         char latdirection;
         double latdegrees;
