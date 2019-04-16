@@ -21,6 +21,7 @@
 #include <vector>
 #include <ctime>
 #include <string>
+#include "../src/utils/TimeUtils.hpp"
 
 /*!
  * \brief Sound velocity profile class
@@ -87,15 +88,17 @@ public:
     
     /**
      * Return the timestamp in julian time format (yyyy-ddd hh:mm:ss) 
+     * 
+     * @param mE number of microsecond of the timestamp 
      */
-    std::string julianTime()
+    static std::string julianTime(uint64_t mE)
     {
-        time_t date = microEpoch/1000000 + 18000;
-                struct tm * timeinfo;
-                timeinfo = localtime (&date);
-                std::stringstream ssDate;
-                ssDate << timeinfo->tm_year + 1900 << "-" << timeinfo->tm_yday + 1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
-                return ssDate.str();
+    time_t date = mE/1000000 + 18000;
+    struct tm * timeinfo;
+    timeinfo = localtime (&date);
+    std::stringstream ssDate;
+    ssDate << timeinfo->tm_year + 1900 << "-" << timeinfo->tm_yday + 1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
+    return ssDate.str();
     }
     
     /**
@@ -198,12 +201,20 @@ public:
             {
                 lat = -lat;
             }
+            else if (sdirection.compare("North")!=0)
+            {
+                return false;
+            }
             lon = lonsecond/60 + lonminute;
             lon = lon/60 + londegrees;
             sdirection = londirection;
             if (sdirection.compare("West") == 0)
             {
                 lon = -lon;
+            }
+            else if (sdirection.compare("East")!=0)
+            {
+                return false;
             }
             return true;
         }
@@ -281,13 +292,13 @@ void SoundVelocityProfile::write(std::string & filename){
 	if(out.is_open()){
 		//TODO: write proper date and lat/lon
                 std::string sDate;
-                sDate = julianTime();
+                sDate = julianTime(microEpoch);
                 std::string slat;
                 slat = latFormat(latitude);
                 std::string slong;
                 slong = longFormat(longitude);
 		out << "[SVP_VERSION_2]" << "\r\n";
-		out << filename << "\r\n";
+		out << filename << " \r\n";
                 out << "Section " << sDate << " " << slat << " " << slong << " \r\n" ;//FIXME: put date as yyyy-ddd hh:mm:ss dd:mm:ss (lat) dd:mm:ss (lon)
 		for(unsigned int i=0;i<samples.size();i++){
 			out << samples[i].first << " " << samples[i].second << " \r\n";
@@ -314,37 +325,51 @@ bool SoundVelocityProfile::read(std::string filename)
         int i = 0;
         while ((std::getline(inFile,row))&&(valide))
         {
-            if (i>1)
+            if (i == 0)
             {
-                if (i==2)
+                int ver;
+                if (std::sscanf(row.c_str(),"[SVP_VERSION_%d]",&ver)!=1)
                 {
-                    uint64_t ms = 0;
-                    double lat = 0;
-                    double lon = 0;
-                    if(readTimeLatLong(row,ms,lat,lon))
-                    {
-                        microEpoch = ms;
-                        latitude = lat;
-                        longitude = lon;
-                    }
-                    else
-                    {
-                        valide = false;
-                    }
-                    samples = std::vector<std::pair<double,double>>();
+                    valide = false;
+                }
+            }
+            else if (i==1)
+            {
+                std::string name;
+                name = row.substr(0,row.find(" "));
+                if(name.compare(filename)!=0)
+                {
+                    valide = false;
+                }
+            }
+            else if (i==2)
+            {
+                uint64_t ms = 0;
+                double lat = 0;
+                double lon = 0;
+                if(readTimeLatLong(row,ms,lat,lon))
+                {
+                    microEpoch = ms;
+                    latitude = lat;
+                    longitude = lon;
                 }
                 else
                 {
-                    double deph;
-                    double speed;
-                    if (std::sscanf(row.c_str(), "%lf %lf",&deph,&speed)==2)
-                    {
-                        add(deph,speed);
-                    }
-                    else
-                    {
-                        valide = false;
-                    }
+                    valide = false;
+                }
+                samples = std::vector<std::pair<double,double>>();
+            }
+            else
+            {
+                double deph;
+                double speed;
+                if (std::sscanf(row.c_str(), "%lf %lf",&deph,&speed)==2)
+                {
+                    add(deph,speed);
+                }
+                else
+                {
+                    valide = false;
                 }
             }
             i = i+1;
