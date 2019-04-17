@@ -2,12 +2,14 @@
 #define TIMEUTILS_HPP
 
 #include <cstring>
+#include "../SoundVelocityProfile.hpp"
 #ifdef _WIN32
 #include <ctime>
 #endif
 /**
  * Returns epoch in microseconds since Jan 1 1970
  */
+
 uint64_t build_time(int year,int month,int day,int hour,int minutes,int seconds,int millis,int microseconds){
 	struct tm t;
 	memset(&t,0,sizeof(struct tm));
@@ -66,6 +68,21 @@ uint64_t build_time(int year,int yday, int hour, int minutes, long timeInMicroSe
     uint64_t res = mktime(&t)*1000000 + timeInMicroSeconds;
 
     return res;
+}
+
+/**
+ * Return the timestamp in julian time format (yyyy-ddd hh:mm:ss) 
+ * 
+ * @param mE number of microsecond of the timestamp 
+ */
+static std::string julianTime(uint64_t mE)
+{
+    time_t date = mE/1000000 + 18000;
+    struct tm * timeinfo;
+    timeinfo = localtime (&date);
+    std::stringstream ssDate;
+    ssDate << timeinfo->tm_year + 1900 << "-" << timeinfo->tm_yday + 1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
+    return ssDate.str();
 }
 
 #endif
