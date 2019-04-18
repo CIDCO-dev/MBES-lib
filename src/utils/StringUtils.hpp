@@ -10,12 +10,12 @@
 #endif
 
 /**
- * Return 1 if the first text value ends with the second text value and return 0 if not
+ * Return if the first text value ends with the second text value is true or false
  * 
  * @param str first text value
  * @param suffix second text value
  */
-int ends_with(const char * str, const char * suffix) {
+bool ends_with(const char * str, const char * suffix) {
 
         if( str == NULL || suffix == NULL )
                 return 0;
