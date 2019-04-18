@@ -1,8 +1,14 @@
 #ifndef SOUNDVELOCITYPROFILEFACTORY_HPP
 #define SOUNDVELOCITYPROFILEFACTORY_HPP
 
+/*!
+ * \brief Sound velocity profile factory class
+ */
 class SoundVelocityProfileFactory{
 	public:
+                /**
+                 * Return a Sound velocity profile model with salt water
+                 */
 		static SoundVelocityProfile * buildSaltWaterModel(){
 			SoundVelocityProfile * svp = new SoundVelocityProfile();
 			//TODO: set time/location?
