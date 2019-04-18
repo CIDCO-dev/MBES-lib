@@ -9,6 +9,18 @@
  * Returns epoch in microseconds since Jan 1 1970
  */
 
+/**
+ * Return the number microseconds since 1st January 1970 of the parameters in total
+ * 
+ * @param year number of year
+ * @param month number of month less than an year
+ * @param day number of day less than an month
+ * @param hour number of hour less than an day
+ * @param minutes number of minute les than an hour 
+ * @param seconds number of second les than an second
+ * @param millis number of millisecond less than an second
+ * @param microseconds number of microsecond less than an millisecond
+ */
 uint64_t build_time(int year,int month,int day,int hour,int minutes,int seconds,int millis,int microseconds){
 	struct tm t;
 	memset(&t,0,sizeof(struct tm));
@@ -26,9 +38,12 @@ uint64_t build_time(int year,int month,int day,int hour,int minutes,int seconds,
 }
 
 /**
- * Returns epoch in microseconds since Jan 1 1970
- *
- * Time includes hours and minutes since midnight
+ * Return the number microseconds since 1st January 1970 of the parameters in total
+ * 
+ * @param year number of year
+ * @param month number of month less than an year
+ * @param day number of day less than an month
+ * @param timeInMilliseconds number of millisecond less than an day
  */
 uint64_t build_time(int year,int month,int day,long timeInMilliseconds){
     struct tm t;
@@ -47,12 +62,13 @@ uint64_t build_time(int year,int month,int day,long timeInMilliseconds){
 }
 
 /**
- * Returns epoch in microseconds since Jan 1 1970
- *
- * Time includes hours and minutes since midnight
- * yday : 0-365
- * hour: 0-23
- * minute: 0-59
+ * Return the number microseconds since 1st January 1970 of the parameters in total
+ * 
+ * @param year number of year
+ * @param yday number of day less than an year
+ * @param hour number of hour less than an day
+ * @param minutes number of minute les than an hour 
+ * @param timeMicroseconds number of microsecond less than an minute
  */
 uint64_t build_time(int year,int yday, int hour, int minutes, long timeInMicroSeconds){
     struct tm t;
