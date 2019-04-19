@@ -16,16 +16,37 @@
 #include "../utils/Constants.hpp"
 #include <Eigen/Dense>
 
+/*!
+ * \brief Coordinate transform class
+ */
 class CoordinateTransform {
 public:
 
     // WGS84 ellipsoid Parameters
+    
+    /**WGS84 ellipsoid semi-major axis*/
     static constexpr double a = 6378137.0;
+    
+    /**WGS84 ellipsoid first eccentricity squared*/
     static constexpr double e2 = 0.081819190842622 * 0.081819190842622;
+    
+    /**WGS84 ellipsoid inverse flattening*/
     static constexpr double f = 1.0 / 298.257223563;
+    
+    /**WGS84 ellipsoid semi-minor axis*/
     static constexpr double b = a * (1-f); // semi-minor axis
+    
+    /**WGS84 ellipsoid second eccentricity squared*/
     static constexpr double epsilon = e2 / (1.0 - e2); // second eccentricity squared
 
+    /**
+     * set the position in navigation frame
+     * 
+     * @param positionInNavigationFrame the value who need to be set
+     * @param positionGeographic the geographic position
+     * @param navDCM the rotation matrix
+     * @param originECEF the ECEF origin position
+     */
     static void getPositionInNavigationFrame(Eigen::Vector3d & positionInNavigationFrame, Position & positionGeographic, Eigen::Matrix3d & navDCM, Eigen::Vector3d & originECEF) {
         Eigen::Vector3d positionECEF;
         getPositionECEF(positionECEF, positionGeographic);
@@ -35,6 +56,12 @@ public:
         positionInNavigationFrame << positionVector(0), positionVector(1), positionVector(2);
     };
 
+    /**
+     * set the ECEF position by the given position
+     * 
+     * @param positionECEF value who need to be set
+     * @param position the position use to get the ECEF position
+     */
     static void getPositionECEF(Eigen::Vector3d & positionECEF, Position & position) {
         double N = a / (sqrt(1 - e2 * position.getSlat() * position.getSlat()));
         double xTRF = (N + position.getEllipsoidalHeight()) * position.getClat() * position.getClon();
@@ -44,6 +71,12 @@ public:
         positionECEF << xTRF, yTRF, zTRF;
     };
 
+    /**
+     * Get the longitude latitude and elevation of a ECEF position
+     * 
+     * @param positionInNavigationFrame position who we need to get the latitude, longitude and elevation
+     * @param positionGeographic the position where the latitude, longitude et elevation will be put
+     */
     static void convertECEFToLongitudeLatitudeElevation(Eigen::Vector3d & positionInNavigationFrame, Position & positionGeographic) {
         double x = positionInNavigationFrame(0);
         double y = positionInNavigationFrame(1);
@@ -83,6 +116,12 @@ public:
         positionGeographic.setEllipsoidalHeight(height);
     }
 
+    /**
+     * set a terrestial to local geodetic reference frame matrix by the given position
+     * 
+     * @param trf2lgf the terrestial to local geodetic reference frame matrix who need to be set
+     * @param position the given position
+     */
     static void getTerrestialToLocalGeodeticReferenceFrameMatrix(Eigen::Matrix3d & trf2lgf, Position & position) {
         double m00 = -position.getSlat() * position.getClon();
         double m01 = -position.getSlat() * position.getSlon();
@@ -103,8 +142,11 @@ public:
     };
 
     /**
-    * Rotation matrix from neutral/zero position to the given attitude
-    */
+     * Set rotation matrix from neutral/zero position to the given attitude
+     * 
+     * @param outputMatrix matrix who need to be set
+     * @param attitude the given attitude
+     */
     static void getDCM(Eigen::Matrix3d & outputMatrix,Attitude & attitude){
         outputMatrix <<         attitude.getCh()*attitude.getCp(),   attitude.getCh()*attitude.getSp()*attitude.getSr()-attitude.getCr()*attitude.getSh(), attitude.getCh()*attitude.getCr()*attitude.getSp()+attitude.getSr()*attitude.getSh(),
                                 attitude.getCp()*attitude.getSh(),   attitude.getCh()*attitude.getCr()+attitude.getSp()*attitude.getSr()*attitude.getSh(), attitude.getSh()*attitude.getCr()*attitude.getSp()-attitude.getCh()*attitude.getSr(),
@@ -114,6 +156,9 @@ public:
 
     /**
      * NED Tangent plane at position to WGS84 ECEF
+     * 
+     * @param outputMatrix the matrix who need to be set
+     * @param position the position to convert
      */
     static void ned2ecef(Eigen::Matrix3d & outputMatrix,Position & position){
 
@@ -126,6 +171,11 @@ public:
 
     /**
      * Converts spherical coordinates to cartesian
+     * 
+     * @param outputVector the cartesian coordinates
+     * @param theta the polar angle
+     * @param phi the azimuthal angle
+     * @param r the radial distance
      */
     static void spherical2cartesian(Eigen::Vector3d & outputVector,double theta,double phi,double r){
 	outputVector(0) = r * sin(D2R*theta)*cos(D2R*phi);
@@ -135,6 +185,11 @@ public:
 
     /**
      * Converts sonar coordinates (alpha,beta,r) to cartesian (NED)
+     * 
+     * @param outputVector the cartesian coordinates
+     * @param aphaDegrees the alpha degree
+     * @param betaDegrees the beta degree
+     * @param r the radical distance
      */
      static void sonar2cartesian(Eigen::Vector3d & outputVector,double alphaDegrees,double betaDegrees,double r){
         //FIXME: This is just for quick testing purposes and assumes a null tilt angle

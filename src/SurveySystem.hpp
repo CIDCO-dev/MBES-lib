@@ -21,67 +21,103 @@
 #include "utils/Exception.hpp"
 #include "Attitude.hpp"
 
+/*!
+ * \brief Survey system class
+ */
 class SurveySystem {
 public:
+    
+    /**Create a Survey system*/
     SurveySystem();
+    
+    /**Destroy the Survey system*/
     ~SurveySystem();
 
+    /**Return the MBES model*/
     std::string & getMBES_model() {
         return MBES_model;
     }
 
+    /**Return the antenna position*/
     Eigen::Vector3d & getAntennaPosition() {
         return antennaPosition;
     }
 
+    /**Return the attitude accuracy*/
     Attitude * getAttitudeAccuracy() {
         return attitudeAccuracy;
     }
 
+    /**Return the boresigth patch test*/
     Attitude * getBoresightPatchTest() {
         return boresightPatchTest;
     }
 
+    /**Return the draft*/
     double getDraft() {
         return draft;
     }
 
+    /**Return the echo sounder receiver position*/
     Eigen::Vector3d & getEchosounderReceivererPosition() {
         return echosounderReceivererPosition;
     }
 
+    /**Return the echo sounder transmitter position*/
     Eigen::Vector3d & getEchosounderTransmitterPosition() {
         return echosounderTransmitterPosition;
     }
 
+    /**Return the position accuracy*/
     Eigen::Vector3d & getPositionAccuracy() {
         return positionAccuracy;
     }
 
+    /**
+     * Change the Survey system values by reading a file
+     * Return false if the file is not valid
+     * 
+     * @param filename name of the file who will be read
+     */
     bool readFile(const std::string & fileName);
 
 private:
+    
+    /**Name of the Survey system MBES model*/
     std::string MBES_model;
 
+    /**Value of the Survey system draft (meter)*/
     double draft; // in meters
 
     // positions in the IMU reference frame in meters
+    
+    /**Vector3d of the Survey system antenna position*/
     Eigen::Vector3d antennaPosition;
+    
+    /**Vector3d of the Survey system echo sounder transmitter position*/
     Eigen::Vector3d echosounderTransmitterPosition;
+    
+    /**Vector3d of the Survey system echo sounder receiver position*/
     Eigen::Vector3d echosounderReceivererPosition;
 
     // angles in degrees
     // will be converted internally to radians
+    /**Value of the Survey system boresigth path test (attitude)*/
     Attitude* boresightPatchTest = NULL;
 
     // accuracy in 2 sigma
+    /**Value of the Survey system attitude accuracy (attitude)*/
     Attitude* attitudeAccuracy = NULL;
+    
+    /**Vector3d of the Survey system position accuracy*/
     Eigen::Vector3d positionAccuracy;
 };
 
+/**Create a Survey system*/
 SurveySystem::SurveySystem() {
 }
 
+/**Destroy the Survey system and the boresigth path test and attitude accuracy*/
 SurveySystem::~SurveySystem() {
     if (boresightPatchTest) {
         delete boresightPatchTest;
@@ -92,6 +128,12 @@ SurveySystem::~SurveySystem() {
     }
 }
 
+/**
+ * Change the Survey system values by reading a file
+ * Return false if the file is not valid
+ * 
+ * @param filename name of the file who will be read
+ */
 bool SurveySystem::readFile(const std::string & fileName) {
 
     // Temporary place holder variables

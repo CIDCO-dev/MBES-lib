@@ -9,7 +9,13 @@
 #include <cctype>
 #endif
 
-int ends_with(const char * str, const char * suffix) {
+/**
+ * Return if the first text value ends with the second text value is true or false
+ * 
+ * @param str first text value
+ * @param suffix second text value
+ */
+bool ends_with(const char * str, const char * suffix) {
 
         if( str == NULL || suffix == NULL )
                 return 0;
@@ -23,6 +29,11 @@ int ends_with(const char * str, const char * suffix) {
         return 0 == strncmp( str + str_len - suffix_len, suffix, suffix_len );
 }
 
+/**
+ * Return a text value without space
+ * 
+ * @param s text who needs to be trim
+ */
 std::string trim(const std::string &s)
 {
 	auto wsfront=std::find_if_not(s.begin(),s.end(),[](int c){return std::isspace(c);});
