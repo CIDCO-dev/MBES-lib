@@ -21,37 +21,119 @@
 #include <list>
 #include "../../SoundVelocityProfile.hpp"
 
+/*!
+ * \brief S7k parser class extention of Datagram parser
+ */
 class S7kParser : public DatagramParser {
 public:
+    
+    /**
+     * Create an S7k parser
+     * 
+     * @param processor the datagram processor 
+     */
     S7kParser(DatagramProcessor & processor);
+    
+    /**Destroy the S7k parser*/
     ~S7kParser();
 
+    /**
+     * Read a file and change the Kongsberg parser depending on the information
+     * 
+     * @param filename name of the file to read
+     */
     void parse(std::string & filename);
 
 protected:
+    
+    /**
+     * set the S7k data record frame
+     * 
+     * @param drf the new S7k data record frame
+     */
     void processDataRecordFrame(S7kDataRecordFrame & drf);
+    
+    /**
+     * call the process Attitude
+     * 
+     * @param drf the S7k data record frame
+     * @param data the datagram
+     */
     void processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+    
+    /**
+     * call the process Position
+     * 
+     * @param drf the S7k data record frame
+     * @param data the datagram
+     */
     void processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+    
+    /**
+     * call the process Ping
+     * 
+     * @param drf the S7k data record frame
+     * @param data the datagram
+     */
     void processPingDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+    
+    /**
+     * call the process Sonar setting
+     * 
+     * @param drf the S7k data record frame
+     * @param data datagram
+     */
     void processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+    
+    /**
+     * call the process Sound Velocity Profile base on the Ctd
+     * 
+     * @param drf the S7k data record frame
+     * @param data the datagram
+     */
     void processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data);
 
 private:
+    
+    /**
+     * Return the Check summary of the S7k data record frame
+     * 
+     * @param drf the S7k data record frame
+     * @param data the datagram
+     */
     uint32_t computeChecksum(S7kDataRecordFrame * drf, unsigned char * data);
+    
+    /**
+     * Get the S7k data record frame
+     * 
+     * @param drf the S7k data record frame 
+     */
     uint64_t extractMicroEpoch(S7kDataRecordFrame & drf);
 
     //TODO Use a map instead
+    /**List of ping settings*/
     std::list<S7kSonarSettings *> pingSettings;
 };
 
+/**
+ * Create an S7k parser
+ * 
+ * @param processor the datagram processor 
+ */
 S7kParser::S7kParser(DatagramProcessor & processor) : DatagramParser(processor) {
 
 }
 
+/**Destroy the S7k parser*/
 S7kParser::~S7kParser() {
 
 }
 
+/**
+ * Read a file and change the Kongsberg parser depending on the information
+ * 
+ * @param filename name of the file to read
+ */
 void S7kParser::parse(std::string & filename) {
     FILE * file = fopen(filename.c_str(), "rb");
 
@@ -133,6 +215,11 @@ void S7kParser::parse(std::string & filename) {
     }
 }
 
+/**
+ * set the S7k data record frame
+ * 
+ * @param drf the new S7k data record frame
+ */
 void S7kParser::processDataRecordFrame(S7kDataRecordFrame & drf) {
     //TODO: remove later, leave derived classes decide what to do
 /*    printf("--------------------\n");
@@ -143,6 +230,12 @@ void S7kParser::processDataRecordFrame(S7kDataRecordFrame & drf) {
 */
 }
 
+/**
+ * Return the Check summary of the S7k data record frame
+ * 
+ * @param drf the S7k data record frame
+ * @param data the datagram
+ */
 uint32_t S7kParser::computeChecksum(S7kDataRecordFrame * drf, unsigned char * data) {
     uint32_t checksum = 0;
 
@@ -159,6 +252,12 @@ uint32_t S7kParser::computeChecksum(S7kDataRecordFrame * drf, unsigned char * da
     return checksum;
 }
 
+/**
+ * call the process Attitude
+ * 
+ * @param drf the S7k data record frame
+ * @param data the datagram
+ */
 void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
     uint64_t microEpoch  = extractMicroEpoch(drf);
     uint8_t  nEntries    = ((uint8_t*)data)[0];
@@ -178,6 +277,12 @@ void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char 
     }
 }
 
+/**
+ * call the process Sonar setting
+ * 
+ * @param drf the S7k data record frame
+ * @param data the datagram
+ */
 void S7kParser::processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned char * data){
     S7kSonarSettings * settings = (S7kSonarSettings*)data;
 
@@ -187,6 +292,12 @@ void S7kParser::processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned 
     pingSettings.push_back(settingsCopy);
 }
 
+/**
+ * call the process Position
+ * 
+ * @param drf the S7k data record frame
+ * @param data the datagram
+ */
 void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
     uint64_t microEpoch = extractMicroEpoch(drf);
     S7kPosition *position = (S7kPosition*) data;
@@ -197,6 +308,12 @@ void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char 
     }
 }
 
+/**
+ * call the process Ping
+ * 
+ * @param drf the S7k data record frame
+ * @param data the datagram
+ */
 void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
     uint64_t microEpoch = extractMicroEpoch(drf);
 
@@ -236,6 +353,11 @@ void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * da
     }
 }
 
+/**
+ * Get the S7k data record frame
+ * 
+ * @param drf the S7k data record frame 
+ */
 uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
     long microSeconds = drf.Timestamp.Seconds * 1e6;
 
@@ -244,6 +366,12 @@ uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
     return res;
 }
 
+/**
+ * call the process Sound Velocity Profile base on the Ctd
+ * 
+ * @param drf the S7k data record frame
+ * @param data the datagram
+ */
 void S7kParser::processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data){
         S7kCtdRTH * ctd = (S7kCtdRTH*) data;
 
