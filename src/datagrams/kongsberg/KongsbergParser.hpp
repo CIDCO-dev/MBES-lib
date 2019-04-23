@@ -44,10 +44,10 @@ class KongsbergParser : public DatagramParser{
         private:
 
                 /**
-                 * Call the process datagram depending on the character receive
+                 * Call the process datagram depending on the type of the Kongsberg Header
                  * 
                  * @param hdr the Kongsberg header
-                 * @param datagram the character who identify the process
+                 * @param datagram the datagram
                  */
 	        void processDatagram(KongsbergHeader & hdr,unsigned char * datagram);
                 
@@ -55,7 +55,7 @@ class KongsbergParser : public DatagramParser{
                  * call the process Depth
                  * 
                  * @param hdr the Kongsberg header
-                 * @param datagram the character id of the process Depth
+                 * @param datagram the datagram
                  */
 	        void processDepth(KongsbergHeader & hdr,unsigned char * datagram);
                 
@@ -63,7 +63,7 @@ class KongsbergParser : public DatagramParser{
                  * call the process Water Height
                  * 
                  * @param hdr the Kongsberg header
-                 * @param datagram the character id of the process Water Height
+                 * @param datagram the datagram
                  */
 	        void processWaterHeight(KongsbergHeader & hdr,unsigned char * datagram);
                 
@@ -71,7 +71,7 @@ class KongsbergParser : public DatagramParser{
                  * call the process Attitude
                  * 
                  * @param hdr the Kongsberg header
-                 * @param datagram the character id of the process Attitude
+                 * @param datagram the datagram
                  */
 	        void processAttitudeDatagram(KongsbergHeader & hdr,unsigned char * datagram);
                 
@@ -79,7 +79,7 @@ class KongsbergParser : public DatagramParser{
                  * call the process Position
                  * 
                  * @param hdr the Kongsberg header
-                 * @param datagram the character id of the process Position
+                 * @param datagram the datagram
                  */
 	        void processPositionDatagram(KongsbergHeader & hdr,unsigned char * datagram);
                 
@@ -87,7 +87,7 @@ class KongsbergParser : public DatagramParser{
                  * call the process Quality Factor
                  * 
                  * @param hdr the Kongsberg header
-                 * @param datagram the character id of the process Quality Factor
+                 * @param datagram the datagram
                  */
 	        void processQualityFactor(KongsbergHeader & hdr,unsigned char * datagram);
                 
@@ -95,7 +95,7 @@ class KongsbergParser : public DatagramParser{
                  * call the process Seabed Image Data
                  * 
                  * @param hdr the Kongsberg header
-                 * @param datagram the character id of the process Seabed Image Data
+                 * @param datagram the datagram
                  */
 	        void processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram);
                 
@@ -103,7 +103,7 @@ class KongsbergParser : public DatagramParser{
                  * call the process Sound Speed Profile
                  * 
                  * @param hdr the Kongsberg header
-                 * @param datagram the character id of the process Sound Speed Profile
+                 * @param datagram the datagram
                  */
 		void processSoundSpeedProfile(KongsbergHeader & hdr,unsigned char * datagram);
 
@@ -173,10 +173,10 @@ void KongsbergParser::parse(std::string & filename){
 }
 
 /**
- * Call the process datagram depending on the character receive
+ * Call the process datagram depending on the type of the Kongsberg Header
  * 
  * @param hdr the Kongsberg header
- * @param datagram the character who identify the process
+ * @param datagram the datagram
  */
 void KongsbergParser::processDatagram(KongsbergHeader & hdr,unsigned char * datagram){
 
@@ -237,7 +237,7 @@ void KongsbergParser::processDatagram(KongsbergHeader & hdr,unsigned char * data
  * call the process Depth
  * 
  * @param hdr the Kongsberg header
- * @param datagram the character id of the process Depth
+ * @param datagram the datagram
  */
 void KongsbergParser::processDepth(KongsbergHeader & hdr,unsigned char * datagram){
 	//printf("TODO: parse depth data\n");
@@ -247,7 +247,7 @@ void KongsbergParser::processDepth(KongsbergHeader & hdr,unsigned char * datagra
  * call the process Water Height
  * 
  * @param hdr the Kongsberg header
- * @param datagram the character id of the process Water Height
+ * @param datagram the datagram
  */
 void KongsbergParser::processWaterHeight(KongsbergHeader & hdr,unsigned char * datagram){
     //printf("TODO: parse height data\n");
@@ -257,7 +257,7 @@ void KongsbergParser::processWaterHeight(KongsbergHeader & hdr,unsigned char * d
  * call the process Attitude
  * 
  * @param hdr the Kongsberg header
- * @param datagram the character id of the process Attitude
+ * @param datagram the datagram
  */
 void KongsbergParser::processAttitudeDatagram(KongsbergHeader & hdr,unsigned char * datagram){
     uint64_t microEpoch = convertTime(hdr.date,hdr.time);
@@ -284,7 +284,7 @@ void KongsbergParser::processAttitudeDatagram(KongsbergHeader & hdr,unsigned cha
  * call the process Sound speed profile
  * 
  * @param hdr the Kongsberg header
- * @param datagram the character id of the process Sound Speed Profile
+ * @param datagram the datagram
  */
 void KongsbergParser::processSoundSpeedProfile(KongsbergHeader & hdr,unsigned char * datagram){
     SoundVelocityProfile * svp = new SoundVelocityProfile();
@@ -326,7 +326,7 @@ long KongsbergParser::convertTime(long datagramDate,long datagramTime){
  * call the process Position
  * 
  * @param hdr the Kongsberg header
- * @param datagram the character id of the process Position
+ * @param datagram the datagram
  */
 void KongsbergParser::processPositionDatagram(KongsbergHeader & hdr,unsigned char * datagram){
         KongsbergPositionDatagram * p = (KongsbergPositionDatagram*) datagram;
@@ -364,7 +364,7 @@ void KongsbergParser::processPositionDatagram(KongsbergHeader & hdr,unsigned cha
  * call the process Quality Factor
  * 
  * @param hdr the Kongsberg header
- * @param datagram the character id of the process Quality Factor
+ * @param datagram the datagram
  */
 void KongsbergParser::processQualityFactor(KongsbergHeader & hdr,unsigned char * datagram){
         //printf("TODO: parse quality factor data\n");
@@ -374,7 +374,7 @@ void KongsbergParser::processQualityFactor(KongsbergHeader & hdr,unsigned char *
  * call the process Seabed Image Data
  * 
  * @param hdr the Kongsberg header
- * @param datagram the character id of the process Seabed Image Data
+ * @param datagram the datagram
  */
 void KongsbergParser::processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram){
 	//printf("TODO: parse Seabed Image Data\n");
