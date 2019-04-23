@@ -38,7 +38,7 @@ public:
     ~S7kParser();
 
     /**
-     * Read a file and change the Kongsberg parser depending on the information
+     * Read a file and change the S7k parser depending on the information
      * 
      * @param filename name of the file to read
      */
