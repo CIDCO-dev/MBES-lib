@@ -8,10 +8,16 @@
  * Fournit des methodes virtuelles pour le traitement des contenus des datagrammes de sonar
  */
 
-
+/*!
+ * \brief Datagram processor class
+ */
 class DatagramProcessor{
 	public:
+            
+                /**Create a datagram processor*/
 		DatagramProcessor(){};
+                
+                /**Destroy the datagram processor*/
 		virtual ~DatagramProcessor(){};
 
 
@@ -30,6 +36,14 @@ class DatagramProcessor{
                 virtual void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){};
 
 
+                /**
+                 * Convention for position
+                 * 
+                 * @param microEpoch the position timestamp
+                 * @param longitude the position longitude
+                 * @param latitude the position latitude
+                 * @param height the position ellipsoidal Height
+                 */
                 virtual void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){};
 
 
@@ -41,6 +55,11 @@ class DatagramProcessor{
 		*/
                 virtual void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){};
 
+                /**
+                 * Convention for Swath
+                 * 
+                 * @param surfaceSoundSpeed the swath surface sound speed
+                 */
                 virtual void processSwathStart(double surfaceSoundSpeed){};
 
 		/*
