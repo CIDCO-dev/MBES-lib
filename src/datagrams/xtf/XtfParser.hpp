@@ -16,32 +16,94 @@
  * @author Guillaume Morissette
  *
  */
+
+/*!
+ * \brief Xtf parser class extention datagram parser
+ */
 class XtfParser : public DatagramParser{
 	public:
+            
+                /**
+                 * Create an Xtf parser 
+                 * 
+                 * @param processor the datagram processor
+                 */
 		XtfParser(DatagramProcessor & processor);
+                
+                /**Destroy the Xtf parser*/
 		~XtfParser();
 
+                /**
+                 * Read a file and change the S7k parser depending on the information
+                 * 
+                 * @param filename name of the file to read
+                 */
 		void parse(std::string & filename);
+                
+                /**Return the number channels in the file header*/
 		int getTotalNumberOfChannels();
 
 	protected:
+                
+                /**
+                 * Edit a Xtf PacketHeader
+                 * 
+                 * @param hdr the Xtf PacketHeader
+                 */
 		void processPacketHeader(XtfPacketHeader & hdr);
+                
+                /**
+                 * Set the processor depending by the content of the Xtf Packet header
+                 * 
+                 * @param hdr the Xtf Packet Header 
+                 * @param packet the packet
+                 */
 		void processPacket(XtfPacketHeader & hdr,unsigned char * packet);
+                
+                /**
+                 * Edit a Xtf PingHeader
+                 * 
+                 * @param hdr the Xtf PingHeader
+                 */
 	        void processPingHeader(XtfPingHeader & hdr);
+                
+                /**
+                 * Edit a Xtf FileHeader
+                 * 
+                 * @param hdr the Xtf FileHeader
+                 */
 	        void processFileHeader(XtfFileHeader & hdr);
+                
+                /**
+                 * Edit a Xtf ChanInfo
+                 * 
+                 * @param c the Xtf ChanInfo
+                 */
 	        void processChanInfo(XtfChanInfo & c);
 
+                /**the Xtf FileHeader*/
 		XtfFileHeader fileHeader;
 };
 
+/**
+ * Create an Xtf parser 
+ * 
+ * @param processor the datagram processor
+ */
 XtfParser::XtfParser(DatagramProcessor & processor):DatagramParser(processor){
 
 }
 
+/**Destroy the Xtf parser*/
 XtfParser::~XtfParser(){
 
 }
 
+/**
+ * Read a file and change the S7k parser depending on the information
+ * 
+ * @param filename name of the file to read
+ */
 void XtfParser::parse(std::string & filename){
 	FILE * file = fopen(filename.c_str(),"rb");
 
@@ -143,6 +205,7 @@ void XtfParser::parse(std::string & filename){
 	}
 }
 
+/**Return the number channels in the file header*/
 int XtfParser::getTotalNumberOfChannels(){
 	return  this->fileHeader.NumberOfSonarChannels+
 		this->fileHeader.NumberOfBathymetryChannels+
@@ -151,6 +214,11 @@ int XtfParser::getTotalNumberOfChannels(){
 		this->fileHeader.NumberOfInterferometryChannels;
 };
 
+/**
+ * Edit a Xtf FileHeader
+ * 
+ * @param f the Xtf FileHeader
+ */
 void XtfParser::processFileHeader(XtfFileHeader & f){
     /*
         printf("------------\n");
@@ -197,6 +265,11 @@ void XtfParser::processFileHeader(XtfFileHeader & f){
         */
 }
 
+/**
+ * Edit a Xtf ChanInfo
+ * 
+ * @param c the Xtf ChanInfo
+ */
 void XtfParser::processChanInfo(XtfChanInfo & c){
     /*
         printf("------------\n");
@@ -224,6 +297,11 @@ void XtfParser::processChanInfo(XtfChanInfo & c){
         */
 }
 
+/**
+ * Edit a Xtf PacketHeader
+ * 
+ * @param hdr the Xtf PacketHeader
+ */
 void XtfParser::processPacketHeader(XtfPacketHeader & hdr){
     /*
         printf("------------\n");
@@ -237,10 +315,21 @@ void XtfParser::processPacketHeader(XtfPacketHeader & hdr){
 */
 }
 
+/**
+ * Edit a Xtf PingHeader
+ * 
+ * @param hdr the Xtf PingHeader
+ */
 void XtfParser::processPingHeader(XtfPingHeader & hdr){
     processor.processSwathStart(hdr.SoundVelocity);
 }
 
+/**
+ * Set the processor depending by the content of the Xtf Packet header
+ * 
+ * @param hdr the Xtf Packet Header 
+ * @param packet the packet
+ */
 void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 	processor.processDatagramTag(hdr.HeaderType);
 
