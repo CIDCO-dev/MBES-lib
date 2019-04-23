@@ -93,9 +93,9 @@ public:
      */
     static std::string julianTime(uint64_t microEpoch)
     {
-    time_t date = microEpoch/1000000 + 18000;
+    time_t date = microEpoch/1000000;
     struct tm * timeinfo;
-    timeinfo = localtime (&date);
+    timeinfo = gmtime(&date);
     std::stringstream ssDate;
     ssDate << timeinfo->tm_year + 1900 << "-" << timeinfo->tm_yday + 1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
     return ssDate.str();
