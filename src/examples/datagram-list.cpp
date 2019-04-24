@@ -11,6 +11,7 @@
 #include <string>
 #include "../utils/StringUtils.hpp"
 
+/**Write the information about the datagram-list*/
 void printUsage(){
 	std::cerr << "\n\
   NAME\n\n\
@@ -24,20 +25,35 @@ void printUsage(){
 
 class DatagramPrinter : public DatagramProcessor{
 	public:
+            
+                /**
+                 * Create a datagram printer and open all the files
+                 */
 		DatagramPrinter(){
 
 		}
 
+                /**Destroy the datagram printer and close all the files*/
 		~DatagramPrinter(){
 
 		}
 
+                /**
+                 * Write a new line with a tag at the start
+                 * 
+                 * tag the tag
+                 */
 		void processDatagramTag(int tag){
 			printf("%d\n",tag);
 		}
 };
 
-
+/**
+  * declare the parser depending on argument receive
+  * 
+  * @param argc number of argument
+  * @param argv value of the arguments
+  */
 int main (int argc , char ** argv ){
 	DatagramParser * parser = NULL;
 	DatagramPrinter  printer;

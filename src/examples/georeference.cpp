@@ -16,6 +16,7 @@
 #include "../Georeferencing.hpp"
 #include "../SoundVelocityProfileFactory.hpp"
 
+/**Write the information about the georeference*/
 void printUsage(){
 	std::cerr << "\n\
   NAME\n\n\
@@ -27,36 +28,79 @@ void printUsage(){
 	exit(1);
 }
 
+/*!
+ * \brief Datagramer Georeferencer class extention of the Datagram Processor class
+ */
 class DatagramGeoreferencer : public DatagramProcessor{
 	public:
+                /**Create a datagram georeferencer*/
 		DatagramGeoreferencer(){
 
 		}
 
+                /**Destroy the datagram georeferencer*/
 		~DatagramGeoreferencer(){
 
 		}
 
+                /**
+                 * Add the information of a attitude in the vector attitudes
+                 * 
+                 * @param microEpoch the attitude timestamp
+                 * @param heading the attitude heading
+                 * @param pitch the attitude pitch
+                 * @param roll the attitude roll
+                 */
                 void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
 			attitudes.push_back(Attitude(microEpoch,roll,pitch,heading));
                 };
 
+                /**
+                 * Add the information of a position in the vector positions
+                 * 
+                 * @param microEpoch the position timestamp
+                 * @param longitude the position longitude
+                 * @param latitude the position latitude
+                 * @param height the position ellipsoidal height
+                 */
                 void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
 			positions.push_back(Position(microEpoch,longitude,latitude,height));
                 };
 
+                /**
+                 * Add the information of a ping in the vector pings
+                 * 
+                 * @param microEpoch the ping timestamp
+                 * @param id the ping id
+                 * @param beamAngle the ping beam angle
+                 * @param tiltAngle the ping tilt angle
+                 * @param twoWayTravelTime the ping two way travel time
+                 * @param quality the ping quality
+                 * @param intensity the ping intensity
+                 */
                 void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
 			pings.push_back(Ping(microEpoch,id,quality,intensity,currentSurfaceSoundSpeed,twoWayTravelTime,tiltAngle,beamAngle));
                 };
 
+                /**
+                 * Change the current surface sound speed
+                 * 
+                 * @param surfaceSoundSpeed the new current surface sound speed
+                 */
                 void processSwathStart(double surfaceSoundSpeed){
 			currentSurfaceSoundSpeed = surfaceSoundSpeed;
                 };
 
+                /**
+                 * Add a sound velocity profile in the vector svp
+                 * 
+                 * @param svp the sound velocity profile
+                 */
 		void processSoundVelocityProfile(SoundVelocityProfile * svp){
 			svps.push_back(svp);
 		}
 
+                /**Return the georeference (the three ping, the quality and the intensity)*/
 		void georeference(){
 			//interpolate attitudes and positions around pings
 			unsigned int attitudeIndex=0;
@@ -123,14 +167,30 @@ class DatagramGeoreferencer : public DatagramProcessor{
 		};
 
 	private:
+                
+                /**the current surface sound speed*/
 		double 					currentSurfaceSoundSpeed;
+                
+                /**Vector of pings*/
 		std::vector<Ping> 			pings;
+                
+                /**Vector of positions*/
 		std::vector<Position> 			positions;
+                
+                /**vector of attitudes*/
 		std::vector<Attitude> 			attitudes;
+                
+                /**vector of sound velocity profiles*/
 		std::vector<SoundVelocityProfile*>  	svps;
 
 };
 
+/**
+  * declare the parser depending on argument receive
+  * 
+  * @param argc number of argument
+  * @param argv value of the arguments
+  */
 int main (int argc , char ** argv ){
 	DatagramParser * parser = NULL;
 	DatagramGeoreferencer  printer;
