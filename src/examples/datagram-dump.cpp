@@ -41,7 +41,7 @@ class DatagramPrinter : public DatagramProcessor{
 		}
 
                 /**
-                 * Add the information of a attitude on the pitchRollFile and headingFile
+                 * show the information of a attitude
                  * 
                  * @param microEpoch the attitude timestamp
                  * @param heading the attitude heading
@@ -53,7 +53,7 @@ class DatagramPrinter : public DatagramProcessor{
 		};
 
                 /**
-                 * Add the information of a position on the positionFile
+                 * show the information of a position
                  * 
                  * @param microEpoch the position timestamp
                  * @param longitude the position longitude
@@ -65,7 +65,7 @@ class DatagramPrinter : public DatagramProcessor{
 		};
 
                 /**
-                 * Add the information of a ping on the pingLine
+                 * show the information of a ping
                  * 
                  * @param microEpoch the ping timestamp
                  * @param id the ping id
@@ -80,7 +80,7 @@ class DatagramPrinter : public DatagramProcessor{
 		};
 
                 /**
-                 * Add the information of a swath on the pingLine
+                 * show the information of a swath
                  * 
                  * @param surfaceSoundSpeed the new current surface sound speed
                  */
