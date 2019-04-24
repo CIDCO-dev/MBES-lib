@@ -10,7 +10,9 @@
 #include <iostream>
 #include <string>
 #include "../utils/StringUtils.hpp"
- void printUsage(){
+
+/**Write the information about the cidco-decoder*/ 
+void printUsage(){
 	std::cerr << "\n\
   NAME\n\n\
      cidco-decoder - lit un fichier MBES et le transforme en format cidco (ASCII)\n\n\
