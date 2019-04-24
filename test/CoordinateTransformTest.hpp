@@ -15,6 +15,7 @@
 
 #define POSITION_PRECISION 0.00000001
 
+/**Test if the coordinate transform works*/
 TEST_CASE("Coordinate Transform Test") {
 
     // prime meridian, equator, on ellipsoid
@@ -43,6 +44,7 @@ TEST_CASE("Coordinate Transform Test") {
 
 }
 
+/**test if the conversion between ECEF and longitude latitude height works*/
 TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     Position testPosition(0, 48, -68, 10);
 
@@ -59,7 +61,7 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
 }
 
 
-
+/**Test if the conversion between spherical to cartesian works*/
 TEST_CASE("Conversion between spherical to cartesian"){
     Eigen::Vector3d v;
 
@@ -70,6 +72,7 @@ TEST_CASE("Conversion between spherical to cartesian"){
     REQUIRE(abs(v(2) - 0.707107) < 0.000001);
 }
 
+/**Test if the conversion between sonar to cartesian works*/
 TEST_CASE("Conversion between sonar to cartesian"){
     Eigen::Vector3d v;
 
@@ -77,7 +80,7 @@ TEST_CASE("Conversion between sonar to cartesian"){
 }
 
 
-
+/**Test if CoordinateTransform get a valid DCM*/
 TEST_CASE("getDCM Test") {
 
     Eigen::Vector3d testVector = Eigen::Vector3d::Ones();
