@@ -28,8 +28,8 @@ void printUsage(){
   NAME\n\n\
      georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
   SYNOPSIS\n \
-	   georeference fichier\n\
-           [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z]\n\n\
+	   [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z]\n\
+           georeference fichier\n\n\
   DESCRIPTION\n\n \
   Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
@@ -257,7 +257,7 @@ int main (int argc , char ** argv){
                     switch(index)
                     {
                         case 'x':
-                            if(sscanf(optarg,"%1f", &leverArmX) != 1)
+                            if(sscanf(optarg,"%f", &leverArmX) != 1)
                             {
                                 std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
                                 printUsage();
@@ -265,7 +265,7 @@ int main (int argc , char ** argv){
                         break;
                                         
                         case 'y':
-                            if (sscanf(optarg,"%1f", &leverArmY) != 1)
+                            if (sscanf(optarg,"%f", &leverArmY) != 1)
                             {
                                 std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
                                 printUsage();
@@ -273,7 +273,7 @@ int main (int argc , char ** argv){
                         break;
                                         
                         case 'z':
-                            if (sscanf(optarg,"%1f", &leverArmZ) != 1)
+                            if (sscanf(optarg,"%f", &leverArmZ) != 1)
                             {
                                 std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
                                 printUsage();
