@@ -8,6 +8,7 @@
 #include "../datagrams/xtf/XtfParser.hpp"
 #include "../datagrams/s7k/S7kParser.hpp"
 #include <iostream>
+#include <Eigen/Dense>
 #include <string>
 #include "../utils/StringUtils.hpp"
 #include "../Ping.hpp"
@@ -21,6 +22,7 @@
 #include <iostream>
 #include <string>
 #include "../utils/StringUtils.hpp"
+using namespace std;
 
 /**Write the information about the georeference*/
 void printUsage(){
@@ -179,6 +181,11 @@ class DatagramGeoreferencer : public DatagramProcessor{
                     leverArmY = Y;
                     leverArmZ = Z;
                 };
+                
+                double getX()
+                {
+                    return leverArmX;
+                }
 
 	private:
                 
@@ -220,7 +227,7 @@ int main (int argc , char ** argv){
 	putenv("TZ");
 #endif
 
-	if(argc != 2){
+	if(argc < 2){
 		printUsage();
 	}
 
@@ -252,11 +259,13 @@ int main (int argc , char ** argv){
 		std::cout << std::fixed;
 
                 int index;
-                while((index=getopt(argc,argv,"x:y:z"))!=-1)
+                std::cerr << "Search x y z" << std::endl;
+                while((index=getopt(argc,argv,"x:y:z:p"))!=-1)
                 {
                     switch(index)
                     {
                         case 'x':
+                            std::cerr << "Find a x" << std::endl;
                             if(sscanf(optarg,"%f", &leverArmX) != 1)
                             {
                                 std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
@@ -265,6 +274,7 @@ int main (int argc , char ** argv){
                         break;
                                         
                         case 'y':
+                            std::cerr << "Find a y" << std::endl;
                             if (sscanf(optarg,"%f", &leverArmY) != 1)
                             {
                                 std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
@@ -273,6 +283,7 @@ int main (int argc , char ** argv){
                         break;
                                         
                         case 'z':
+                            std::cerr << "Find a z" << std::endl;
                             if (sscanf(optarg,"%f", &leverArmZ) != 1)
                             {
                                 std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
@@ -283,6 +294,7 @@ int main (int argc , char ** argv){
                 }
                 printer.setLeverArm(leverArmX,leverArmY,leverArmZ);
                 printer.georeference();
+                std::cout << 1 << std::endl;
         }
 	catch(const char * error){
 		std::cerr << "Error while parsing " << fileName << ": " << error << std::endl;
