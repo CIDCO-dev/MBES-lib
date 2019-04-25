@@ -15,6 +15,12 @@
 #include "../math/Interpolation.hpp"
 #include "../Georeferencing.hpp"
 #include "../SoundVelocityProfileFactory.hpp"
+ #include "../datagrams/kongsberg/KongsbergParser.hpp"
+#include "../datagrams/xtf/XtfParser.hpp"
+#include "../datagrams/s7k/S7kParser.hpp"
+#include <iostream>
+#include <string>
+#include "../utils/StringUtils.hpp"
 
 /**Write the information about the georeference*/
 void printUsage(){
@@ -22,7 +28,8 @@ void printUsage(){
   NAME\n\n\
      georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
   SYNOPSIS\n \
-	   georeference fichier\n\n\
+	   georeference fichier\n\
+           [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z]\n\n\
   DESCRIPTION\n\n \
   Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
@@ -153,9 +160,9 @@ class DatagramGeoreferencer : public DatagramProcessor{
 
 				//TODO: Get leverArm from the data or command line
 				Eigen::Vector3d leverArm;
-				leverArm << 0,0,0;
-
-				//georeference
+				leverArm << leverArmX,leverArmY,leverArmZ;
+                                
+                                //georeference
 				Eigen::Vector3d georeferencedPing;
 				Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm);
 
@@ -163,8 +170,15 @@ class DatagramGeoreferencer : public DatagramProcessor{
 
 				delete interpolatedAttitude;
 				delete interpolatedPosition;
+                                }
 			}
-		};
+                
+                void setLeverArm(double X,double Y,double Z)
+                {
+                    leverArmX = X;
+                    leverArmY = Y;
+                    leverArmZ = Z;
+                };
 
 	private:
                 
@@ -182,7 +196,11 @@ class DatagramGeoreferencer : public DatagramProcessor{
                 
                 /**vector of sound velocity profiles*/
 		std::vector<SoundVelocityProfile*>  	svps;
-
+                
+                double leverArmX = 0.0;
+                double leverArmY = 0.0;
+                double leverArmZ = 0.0;
+                
 };
 
 /**
@@ -207,6 +225,9 @@ int main (int argc , char ** argv ){
 	}
 
 	std::string fileName(argv[1]);
+        double leverArmX = 0.0;
+        double leverArmY = 0.0;
+        double leverArmZ = 0.0;
 
 	try{
 		std::cerr << "Decoding " << fileName << std::endl;
@@ -230,10 +251,41 @@ int main (int argc , char ** argv ){
 		std::cout << std::setprecision(6);
 		std::cout << std::fixed;
 
-		printer.georeference();
-	}
+                int index;
+                while((index=getopt(argc,argv,"x:y:z"))!=-1)
+                {
+                    switch(index)
+                    {
+                        case 'x':
+                            if(sscanf(optarg,"%1f", &leverArmX) != 1)
+                            {
+                                std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
+                                printUsage();
+                            }
+                        break;
+                                        
+                        case 'y':
+                            if (sscanf(optarg,"%1f", &leverArmY) != 1)
+                            {
+                                std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
+                                printUsage();
+                            }
+                        break;
+                                        
+                        case 'z':
+                            if (sscanf(optarg,"%1f", &leverArmZ) != 1)
+                            {
+                                std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
+                                printUsage();
+                            }
+                        break;
+                    }
+                }
+                printer.setLeverArm(leverArmX,leverArmY,leverArmZ);
+                printer.georeference();
+        }
 	catch(const char * error){
-		std::cerr << "Error whille parsing " << fileName << ": " << error << std::endl;
+		std::cerr << "Error while parsing " << fileName << ": " << error << std::endl;
 	}
 
 
