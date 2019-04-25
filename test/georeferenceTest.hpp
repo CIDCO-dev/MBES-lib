@@ -57,14 +57,88 @@ std::stringstream system_call(const std::string& command){
      return out;
 }
 
-TEST_CASE("test")
+TEST_CASE("test if the parameter x y z are correctly get")
 {
-    string commX = " -x 1.0";
-    string commY = " -y 1.0";
-    string commZ = " -z 1.0";
+    string commX = " -x 1";
+    string commY = " -y 1";
+    string commZ = " -z 1";
     string commFile = " test/data/all/example.all";
-    string commTest = binexec+commFile+commX+commY+commZ;
+    string commTest = binexec+commX+commY+commZ+commFile;
     std::stringstream ss;
     ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="0");
+    REQUIRE(ss.str()=="1:1:1");
+}
+
+TEST_CASE("test the leverArm result without parameter")
+{
+    string commX = "";
+    string commY = "";
+    string commZ = "";
+    string commFile = " test/data/all/example.all";
+    string commTest = binexec+commX+commY+commZ+commFile;
+    std::stringstream ss;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()=="0:0:0");
+}
+
+TEST_CASE("test the leverArm result without all the parameter")
+{
+    string commX = " -x 1";
+    string commY = " -y 1";
+    string commZ = " -z 1";
+    string commFile = " test/data/all/example.all";
+    string commTest = binexec+commX+commFile;
+    std::stringstream ss;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()=="1:0:0");
+    commTest = binexec+commX+commZ+commFile;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()=="1:0:1");
+    commTest = binexec+commY+commZ+commFile;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()=="0:1:1");
+}
+
+TEST_CASE("test the extention of the file receive")
+{
+    string commFile = " test/data/all/example.all";
+    string commTest = binexec+commFile;
+    std::stringstream ss;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()!="Error while parsing test/data/all/example.all: Unknown extension");
+    commFile = " test/data/s7k/20141016_150519_FJ-Saucier.s7k";
+    commTest = binexec+commFile;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()!="Error while parsing test/data/s7k/20141016_150519_FJ-Saucier.s7k: Unknown extension");
+    commFile = " test/data/xtf/example.xtf";
+    commTest = binexec+commFile;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()!="Error while parsing test/data/xtf/example.xtf: Unknown extension");
+}
+
+TEST_CASE("test if the file is invalid")
+{
+    string commFile = " test.txt";
+    string commTest = binexec+commFile;
+    std::stringstream ss;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()=="Error while parsing test.txt: Unknown extension");
+}
+
+TEST_CASE("test if the file is not present")
+{
+    string commFile = " test/data/all/examplee.all";
+    string commTest = binexec+commFile;
+    std::stringstream ss;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()=="Error while parsing test/data/all/examplee.all: File not found");
+}
+
+TEST_CASE("test if file parameter is not present")
+{
+    string commFile = "";
+    string commTest = binexec+commFile;
+    std::stringstream ss;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()=="Error no file enter");
 }
