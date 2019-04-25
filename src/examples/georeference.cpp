@@ -230,6 +230,7 @@ int main (int argc , char ** argv){
 #endif
 
 	if(argc < 2){
+                std::cout << "Error no file enter";
 		printUsage();
 	}
 
@@ -240,20 +241,27 @@ int main (int argc , char ** argv){
 
 	try{
 		std::cerr << "Decoding " << fileName << std::endl;
-
-		if(ends_with(fileName.c_str(),".all")){
+                std::ifstream inFile;
+                inFile.open(fileName);
+                if (inFile)
+                {    
+                    if(ends_with(fileName.c_str(),".all")){
 			parser = new KongsbergParser(printer);
-		}
-		else if(ends_with(fileName.c_str(),".xtf")){
+                    }   
+                    else if(ends_with(fileName.c_str(),".xtf")){
 			parser = new XtfParser(printer);
-		}
-		else if(ends_with(fileName.c_str(),".s7k")){
+                    }
+                    else if(ends_with(fileName.c_str(),".s7k")){
                         parser = new S7kParser(printer);
-		}
-		else{
+                    }
+                    else{
 			throw "Unknown extension";
-		}
-
+                    }
+                }
+                else
+                {
+                    throw "File not found";
+                }
 		parser->parse(fileName);
 
 
@@ -261,13 +269,11 @@ int main (int argc , char ** argv){
 		std::cout << std::fixed;
 
                 int index;
-                std::cerr << "Search x y z" << std::endl;
                 while((index=getopt(argc,argv,"x:y:z:"))!=-1)
                 {
                     switch(index)
                     {
                         case 'x':
-                            std::cerr << "Find a x" << std::endl;
                             if(sscanf(optarg,"%lf", &leverArmX) != 1)
                             {
                                 std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
@@ -276,7 +282,6 @@ int main (int argc , char ** argv){
                         break;
                                         
                         case 'y':
-                            std::cerr << "Find a y" << std::endl;
                             if (sscanf(optarg,"%lf", &leverArmY) != 1)
                             {
                                 std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
@@ -285,7 +290,6 @@ int main (int argc , char ** argv){
                         break;
                                         
                         case 'z':
-                            std::cerr << "Find a z" << std::endl;
                             if (sscanf(optarg,"%lf", &leverArmZ) != 1)
                             {
                                 std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
@@ -302,7 +306,7 @@ int main (int argc , char ** argv){
         }
 	catch(const char * error){
 		std::cerr << "Error while parsing " << fileName << ": " << error << std::endl;
-                std::cout << "Error while parsing " << fileName << ": " << error << std::endl;
+                std::cout << "Error while parsing " << fileName << ": " << error;
 	}
 
 
