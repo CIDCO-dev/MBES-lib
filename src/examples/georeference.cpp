@@ -209,7 +209,7 @@ class DatagramGeoreferencer : public DatagramProcessor{
   * @param argc number of argument
   * @param argv value of the arguments
   */
-int main (int argc , char ** argv ){
+int main (int argc , char ** argv){
 	DatagramParser * parser = NULL;
 	DatagramGeoreferencer  printer;
 
