@@ -6,3 +6,4 @@
 #include "SoundVelocityProfileTest.hpp"
 #include "SurveySystemTest.hpp"
 #include "CoordinateTransformTest.hpp"
+#include "georeferenceTest.hpp"
