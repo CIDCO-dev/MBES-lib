@@ -1,4 +1,7 @@
-﻿/*
+
+#include <fstream>
+
+/*
  *  Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 #ifndef GEOREFERENCE_CPP
@@ -8,6 +11,7 @@
 #include "../datagrams/xtf/XtfParser.hpp"
 #include "../datagrams/s7k/S7kParser.hpp"
 #include <iostream>
+#include <Eigen/Dense>
 #include <string>
 #include "../utils/StringUtils.hpp"
 #include "../Ping.hpp"
@@ -15,6 +19,13 @@
 #include "../math/Interpolation.hpp"
 #include "../Georeferencing.hpp"
 #include "../SoundVelocityProfileFactory.hpp"
+ #include "../datagrams/kongsberg/KongsbergParser.hpp"
+#include "../datagrams/xtf/XtfParser.hpp"
+#include "../datagrams/s7k/S7kParser.hpp"
+#include <iostream>
+#include <string>
+#include "../utils/StringUtils.hpp"
+using namespace std;
 
 /**Write the information about the georeference*/
 void printUsage(){
@@ -22,7 +33,7 @@ void printUsage(){
   NAME\n\n\
      georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
   SYNOPSIS\n \
-	   georeference fichier\n\n\
+	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] fichier\n\n\
   DESCRIPTION\n\n \
   Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
@@ -153,9 +164,9 @@ class DatagramGeoreferencer : public DatagramProcessor{
 
 				//TODO: Get leverArm from the data or command line
 				Eigen::Vector3d leverArm;
-				leverArm << 0,0,0;
-
-				//georeference
+				leverArm << leverArmX,leverArmY,leverArmZ;
+                                
+                                //georeference
 				Eigen::Vector3d georeferencedPing;
 				Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm);
 
@@ -163,8 +174,32 @@ class DatagramGeoreferencer : public DatagramProcessor{
 
 				delete interpolatedAttitude;
 				delete interpolatedPosition;
+                                }
 			}
-		};
+                
+                /**
+                 * set the position x y z of the leverArm
+                 * 
+                 * @param X the axe x position
+                 * @param Y the axe y position
+                 * @param Z the axe z position
+                 */
+                void setLeverArm(double X,double Y,double Z)
+                {
+                    leverArmX = X;
+                    leverArmY = Y;
+                    leverArmZ = Z;
+                };
+                
+                /**
+                 * Return a text value who contain the x y z value of the leverArm 
+                 */
+                std::string getleverArmLine()
+                {
+                    std::stringstream line;
+                    line << leverArmX << ":" << leverArmY << ":" << leverArmZ;
+                    return line.str();
+                }
 
 	private:
                 
@@ -182,7 +217,16 @@ class DatagramGeoreferencer : public DatagramProcessor{
                 
                 /**vector of sound velocity profiles*/
 		std::vector<SoundVelocityProfile*>  	svps;
-
+                
+                /**the axe x position of the leverArm*/
+                double leverArmX = 0.0;
+                
+                /**the axe y position of the leverArm*/
+                double leverArmY = 0.0;
+                
+                /**the axe z position of the leverArm*/
+                double leverArmZ = 0.0;
+                
 };
 
 /**
@@ -191,7 +235,7 @@ class DatagramGeoreferencer : public DatagramProcessor{
   * @param argc number of argument
   * @param argv value of the arguments
   */
-int main (int argc , char ** argv ){
+int main (int argc , char ** argv){
 	DatagramParser * parser = NULL;
 	DatagramGeoreferencer  printer;
 
@@ -201,43 +245,89 @@ int main (int argc , char ** argv ){
 #ifdef _WIN32
 	putenv("TZ");
 #endif
-
-	if(argc != 2){
-		printUsage();
-	}
-
-	std::string fileName(argv[1]);
-
-	try{
-		std::cerr << "Decoding " << fileName << std::endl;
-
-		if(ends_with(fileName.c_str(),".all")){
-			parser = new KongsbergParser(printer);
-		}
-		else if(ends_with(fileName.c_str(),".xtf")){
-			parser = new XtfParser(printer);
-		}
-		else if(ends_with(fileName.c_str(),".s7k")){
-                        parser = new S7kParser(printer);
-		}
-		else{
-			throw "Unknown extension";
-		}
-
-		parser->parse(fileName);
-
-
-		std::cout << std::setprecision(6);
-		std::cout << std::fixed;
-
-		printer.georeference();
-	}
-	catch(const char * error){
-		std::cerr << "Error whille parsing " << fileName << ": " << error << std::endl;
-	}
-
-
-	if(parser) delete parser;
+if(argc < 2)
+{
+    printUsage();
+}
+else
+{
+    std::string fileName(argv[argc-1]);
+    double leverArmX = 0.0;
+    double leverArmY = 0.0;
+    double leverArmZ = 0.0;
+    int index;
+    while((index=getopt(argc,argv,"x:y:z:"))!=-1)
+    {
+        switch(index)
+        {
+            case 'x':
+                if(sscanf(optarg,"%lf", &leverArmX) != 1)
+                {
+                    std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
+                    printUsage();
+                }
+           break;
+                                        
+            case 'y':
+                if (sscanf(optarg,"%lf", &leverArmY) != 1)
+                {
+                    std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
+                    printUsage();
+                }
+            break;
+                                        
+            case 'z':
+                if (sscanf(optarg,"%lf", &leverArmZ) != 1)
+                {
+                    std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
+                    printUsage();
+                }
+            break;
+        }
+    }
+    try
+    {
+	std::cerr << "Decoding " << fileName << std::endl;
+        std::ifstream inFile;
+        inFile.open(fileName);
+        if (inFile)
+        {    
+            if(ends_with(fileName.c_str(),".all"))
+            {
+		parser = new KongsbergParser(printer);
+            }   
+            else if(ends_with(fileName.c_str(),".xtf"))
+            {
+		parser = new XtfParser(printer);
+            }
+            else if(ends_with(fileName.c_str(),".s7k"))
+            {
+                parser = new S7kParser(printer);
+            }
+            else
+            {
+		throw "Unknown extension";
+            }
+        }
+        else
+        {
+            throw "File not found";
+        }
+        parser->parse(fileName);
+	std::cout << std::setprecision(6);
+	std::cout << std::fixed;
+        printer.setLeverArm(leverArmX,leverArmY,leverArmZ);
+        printer.georeference();
+        std::string leverArmLine;
+        leverArmLine = printer.getleverArmLine();
+        std::cout << leverArmLine;
+    }
+    catch(const char * error)
+    {
+	std::cerr << "Error while parsing " << fileName << ": " << error << std::endl;
+    }
+    if(parser) delete parser;
+}       
 }
 
 #endif
