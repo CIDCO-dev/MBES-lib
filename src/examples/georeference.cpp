@@ -33,8 +33,7 @@ void printUsage(){
   NAME\n\n\
      georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
   SYNOPSIS\n \
-	   [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z]\n\
-           georeference fichier\n\n\
+	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] fichier\n\n\
   DESCRIPTION\n\n \
   Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
@@ -248,7 +247,6 @@ int main (int argc , char ** argv){
 #endif
 if(argc < 2)
 {
-    std::cout << "Error no file enter";
     printUsage();
 }
 else
@@ -257,7 +255,36 @@ else
     double leverArmX = 0.0;
     double leverArmY = 0.0;
     double leverArmZ = 0.0;
-    
+    int index;
+    while((index=getopt(argc,argv,"x:y:z:"))!=-1)
+    {
+        switch(index)
+        {
+            case 'x':
+                if(sscanf(optarg,"%lf", &leverArmX) != 1)
+                {
+                    std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
+                    printUsage();
+                }
+           break;
+                                        
+            case 'y':
+                if (sscanf(optarg,"%lf", &leverArmY) != 1)
+                {
+                    std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
+                    printUsage();
+                }
+            break;
+                                        
+            case 'z':
+                if (sscanf(optarg,"%lf", &leverArmZ) != 1)
+                {
+                    std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
+                    printUsage();
+                }
+            break;
+        }
+    }
     try
     {
 	std::cerr << "Decoding " << fileName << std::endl;
@@ -289,36 +316,6 @@ else
         parser->parse(fileName);
 	std::cout << std::setprecision(6);
 	std::cout << std::fixed;
-        int index;
-        while((index=getopt(argc,argv,"x:y:z:"))!=-1)
-        {
-            switch(index)
-            {
-                case 'x':
-                    if(sscanf(optarg,"%lf", &leverArmX) != 1)
-                    {
-                        std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
-                        printUsage();
-                    }
-                break;
-                                        
-                case 'y':
-                    if (sscanf(optarg,"%lf", &leverArmY) != 1)
-                    {
-                        std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
-                        printUsage();
-                    }
-                break;
-                                        
-                case 'z':
-                    if (sscanf(optarg,"%lf", &leverArmZ) != 1)
-                    {
-                        std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
-                        printUsage();
-                    }
-                break;
-            }
-        }
         printer.setLeverArm(leverArmX,leverArmY,leverArmZ);
         printer.georeference();
         std::string leverArmLine;
