@@ -178,6 +178,13 @@ class DatagramGeoreferencer : public DatagramProcessor{
                                 }
 			}
                 
+                /**
+                 * set the position x y z of the leverArm
+                 * 
+                 * @param X the axe x position
+                 * @param Y the axe y position
+                 * @param Z the axe z position
+                 */
                 void setLeverArm(double X,double Y,double Z)
                 {
                     leverArmX = X;
@@ -185,6 +192,9 @@ class DatagramGeoreferencer : public DatagramProcessor{
                     leverArmZ = Z;
                 };
                 
+                /**
+                 * Return a text value who contain the x y z value of the leverArm 
+                 */
                 std::string getleverArmLine()
                 {
                     std::stringstream line;
@@ -209,8 +219,13 @@ class DatagramGeoreferencer : public DatagramProcessor{
                 /**vector of sound velocity profiles*/
 		std::vector<SoundVelocityProfile*>  	svps;
                 
+                /**the axe x position of the leverArm*/
                 double leverArmX = 0.0;
+                
+                /**the axe y position of the leverArm*/
                 double leverArmY = 0.0;
+                
+                /**the axe z position of the leverArm*/
                 double leverArmZ = 0.0;
                 
 };
