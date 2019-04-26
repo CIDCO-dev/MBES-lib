@@ -166,10 +166,14 @@ TEST_CASE("test if file parameter is not present")
     string commTest = binexec+commFile;
     std::stringstream ss;
     ss = system_call(std::string(commTest));
-    std::string result = "Error no file enter";
-    std::string line;
-    getline(ss,line);
-    REQUIRE(line==result);
+    std::string result = "\n\
+    NAME\n\n\
+    georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
+    SYNOPSIS\n \
+    georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] fichier\n\n\
+    DESCRIPTION\n\n \
+    Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n";
+    REQUIRE(ss.str()==result);
 }
 
 /**Test with parameter x y z invalid*/
@@ -184,16 +188,13 @@ TEST_CASE("test if the parameter x y z are invalid")
     ss = system_call(std::string(commTest));
     std::string line;
     getline(ss,line);
-    getline(ss,line);
     REQUIRE(line=="Invalid lever arm X offset (-x)");
     commTest = binexec+commY+commFile;
     ss = system_call(std::string(commTest));
     getline(ss,line);
-    getline(ss,line);
     REQUIRE(line=="Invalid lever arm Y offset (-y)");
     commTest = binexec+commZ+commFile;
     ss = system_call(std::string(commTest));
-    getline(ss,line);
     getline(ss,line);
     REQUIRE(line=="Invalid lever arm Z offset (-z)");
 }
