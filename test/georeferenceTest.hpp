@@ -111,49 +111,65 @@ TEST_CASE("test the leverArm result without all the parameter")
 /**Test with file extention valid*/
 TEST_CASE("test the extention of the file receive")
 {
-    string commFile = " test/data/all/example.all";
+    string commFile = " test/data/all/example.all 2>&1";
     string commTest = binexec+commFile;
     std::stringstream ss;
     ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()!="Error while parsing test/data/all/example.all: Unknown extension");
-    commFile = " test/data/s7k/20141016_150519_FJ-Saucier.s7k";
+    std::string line;
+    getline(ss,line);
+    getline(ss,line);
+    REQUIRE(line!="Error while parsing test/data/all/example.all: Unknown extension");
+    commFile = " test/data/s7k/20141016_150519_FJ-Saucier.s7k 2>&1";
     commTest = binexec+commFile;
     ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()!="Error while parsing test/data/s7k/20141016_150519_FJ-Saucier.s7k: Unknown extension");
-    commFile = " test/data/xtf/example.xtf";
+    getline(ss,line);
+    getline(ss,line);
+    REQUIRE(line!="Error while parsing test/data/s7k/20141016_150519_FJ-Saucier.s7k: Unknown extension");
+    commFile = " test/data/xtf/example.xtf 2>&1";
     commTest = binexec+commFile;
     ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()!="Error while parsing test/data/xtf/example.xtf: Unknown extension");
+    getline(ss,line);
+    getline(ss,line);
+    REQUIRE(line!="Error while parsing test/data/xtf/example.xtf: Unknown extension");
 }
 
 /**Test with file extention invalid*/
 TEST_CASE("test if the file is invalid")
 {
-    string commFile = " test.txt";
+    string commFile = " test.txt 2>&1";
     string commTest = binexec+commFile;
     std::stringstream ss;
     ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="Error while parsing test.txt: Unknown extension");
+    std::string line;
+    getline(ss,line);
+    getline(ss,line);
+    REQUIRE(line=="Error while parsing test.txt: Unknown extension");
 }
 
 /**Test with no file*/
 TEST_CASE("test if the file is not present")
 {
-    string commFile = " test/data/all/examplee.all";
+    string commFile = " test/data/all/examplee.all 2>&1";
     string commTest = binexec+commFile;
     std::stringstream ss;
     ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="Error while parsing test/data/all/examplee.all: File not found");
+    std::string line;
+    getline(ss,line);
+    getline(ss,line);
+    REQUIRE(line=="Error while parsing test/data/all/examplee.all: File not found");
 }
 
 /**Test with no existent file*/
 TEST_CASE("test if file parameter is not present")
 {
-    string commFile = "";
+    string commFile = " 2>&1";
     string commTest = binexec+commFile;
     std::stringstream ss;
     ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="Error no file enter");
+    std::string result = "Error no file enter";
+    std::string line;
+    getline(ss,line);
+    REQUIRE(line==result);
 }
 
 /**Test with parameter x y z invalid*/
@@ -162,15 +178,22 @@ TEST_CASE("test if the parameter x y z are invalid")
     string commX = " -x sjdhsd";
     string commY = " -y gyhgj";
     string commZ = " -z gyigkb";
-    string commFile = " test/data/all/example.all";
+    string commFile = " test/data/all/example.all 2>&1";
     string commTest = binexec+commX+commFile;
     std::stringstream ss;
     ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="Invalid lever arm X offset (-x)");
+    std::string line;
+    getline(ss,line);
+    getline(ss,line);
+    REQUIRE(line=="Invalid lever arm X offset (-x)");
     commTest = binexec+commY+commFile;
     ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="Invalid lever arm Y offset (-y)");
+    getline(ss,line);
+    getline(ss,line);
+    REQUIRE(line=="Invalid lever arm Y offset (-y)");
     commTest = binexec+commZ+commFile;
     ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="Invalid lever arm Z offset (-z)");
+    getline(ss,line);
+    getline(ss,line);
+    REQUIRE(line=="Invalid lever arm Z offset (-z)");
 }
