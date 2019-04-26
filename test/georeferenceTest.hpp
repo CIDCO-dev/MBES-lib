@@ -29,6 +29,11 @@ static string binexec("build/bin/georeference");
 static string outputdir(".");
 #endif
 
+/**
+ * Execute a main function
+ * 
+ * @param command the parameters for the execution
+ */
 std::stringstream system_call(const std::string& command){
 
      std::stringstream out;
@@ -58,6 +63,7 @@ std::stringstream system_call(const std::string& command){
      return out;
 }
 
+/**Test with parameter x y z valid*/
 TEST_CASE("test if the parameter x y z are correctly get")
 {
     string commX = " -x 1";
@@ -70,6 +76,7 @@ TEST_CASE("test if the parameter x y z are correctly get")
     REQUIRE(ss.str()=="1:1:1");
 }
 
+/**Test with no parameter x y z*/
 TEST_CASE("test the leverArm result without parameter")
 {
     string commX = "";
@@ -82,6 +89,7 @@ TEST_CASE("test the leverArm result without parameter")
     REQUIRE(ss.str()=="0:0:0");
 }
 
+/**Test with certain parameter x y z*/
 TEST_CASE("test the leverArm result without all the parameter")
 {
     string commX = " -x 1";
@@ -100,6 +108,7 @@ TEST_CASE("test the leverArm result without all the parameter")
     REQUIRE(ss.str()=="0:1:1");
 }
 
+/**Test with file extention valid*/
 TEST_CASE("test the extention of the file receive")
 {
     string commFile = " test/data/all/example.all";
@@ -117,6 +126,7 @@ TEST_CASE("test the extention of the file receive")
     REQUIRE(ss.str()!="Error while parsing test/data/xtf/example.xtf: Unknown extension");
 }
 
+/**Test with file extention invalid*/
 TEST_CASE("test if the file is invalid")
 {
     string commFile = " test.txt";
@@ -126,6 +136,7 @@ TEST_CASE("test if the file is invalid")
     REQUIRE(ss.str()=="Error while parsing test.txt: Unknown extension");
 }
 
+/**Test with no file*/
 TEST_CASE("test if the file is not present")
 {
     string commFile = " test/data/all/examplee.all";
@@ -135,6 +146,7 @@ TEST_CASE("test if the file is not present")
     REQUIRE(ss.str()=="Error while parsing test/data/all/examplee.all: File not found");
 }
 
+/**Test with no existent file*/
 TEST_CASE("test if file parameter is not present")
 {
     string commFile = "";
@@ -144,6 +156,7 @@ TEST_CASE("test if file parameter is not present")
     REQUIRE(ss.str()=="Error no file enter");
 }
 
+/**Test with parameter x y z invalid*/
 TEST_CASE("test if the parameter x y z are invalid")
 {
     string commX = " -x sjdhsd";
