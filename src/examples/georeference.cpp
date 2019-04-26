@@ -1,4 +1,7 @@
-﻿/*
+
+#include <fstream>
+
+/*
  *  Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 #ifndef GEOREFERENCE_CPP
@@ -228,12 +231,12 @@ int main (int argc , char ** argv){
 #ifdef _WIN32
 	putenv("TZ");
 #endif
-
 	if(argc < 2){
                 std::cout << "Error no file enter";
 		printUsage();
 	}
-
+        else
+        {
 	std::string fileName(argv[argc-1]);
         double leverArmX = 0.0;
         double leverArmY = 0.0;
@@ -263,11 +266,8 @@ int main (int argc , char ** argv){
                     throw "File not found";
                 }
 		parser->parse(fileName);
-
-
 		std::cout << std::setprecision(6);
 		std::cout << std::fixed;
-
                 int index;
                 while((index=getopt(argc,argv,"x:y:z:"))!=-1)
                 {
@@ -277,6 +277,7 @@ int main (int argc , char ** argv){
                             if(sscanf(optarg,"%lf", &leverArmX) != 1)
                             {
                                 std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
+                                std::cout << "Invalid lever arm X offset (-x)";
                                 printUsage();
                             }
                         break;
@@ -285,6 +286,7 @@ int main (int argc , char ** argv){
                             if (sscanf(optarg,"%lf", &leverArmY) != 1)
                             {
                                 std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
+                                std::cout << "Invalid lever arm Y offset (-y)";
                                 printUsage();
                             }
                         break;
@@ -293,6 +295,7 @@ int main (int argc , char ** argv){
                             if (sscanf(optarg,"%lf", &leverArmZ) != 1)
                             {
                                 std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
+                                std::cout << "Invalid lever arm Z offset (-z)";
                                 printUsage();
                             }
                         break;
@@ -308,9 +311,8 @@ int main (int argc , char ** argv){
 		std::cerr << "Error while parsing " << fileName << ": " << error << std::endl;
                 std::cout << "Error while parsing " << fileName << ": " << error;
 	}
-
-
 	if(parser) delete parser;
+        }       
 }
 
 #endif
