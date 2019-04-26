@@ -17,6 +17,7 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include "catch.hpp"
 #include "../src/utils/Exception.hpp"
 using namespace std;
@@ -141,4 +142,22 @@ TEST_CASE("test if file parameter is not present")
     std::stringstream ss;
     ss = system_call(std::string(commTest));
     REQUIRE(ss.str()=="Error no file enter");
+}
+
+TEST_CASE("test if the parameter x y z are invalid")
+{
+    string commX = " -x sjdhsd";
+    string commY = " -y gyhgj";
+    string commZ = " -z gyigkb";
+    string commFile = " test/data/all/example.all";
+    string commTest = binexec+commX+commFile;
+    std::stringstream ss;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()=="Invalid lever arm X offset (-x)");
+    commTest = binexec+commY+commFile;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()=="Invalid lever arm Y offset (-y)");
+    commTest = binexec+commZ+commFile;
+    ss = system_call(std::string(commTest));
+    REQUIRE(ss.str()=="Invalid lever arm Z offset (-z)");
 }
