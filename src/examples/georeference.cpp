@@ -246,88 +246,91 @@ int main (int argc , char ** argv){
 #ifdef _WIN32
 	putenv("TZ");
 #endif
-	if(argc < 2){
-                std::cout << "Error no file enter";
-		printUsage();
-	}
+if(argc < 2)
+{
+    std::cout << "Error no file enter";
+    printUsage();
+}
+else
+{
+    std::string fileName(argv[argc-1]);
+    double leverArmX = 0.0;
+    double leverArmY = 0.0;
+    double leverArmZ = 0.0;
+    
+    try
+    {
+	std::cerr << "Decoding " << fileName << std::endl;
+        std::ifstream inFile;
+        inFile.open(fileName);
+        if (inFile)
+        {    
+            if(ends_with(fileName.c_str(),".all"))
+            {
+		parser = new KongsbergParser(printer);
+            }   
+            else if(ends_with(fileName.c_str(),".xtf"))
+            {
+		parser = new XtfParser(printer);
+            }
+            else if(ends_with(fileName.c_str(),".s7k"))
+            {
+                parser = new S7kParser(printer);
+            }
+            else
+            {
+		throw "Unknown extension";
+            }
+        }
         else
         {
-	std::string fileName(argv[argc-1]);
-        double leverArmX = 0.0;
-        double leverArmY = 0.0;
-        double leverArmZ = 0.0;
-
-	try{
-		std::cerr << "Decoding " << fileName << std::endl;
-                std::ifstream inFile;
-                inFile.open(fileName);
-                if (inFile)
-                {    
-                    if(ends_with(fileName.c_str(),".all")){
-			parser = new KongsbergParser(printer);
-                    }   
-                    else if(ends_with(fileName.c_str(),".xtf")){
-			parser = new XtfParser(printer);
-                    }
-                    else if(ends_with(fileName.c_str(),".s7k")){
-                        parser = new S7kParser(printer);
-                    }
-                    else{
-			throw "Unknown extension";
-                    }
-                }
-                else
-                {
-                    throw "File not found";
-                }
-		parser->parse(fileName);
-		std::cout << std::setprecision(6);
-		std::cout << std::fixed;
-                int index;
-                while((index=getopt(argc,argv,"x:y:z:"))!=-1)
-                {
-                    switch(index)
-                    {
-                        case 'x':
-                            if(sscanf(optarg,"%lf", &leverArmX) != 1)
-                            {
-                                std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
-                                std::cout << "Invalid lever arm X offset (-x)";
-                                printUsage();
-                            }
-                        break;
-                                        
-                        case 'y':
-                            if (sscanf(optarg,"%lf", &leverArmY) != 1)
-                            {
-                                std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
-                                std::cout << "Invalid lever arm Y offset (-y)";
-                                printUsage();
-                            }
-                        break;
-                                        
-                        case 'z':
-                            if (sscanf(optarg,"%lf", &leverArmZ) != 1)
-                            {
-                                std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
-                                std::cout << "Invalid lever arm Z offset (-z)";
-                                printUsage();
-                            }
-                        break;
-                    }
-                }
-                printer.setLeverArm(leverArmX,leverArmY,leverArmZ);
-                printer.georeference();
-                std::string leverArmLine;
-                leverArmLine = printer.getleverArmLine();
-                std::cout << leverArmLine;
+            throw "File not found";
         }
-	catch(const char * error){
-		std::cerr << "Error while parsing " << fileName << ": " << error << std::endl;
-                std::cout << "Error while parsing " << fileName << ": " << error;
-	}
-	if(parser) delete parser;
-        }       
+        parser->parse(fileName);
+	std::cout << std::setprecision(6);
+	std::cout << std::fixed;
+        int index;
+        while((index=getopt(argc,argv,"x:y:z:"))!=-1)
+        {
+            switch(index)
+            {
+                case 'x':
+                    if(sscanf(optarg,"%lf", &leverArmX) != 1)
+                    {
+                        std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
+                        printUsage();
+                    }
+                break;
+                                        
+                case 'y':
+                    if (sscanf(optarg,"%lf", &leverArmY) != 1)
+                    {
+                        std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
+                        printUsage();
+                    }
+                break;
+                                        
+                case 'z':
+                    if (sscanf(optarg,"%lf", &leverArmZ) != 1)
+                    {
+                        std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
+                        printUsage();
+                    }
+                break;
+            }
+        }
+        printer.setLeverArm(leverArmX,leverArmY,leverArmZ);
+        printer.georeference();
+        std::string leverArmLine;
+        leverArmLine = printer.getleverArmLine();
+        std::cout << leverArmLine;
+    }
+    catch(const char * error)
+    {
+	std::cerr << "Error while parsing " << fileName << ": " << error << std::endl;
+    }
+    if(parser) delete parser;
+}       
 }
 
 #endif
