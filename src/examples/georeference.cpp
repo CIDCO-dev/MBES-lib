@@ -15,7 +15,7 @@
 #include <iostream>
 #include <string>
 #include "../utils/StringUtils.hpp"
-
+#include "../utils/Exception.hpp"
 
 
 using namespace std;
@@ -111,7 +111,7 @@ else
             }
             else
             {
-		throw "Unknown extension";
+		throw new Exception("Unknown extension");
             }
         }
         else
@@ -127,7 +127,7 @@ else
 
         printer.georeference(leverArm);
     }
-    catch(const char * error)
+    catch(Exception * error)
     {
 	std::cerr << "Error while parsing " << fileName << ": " << error << std::endl;
     }

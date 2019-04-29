@@ -31,8 +31,8 @@ public:
     }
 
     /**Return the message in character line*/
-    const char* what() const throw () {
-        return message.c_str();
+    std::string & getMessage() {
+        return message;
     }
 };
 
