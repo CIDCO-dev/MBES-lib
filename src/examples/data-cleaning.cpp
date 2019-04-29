@@ -49,12 +49,31 @@ int main(int argc,char** argv){
 	std::list<PointFilter *> filters;
 
 	//TODO: load desired filters and parameters from command line
-        if ()
-	filters.push_back(new QualityFilter(3));
+        if (argc < 2)
+        {
+            
+        }
+        else
+        {
+            int i = 1;
+            int quality;
+            while(i < argc)
+            {
+                
+                if (std::sscanf(argv[i],"%d",&quality)==1)
+                {
+                    filters.push_back(new QualityFilter(quality));
+                    i = i+1;
+                }
+                else
+                {
+                    std::cerr << "Error: parametre " << argv[i] << " invalide" << std::endl;
+                }
+            }
 
-	unsigned int lineCount = 1;
+            unsigned int lineCount = 1;
 
-	while(std::getline(std::cin,line)){
+            while(std::getline(std::cin,line)){
 		uint64_t microEpoch;
 		double x,y,z;
 		uint32_t quality;
@@ -80,7 +99,8 @@ int main(int argc,char** argv){
 		}
 
 		lineCount++;
-	}
+            }
+        }
 }
 
 #endif
