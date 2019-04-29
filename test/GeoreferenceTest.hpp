@@ -63,51 +63,6 @@ std::stringstream system_call(const std::string& command){
      return out;
 }
 
-/**Test with parameter x y z valid*/
-TEST_CASE("test if the parameter x y z are correctly get")
-{
-    string commX = " -x 1";
-    string commY = " -y 1";
-    string commZ = " -z 1";
-    string commFile = " test/data/all/example.all";
-    string commTest = binexec+commX+commY+commZ+commFile;
-    std::stringstream ss;
-    ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="1:1:1");
-}
-
-/**Test with no parameter x y z*/
-TEST_CASE("test the leverArm result without parameter")
-{
-    string commX = "";
-    string commY = "";
-    string commZ = "";
-    string commFile = " test/data/all/example.all";
-    string commTest = binexec+commX+commY+commZ+commFile;
-    std::stringstream ss;
-    ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="0:0:0");
-}
-
-/**Test with certain parameter x y z*/
-TEST_CASE("test the leverArm result without all the parameter")
-{
-    string commX = " -x 1";
-    string commY = " -y 1";
-    string commZ = " -z 1";
-    string commFile = " test/data/all/example.all";
-    string commTest = binexec+commX+commFile;
-    std::stringstream ss;
-    ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="1:0:0");
-    commTest = binexec+commX+commZ+commFile;
-    ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="1:0:1");
-    commTest = binexec+commY+commZ+commFile;
-    ss = system_call(std::string(commTest));
-    REQUIRE(ss.str()=="0:1:1");
-}
-
 /**Test with file extention valid*/
 TEST_CASE("test the extention of the file receive")
 {

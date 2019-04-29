@@ -2,7 +2,7 @@
 #define DATAGRAMPARSER_HPP
 
 #include <cstdint>
-#include "DatagramProcessor.hpp"
+#include "DatagramEventHandler.hpp"
 
 /*!
  * \brief Datagram parser class
@@ -14,7 +14,7 @@ class DatagramParser{
                  * 
                  * @param processor the datagram processor
                  */
-		DatagramParser(DatagramProcessor & processor);
+		DatagramParser(DatagramEventHandler & processor);
                 
                 /**
                  * Destroy the datagram parser
@@ -31,7 +31,7 @@ class DatagramParser{
 	protected:
 
             /**The datagram processor*/
-		DatagramProcessor & processor;
+		DatagramEventHandler & processor;
 };
 
 /**
@@ -39,7 +39,7 @@ class DatagramParser{
  * 
  * @param processor the datagram processor
  */
-DatagramParser::DatagramParser(DatagramProcessor & processor) : processor(processor){
+DatagramParser::DatagramParser(DatagramEventHandler & processor) : processor(processor){
 
 }
 

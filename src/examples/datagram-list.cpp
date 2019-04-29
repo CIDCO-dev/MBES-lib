@@ -23,9 +23,9 @@ void printUsage(){
 	exit(1);
 }
 
-class DatagramPrinter : public DatagramProcessor{
+class DatagramPrinter : public DatagramEventHandler{
 	public:
-            
+
                 /**
                  * Create a datagram printer and open all the files
                  */

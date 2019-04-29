@@ -28,7 +28,7 @@ class XtfParser : public DatagramParser{
                  * 
                  * @param processor the datagram processor
                  */
-		XtfParser(DatagramProcessor & processor);
+		XtfParser(DatagramEventHandler & processor);
                 
                 /**Destroy the XTF parser*/
 		~XtfParser();
@@ -90,7 +90,7 @@ class XtfParser : public DatagramParser{
  * 
  * @param processor the datagram processor
  */
-XtfParser::XtfParser(DatagramProcessor & processor):DatagramParser(processor){
+XtfParser::XtfParser(DatagramEventHandler & processor):DatagramParser(processor){
 
 }
 
