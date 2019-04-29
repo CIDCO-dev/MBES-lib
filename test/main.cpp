@@ -6,5 +6,5 @@
 #include "SoundVelocityProfileTest.hpp"
 #include "SurveySystemTest.hpp"
 #include "CoordinateTransformTest.hpp"
-#include "georeferenceTest.hpp"
-#include "data-cleaningTest.hpp"
+#include "GeoreferenceTest.hpp"
+#include "Data-cleaningTest.hpp"
