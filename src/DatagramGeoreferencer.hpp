@@ -142,14 +142,14 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                                 delete interpolatedAttitude;
                                 delete interpolatedPosition;
                  	}
-                 }
+                }
+
+                void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity){
+                        std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality  << " " << intensity << std::endl;
+                }
+
 
         protected:
-
-		void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity){
-			std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality  << " " << intensity << std::endl;
-		}
-
 
                 /**the current surface sound speed*/
                 double                                  currentSurfaceSoundSpeed;
