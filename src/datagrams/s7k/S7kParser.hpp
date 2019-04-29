@@ -361,7 +361,7 @@ void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * da
 uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
     long microSeconds = drf.Timestamp.Seconds * 1e6;
 
-    uint64_t res = build_time(drf.Timestamp.Year, drf.Timestamp.Day, drf.Timestamp.Hours, drf.Timestamp.Minutes, microSeconds);
+    uint64_t res = TimeUtils::build_time(drf.Timestamp.Year, drf.Timestamp.Day, drf.Timestamp.Hours, drf.Timestamp.Minutes, microSeconds);
 
     return res;
 }

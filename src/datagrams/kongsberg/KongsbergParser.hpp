@@ -319,7 +319,7 @@ long KongsbergParser::convertTime(long datagramDate,long datagramTime){
     int day = datagramDate - ((datagramDate - (datagramDate / 10000))/100);
 
     //month is 1-12, day is 1-31, shift to zero offset
-    return build_time(year,month-1,day-1,datagramTime);
+    return TimeUtils::build_time(year,month-1,day-1,datagramTime);
 }
 
 /**
