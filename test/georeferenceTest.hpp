@@ -167,12 +167,12 @@ TEST_CASE("test if file parameter is not present")
     std::stringstream ss;
     ss = system_call(std::string(commTest));
     std::string result = "\n\
-    NAME\n\n\
-    georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
-    SYNOPSIS\n \
-    georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] fichier\n\n\
-    DESCRIPTION\n\n \
-    Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n";
+  NAME\n\n\
+     georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
+  SYNOPSIS\n \
+	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] fichier\n\n\
+  DESCRIPTION\n\n \
+  Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n";
     REQUIRE(ss.str()==result);
 }
 
