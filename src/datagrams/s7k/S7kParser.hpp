@@ -19,7 +19,7 @@
 #include "../../utils/TimeUtils.hpp"
 #include "../../utils/Constants.hpp"
 #include <list>
-#include "../../SoundVelocityProfile.hpp"
+#include "../../svp/SoundVelocityProfile.hpp"
 
 /*!
  * \brief S7k parser class extention of Datagram parser
@@ -32,7 +32,7 @@ public:
      * 
      * @param processor the datagram processor 
      */
-    S7kParser(DatagramProcessor & processor);
+    S7kParser(DatagramEventHandler & processor);
     
     /**Destroy the S7k parser*/
     ~S7kParser();
@@ -120,7 +120,7 @@ private:
  * 
  * @param processor the datagram processor 
  */
-S7kParser::S7kParser(DatagramProcessor & processor) : DatagramParser(processor) {
+S7kParser::S7kParser(DatagramEventHandler & processor) : DatagramParser(processor) {
 
 }
 

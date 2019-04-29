@@ -26,7 +26,7 @@ void printUsage(){
 /*!
   * \brief Datagram printer class extention of Datagram processor class
   */
-class DatagramPrinter : public DatagramProcessor{
+class DatagramPrinter : public DatagramEventHandler{
 	public:
                 /**
                  * Create a datagram printer and open all the files
@@ -34,7 +34,7 @@ class DatagramPrinter : public DatagramProcessor{
 		DatagramPrinter(){
 
 		}
-                
+
                 /**Destroy the datagram printer and close all the files*/
 		~DatagramPrinter(){
 

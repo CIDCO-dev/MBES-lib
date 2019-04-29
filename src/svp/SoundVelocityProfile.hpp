@@ -21,7 +21,7 @@
 #include <vector>
 #include <ctime>
 #include <string>
-#include "../src/utils/TimeUtils.hpp"
+#include "../utils/TimeUtils.hpp"
 
 /*!
  * \brief Sound velocity profile class

@@ -26,7 +26,7 @@ void printUsage(){
  /*!
   * \brief Datagram printer class extention of Datagram processor class
   */
- class DatagramPrinter : public DatagramProcessor{
+ class DatagramPrinter : public DatagramEventHandler{
          private:
              
                 /**The heading File*/

@@ -9,6 +9,8 @@
 #ifndef RAYTRACING_HPP
 #define RAYTRACING_HPP
 
+#include "svp/SoundVelocityProfile.hpp"
+
 /*!
  * \brief Raytracing class
  */

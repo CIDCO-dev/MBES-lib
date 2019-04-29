@@ -1,7 +1,7 @@
 #ifndef DATAGRAMPROCESSOR_HPP
 #define DATAGRAMPROCESSOR_HPP
 
-#include "../SoundVelocityProfile.hpp"
+#include "../svp/SoundVelocityProfile.hpp"
 
 /**
  * @author Guillaume Morissette

@@ -28,7 +28,7 @@ class KongsbergParser : public DatagramParser{
                  * 
                  * @param processor the datagram processor
                  */
-	        KongsbergParser(DatagramProcessor & processor);
+	        KongsbergParser(DatagramEventHandler & processor);
                 
                 /**Destroy the Kongsberg parser*/
 	        ~KongsbergParser();
@@ -122,7 +122,7 @@ class KongsbergParser : public DatagramParser{
  * 
  * @param processor the datagram processor
  */
-KongsbergParser::KongsbergParser(DatagramProcessor & processor):DatagramParser(processor){
+KongsbergParser::KongsbergParser(DatagramEventHandler & processor):DatagramParser(processor){
 
 }
 
