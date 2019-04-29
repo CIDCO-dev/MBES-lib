@@ -82,7 +82,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                 }
 
                 /**Return the georeference (the three ping, the quality and the intensity)*/
-                void georeference(Eigen::Vector3d & leverArm){
+                virtual void georeference(Eigen::Vector3d & leverArm){
                         //interpolate attitudes and positions around pings
                         unsigned int attitudeIndex=0;
                         unsigned int positionIndex=0;
