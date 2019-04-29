@@ -129,6 +129,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                                                 //use default model
                                                 //TODO: allow different models to be used with command line switches
                                                 svp = SoundVelocityProfileFactory::buildSaltWaterModel();
+						std::cerr << "Using default model" << std::endl;
                                         }
                                 }
 
@@ -136,7 +137,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                                 Eigen::Vector3d georeferencedPing;
                                 Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm);
 
-                                std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << (*i).getQuality()  << " " << (*i).getIntensity() << std::endl;
+				processGeoreferencedPing(georeferencedPing,(*i).getQuality(),(*i).getIntensity());
 
                                 delete interpolatedAttitude;
                                 delete interpolatedPosition;
@@ -144,6 +145,11 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                  }
 
         protected:
+
+		void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity){
+			std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality  << " " << intensity << std::endl;
+		}
+
 
                 /**the current surface sound speed*/
                 double                                  currentSurfaceSoundSpeed;
