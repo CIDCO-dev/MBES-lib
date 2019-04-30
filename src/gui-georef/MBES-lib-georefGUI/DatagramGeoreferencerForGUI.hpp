@@ -21,36 +21,30 @@
  */
 class DatagramGeoreferencerForGui : public DatagramGeoreferencer{
         public:
-
-                // TODO: warning: "'DatagramGeoreferencerForGui' has no out-of-line virtual method definitions; its vtable will emit in every translation unit"
-
-                // TODO:DatagramGeoreferencerForGui will take "std::ifstream &outFile" as argument
-
-                /**Create a datagram georeferencer*/
-                DatagramGeoreferencerForGui( ){
-
-                    // TODO: set precision on the stream
-
-                    std::cout << std::setprecision(6);
-                    std::cout << std::fixed;
+                 /**Create a datagram georeferencer*/
+                DatagramGeoreferencerForGui( std::ofstream & outFileIn )
+                    : outFile( outFileIn )
+                {
+                    outFile << std::setprecision(6);
+                    outFile << std::fixed;
                 }
 
                 /**Destroy the datagram georeferencer*/
-                ~DatagramGeoreferencerForGui(){
-
-                }
-
-
+                virtual ~DatagramGeoreferencerForGui() {}
 
         protected:
 
-		void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity){
-            // TODO: output on the stream
-            std::cout << "ForGUI" << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2)
-                      << " " << quality  << " " << intensity << std::endl;
-		}
+            virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity);
+
+        private:
+            std::ofstream & outFile;
 
 
 };
+
+void DatagramGeoreferencerForGui::processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity){
+    outFile << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2)
+              << " " << quality  << " " << intensity << std::endl;
+}
 
 #endif

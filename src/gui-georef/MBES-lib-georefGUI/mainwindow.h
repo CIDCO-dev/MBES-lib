@@ -32,6 +32,8 @@ private:
     Ui::MainWindow *ui;
 
     std::string inputFileName;
+
+    std::string outputFileName;
 };
 
 #endif // MAINWINDOW_H

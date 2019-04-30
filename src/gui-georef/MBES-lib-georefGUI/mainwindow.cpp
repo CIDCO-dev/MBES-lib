@@ -29,7 +29,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    inputFileName( "" )
+    inputFileName( "" ),
+    outputFileName( "/home/christian/Documents/DeleteMe/JUNK/georeferenceData.txt" )    // TODO: Initialize to an empty string
 {
     ui->setupUi(this);
 
@@ -89,52 +90,59 @@ void MainWindow::on_Process_clicked()
     try
     {
 
-        // TODO: try and open the output file
+        std::ofstream outFile;
+        outFile.open( outputFileName, std::ofstream::out | std::ofstream::trunc );
 
-        // TODO pass the output file stream when creating the DatagramGeoreferencerForGui object
-
-        DatagramGeoreferencerForGui  printer;
-
-
-        std::ifstream inFile;
-        inFile.open( inputFileName );
-
-        qDebug() << "Decoding \n" << tr( inputFileName.c_str() );
-
-        if (inFile)
+        if (outFile)
         {
-            if ( ends_with( inputFileName.c_str(),".all" ) )
+
+            DatagramGeoreferencerForGui printer( outFile );
+
+
+            std::ifstream inFile;
+            inFile.open( inputFileName );
+
+            qDebug() << "Decoding \n" << tr( inputFileName.c_str() );
+
+            if (inFile)
             {
-                parser = new KongsbergParser(printer);
-            }
-            else if ( ends_with( inputFileName.c_str(),".xtf") )
-            {
-                parser = new XtfParser(printer);
-            }
-            else if ( ends_with( inputFileName.c_str(),".s7k") )
-            {
-                parser = new S7kParser(printer);
+                if ( ends_with( inputFileName.c_str(),".all" ) )
+                {
+                    parser = new KongsbergParser(printer);
+                }
+                else if ( ends_with( inputFileName.c_str(),".xtf") )
+                {
+                    parser = new XtfParser(printer);
+                }
+                else if ( ends_with( inputFileName.c_str(),".s7k") )
+                {
+                    parser = new S7kParser(printer);
+                }
+                else
+                {
+                    throw new Exception("Unknown extension");
+                }
             }
             else
             {
-                throw new Exception("Unknown extension");
+                throw new Exception("Input file not found");
             }
+            parser->parse( inputFileName );
+
+            inFile.close();
+
+
+
+            Eigen::Vector3d leverArm;
+
+            leverArm << leverArmX,leverArmY,leverArmZ;
+
+            printer.georeference(leverArm);
         }
         else
         {
-            throw new Exception("Input file not found");
+            throw new Exception("Could not open output file");
         }
-        parser->parse( inputFileName );
-
-        inFile.close();
-
-
-
-        Eigen::Vector3d leverArm;
-
-        leverArm << leverArmX,leverArmY,leverArmZ;
-
-        printer.georeference(leverArm);
     }
     catch(Exception * error)
     {
@@ -173,36 +181,6 @@ void MainWindow::on_Process_clicked()
 
 
 
-
-//    // TODO: Process the file with MBES-lib
-
-//    // TODO: Handle exception of not being able to open the file
-
-//    // TODO: Handle other exceptions
-
-//    // Temporary:
-//    // Try to open the file
-
-//    FILE * file = fopen( inputFileName.c_str(), "rb" );
-
-//    if ( ! file )
-//    {
-//        qDebug() << "Was NOT able to open the file \n" << tr( inputFileName.c_str() );
-
-//        std::string message = "Could not open file \n\"" + inputFileName + "\"";
-
-//        QMessageBox::warning( this,tr("Warning"), tr( message.c_str() ), QMessageBox::Ok );
-
-
-//    }
-//    else
-//    {
-//        fclose(file);
-
-//        qDebug() << "Was able to open the file \n" << tr( inputFileName.c_str() );
-
-
-//    }
 
 }
 
