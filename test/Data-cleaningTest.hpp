@@ -22,11 +22,11 @@
 #include "../src/utils/Exception.hpp"
 using namespace std;
 #ifdef _WIN32
-static string binexec("..\\bin\\georeference.exe");
+static string DataBinexec("..\\bin\\data-cleaning.exe");
 static string outputdir(".");
 #else
-static string binexec("build/bin/data-cleaning");
-static string outputdir(".");
+static string dataBinexec("build/bin/data-cleaning");
+static string dataOutputdir(".");
 #endif
 
 /**
@@ -34,7 +34,7 @@ static string outputdir(".");
  * 
  * @param command the parameters for the execution
  */
-std::stringstream system_call(const std::string& command){
+std::stringstream DataSystem_call(const std::string& command){
 
      std::stringstream out;
      FILE *fp;
@@ -63,3 +63,31 @@ std::stringstream system_call(const std::string& command){
      return out;
 }
 
+TEST_CASE("test with no parameter")
+{
+    std::stringstream ss;
+    ss = DataSystem_call(std::string(dataBinexec));
+    REQUIRE(ss.str()=="Quality filter 0 add\n");
+}
+
+TEST_CASE("test with one parameter")
+{
+    string param = " 19";
+    std::stringstream ss;
+    ss = DataSystem_call(std::string(dataBinexec+param));
+    REQUIRE(ss.str()=="Quality filter 19 add\n");
+}
+
+TEST_CASE("test with multiple parameter")
+{
+    string param = " 19 16 12";
+    std::stringstream ss;
+    ss = DataSystem_call(std::string(dataBinexec+param));
+    string line;
+    getline(ss,line);
+    REQUIRE(line=="Quality filter 19 add");
+    getline(ss,line);
+    REQUIRE(line=="Quality filter 16 add");
+    getline(ss,line);
+    REQUIRE(line=="Quality filter 12 add");
+}
