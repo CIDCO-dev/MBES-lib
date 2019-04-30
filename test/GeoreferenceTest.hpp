@@ -26,7 +26,7 @@ static string GeoBinexec("..\\bin\\georeference.exe");
 static string outputdir(".");
 #else
 static string GeoBinexec("build/bin/georeference");
-static string outputdir(".");
+static string GeoOutputdir(".");
 #endif
 
 /**
