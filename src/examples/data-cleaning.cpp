@@ -51,7 +51,7 @@ int main(int argc,char** argv){
 	//TODO: load desired filters and parameters from command line
         if (argc < 2)
         {
-            
+            filters.push_back(new QualityFilter(0));
         }
         else
         {
@@ -70,37 +70,35 @@ int main(int argc,char** argv){
                     std::cerr << "Error: parametre " << argv[i] << " invalide" << std::endl;
                 }
             }
+        }
+        unsigned int lineCount = 1;
 
-            unsigned int lineCount = 1;
+        while(std::getline(std::cin,line)){
+            uint64_t microEpoch;
+            double x,y,z;
+            uint32_t quality;
+            uint32_t intensity;
 
-            while(std::getline(std::cin,line)){
-		uint64_t microEpoch;
-		double x,y,z;
-		uint32_t quality;
-		uint32_t intensity;
-
-		if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6){
-			bool doFilter = false;
+            if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6){
+		bool doFilter = false;
 
 			//Apply filter chain
-			for(auto i = filters.begin();i!= filters.end();i++){
-				if( (*i)->filterPoint(microEpoch,x,y,z,quality,intensity) ){
-					doFilter = true;
-					break;
-				}
-			}
-
-			if(!doFilter){
-				printf("%lu %.6lf %.6lf %.6lf %d %d\r\n",microEpoch,x,y,z,quality,intensity);
-			}
-		}
-		else{
-			std::cerr << "Error at line " << lineCount << std::endl;
+		for(auto i = filters.begin();i!= filters.end();i++){
+                    if( (*i)->filterPoint(microEpoch,x,y,z,quality,intensity) ){
+			doFilter = true;
+                        break;
+                    }
 		}
 
-		lineCount++;
+		if(!doFilter){
+                    printf("%lu %.6lf %.6lf %.6lf %d %d\r\n",microEpoch,x,y,z,quality,intensity);
+		}
             }
+            else{
+		std::cerr << "Error at line " << lineCount << std::endl;
+            }
+                
+            lineCount++;
         }
-}
-
+    }
 #endif
