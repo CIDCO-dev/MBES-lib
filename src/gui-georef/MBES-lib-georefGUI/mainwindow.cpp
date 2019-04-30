@@ -36,12 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     currentInputPath( "" ),
     currentOutputPath( "" ),
 
-    outputFileNameEditedByUser( false ),
-
-    leverArmX( 0.0 ),
-    leverArmY( 0.0 ),
-    leverArmZ( 0.0 )
-
+    outputFileNameEditedByUser( false )
 {
 
 #ifdef __GNU__
@@ -57,14 +52,53 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
 
+
     // Disable process button
     ui->Process->setEnabled(false);
 
     setWindowTitle( tr( "MBES-Lib Georeferencing" ) );
+
+
+    leverArm << 0.0, 0.0, 0.0;
+
+    // Try and read from file the last lever arm values used.
+    std::ifstream inFile;
+    inFile.open( "lastLeverArms.txt" );
+
+    if ( inFile )
+    {
+        double values[ 3 ];
+
+        for ( int countLines = 0; countLines < 3; countLines++ )
+            inFile >> values[ countLines ];
+
+        if( inFile.fail() == false )
+        {
+            leverArm << values[ 0 ], values[ 1 ], values[ 2 ];
+        }
+
+    }
+
+    ui->lineEditLeverArmX->setText( QString::number( leverArm( 0 ), 'f', 6 ) );
+    ui->lineEditLeverArmY->setText( QString::number( leverArm( 1 ), 'f', 6 ) );
+    ui->lineEditLeverArmZ->setText( QString::number( leverArm( 2 ), 'f', 6 ) );
+
 }
 
 MainWindow::~MainWindow()
 {
+    // Save last lever arm values used
+
+    std::ofstream outFile;
+    outFile.open( "lastLeverArms.txt", std::ofstream::out | std::ofstream::trunc );
+
+    if( outFile )
+    {
+        outFile << std::setprecision(6) << std::fixed
+                << leverArm( 0 ) << "\n" << leverArm( 1 ) << "\n" << leverArm( 2 ) << std::endl;
+    }
+
+
     delete ui;
 }
 
@@ -111,11 +145,9 @@ void MainWindow::on_Process_clicked()
 
                 parser->parse( inputFileName );
 
-                Eigen::Vector3d leverArm;
-
-                leverArm << leverArmX,leverArmY,leverArmZ;
-
                 printer.georeference(leverArm);
+
+                // TODO: ? Display a dialog indicating that the processing is finished?
 
 
             }
@@ -134,21 +166,16 @@ void MainWindow::on_Process_clicked()
     {
 
         std::ostringstream streamToDisplay;
-
         streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\n" << error->getMessage() << std::endl;
-
 
         qDebug() << tr( streamToDisplay.str().c_str() );
 
         QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
-
     }
     catch ( const char * message )
     {
         std::ostringstream streamToDisplay;
-
         streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\n" << message << std::endl;
-
 
         qDebug() << tr( streamToDisplay.str().c_str() );
 
@@ -157,14 +184,11 @@ void MainWindow::on_Process_clicked()
     catch (...)
     {
         std::ostringstream streamToDisplay;
-
         streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\nOther exception" << std::endl;
-
 
         qDebug() << tr( streamToDisplay.str().c_str() );
 
         QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
-
     }
 
 
@@ -293,4 +317,41 @@ void MainWindow::on_BrowseOutput_clicked()
     }
 }
 
+// TODO: Do something better to validate the user input and display problem
+void MainWindow::setLeverArm( const QString &text, const int position )
+{
+    // TODO: how to deal with precision?
 
+    bool OK = false;
+
+    double value = text.toDouble( &OK );
+
+    if ( OK )
+        leverArm( position ) = value;
+    else
+    {
+        std::ostringstream streamToDisplay;
+        streamToDisplay << "\"" << text.toLocal8Bit().constData() << "\" is not a valid number\n";
+
+        qDebug() << tr( streamToDisplay.str().c_str() );
+
+        QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+    }
+
+}
+
+
+void MainWindow::on_lineEditLeverArmX_textEdited(const QString &text)
+{
+    setLeverArm( text, 0 );
+}
+
+void MainWindow::on_lineEditLeverArmY_textEdited(const QString &text)
+{
+    setLeverArm( text, 1 );
+}
+
+void MainWindow::on_lineEditLeverArmZ_textEdited(const QString &text)
+{
+    setLeverArm( text, 2 );
+}

@@ -8,6 +8,8 @@
 
 #include <QMainWindow>
 
+#include <Eigen/Dense>
+
 namespace Ui {
 class MainWindow;
 }
@@ -38,12 +40,19 @@ private slots:
     void on_BrowseOutput_clicked();
 
 
+    void on_lineEditLeverArmX_textEdited(const QString &text);
+
+    void on_lineEditLeverArmY_textEdited(const QString &arg1);
+
+    void on_lineEditLeverArmZ_textEdited(const QString &arg1);
 
 private:
 
     void setStateProcess();
 
     void possiblyUpdateOutputFileName();
+
+    void setLeverArm( const QString &text, const int position );
 
     Ui::MainWindow *ui;
 
@@ -57,9 +66,10 @@ private:
 
     bool outputFileNameEditedByUser;
 
-    double leverArmX;
-    double leverArmY;
-    double leverArmZ;
+    // double leverArm[ 3 ];
+
+    Eigen::Vector3d leverArm;
+
 };
 
 #endif // MAINWINDOW_H

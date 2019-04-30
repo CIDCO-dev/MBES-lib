@@ -22,7 +22,7 @@ static const uint qt_meta_data_MainWindow[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       6,   14, // methods
+       9,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -36,6 +36,9 @@ static const uint qt_meta_data_MainWindow[] = {
      122,   33,   11,   11, 0x08,
      165,   11,   11,   11, 0x08,
      190,   11,   11,   11, 0x08,
+     216,   33,   11,   11, 0x08,
+     262,  257,   11,   11, 0x08,
+     303,  257,   11,   11, 0x08,
 
        0        // eod
 };
@@ -47,6 +50,9 @@ static const char qt_meta_stringdata_MainWindow[] = {
     "on_lineEditOutputFile_textChanged(QString)\0"
     "on_BrowseInput_clicked()\0"
     "on_BrowseOutput_clicked()\0"
+    "on_lineEditLeverArmX_textEdited(QString)\0"
+    "arg1\0on_lineEditLeverArmY_textEdited(QString)\0"
+    "on_lineEditLeverArmZ_textEdited(QString)\0"
 };
 
 void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -61,6 +67,9 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 3: _t->on_lineEditOutputFile_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 4: _t->on_BrowseInput_clicked(); break;
         case 5: _t->on_BrowseOutput_clicked(); break;
+        case 6: _t->on_lineEditLeverArmX_textEdited((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 7: _t->on_lineEditLeverArmY_textEdited((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 8: _t->on_lineEditLeverArmZ_textEdited((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -98,9 +107,9 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 6)
+        if (_id < 9)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 6;
+        _id -= 9;
     }
     return _id;
 }
