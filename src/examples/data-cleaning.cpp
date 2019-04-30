@@ -93,7 +93,6 @@ int main(int argc,char** argv){
         if (argc < 2)
         {
             filters.push_back(new QualityFilter(0));
-            std::cout << "Quality filter 0 add" << std::endl;
         }
         else
         {
@@ -105,7 +104,6 @@ int main(int argc,char** argv){
                 if (std::sscanf(argv[i],"%d",&quality)==1)
                 {
                     filters.push_back(new QualityFilter(quality));
-                    std::cout << "Quality filter " << quality << " add" << std::endl;
                 }
                 else
                 {
@@ -135,7 +133,6 @@ int main(int argc,char** argv){
 		if(!doFilter){
                     printf("%lu %.6lf %.6lf %.6lf %d %d\r\n",microEpoch,x,y,z,quality,intensity);
 		}
-                std::cout << "Line " << lineCount << " valid" << std::endl;
             }
             else{
 		std::cerr << "Error at line " << lineCount << std::endl;
