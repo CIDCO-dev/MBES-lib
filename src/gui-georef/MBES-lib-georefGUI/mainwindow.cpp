@@ -36,8 +36,21 @@ MainWindow::MainWindow(QWidget *parent) :
     currentInputPath( "" ),
     currentOutputPath( "" ),
 
-    outputFileNameEditedByUser( false )
+    outputFileNameEditedByUser( false ),
+
+    leverArmX( 0.0 ),
+    leverArmY( 0.0 ),
+    leverArmZ( 0.0 )
+
 {
+
+#ifdef __GNU__
+    setenv("TZ", "UTC", 1);
+#endif
+#ifdef _WIN32
+    putenv("TZ");
+#endif
+
     ui->setupUi(this);
 
     ui->lineEditInputFile->setText( tr( inputFileName.c_str() ) );
@@ -58,23 +71,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_Process_clicked()
 {
-    // TODO: add the possibility for the user to enter the leverArm
-
-    double leverArmX = 0.0;
-    double leverArmY = 0.0;
-    double leverArmZ = 0.0;
-
-
-
-#ifdef __GNU__
-    setenv("TZ", "UTC", 1);
-#endif
-#ifdef _WIN32
-    putenv("TZ");
-#endif
 
     DatagramParser * parser = nullptr;
-
 
     try
     {

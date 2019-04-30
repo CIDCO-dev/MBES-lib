@@ -56,6 +56,10 @@ private:
     QString currentOutputPath;
 
     bool outputFileNameEditedByUser;
+
+    double leverArmX;
+    double leverArmY;
+    double leverArmZ;
 };
 
 #endif // MAINWINDOW_H
