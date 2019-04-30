@@ -52,6 +52,7 @@ int main(int argc,char** argv){
         if (argc < 2)
         {
             filters.push_back(new QualityFilter(0));
+            std::cout << "Quality filter 0 add" << std::endl;
         }
         else
         {
@@ -63,17 +64,17 @@ int main(int argc,char** argv){
                 if (std::sscanf(argv[i],"%d",&quality)==1)
                 {
                     filters.push_back(new QualityFilter(quality));
-                    i = i+1;
+                    std::cout << "Quality filter " << quality << " add" << std::endl;
                 }
                 else
                 {
-                    std::cerr << "Error: parametre " << argv[i] << " invalide" << std::endl;
+                    std::cerr << "Error: parameter " << argv[i] << " invalid" << std::endl;
                 }
+                i = i+1;
             }
         }
         unsigned int lineCount = 1;
-
-        while(std::getline(std::cin,line)){
+        while((std::getline(std::cin,line))&&(line!="0")){
             uint64_t microEpoch;
             double x,y,z;
             uint32_t quality;
