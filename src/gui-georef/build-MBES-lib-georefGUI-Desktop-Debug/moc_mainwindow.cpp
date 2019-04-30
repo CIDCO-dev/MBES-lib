@@ -31,16 +31,16 @@ static const uint qt_meta_data_MainWindow[] = {
 
  // slots: signature, parameters, type, tag, flags
       12,   11,   11,   11, 0x08,
-      32,   11,   11,   11, 0x08,
-      58,   53,   11,   11, 0x08,
+      38,   33,   11,   11, 0x08,
+      80,   11,   11,   11, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_MainWindow[] = {
-    "MainWindow\0\0on_Browse_clicked()\0"
-    "on_Process_clicked()\0text\0"
-    "on_lineEdit_textChanged(QString)\0"
+    "MainWindow\0\0on_Process_clicked()\0text\0"
+    "on_lineEditInputFile_textChanged(QString)\0"
+    "on_BrowseInput_clicked()\0"
 };
 
 void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -49,9 +49,9 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         Q_ASSERT(staticMetaObject.cast(_o));
         MainWindow *_t = static_cast<MainWindow *>(_o);
         switch (_id) {
-        case 0: _t->on_Browse_clicked(); break;
-        case 1: _t->on_Process_clicked(); break;
-        case 2: _t->on_lineEdit_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 0: _t->on_Process_clicked(); break;
+        case 1: _t->on_lineEditInputFile_textChanged((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 2: _t->on_BrowseInput_clicked(); break;
         default: ;
         }
     }

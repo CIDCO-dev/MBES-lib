@@ -34,7 +34,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->lineEdit->setText( "" );
+    ui->lineEditInputFile->setText( "" );
 
     // Disable process button
     ui->Process->setEnabled(false);
@@ -47,20 +47,20 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_Browse_clicked()
-{
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                        tr( "File to Georeference"), "",
-                                        tr( "*.all *.xtf *.s7k;;*.all;;*.xtf;;*.s7k;;All Files (*)") );
+//void MainWindow::on_Browse_clicked()
+//{
+//    QString fileName = QFileDialog::getOpenFileName(this,
+//                                        tr( "File to Georeference"), "",
+//                                        tr( "*.all *.xtf *.s7k;;*.all;;*.xtf;;*.s7k;;All Files (*)") );
 
-    if ( ! fileName.isEmpty() )
-    {
-        inputFileName = fileName.toLocal8Bit().constData();
+//    if ( ! fileName.isEmpty() )
+//    {
+//        inputFileName = fileName.toLocal8Bit().constData();
 
-        // Put the file name in the lineEdit
-        ui->lineEdit->setText( fileName );
-    }
-}
+//        // Put the file name in the lineEdit
+//        ui->lineEdit->setText( fileName );
+//    }
+//}
 
 void MainWindow::on_Process_clicked()
 {
@@ -184,7 +184,7 @@ void MainWindow::on_Process_clicked()
 
 }
 
-void MainWindow::on_lineEdit_textChanged(const QString &text)
+void MainWindow::on_lineEditInputFile_textChanged(const QString &text)
 {
     if ( text == "" )
     {
@@ -197,4 +197,19 @@ void MainWindow::on_lineEdit_textChanged(const QString &text)
 
     inputFileName = text.toLocal8Bit().constData();
 
+}
+
+void MainWindow::on_BrowseInput_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                        tr( "File to Georeference"), "",
+                                        tr( "*.all *.xtf *.s7k;;*.all;;*.xtf;;*.s7k;;All Files (*)") );
+
+    if ( ! fileName.isEmpty() )
+    {
+        inputFileName = fileName.toLocal8Bit().constData();
+
+        // Put the file name in the lineEdit
+        ui->lineEditInputFile->setText( fileName );
+    }
 }

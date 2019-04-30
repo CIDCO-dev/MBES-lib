@@ -29,10 +29,13 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralWidget;
-    QPushButton *Browse;
+    QPushButton *BrowseInput;
     QPushButton *Process;
-    QLabel *label;
-    QLineEdit *lineEdit;
+    QLabel *labelInputFile;
+    QLineEdit *lineEditInputFile;
+    QLabel *labelOutputFile;
+    QLineEdit *lineEditOutputFile;
+    QPushButton *BrowseOutput;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -44,18 +47,27 @@ public:
         MainWindow->resize(791, 526);
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
-        Browse = new QPushButton(centralWidget);
-        Browse->setObjectName(QString::fromUtf8("Browse"));
-        Browse->setGeometry(QRect(700, 60, 80, 23));
+        BrowseInput = new QPushButton(centralWidget);
+        BrowseInput->setObjectName(QString::fromUtf8("BrowseInput"));
+        BrowseInput->setGeometry(QRect(700, 60, 80, 23));
         Process = new QPushButton(centralWidget);
         Process->setObjectName(QString::fromUtf8("Process"));
         Process->setGeometry(QRect(700, 440, 80, 23));
-        label = new QLabel(centralWidget);
-        label->setObjectName(QString::fromUtf8("label"));
-        label->setGeometry(QRect(10, 70, 56, 15));
-        lineEdit = new QLineEdit(centralWidget);
-        lineEdit->setObjectName(QString::fromUtf8("lineEdit"));
-        lineEdit->setGeometry(QRect(40, 60, 651, 24));
+        labelInputFile = new QLabel(centralWidget);
+        labelInputFile->setObjectName(QString::fromUtf8("labelInputFile"));
+        labelInputFile->setGeometry(QRect(10, 70, 61, 16));
+        lineEditInputFile = new QLineEdit(centralWidget);
+        lineEditInputFile->setObjectName(QString::fromUtf8("lineEditInputFile"));
+        lineEditInputFile->setGeometry(QRect(90, 60, 601, 24));
+        labelOutputFile = new QLabel(centralWidget);
+        labelOutputFile->setObjectName(QString::fromUtf8("labelOutputFile"));
+        labelOutputFile->setGeometry(QRect(10, 220, 71, 16));
+        lineEditOutputFile = new QLineEdit(centralWidget);
+        lineEditOutputFile->setObjectName(QString::fromUtf8("lineEditOutputFile"));
+        lineEditOutputFile->setGeometry(QRect(90, 210, 601, 24));
+        BrowseOutput = new QPushButton(centralWidget);
+        BrowseOutput->setObjectName(QString::fromUtf8("BrowseOutput"));
+        BrowseOutput->setGeometry(QRect(700, 210, 80, 23));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
@@ -76,9 +88,11 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
-        Browse->setText(QApplication::translate("MainWindow", "Browse", 0, QApplication::UnicodeUTF8));
+        BrowseInput->setText(QApplication::translate("MainWindow", "Browse", 0, QApplication::UnicodeUTF8));
         Process->setText(QApplication::translate("MainWindow", "Process", 0, QApplication::UnicodeUTF8));
-        label->setText(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
+        labelInputFile->setText(QApplication::translate("MainWindow", "Input File", 0, QApplication::UnicodeUTF8));
+        labelOutputFile->setText(QApplication::translate("MainWindow", "Output File", 0, QApplication::UnicodeUTF8));
+        BrowseOutput->setText(QApplication::translate("MainWindow", "Browse", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

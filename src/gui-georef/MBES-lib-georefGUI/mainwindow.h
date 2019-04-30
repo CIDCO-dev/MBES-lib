@@ -22,11 +22,13 @@ public:
 
 private slots:
 
-    void on_Browse_clicked();
+//    void on_Browse_clicked();
 
     void on_Process_clicked();
 
-    void on_lineEdit_textChanged(const QString &text);
+    void on_lineEditInputFile_textChanged(const QString &text);
+
+    void on_BrowseInput_clicked();
 
 private:
     Ui::MainWindow *ui;

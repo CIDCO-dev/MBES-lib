@@ -17,7 +17,7 @@
 #include "../../math/Interpolation.hpp"
 
 /*!
- * \brief Datagramer Georeferencer class extention of the Datagram Processor class
+ * \brief "Datagramer Georeferencer to an ostream" class, extention of the Datagramer Georeferencer class
  */
 class DatagramGeoreferencerToOstream : public DatagramGeoreferencer{
         public:
@@ -37,7 +37,7 @@ class DatagramGeoreferencerToOstream : public DatagramGeoreferencer{
             virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity);
 
         private:
-            std::ostream & out;
+            std::ostream & out; // ostream: can be used for a file or for std::cout
 
 
 };
