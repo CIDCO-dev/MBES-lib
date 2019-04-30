@@ -20,6 +20,7 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+
 private slots:
 
 //    void on_Browse_clicked();
@@ -28,9 +29,18 @@ private slots:
 
     void on_lineEditInputFile_textChanged(const QString &text);
 
+    void on_lineEditOutputFile_textChanged(const QString &text);
+
     void on_BrowseInput_clicked();
 
+
+
+    void on_BrowseOutput_clicked();
+
 private:
+
+    void setStateProcess();
+
     Ui::MainWindow *ui;
 
     std::string inputFileName;

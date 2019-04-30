@@ -30,11 +30,14 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     inputFileName( "" ),
+//    outputFileName( "/home/christian/Documents/DeleteMe/JUNK/georeferenceData.txt" )    // TODO: Initialize to an empty string
     outputFileName( "/home/christian/Documents/DeleteMe/JUNK/georeferenceData.txt" )    // TODO: Initialize to an empty string
 {
     ui->setupUi(this);
 
-    ui->lineEditInputFile->setText( "" );
+    ui->lineEditInputFile->setText( tr( inputFileName.c_str() ) );
+
+    ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
 
     // Disable process button
     ui->Process->setEnabled(false);
@@ -184,19 +187,35 @@ void MainWindow::on_Process_clicked()
 
 }
 
-void MainWindow::on_lineEditInputFile_textChanged(const QString &text)
+
+void MainWindow::setStateProcess()
 {
-    if ( text == "" )
-    {
-        ui->Process->setEnabled( false );
-    }
-    else
+    if( inputFileName != "" && outputFileName != "" )
     {
         ui->Process->setEnabled( true );
     }
+    else
+    {
+        ui->Process->setEnabled( false );
+    }
 
+}
+
+void MainWindow::on_lineEditInputFile_textChanged(const QString &text)
+{
     inputFileName = text.toLocal8Bit().constData();
 
+    setStateProcess();
+}
+
+
+
+
+void MainWindow::on_lineEditOutputFile_textChanged(const QString &text)
+{
+    outputFileName = text.toLocal8Bit().constData();
+
+    setStateProcess();
 }
 
 void MainWindow::on_BrowseInput_clicked()
@@ -211,5 +230,35 @@ void MainWindow::on_BrowseInput_clicked()
 
         // Put the file name in the lineEdit
         ui->lineEditInputFile->setText( fileName );
+
+        if ( outputFileName == "" )
+        {
+            // TODO: Set an output path/file name based on the input file path / name
+
+
+
+
+            // Put the file name in the lineEdit
+            ui->lineEditInputFile->setText( tr( outputFileName.c_str() ) );
+
+        }
+    }
+}
+
+
+
+void MainWindow::on_BrowseOutput_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                        tr( "Georeferenced Output File"));
+
+    if ( ! fileName.isEmpty() )
+    {
+        outputFileName = fileName.toLocal8Bit().constData();
+
+        // Put the file name in the lineEdit
+        ui->lineEditOutputFile->setText( fileName );
+
+
     }
 }
