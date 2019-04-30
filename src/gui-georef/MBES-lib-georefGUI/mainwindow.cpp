@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     inputFileName( "" ),
 //    outputFileName( "/home/christian/Documents/DeleteMe/JUNK/georeferenceData.txt" )    // TODO: Initialize to an empty string
-    outputFileName( "/home/christian/Documents/DeleteMe/JUNK/georeferenceData.txt" )    // TODO: Initialize to an empty string
+    outputFileName( "" )    // TODO: Initialize to an empty string
 {
     ui->setupUi(this);
 
@@ -235,11 +235,24 @@ void MainWindow::on_BrowseInput_clicked()
         {
             // TODO: Set an output path/file name based on the input file path / name
 
+            QFileInfo info( tr( inputFileName.c_str() ) );
 
+            std::cout << "info.absoluteFilePath(): " << info.absoluteFilePath().toLocal8Bit().constData() << std::endl;
+
+            std::cout << "info.absolutePath() : " << info.absolutePath() .toLocal8Bit().constData() << std::endl;
+
+            std::cout << "info.completeBaseName(): " << info.completeBaseName().toLocal8Bit().constData() << std::endl;
+
+            std::string absolutePath( info.absolutePath() .toLocal8Bit().constData() );
+            std::string completeBaseName( info.completeBaseName() .toLocal8Bit().constData() );
+
+
+
+            outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
 
 
             // Put the file name in the lineEdit
-            ui->lineEditInputFile->setText( tr( outputFileName.c_str() ) );
+            ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
 
         }
     }
