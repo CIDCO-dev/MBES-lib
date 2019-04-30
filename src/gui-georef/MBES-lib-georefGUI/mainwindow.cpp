@@ -84,10 +84,6 @@ void MainWindow::on_Process_clicked()
 
         if (outFile)
         {
-
-            DatagramGeoreferencerToOstream printer( outFile );
-
-
             std::ifstream inFile;
             inFile.open( inputFileName );
 
@@ -95,6 +91,9 @@ void MainWindow::on_Process_clicked()
 
             if (inFile)
             {
+
+                DatagramGeoreferencerToOstream printer( outFile );
+
                 if ( ends_with( inputFileName.c_str(),".all" ) )
                 {
                     parser = new KongsbergParser(printer);
@@ -111,22 +110,22 @@ void MainWindow::on_Process_clicked()
                 {
                     throw new Exception("Unknown extension");
                 }
+
+                parser->parse( inputFileName );
+
+                Eigen::Vector3d leverArm;
+
+                leverArm << leverArmX,leverArmY,leverArmZ;
+
+                printer.georeference(leverArm);
+
+
             }
             else
             {
                 throw new Exception("Input file not found");
             }
-            parser->parse( inputFileName );
 
-            inFile.close();
-
-
-
-            Eigen::Vector3d leverArm;
-
-            leverArm << leverArmX,leverArmY,leverArmZ;
-
-            printer.georeference(leverArm);
         }
         else
         {
@@ -145,22 +144,32 @@ void MainWindow::on_Process_clicked()
 
         QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
 
+    }
+    catch ( const char * message )
+    {
+        std::ostringstream streamToDisplay;
+
+        streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\n" << message << std::endl;
 
 
-        // TODO: Handle "Could not open output file"
+        qDebug() << tr( streamToDisplay.str().c_str() );
 
-//        if ( error->getMessage() == "Could not open output file" )
-//        {
+        QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+    }
+    catch (...)
+    {
+        std::ostringstream streamToDisplay;
+
+        streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\nOther exception" << std::endl;
 
 
-//        }
+        qDebug() << tr( streamToDisplay.str().c_str() );
 
-        // TODO: Handle "Unknown extension"
-
-        // TODO: Handle "Input file not found"
-
+        QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
 
     }
+
+
     if(parser) delete parser;
 
 }
