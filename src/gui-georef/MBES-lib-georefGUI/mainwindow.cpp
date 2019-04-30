@@ -29,9 +29,14 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
+
     inputFileName( "" ),
-//    outputFileName( "/home/christian/Documents/DeleteMe/JUNK/georeferenceData.txt" )    // TODO: Initialize to an empty string
-    outputFileName( "" )    // TODO: Initialize to an empty string
+    outputFileName( "" ),
+
+    currentInputPath( "" ),
+    currentOutputPath( "" ),
+
+    outputFileNameEditedByUser( false )
 {
     ui->setupUi(this);
 
@@ -50,26 +55,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//void MainWindow::on_Browse_clicked()
-//{
-//    QString fileName = QFileDialog::getOpenFileName(this,
-//                                        tr( "File to Georeference"), "",
-//                                        tr( "*.all *.xtf *.s7k;;*.all;;*.xtf;;*.s7k;;All Files (*)") );
-
-//    if ( ! fileName.isEmpty() )
-//    {
-//        inputFileName = fileName.toLocal8Bit().constData();
-
-//        // Put the file name in the lineEdit
-//        ui->lineEdit->setText( fileName );
-//    }
-//}
 
 void MainWindow::on_Process_clicked()
 {
-
     // TODO: add the possibility for the user to enter the leverArm
-
 
     double leverArmX = 0.0;
     double leverArmY = 0.0;
@@ -85,9 +74,6 @@ void MainWindow::on_Process_clicked()
 #endif
 
     DatagramParser * parser = nullptr;
-
-
-
 
 
     try
@@ -177,14 +163,6 @@ void MainWindow::on_Process_clicked()
     }
     if(parser) delete parser;
 
-
-
-
-
-
-
-
-
 }
 
 
@@ -201,59 +179,93 @@ void MainWindow::setStateProcess()
 
 }
 
+void MainWindow::possiblyUpdateOutputFileName()
+{
+
+    QFileInfo infoInput( tr( inputFileName.c_str() ) );
+
+
+    if ( infoInput.exists() )
+    {
+        currentInputPath = infoInput.absolutePath();
+
+        if ( outputFileNameEditedByUser == false )
+        {
+            // Set an output path/file name based on the input file path / name
+
+            std::string absolutePath( infoInput.absolutePath() .toLocal8Bit().constData() );
+            std::string completeBaseName( infoInput.completeBaseName() .toLocal8Bit().constData() );
+            outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
+
+            // Put the file name in the lineEdit
+            ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
+        }
+
+    }
+
+}
+
+
 void MainWindow::on_lineEditInputFile_textChanged(const QString &text)
 {
     inputFileName = text.toLocal8Bit().constData();
 
+    possiblyUpdateOutputFileName();
+
     setStateProcess();
 }
 
+// https://doc.qt.io/qt-5/qlineedit.html#textEdited
+// This function is called when the text is not changed programmatically (that is, when it is edited)
+void MainWindow::on_lineEditOutputFile_textEdited(const QString &text)
+{
+//    std::cout << "\nBeginning of on_lineEditOutputFile_textEdited\n" << std::endl;
 
+    if( text.isEmpty()  )
+        outputFileNameEditedByUser = false; // Reset variable
+    else
+        outputFileNameEditedByUser = true;
 
+}
 
+// This function is called when the text is edited and when it is changed programmatically
 void MainWindow::on_lineEditOutputFile_textChanged(const QString &text)
 {
+//    std::cout << "\nBeginning of on_lineEditOutputFile_textChanged\n" << std::endl;
+
     outputFileName = text.toLocal8Bit().constData();
 
     setStateProcess();
+
+    QFileInfo infoOutput( tr( outputFileName.c_str() ) );
+
+    if ( QDir( infoOutput.absolutePath() ).exists() )
+    {
+        currentOutputPath = infoOutput.absolutePath();
+    }
 }
 
 void MainWindow::on_BrowseInput_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
-                                        tr( "File to Georeference"), "",
+                                        tr( "File to Georeference"), currentInputPath,
                                         tr( "*.all *.xtf *.s7k;;*.all;;*.xtf;;*.s7k;;All Files (*)") );
 
     if ( ! fileName.isEmpty() )
     {
+        std::string OldInputFileName = inputFileName;
         inputFileName = fileName.toLocal8Bit().constData();
 
         // Put the file name in the lineEdit
         ui->lineEditInputFile->setText( fileName );
 
-        if ( outputFileName == "" )
+        // If the file name does not change, function MainWindow::on_lineEditInputFile_textChanged() will not be called,
+        // So do here what would be done by the function
+        if ( inputFileName == OldInputFileName )
         {
-            // TODO: Set an output path/file name based on the input file path / name
+            possiblyUpdateOutputFileName();
 
-            QFileInfo info( tr( inputFileName.c_str() ) );
-
-            std::cout << "info.absoluteFilePath(): " << info.absoluteFilePath().toLocal8Bit().constData() << std::endl;
-
-            std::cout << "info.absolutePath() : " << info.absolutePath() .toLocal8Bit().constData() << std::endl;
-
-            std::cout << "info.completeBaseName(): " << info.completeBaseName().toLocal8Bit().constData() << std::endl;
-
-            std::string absolutePath( info.absolutePath() .toLocal8Bit().constData() );
-            std::string completeBaseName( info.completeBaseName() .toLocal8Bit().constData() );
-
-
-
-            outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
-
-
-            // Put the file name in the lineEdit
-            ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
-
+            setStateProcess();
         }
     }
 }
@@ -263,7 +275,7 @@ void MainWindow::on_BrowseInput_clicked()
 void MainWindow::on_BrowseOutput_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
-                                        tr( "Georeferenced Output File"));
+                                        tr( "Georeferenced Output File"), currentOutputPath);
 
     if ( ! fileName.isEmpty() )
     {
@@ -271,7 +283,7 @@ void MainWindow::on_BrowseOutput_clicked()
 
         // Put the file name in the lineEdit
         ui->lineEditOutputFile->setText( fileName );
-
-
     }
 }
+
+

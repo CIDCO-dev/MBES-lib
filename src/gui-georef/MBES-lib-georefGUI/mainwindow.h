@@ -29,23 +29,33 @@ private slots:
 
     void on_lineEditInputFile_textChanged(const QString &text);
 
+    void on_lineEditOutputFile_textEdited(const QString &text);
+
     void on_lineEditOutputFile_textChanged(const QString &text);
 
     void on_BrowseInput_clicked();
 
-
-
     void on_BrowseOutput_clicked();
+
+
 
 private:
 
     void setStateProcess();
+
+    void possiblyUpdateOutputFileName();
 
     Ui::MainWindow *ui;
 
     std::string inputFileName;
 
     std::string outputFileName;
+
+    QString currentInputPath;
+
+    QString currentOutputPath;
+
+    bool outputFileNameEditedByUser;
 };
 
 #endif // MAINWINDOW_H
