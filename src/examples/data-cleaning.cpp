@@ -6,41 +6,82 @@
 #include <iostream>
 #include <list>
 
+/*!
+ * \brief Point filter class
+ */
 class PointFilter{
    public:
+       
+       /**Create a point filter*/
 	PointFilter(){
 
 	}
 
+        /**Destroy the point filter*/
 	~PointFilter(){
 
 	}
-
-	//returns true if we remove this point
+        
+        /**
+         * return true if we remove this point
+         * 
+         * @param microEpoch timestamp of the point
+         * @param x x position of the point
+         * @param y y position of the point
+         * @param z z position of the point
+         * @param quality quality of the point
+         * @param intensity intensity of the point
+         */
 	virtual bool filterPoint(uint64_t microEpoch,double x,double y,double z, uint32_t quality,uint32_t intensity) = 0;
 };
 
+/*!
+ * \brief Quality filter class extend of the Point filter class
+ */
 class QualityFilter : public PointFilter{
    public:
 
+       /**
+        * Create a quality filter
+        * 
+        * @param minimumQuality the minimal quality accepted
+        */
 	QualityFilter(int minimumQuality) : minimumQuality(minimumQuality){
 
 	}
 
+        /**Destroy the quality filter*/
 	~QualityFilter(){
 
 	}
 
+        /**
+         * return true if the quality receive is low then the minimum accepted
+         * 
+         * @param microEpoch timestamp of the point
+         * @param x x position of the point
+         * @param y y position of the point
+         * @param z z position of the point
+         * @param quality quality of the point
+         * @param intensity intensity of the point
+         */
 	bool filterPoint(uint64_t microEpoch,double x,double y,double z, uint32_t quality,uint32_t intensity){
 		return quality < minimumQuality;
 	}
 
   private:
+        
+      /**minimal quality accepted*/
 	unsigned int minimumQuality;
 
 };
 
-
+/**
+ * Filter all point receive in the terminal
+ * 
+ * @param argc number of parameter
+ * @param argv value of the parameters
+ */
 int main(int argc,char** argv){
 
 	std::string line;
@@ -94,6 +135,7 @@ int main(int argc,char** argv){
 		if(!doFilter){
                     printf("%lu %.6lf %.6lf %.6lf %d %d\r\n",microEpoch,x,y,z,quality,intensity);
 		}
+                std::cout << "Line " << lineCount << " valid" << std::endl;
             }
             else{
 		std::cerr << "Error at line " << lineCount << std::endl;
