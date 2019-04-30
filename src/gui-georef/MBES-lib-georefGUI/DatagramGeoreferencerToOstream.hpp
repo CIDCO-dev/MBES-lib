@@ -19,31 +19,31 @@
 /*!
  * \brief Datagramer Georeferencer class extention of the Datagram Processor class
  */
-class DatagramGeoreferencerForGui : public DatagramGeoreferencer{
+class DatagramGeoreferencerToOstream : public DatagramGeoreferencer{
         public:
                  /**Create a datagram georeferencer*/
-                DatagramGeoreferencerForGui( std::ofstream & outFileIn )
-                    : outFile( outFileIn )
+                DatagramGeoreferencerToOstream( std::ostream & out )
+                    : out( out )
                 {
-                    outFile << std::setprecision(6);
-                    outFile << std::fixed;
+                    out << std::setprecision(6);
+                    out << std::fixed;
                 }
 
                 /**Destroy the datagram georeferencer*/
-                virtual ~DatagramGeoreferencerForGui() {}
+                virtual ~DatagramGeoreferencerToOstream() {}
 
         protected:
 
             virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity);
 
         private:
-            std::ofstream & outFile;
+            std::ostream & out;
 
 
 };
 
-void DatagramGeoreferencerForGui::processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity){
-    outFile << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2)
+void DatagramGeoreferencerToOstream::processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity){
+    out << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2)
               << " " << quality  << " " << intensity << std::endl;
 }
 

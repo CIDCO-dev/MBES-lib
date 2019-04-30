@@ -13,7 +13,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "DatagramGeoreferencerForGUI.hpp"
+#include "DatagramGeoreferencerToOstream.hpp"
 
 #include "../../datagrams/kongsberg/KongsbergParser.hpp"
 #include "../../datagrams/xtf/XtfParser.hpp"
@@ -96,7 +96,7 @@ void MainWindow::on_Process_clicked()
         if (outFile)
         {
 
-            DatagramGeoreferencerForGui printer( outFile );
+            DatagramGeoreferencerToOstream printer( outFile );
 
 
             std::ifstream inFile;
