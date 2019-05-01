@@ -13,7 +13,7 @@
 #include <iostream>
 #include <iomanip>
 #include "catch.hpp"
-#include "../src/SoundVelocityProfile.hpp"
+#include "../src/svp/SoundVelocityProfile.hpp"
 #include "../src/utils/Exception.hpp"
 
 /**Test the writing and the reading of a SVP file*/
