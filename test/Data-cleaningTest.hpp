@@ -63,8 +63,8 @@ std::stringstream DataSystem_call(const std::string& command){
      return out;
 }
 
-/**Test when there is no parameter*/
-TEST_CASE("test with no parameter")
+/**Test the insane position filter*/
+TEST_CASE("test insane position filter")
 {
     string output = "cat test/data/dataCleanTest.txt | ./";
     std::stringstream ss;
@@ -79,7 +79,12 @@ TEST_CASE("test with no parameter")
     {
         if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
         {
-            REQUIRE(quality>=0);
+            REQUIRE(x<=1.00*100000000);
+            REQUIRE(x>=-1.00*100000000);
+            REQUIRE(y<=1.00*100000000);
+            REQUIRE(y>=-1.00*100000000);
+            REQUIRE(z<=1.00*100000000);
+            REQUIRE(z>=-1.00*100000000);
             lineCount = lineCount+1;
         }
     }
