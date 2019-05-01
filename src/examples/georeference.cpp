@@ -9,12 +9,9 @@
 
 #include <Eigen/Dense>
 #include "../DatagramGeoreferencer.hpp"
-#include "../datagrams/kongsberg/KongsbergParser.hpp"
-#include "../datagrams/xtf/XtfParser.hpp"
-#include "../datagrams/s7k/S7kParser.hpp"
+#include "../datagrams/DatagramParserFactory.hpp"
 #include <iostream>
 #include <string>
-#include "../utils/StringUtils.hpp"
 #include "../utils/Exception.hpp"
 
 
@@ -72,7 +69,7 @@ else
                     printUsage();
                 }
            break;
-                                        
+
             case 'y':
                 if (sscanf(optarg,"%lf", &leverArmY) != 1)
                 {
@@ -80,7 +77,7 @@ else
                     printUsage();
                 }
             break;
-                                        
+
             case 'z':
                 if (sscanf(optarg,"%lf", &leverArmZ) != 1)
                 {
@@ -95,28 +92,12 @@ else
 	std::cerr << "Decoding " << fileName << std::endl;
         std::ifstream inFile;
         inFile.open(fileName);
-        if (inFile)
-        {    
-            if(ends_with(fileName.c_str(),".all"))
-            {
-		parser = new KongsbergParser(printer);
-            }   
-            else if(ends_with(fileName.c_str(),".xtf"))
-            {
-		parser = new XtfParser(printer);
-            }
-            else if(ends_with(fileName.c_str(),".s7k"))
-            {
-                parser = new S7kParser(printer);
-            }
-            else
-            {
-		throw new Exception("Unknown extension");
-            }
+        if (inFile){
+		parser = DatagramParserFactory::build(fileName,printer);
         }
         else
         {
-            throw "File not found";
+            throw new Exception("File not found");
         }
         parser->parse(fileName);
 	std::cout << std::setprecision(6);
@@ -129,10 +110,10 @@ else
     }
     catch(Exception * error)
     {
-	std::cerr << "Error while parsing " << fileName << ": " << error << std::endl;
+	std::cerr << "Error while parsing " << fileName << ": " << error->getMessage() << std::endl;
     }
     if(parser) delete parser;
-}       
+}
 }
 
 #endif
