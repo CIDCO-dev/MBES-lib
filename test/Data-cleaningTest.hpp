@@ -74,20 +74,23 @@ TEST_CASE("test with no parameter")
     double x,y,z;
     uint32_t quality;
     uint32_t intensity;
+    int lineCount = 0;
     while (getline(ss,line))
     {
         if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
         {
             REQUIRE(quality>=0);
+            lineCount = lineCount+1;
         }
     }
+    REQUIRE(lineCount>0);
 }
 
 /**Test when the quality parameter is enter*/
 TEST_CASE("test with the quality parameter")
 {
     string output = "cat test/data/dataCleanTest.txt | ./";
-    string param = " -q 190000";
+    string param = " -q 8";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
     string line;
@@ -95,20 +98,23 @@ TEST_CASE("test with the quality parameter")
     double x,y,z;
     uint32_t quality;
     uint32_t intensity;
+    int lineCount = 0;
     while (getline(ss,line))
     {
         if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
         {
-            REQUIRE(quality>=190000);
+            REQUIRE(quality>=8);
+            lineCount = lineCount+1;
         }
     }
+    REQUIRE(lineCount>0);
 }
 
 /**Test when the intensity parameter is enter*/
 TEST_CASE("test with the intensity parameter")
 {
     string output = "cat test/data/dataCleanTest.txt | ./";
-    string param = " -i 1800";
+    string param = " -i 9";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
     string line;
@@ -116,13 +122,16 @@ TEST_CASE("test with the intensity parameter")
     double x,y,z;
     uint32_t quality;
     uint32_t intensity;
+    int lineCount = 0;
     while (getline(ss,line))
     {
         if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
         {
-            REQUIRE(intensity>=1800);
+            REQUIRE(intensity>=9);
+            lineCount = lineCount+1;
         }
     }
+    REQUIRE(lineCount>0);
 }
 
 /**Test when there is a invalid quality parameter*/
@@ -153,7 +162,7 @@ TEST_CASE("test with invalid intensity parameter")
 TEST_CASE("test with multiple character parameter")
 {
     string output = "cat test/data/dataCleanTest.txt | ./";
-    string param = " -q 19000 -i 1800";
+    string param = " -q 9 -i 10";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
     string line;
@@ -161,14 +170,17 @@ TEST_CASE("test with multiple character parameter")
     double x,y,z;
     uint32_t quality;
     uint32_t intensity;
+    int lineCount = 0;
     while (getline(ss,line))
     {
         if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
         {
-            REQUIRE(quality>=19000);
-            REQUIRE(intensity>=1800);
+            REQUIRE(quality>=9);
+            REQUIRE(intensity>=10);
+            lineCount = lineCount+1;
         }
     }
+    REQUIRE(lineCount>0);
 }
 
 /**Test when there is a invalid line input*/
@@ -183,12 +195,15 @@ TEST_CASE("test with invalid line input")
     double x,y,z;
     uint32_t quality;
     uint32_t intensity;
+    int lineCount = 0;
     while (getline(ss,line))
     {
         if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)!=6)
         {
-            int linecount;
-            REQUIRE(sscanf(line.c_str(),"Error at line %d",&linecount)==1);
+            int count;
+            REQUIRE(sscanf(line.c_str(),"Error at line %d",&count)==1);
+            lineCount = lineCount+1;
         }
     }
+    REQUIRE(lineCount>0);
 }
