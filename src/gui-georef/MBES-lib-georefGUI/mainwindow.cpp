@@ -238,8 +238,8 @@ void MainWindow::possiblyUpdateOutputFileName()
         {
             // Set an output path/file name based on the input file path / name
 
-            std::string absolutePath( infoInput.absolutePath() .toLocal8Bit().constData() );
-            std::string completeBaseName( infoInput.completeBaseName() .toLocal8Bit().constData() );
+            std::string absolutePath( infoInput.absolutePath().toLocal8Bit().constData() );
+            std::string completeBaseName( infoInput.completeBaseName().toLocal8Bit().constData() );
             outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
 
             // Put the file name in the lineEdit
@@ -501,3 +501,110 @@ void MainWindow::on_lineEditLeverArmZ_editingFinished()
 
 
 
+
+void MainWindow::on_LeverArmLoad_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+                                        tr( "Load Lever Arm Values from File"), "",
+                                        tr( "Text files (*.txt);;All Files (*)")  );
+
+    if ( ! fileName.isEmpty() )
+    {
+
+        std::ifstream inFile;
+        inFile.open( fileName.toLocal8Bit().constData() );
+
+        if ( inFile )
+        {
+            double values[ 3 ];
+
+            for ( int count= 0; count < 3; count++ )
+                inFile >> values[ count];
+
+            if( inFile.fail() == false )
+            {
+                leverArm << values[ 0 ], values[ 1 ], values[ 2 ];
+
+                for ( int count = 0; count < 3; count++ )
+                    lineEditLeverArms[ count ]->setText( QString::number( leverArm( count ), 'f', 6 ) );
+
+            }
+            else
+            {
+                std::ostringstream streamToDisplay;
+                streamToDisplay << "Problem reading the file \n\n\"" << fileName.toLocal8Bit().constData()
+                                   << "\"\n\nCould not read three double values for the lever arms" << std::endl;
+
+                qDebug() << tr( streamToDisplay.str().c_str() );
+
+                QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+            }
+
+        }
+        else
+        {
+            std::ostringstream streamToDisplay;
+            streamToDisplay << "Could not open file \n\n\"" << fileName.toLocal8Bit().constData()
+                               << "\"" << std::endl;
+
+            qDebug() << tr( streamToDisplay.str().c_str() );
+
+            QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+
+        }
+
+    }
+
+
+}
+
+
+void MainWindow::on_LeverArmSave_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                        tr( "Save Lever Arm Values to File"), "",
+                                        tr( "Text files (*.txt);;All Files (*)") );
+
+    if ( ! fileName.isEmpty() )
+    {
+        QFileInfo infoInput( fileName );
+
+        const std::string absoluteFilePath( infoInput.absoluteFilePath().toLocal8Bit().constData() );
+        const std::string suffix( infoInput.suffix().toLocal8Bit().constData() );
+
+        std::string saveFileName;
+
+        if ( suffix == "txt" )
+        {
+            saveFileName = absoluteFilePath;
+        }
+        else
+        {
+            saveFileName = absoluteFilePath + ".txt";
+        }
+
+
+        std::ofstream outFile;
+        outFile.open( saveFileName, std::ofstream::out | std::ofstream::trunc );
+
+        if( outFile )
+        {
+            outFile << std::setprecision(6) << std::fixed
+                    << leverArm( 0 ) << "\n" << leverArm( 1 ) << "\n" << leverArm( 2 ) << std::endl;
+        }
+        else
+        {
+
+            std::ostringstream streamToDisplay;
+            streamToDisplay << "Could not save to file \n\n\"" << saveFileName
+                               << "\"" << std::endl;
+
+            qDebug() << tr( streamToDisplay.str().c_str() );
+
+            QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+
+        }
+
+    }
+
+}

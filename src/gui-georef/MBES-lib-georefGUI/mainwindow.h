@@ -56,6 +56,10 @@ private slots:
 
 
 
+    void on_LeverArmLoad_clicked();
+
+    void on_LeverArmSave_clicked();
+
 private:
 
     void setStateProcess();
