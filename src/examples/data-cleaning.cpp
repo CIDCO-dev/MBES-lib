@@ -5,6 +5,22 @@
 #include <string>
 #include <iostream>
 #include <list>
+#include <iostream>
+#include <Eigen/Dense>
+#include <fstream>
+#include "../math/Interpolation.hpp"
+using namespace std;
+
+void printUsage(){
+	std::cerr << "\n\
+  NAME\n\n\
+     data-cleaning - Filtre les points d'un nuage\n\n\
+  SYNOPSIS\n \
+	   data-cleaning [-q QualityFilter]\n\n\
+  DESCRIPTION\n\n \
+  Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
+	exit(1);
+}
 
 /*!
  * \brief Point filter class
@@ -90,26 +106,23 @@ int main(int argc,char** argv){
 	std::list<PointFilter *> filters;
 
 	//TODO: load desired filters and parameters from command line
-        if (argc < 2)
+        int index;
+        int quality;
+        while((index=getopt(argc,argv,"q:"))!=-1)
         {
-            filters.push_back(new QualityFilter(0));
-        }
-        else
-        {
-            int i = 1;
-            int quality;
-            while(i < argc)
+            switch(index)
             {
-                
-                if (std::sscanf(argv[i],"%d",&quality)==1)
-                {
-                    filters.push_back(new QualityFilter(quality));
-                }
-                else
-                {
-                    std::cerr << "Error: parameter " << argv[i] << " invalid" << std::endl;
-                }
-                i = i+1;
+                case 'q':
+                    if(sscanf(optarg,"%d", &quality) != 1)
+                    {
+                        std::cerr << "Error: parameter QualityFilter invalid" << std::endl;
+                        printUsage();
+                    }
+                    else
+                    {
+                        filters.push_back(new QualityFilter(quality));
+                    }
+                break;
             }
         }
         unsigned int lineCount = 1;
