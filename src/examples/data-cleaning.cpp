@@ -11,6 +11,7 @@
 #include "../math/Interpolation.hpp"
 using namespace std;
 
+/**Show the usage information about data-cleaning*/
 void printUsage(){
 	std::cerr << "\n\
   NAME\n\n\
