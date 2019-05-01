@@ -82,7 +82,7 @@ TEST_CASE("test with no parameter")
     }
 }
 
-TEST_CASE("test with one parameter")
+TEST_CASE("test with the quality parameter")
 {
     string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
     string param = " -q 190000";
@@ -102,7 +102,7 @@ TEST_CASE("test with one parameter")
     }
 }
 
-TEST_CASE("test with invalid parameter")
+TEST_CASE("test with invalid quality parameter")
 {
     string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
     string param = " -q oio 2>&1";
@@ -111,4 +111,25 @@ TEST_CASE("test with invalid parameter")
     string line;
     getline(ss,line);
     REQUIRE(line=="Error: parameter QualityFilter invalid");
+}
+
+TEST_CASE("test with invalid line input")
+{
+    string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
+    string param = " -q 0 2>&1";
+    std::stringstream ss;
+    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    string line;
+    uint64_t microEpoch;
+    double x,y,z;
+    uint32_t quality;
+    uint32_t intensity;
+    while (getline(ss,line))
+    {
+        if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)!=6)
+        {
+            int linecount;
+            REQUIRE(sscanf(line.c_str(),"Error at line %d",&linecount)==1);
+        }
+    }
 }
