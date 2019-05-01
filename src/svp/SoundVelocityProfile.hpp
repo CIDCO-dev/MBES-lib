@@ -21,7 +21,7 @@
 #include <vector>
 #include <ctime>
 #include <string>
-#include "../src/utils/TimeUtils.hpp"
+#include "../utils/TimeUtils.hpp"
 
 /*!
  * \brief Sound velocity profile class
@@ -239,7 +239,7 @@ public:
     Eigen::VectorXd & getSpeeds();
 
 private:
-    
+
     /**value of the sound velocity profile size*/
     unsigned int size;
 
@@ -248,13 +248,13 @@ private:
 
     /**latitude value of the sound velocity profile*/
     double latitude;
-    
+
     /**longitude value of the sound velocity profile*/
     double longitude;
 
     /**vector who contain the dephts of the sound velocity profile*/
     Eigen::VectorXd depths;
-    
+
     /**vector who contain the speeds of the sound velocity profile*/
     Eigen::VectorXd speeds;
 

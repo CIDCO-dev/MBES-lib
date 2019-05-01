@@ -2,7 +2,10 @@
 #define DATAGRAMPARSER_HPP
 
 #include <cstdint>
-#include "DatagramProcessor.hpp"
+#include "DatagramEventHandler.hpp"
+//#include "kongsberg/KongsbergParser.hpp"
+//#include "xtf/XtfParser.hpp"
+//#include "s7k/S7kParser.hpp"
 
 /*!
  * \brief Datagram parser class
@@ -14,7 +17,7 @@ class DatagramParser{
                  * 
                  * @param processor the datagram processor
                  */
-		DatagramParser(DatagramProcessor & processor);
+		DatagramParser(DatagramEventHandler & processor);
                 
                 /**
                  * Destroy the datagram parser
@@ -28,10 +31,33 @@ class DatagramParser{
                  */
         	virtual void parse(std::string & filename){};
 
+                /**
+                 * Creates the appropriate parser for the given file. Throws exception for unknown formats
+                 * @param filename the name of the file
+                 
+                static DatagramParser * build(std::string & filename,DatagramEventHandler & handler){
+                        DatagramParser * parser;
+
+                        if(ends_with(fileName.c_str(),".all")){
+                                parser = new KongsbergParser(handler);
+                        }
+                        else if(ends_with(fileName.c_str(),".xtf")){
+                                parser = new XtfParser(handler);
+                        }
+                        else if(ends_with(fileName.c_str(),".s7k")){
+                                parser = new S7kParser(handler);
+                        }
+                        else{
+                                throw new Exception("Unknown extension");
+                        }
+
+                        return parser;
+                };
+*/
 	protected:
 
             /**The datagram processor*/
-		DatagramProcessor & processor;
+		DatagramEventHandler & processor;
 };
 
 /**
@@ -39,7 +65,7 @@ class DatagramParser{
  * 
  * @param processor the datagram processor
  */
-DatagramParser::DatagramParser(DatagramProcessor & processor) : processor(processor){
+DatagramParser::DatagramParser(DatagramEventHandler & processor) : processor(processor){
 
 }
 

@@ -30,9 +30,11 @@ class PointFilter{
    public:
        
        /**Create a point filter*/
+
 	PointFilter(){
 
 	}
+
 
         /**Destroy the point filter*/
 	~PointFilter(){
@@ -63,14 +65,15 @@ class QualityFilter : public PointFilter{
         * 
         * @param minimumQuality the minimal quality accepted
         */
-	QualityFilter(int minimumQuality) : minimumQuality(minimumQuality){
+      	QualityFilter(int minimumQuality) : minimumQuality(minimumQuality){
 
-	}
+	      }
 
         /**Destroy the quality filter*/
-	~QualityFilter(){
 
-	}
+      	~QualityFilter(){
+
+      	}
 
         /**
          * return true if the quality receive is low then the minimum accepted
@@ -82,14 +85,14 @@ class QualityFilter : public PointFilter{
          * @param quality quality of the point
          * @param intensity intensity of the point
          */
-	bool filterPoint(uint64_t microEpoch,double x,double y,double z, uint32_t quality,uint32_t intensity){
-		return quality < minimumQuality;
-	}
+
+        bool filterPoint(uint64_t microEpoch,double x,double y,double z, uint32_t quality,uint32_t intensity){
+		            return quality < minimumQuality;
+	      }
 
   private:
-        
       /**minimal quality accepted*/
-	unsigned int minimumQuality;
+     	unsigned int minimumQuality;
 
 };
 
@@ -155,4 +158,5 @@ int main(int argc,char** argv){
             lineCount++;
         }
     }
+
 #endif

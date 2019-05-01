@@ -22,38 +22,38 @@
  */
 class XtfParser : public DatagramParser{
 	public:
-            
+
                 /**
                  * Create an XTF parser 
                  * 
                  * @param processor the datagram processor
                  */
-		XtfParser(DatagramProcessor & processor);
+		XtfParser(DatagramEventHandler & processor);
                 
                 /**Destroy the XTF parser*/
 		~XtfParser();
 
                 /**
-                 * Read a file and change the XTF parser depending on the information
+                 * Parse an XTF file
                  * 
                  * @param filename name of the file to read
                  */
 		void parse(std::string & filename);
                 
-                /**Return the number channels in the file header*/
+                /**Return the number channels in the file*/
 		int getTotalNumberOfChannels();
 
 	protected:
                 
                 /**
-                 * show the contain of the file PacketHeader
+                 * Process the contents of the XtfPacketHeader
                  * 
                  * @param hdr the XTF PacketHeader
                  */
 		void processPacketHeader(XtfPacketHeader & hdr);
                 
                 /**
-                 * Set the processor depending by the content of the XTF Packet header
+                 * Dispatch processing to the appropriate callback depending on the content of the XTF Packet header
                  * 
                  * @param hdr the XTF Packet Header 
                  * @param packet the packet
@@ -61,21 +61,21 @@ class XtfParser : public DatagramParser{
 		void processPacket(XtfPacketHeader & hdr,unsigned char * packet);
                 
                 /**
-                 * show the contain of the file PingHeader
+                 * Process the contents of the PingHeader
                  * 
                  * @param hdr the XTF PingHeader
                  */
 	        void processPingHeader(XtfPingHeader & hdr);
                 
                 /**
-                 * show the contain of the file FileHeader
+                 * Process the contents of the FileHeader
                  * 
                  * @param hdr the XTF FileHeader
                  */
 	        void processFileHeader(XtfFileHeader & hdr);
                 
                 /**
-                 * show the contain of the file ChanInfo
+                 * Process the contents of the file ChanInfo
                  * 
                  * @param c the XTF ChanInfo
                  */
@@ -90,7 +90,7 @@ class XtfParser : public DatagramParser{
  * 
  * @param processor the datagram processor
  */
-XtfParser::XtfParser(DatagramProcessor & processor):DatagramParser(processor){
+XtfParser::XtfParser(DatagramEventHandler & processor):DatagramParser(processor){
 
 }
 
@@ -341,7 +341,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 			microEpoch = attitude->SourceEpoch * 1000000 + attitude->EpochMicroseconds;
 		}
 		else{
-			microEpoch = build_time(attitude->Year,attitude->Month-1,attitude->Day,attitude->Hour,attitude->Minutes,attitude->Seconds,attitude->Milliseconds,0);
+			microEpoch = TimeUtils::build_time(attitude->Year,attitude->Month-1,attitude->Day,attitude->Hour,attitude->Minutes,attitude->Seconds,attitude->Milliseconds,0);
 		}
 
         	processor.processAttitude(
@@ -361,7 +361,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 
 		XtfQpsMbEntry * ping = (XtfQpsMbEntry*) ((uint8_t*)packet + sizeof(XtfPingHeader));
 
-	        uint64_t microEpoch = build_time(pingHdr->Year,pingHdr->Month-1,pingHdr->Day,pingHdr->Hour,pingHdr->Minute,pingHdr->Second,pingHdr->HSeconds * 10,0);
+	        uint64_t microEpoch = TimeUtils::build_time(pingHdr->Year,pingHdr->Month-1,pingHdr->Day,pingHdr->Hour,pingHdr->Minute,pingHdr->Second,pingHdr->HSeconds * 10,0);
 
 		for(unsigned int i = 0;i < hdr.NumChansToFollow;i++){
             		processor.processPing(microEpoch,ping[i].Id,ping[i].BeamAngle,ping[i].TiltAngle,ping[i].TwoWayTravelTime,ping[i].Quality,ping[i].Intensity);
@@ -369,7 +369,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 	}
 	else if(hdr.HeaderType==XTF_HEADER_POSITION){
 		XtfPosRawNavigation* position = (XtfPosRawNavigation*)packet;
-        	uint64_t microEpoch = build_time(position->Year,position->Month-1,position->Day,position->Hour,position->Minutes,position->Seconds,position->MicroSeconds/1000,position->MicroSeconds%1000);
+        	uint64_t microEpoch = TimeUtils::build_time(position->Year,position->Month-1,position->Day,position->Hour,position->Minutes,position->Seconds,position->MicroSeconds/1000,position->MicroSeconds%1000);
         	processor.processPosition(microEpoch,position->RawXcoordinate,position->RawYcoordinate,position->RawAltitude);
 	}
 	else{

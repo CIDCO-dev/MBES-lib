@@ -19,7 +19,7 @@
 #include "../../utils/TimeUtils.hpp"
 #include "../../utils/Constants.hpp"
 #include <list>
-#include "../../SoundVelocityProfile.hpp"
+#include "../../svp/SoundVelocityProfile.hpp"
 
 /*!
  * \brief S7k parser class extention of Datagram parser
@@ -32,7 +32,7 @@ public:
      * 
      * @param processor the datagram processor 
      */
-    S7kParser(DatagramProcessor & processor);
+    S7kParser(DatagramEventHandler & processor);
     
     /**Destroy the S7k parser*/
     ~S7kParser();
@@ -120,7 +120,7 @@ private:
  * 
  * @param processor the datagram processor 
  */
-S7kParser::S7kParser(DatagramProcessor & processor) : DatagramParser(processor) {
+S7kParser::S7kParser(DatagramEventHandler & processor) : DatagramParser(processor) {
 
 }
 
@@ -361,7 +361,7 @@ void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * da
 uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
     long microSeconds = drf.Timestamp.Seconds * 1e6;
 
-    uint64_t res = build_time(drf.Timestamp.Year, drf.Timestamp.Day, drf.Timestamp.Hours, drf.Timestamp.Minutes, microSeconds);
+    uint64_t res = TimeUtils::build_time(drf.Timestamp.Year, drf.Timestamp.Day, drf.Timestamp.Hours, drf.Timestamp.Minutes, microSeconds);
 
     return res;
 }

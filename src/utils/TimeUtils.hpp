@@ -5,6 +5,10 @@
 #ifdef _WIN32
 #include <ctime>
 #endif
+
+class TimeUtils{
+public:
+
 /**
  * Returns epoch in microseconds since Jan 1 1970
  */
@@ -21,7 +25,7 @@
  * @param millis number of millisecond less than an second
  * @param microseconds number of microsecond less than an millisecond
  */
-uint64_t build_time(int year,int month,int day,int hour,int minutes,int seconds,int millis,int microseconds){
+static uint64_t build_time(int year,int month,int day,int hour,int minutes,int seconds,int millis,int microseconds){
 	struct tm t;
 	memset(&t,0,sizeof(struct tm));
 
@@ -45,7 +49,7 @@ uint64_t build_time(int year,int month,int day,int hour,int minutes,int seconds,
  * @param day number of day less than an month
  * @param timeInMilliseconds number of millisecond less than an day
  */
-uint64_t build_time(int year,int month,int day,long timeInMilliseconds){
+static uint64_t build_time(int year,int month,int day,long timeInMilliseconds){
     struct tm t;
     memset(&t,0,sizeof(struct tm));
 
@@ -70,7 +74,7 @@ uint64_t build_time(int year,int month,int day,long timeInMilliseconds){
  * @param minutes number of minute les than an hour 
  * @param timeMicroseconds number of microsecond less than an minute
  */
-uint64_t build_time(int year,int yday, int hour, int minutes, long timeInMicroSeconds){
+static uint64_t build_time(int year,int yday, int hour, int minutes, long timeInMicroSeconds){
     struct tm t;
     memset(&t,0,sizeof(struct tm));
 
@@ -100,4 +104,5 @@ static std::string julianTime(uint64_t microEpoch)
     return ssDate.str();
 }
 
+};
 #endif

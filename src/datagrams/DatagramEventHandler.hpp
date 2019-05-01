@@ -1,7 +1,7 @@
 #ifndef DATAGRAMPROCESSOR_HPP
 #define DATAGRAMPROCESSOR_HPP
 
-#include "../SoundVelocityProfile.hpp"
+#include "../svp/SoundVelocityProfile.hpp"
 
 /**
  * @author Guillaume Morissette
@@ -9,16 +9,16 @@
  */
 
 /*!
- * \brief Datagram processor class
+ * \brief Datagram event handler class
  */
-class DatagramProcessor{
+class DatagramEventHandler{
 	public:
-            
-                /**Create a datagram processor*/
-		DatagramProcessor(){};
-                
-                /**Destroy the datagram processor*/
-		virtual ~DatagramProcessor(){};
+
+                /**Create an event handler*/
+		DatagramEventHandler(){};
+
+                /**Destroy the event handler*/
+		virtual ~DatagramEventHandler(){};
 
 
 		/*

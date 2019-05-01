@@ -4,12 +4,9 @@
 #ifndef MAIN_CPP
 #define MAIN_CPP
 
- #include "../datagrams/kongsberg/KongsbergParser.hpp"
-#include "../datagrams/xtf/XtfParser.hpp"
-#include "../datagrams/s7k/S7kParser.hpp"
+#include "../datagrams/DatagramParserFactory.hpp"
 #include <iostream>
 #include <string>
-#include "../utils/StringUtils.hpp"
 
 /**Write the information about the cidco-decoder*/ 
 void printUsage(){
@@ -26,7 +23,7 @@ void printUsage(){
  /*!
   * \brief Datagram printer class extention of Datagram processor class
   */
- class DatagramPrinter : public DatagramProcessor{
+ class DatagramPrinter : public DatagramEventHandler{
          private:
              
                 /**The heading File*/
@@ -190,18 +187,9 @@ void printUsage(){
  	std::string fileName(argv[1]);
  	try{
 		std::cerr << "Decoding " << fileName << std::endl;
- 		if(ends_with(fileName.c_str(),".all")){
-			parser = new KongsbergParser(printer);
-		}
-		else if(ends_with(fileName.c_str(),".xtf")){
-			parser = new XtfParser(printer);
-		}
-		else if(ends_with(fileName.c_str(),".s7k")){
-                        parser = new S7kParser(printer);
-		}
-		else{
-			throw "Unknown extension";
-		}
+
+		parser = DatagramParserFactory::build(fileName,printer);
+
  		parser->parse(fileName);
 	}
 	catch(const char * error){
