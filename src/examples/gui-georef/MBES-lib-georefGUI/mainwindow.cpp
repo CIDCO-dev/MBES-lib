@@ -623,4 +623,5 @@ void MainWindow::on_buttonAbout_clicked()
 
     QMessageBox::about( this, tr( "About 'MBES-Lib Georeferencing'" ),
                           QString::fromUtf8( text.c_str() )  );
+
 }
