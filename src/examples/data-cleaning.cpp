@@ -143,12 +143,12 @@ class InsanePositionFilter : public PointFilter{
        /**
         * Create a insane position filter
         */
-	IntensityFilter(){
+	InsanePositionFilter(){
 
 	}
 
         /**Destroy the insane position filter*/
-	~IntensityFilter(){
+	~InsanePositionFilter(){
 
 	}
 
