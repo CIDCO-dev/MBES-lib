@@ -66,7 +66,10 @@ std::stringstream DataSystem_call(const std::string& command){
 /**Test the insane position filter*/
 TEST_CASE("test insane position filter")
 {
-    string output = "cat test/data/dataCleanTest.txt | ./";
+    std::ifstream inFile;
+    inFile.open("test/data/dataCleanTest.dat");
+    REQUIRE(inFile);
+    string output = "cat test/data/dataCleanTest.dat | ./";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec));
     string line;
@@ -94,7 +97,10 @@ TEST_CASE("test insane position filter")
 /**Test when the quality parameter is enter*/
 TEST_CASE("test with the quality parameter")
 {
-    string output = "cat test/data/dataCleanTest.txt | ./";
+    std::ifstream inFile;
+    inFile.open("test/data/dataCleanTest.dat");
+    REQUIRE(inFile);
+    string output = "cat test/data/dataCleanTest.dat | ./";
     string param = " -q 8";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
@@ -118,7 +124,10 @@ TEST_CASE("test with the quality parameter")
 /**Test when the intensity parameter is enter*/
 TEST_CASE("test with the intensity parameter")
 {
-    string output = "cat test/data/dataCleanTest.txt | ./";
+    std::ifstream inFile;
+    inFile.open("test/data/dataCleanTest.dat");
+    REQUIRE(inFile);
+    string output = "cat test/data/dataCleanTest.dat | ./";
     string param = " -i 9";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
@@ -142,7 +151,10 @@ TEST_CASE("test with the intensity parameter")
 /**Test when there is a invalid quality parameter*/
 TEST_CASE("test with invalid quality parameter")
 {
-    string output = "cat test/data/dataCleanTest.txt | ./";
+    std::ifstream inFile;
+    inFile.open("test/data/dataCleanTest.dat");
+    REQUIRE(inFile);
+    string output = "cat test/data/dataCleanTest.dat | ./";
     string param = " -q oio 2>&1";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
@@ -154,7 +166,10 @@ TEST_CASE("test with invalid quality parameter")
 /**Test when there is a invalid intensity parameter*/
 TEST_CASE("test with invalid intensity parameter")
 {
-    string output = "cat test/data/dataCleanTest.txt | ./";
+    std::ifstream inFile;
+    inFile.open("test/data/dataCleanTest.dat");
+    REQUIRE(inFile);
+    string output = "cat test/data/dataCleanTest.dat | ./";
     string param = " -i oek 2>&1";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
@@ -166,7 +181,10 @@ TEST_CASE("test with invalid intensity parameter")
 /**Test when there is multiple parameter*/
 TEST_CASE("test with multiple character parameter")
 {
-    string output = "cat test/data/dataCleanTest.txt | ./";
+    std::ifstream inFile;
+    inFile.open("test/data/dataCleanTest.dat");
+    REQUIRE(inFile);
+    string output = "cat test/data/dataCleanTest.dat | ./";
     string param = " -q 9 -i 10";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
@@ -191,7 +209,10 @@ TEST_CASE("test with multiple character parameter")
 /**Test when there is a invalid line input*/
 TEST_CASE("test with invalid line input")
 {
-    string output = "cat test/data/dataCleanTest.txt | ./";
+    std::ifstream inFile;
+    inFile.open("test/data/dataCleanTest.dat");
+    REQUIRE(inFile);
+    string output = "cat test/data/dataCleanTest.dat | ./";
     string param = " -q 0 2>&1";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
@@ -216,7 +237,10 @@ TEST_CASE("test with invalid line input")
 /**Test when all the lines do not respect the filters*/
 TEST_CASE("test with no lines who respect the filters")
 {
-    string output = "cat test/data/dataCleanTest.txt | ./";
+    std::ifstream inFile;
+    inFile.open("test/data/dataCleanTest.dat");
+    REQUIRE(inFile);
+    string output = "cat test/data/dataCleanTest.dat | ./";
     string param = " -q 100 -i 100";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
