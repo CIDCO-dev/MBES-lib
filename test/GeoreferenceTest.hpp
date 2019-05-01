@@ -22,11 +22,11 @@
 #include "../src/utils/Exception.hpp"
 using namespace std;
 #ifdef _WIN32
-static string binexec("..\\bin\\georeference.exe");
+static string GeoBinexec("..\\bin\\georeference.exe");
 static string outputdir(".");
 #else
-static string binexec("build/bin/georeference");
-static string outputdir(".");
+static string GeoBinexec("build/bin/georeference");
+static string GeoOutputdir(".");
 #endif
 
 /**
@@ -34,7 +34,7 @@ static string outputdir(".");
  * 
  * @param command the parameters for the execution
  */
-std::stringstream system_call(const std::string& command){
+std::stringstream GeoSystem_call(const std::string& command){
 
      std::stringstream out;
      FILE *fp;
@@ -63,26 +63,71 @@ std::stringstream system_call(const std::string& command){
      return out;
 }
 
+/**Test with parameter x y z valid*/
+TEST_CASE("test if the parameter x y z are correctly get")
+{
+    string commX = " -x 1";
+    string commY = " -y 1";
+    string commZ = " -z 1";
+    string commFile = " test/data/all/example.all";
+    string commTest = GeoBinexec+commX+commY+commZ+commFile;
+    std::stringstream ss;
+    ss = GeoSystem_call(std::string(commTest));
+    REQUIRE(ss.str()=="1:1:1");
+}
+
+/**Test with no parameter x y z*/
+TEST_CASE("test the leverArm result without parameter")
+{
+    string commX = "";
+    string commY = "";
+    string commZ = "";
+    string commFile = " test/data/all/example.all";
+    string commTest = GeoBinexec+commX+commY+commZ+commFile;
+    std::stringstream ss;
+    ss = GeoSystem_call(std::string(commTest));
+    REQUIRE(ss.str()=="0:0:0");
+}
+
+/**Test with certain parameter x y z*/
+TEST_CASE("test the leverArm result without all the parameter")
+{
+    string commX = " -x 1";
+    string commY = " -y 1";
+    string commZ = " -z 1";
+    string commFile = " test/data/all/example.all";
+    string commTest = GeoBinexec+commX+commFile;
+    std::stringstream ss;
+    ss = GeoSystem_call(std::string(commTest));
+    REQUIRE(ss.str()=="1:0:0");
+    commTest = GeoBinexec+commX+commZ+commFile;
+    ss = GeoSystem_call(std::string(commTest));
+    REQUIRE(ss.str()=="1:0:1");
+    commTest = GeoBinexec+commY+commZ+commFile;
+    ss = GeoSystem_call(std::string(commTest));
+    REQUIRE(ss.str()=="0:1:1");
+}
+
 /**Test with file extention valid*/
 TEST_CASE("test the extention of the file receive")
 {
     string commFile = " test/data/all/example.all 2>&1";
-    string commTest = binexec+commFile;
+    string commTest = GeoBinexec+commFile;
     std::stringstream ss;
-    ss = system_call(std::string(commTest));
+    ss = GeoSystem_call(std::string(commTest));
     std::string line;
     getline(ss,line);
     getline(ss,line);
     REQUIRE(line!="Error while parsing test/data/all/example.all: Unknown extension");
     commFile = " test/data/s7k/20141016_150519_FJ-Saucier.s7k 2>&1";
-    commTest = binexec+commFile;
-    ss = system_call(std::string(commTest));
+    commTest = GeoBinexec+commFile;
+    ss = GeoSystem_call(std::string(commTest));
     getline(ss,line);
     getline(ss,line);
     REQUIRE(line!="Error while parsing test/data/s7k/20141016_150519_FJ-Saucier.s7k: Unknown extension");
     commFile = " test/data/xtf/example.xtf 2>&1";
-    commTest = binexec+commFile;
-    ss = system_call(std::string(commTest));
+    commTest = GeoBinexec+commFile;
+    ss = GeoSystem_call(std::string(commTest));
     getline(ss,line);
     getline(ss,line);
     REQUIRE(line!="Error while parsing test/data/xtf/example.xtf: Unknown extension");
@@ -92,9 +137,9 @@ TEST_CASE("test the extention of the file receive")
 TEST_CASE("test if the file is invalid")
 {
     string commFile = " test.txt 2>&1";
-    string commTest = binexec+commFile;
+    string commTest = GeoBinexec+commFile;
     std::stringstream ss;
-    ss = system_call(std::string(commTest));
+    ss = GeoSystem_call(std::string(commTest));
     std::string line;
     getline(ss,line);
     getline(ss,line);
@@ -105,9 +150,9 @@ TEST_CASE("test if the file is invalid")
 TEST_CASE("test if the file is not present")
 {
     string commFile = " test/data/all/examplee.all 2>&1";
-    string commTest = binexec+commFile;
+    string commTest = GeoBinexec+commFile;
     std::stringstream ss;
-    ss = system_call(std::string(commTest));
+    ss = GeoSystem_call(std::string(commTest));
     std::string line;
     getline(ss,line);
     getline(ss,line);
@@ -118,9 +163,9 @@ TEST_CASE("test if the file is not present")
 TEST_CASE("test if file parameter is not present")
 {
     string commFile = " 2>&1";
-    string commTest = binexec+commFile;
+    string commTest = GeoBinexec+commFile;
     std::stringstream ss;
-    ss = system_call(std::string(commTest));
+    ss = GeoSystem_call(std::string(commTest));
     std::string result = "\n\
   NAME\n\n\
      georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
@@ -138,18 +183,18 @@ TEST_CASE("test if the parameter x y z are invalid")
     string commY = " -y gyhgj";
     string commZ = " -z gyigkb";
     string commFile = " test/data/all/example.all 2>&1";
-    string commTest = binexec+commX+commFile;
+    string commTest = GeoBinexec+commX+commFile;
     std::stringstream ss;
-    ss = system_call(std::string(commTest));
+    ss = GeoSystem_call(std::string(commTest));
     std::string line;
     getline(ss,line);
     REQUIRE(line=="Invalid lever arm X offset (-x)");
-    commTest = binexec+commY+commFile;
-    ss = system_call(std::string(commTest));
+    commTest = GeoBinexec+commY+commFile;
+    ss = GeoSystem_call(std::string(commTest));
     getline(ss,line);
     REQUIRE(line=="Invalid lever arm Y offset (-y)");
-    commTest = binexec+commZ+commFile;
-    ss = system_call(std::string(commTest));
+    commTest = GeoBinexec+commZ+commFile;
+    ss = GeoSystem_call(std::string(commTest));
     getline(ss,line);
     REQUIRE(line=="Invalid lever arm Z offset (-z)");
 }
