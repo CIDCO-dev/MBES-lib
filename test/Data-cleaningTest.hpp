@@ -212,3 +212,26 @@ TEST_CASE("test with invalid line input")
     }
     REQUIRE(lineCount>0);
 }
+
+/**Test when all the lines do not respect the filters*/
+TEST_CASE("test with no lines who respect the filters")
+{
+    string output = "cat test/data/dataCleanTest.txt | ./";
+    string param = " -q 100 -i 100";
+    std::stringstream ss;
+    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    string line;
+    uint64_t microEpoch;
+    double x,y,z;
+    uint32_t quality;
+    uint32_t intensity;
+    int lineCount = 0;
+    while (getline(ss,line))
+    {
+        if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
+        {
+            lineCount = lineCount+1;
+        }
+    }
+    REQUIRE(lineCount==0);
+}
