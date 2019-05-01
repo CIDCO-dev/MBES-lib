@@ -17,7 +17,7 @@ void printUsage(){
   NAME\n\n\
      data-cleaning - Filtre les points d'un nuage\n\n\
   SYNOPSIS\n \
-	   data-cleaning [-q QualityFilter]\n\n\
+	   data-cleaning [-q QualityFilter] [-i IntensityFilter]\n\n\
   DESCRIPTION\n\n \
   Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
@@ -30,11 +30,9 @@ class PointFilter{
    public:
        
        /**Create a point filter*/
-
 	PointFilter(){
 
 	}
-
 
         /**Destroy the point filter*/
 	~PointFilter(){
@@ -65,15 +63,14 @@ class QualityFilter : public PointFilter{
         * 
         * @param minimumQuality the minimal quality accepted
         */
-      	QualityFilter(int minimumQuality) : minimumQuality(minimumQuality){
+	QualityFilter(int minimumQuality) : minimumQuality(minimumQuality){
 
-	      }
+	}
 
         /**Destroy the quality filter*/
+	~QualityFilter(){
 
-      	~QualityFilter(){
-
-      	}
+	}
 
         /**
          * return true if the quality receive is low then the minimum accepted
@@ -85,14 +82,55 @@ class QualityFilter : public PointFilter{
          * @param quality quality of the point
          * @param intensity intensity of the point
          */
-
-        bool filterPoint(uint64_t microEpoch,double x,double y,double z, uint32_t quality,uint32_t intensity){
-		            return quality < minimumQuality;
-	      }
+	bool filterPoint(uint64_t microEpoch,double x,double y,double z, uint32_t quality,uint32_t intensity){
+		return quality < minimumQuality;
+	}
 
   private:
+        
       /**minimal quality accepted*/
-     	unsigned int minimumQuality;
+	unsigned int minimumQuality;
+
+};
+
+/*!
+ * \brief Intensity filter class extend of the Point filter class
+ */
+class IntensityFilter : public PointFilter{
+   public:
+
+       /**
+        * Create a intensity filter
+        * 
+        * @param minimumIntensity the minimal intensity accepted
+        */
+	IntensityFilter(int minimumIntensity) : minimumIntensity(minimumIntensity){
+
+	}
+
+        /**Destroy the intensity filter*/
+	~IntensityFilter(){
+
+	}
+
+        /**
+         * return true if the intensity receive is low then the minimum accepted
+         * 
+         * @param microEpoch timestamp of the point
+         * @param x x position of the point
+         * @param y y position of the point
+         * @param z z position of the point
+         * @param quality quality of the point
+         * @param intensity intensity of the point
+         */
+	bool filterPoint(uint64_t microEpoch,double x,double y,double z, uint32_t quality,uint32_t intensity){
+		return intensity < minimumIntensity;
+	}
+
+  private:
+        
+      /**minimal intensity accepted*/
+	unsigned int minimumIntensity;
 
 };
 
@@ -112,7 +150,8 @@ int main(int argc,char** argv){
 	//TODO: load desired filters and parameters from command line
         int index;
         int quality;
-        while((index=getopt(argc,argv,"q:"))!=-1)
+        int intensity;
+        while((index=getopt(argc,argv,"q:i:"))!=-1)
         {
             switch(index)
             {
@@ -125,6 +164,18 @@ int main(int argc,char** argv){
                     else
                     {
                         filters.push_back(new QualityFilter(quality));
+                    }
+                break;
+                
+                case 'i':
+                    if(sscanf(optarg,"%d", &intensity) != 1)
+                    {
+                        std::cerr << "Error: parameter IntensityFilter invalid" << std::endl;
+                        printUsage();
+                    }
+                    else
+                    {
+                        filters.push_back(new IntensityFilter(intensity));
                     }
                 break;
             }
@@ -158,5 +209,4 @@ int main(int argc,char** argv){
             lineCount++;
         }
     }
-
 #endif
