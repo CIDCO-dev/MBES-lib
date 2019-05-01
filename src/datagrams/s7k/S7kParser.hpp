@@ -26,14 +26,14 @@
  */
 class S7kParser : public DatagramParser {
 public:
-    
+
     /**
      * Create an S7k parser
-     * 
-     * @param processor the datagram processor 
+     *
+     * @param processor the datagram processor
      */
     S7kParser(DatagramEventHandler & processor);
-    
+
     /**Destroy the S7k parser*/
     ~S7kParser();
 
@@ -45,7 +45,7 @@ public:
     void parse(std::string & filename);
 
 protected:
-    
+
     /**
      * set the S7k data record frame
      * 
@@ -194,24 +194,24 @@ void S7kParser::parse(std::string & filename) {
                         } else {
                             printf("Checksum error\n");
                             //Checksum error...lets ignore the packet for now
-                            //throw "Checksum error";
+                            //throw new Exception("Checksum error");
                             continue;
                         }
                     }
 
                     free(data);
                 } else {
-                    throw "Couldn't find sync pattern";
+                    throw new Exception("Couldn't find sync pattern");
                 }
             }//Negative items mean something went wrong
             else if (nbItemsRead < 0) {
-                throw "Read error";
+                throw new Exception("Read error");
             }
 
             //zero bytes means EOF. Nothing to do
         }
     } else {
-        throw "File not found";
+        throw new Exception("File not found");
     }
 }
 

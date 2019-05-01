@@ -15,6 +15,7 @@
 #include "../DatagramParser.hpp"
 #include "../../utils/NmeaUtils.hpp"
 #include "../../utils/TimeUtils.hpp"
+#include "../../utils/Exception.hpp"
 #include "KongsbergTypes.hpp"
 
 /*!
@@ -159,7 +160,7 @@ void KongsbergParser::parse(std::string & filename){
 				}
 				else{
 					printf("%02x",hdr.size);
-					throw "Bad datagram";
+					throw new Exception("Bad datagram");
 					//TODO: rejct bad datagram, maybe log it
 				}
             }
@@ -168,7 +169,7 @@ void KongsbergParser::parse(std::string & filename){
 		fclose(file);
 	}
 	else{
-		throw "Couldn't open file " + filename;
+		throw new Exception("Couldn't open file " + filename);
 	}
 }
 
