@@ -69,7 +69,7 @@ else
                     printUsage();
                 }
            break;
-                                        
+
             case 'y':
                 if (sscanf(optarg,"%lf", &leverArmY) != 1)
                 {
@@ -77,7 +77,7 @@ else
                     printUsage();
                 }
             break;
-                                        
+
             case 'z':
                 if (sscanf(optarg,"%lf", &leverArmZ) != 1)
                 {
@@ -97,7 +97,7 @@ else
         }
         else
         {
-            throw "File not found";
+            throw new Exception("File not found");
         }
         parser->parse(fileName);
 	std::cout << std::setprecision(6);
@@ -110,10 +110,10 @@ else
     }
     catch(Exception * error)
     {
-	std::cerr << "Error while parsing " << fileName << ": " << error << std::endl;
+	std::cerr << "Error while parsing " << fileName << ": " << error->getMessage() << std::endl;
     }
     if(parser) delete parser;
-}       
+}
 }
 
 #endif

@@ -95,6 +95,8 @@ TEST_CASE("test with the quality parameter")
     double x,y,z;
     uint32_t quality;
     uint32_t intensity;
+
+    int lineCount = 0;
     while (getline(ss,line))
     {
         if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
@@ -102,6 +104,8 @@ TEST_CASE("test with the quality parameter")
             REQUIRE(quality>=190000);
         }
     }
+
+   REQUIRE(lineCount > 0);
 }
 
 /**Test when there is a invalid quality parameter*/
