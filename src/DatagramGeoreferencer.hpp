@@ -150,7 +150,6 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                         std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality  << " " << intensity << std::endl;
                 }
 
-
         protected:
 
                 /**the current surface sound speed*/
