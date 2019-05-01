@@ -3,7 +3,7 @@
  */
 
 #include <QFileDialog>
-#include <QLineEdit>
+
 #include <QMessageBox>
 
 #include <QDebug>
@@ -36,7 +36,13 @@ MainWindow::MainWindow(QWidget *parent) :
     currentInputPath( "" ),
     currentOutputPath( "" ),
 
-    outputFileNameEditedByUser( false )
+    outputFileNameEditedByUser( false ),
+
+    editingLeverArm{ false, false, false },
+
+    originalLeverArmPointSize{ 12, 12, 12}, // Temporary possible values
+    originalLeverArmPixelSize{ 12, 12, 12}, // Temporary possible values
+    originalLeverArmSpecifiedWithPointSize{ true, true, true, }
 {
 
 #ifdef __GNU__
@@ -69,8 +75,8 @@ MainWindow::MainWindow(QWidget *parent) :
     {
         double values[ 3 ];
 
-        for ( int countLines = 0; countLines < 3; countLines++ )
-            inFile >> values[ countLines ];
+        for ( int count= 0; count < 3; count++ )
+            inFile >> values[ count];
 
         if( inFile.fail() == false )
         {
@@ -79,15 +85,25 @@ MainWindow::MainWindow(QWidget *parent) :
 
     }
 
-    ui->lineEditLeverArmX->setText( QString::number( leverArm( 0 ), 'f', 6 ) );
-    ui->lineEditLeverArmY->setText( QString::number( leverArm( 1 ), 'f', 6 ) );
-    ui->lineEditLeverArmZ->setText( QString::number( leverArm( 2 ), 'f', 6 ) );
+
+    lineEditLeverArms[ 0 ] = ui->lineEditLeverArmX;
+    lineEditLeverArms[ 1 ] = ui->lineEditLeverArmY;
+    lineEditLeverArms[ 2 ] = ui->lineEditLeverArmZ;
+
+
+    for ( int count = 0; count < 3; count++ )
+    {
+        lineEditLeverArms[ count ]->setText( QString::number( leverArm( count ), 'f', 6 ) );
+        lineEditLeverArms[ count ]->setValidator( new QDoubleValidator( lineEditLeverArms[ count ] ) );
+        lineEditLeverArms[ count ]->setAlignment(Qt::AlignRight);
+    }
+
 
 }
 
 MainWindow::~MainWindow()
 {
-    // Save last lever arm values used
+    // Save to file the last lever arm values used
 
     std::ofstream outFile;
     outFile.open( "lastLeverArms.txt", std::ofstream::out | std::ofstream::trunc );
@@ -212,9 +228,7 @@ void MainWindow::setStateProcess()
 
 void MainWindow::possiblyUpdateOutputFileName()
 {
-
     QFileInfo infoInput( tr( inputFileName.c_str() ) );
-
 
     if ( infoInput.exists() )
     {
@@ -306,7 +320,7 @@ void MainWindow::on_BrowseInput_clicked()
 void MainWindow::on_BrowseOutput_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
-                                        tr( "Georeferenced Output File"), currentOutputPath);
+                                        tr( "Georeferenced Output File"), currentOutputPath );
 
     if ( ! fileName.isEmpty() )
     {
@@ -317,17 +331,90 @@ void MainWindow::on_BrowseOutput_clicked()
     }
 }
 
-// TODO: Do something better to validate the user input and display problem
-void MainWindow::setLeverArm( const QString &text, const int position )
+
+void MainWindow::adjustLineEditFontSize( const int position )
 {
-    // TODO: how to deal with precision?
+    // If fist time the function is called while the user modifies the value
+    if ( editingLeverArm[ position ] == false )
+    {
+
+        editingLeverArm[ position ] = true;
+
+        // Change font size
+
+        QFont font = lineEditLeverArms[ position ]->font();
+        int leverArmPointSize = font.pointSize();
+
+//        std::cout << "\nleverArmPointSize: " << leverArmPointSize << "\n" << std::endl;
+
+
+        // If font specified with point size
+        if ( leverArmPointSize != -1 )
+        {
+            originalLeverArmSpecifiedWithPointSize[ position ] = true;
+
+            originalLeverArmPointSize[ position ] = leverArmPointSize;
+
+            font.setPointSize( originalLeverArmPointSize[ position ] + lineEditleverArmFontPointSizeChange );
+            lineEditLeverArms[ position ]->setFont(font);
+        }
+        else    // Font specified with pixel size;
+        {
+            originalLeverArmSpecifiedWithPointSize[ position ] = false;
+
+            originalLeverArmPixelSize[ position ] = font.pixelSize();
+
+            font.setPixelSize( originalLeverArmPixelSize[ position ] + lineEditleverArmFontPixelSizeChange );
+            lineEditLeverArms[ position ]->setFont(font);
+        }
+
+    }
+
+}
+
+
+void MainWindow::on_lineEditLeverArmX_textEdited(const QString &text)
+{
+    if ( editingLeverArm[ 0 ] == false )
+    {
+        adjustLineEditFontSize( 0 );
+    }
+}
+
+void MainWindow::on_lineEditLeverArmY_textEdited(const QString &text)
+{
+    if ( editingLeverArm[ 1 ] == false )
+    {
+        adjustLineEditFontSize( 1 );
+    }
+}
+
+void MainWindow::on_lineEditLeverArmZ_textEdited(const QString &text)
+{
+    if ( editingLeverArm[ 2 ] == false )
+    {
+        adjustLineEditFontSize( 2 );
+    }
+}
+
+
+bool MainWindow::setLeverArm( const QString &text, const int position )
+{
+
+//    std::cout << "\nBeginning of setLeverArm(), text: \"" << text.toLocal8Bit().constData()
+//              << "\", position: " << position << std::endl;
+
+    // TODO: how to deal with precision of the double in memory and used for the
+    // georeferencing vs. what is displayed in the GUI?
 
     bool OK = false;
 
     double value = text.toDouble( &OK );
 
     if ( OK )
+    {
         leverArm( position ) = value;
+    }
     else
     {
         std::ostringstream streamToDisplay;
@@ -338,20 +425,79 @@ void MainWindow::setLeverArm( const QString &text, const int position )
         QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
     }
 
+    return OK;
+
 }
 
-
-void MainWindow::on_lineEditLeverArmX_textEdited(const QString &text)
+void MainWindow::editingFinished( const int position )
 {
-    setLeverArm( text, 0 );
+
+    if ( editingLeverArm[ position ] == true )
+    {
+
+        // Validate if the text is the line edit is a double, set lever arm value if so
+
+        bool validNumber = setLeverArm( lineEditLeverArms[ position ]->text(), position );
+
+//        std::cout << "\nleverArm( position ): " << leverArm( position ) << std::endl;
+
+        if ( validNumber )
+        {
+            editingLeverArm[ position ] = false;
+
+            // Set back the font size
+            QFont font = lineEditLeverArms[ position ]->font();
+
+            // If font specified with point size
+            if ( originalLeverArmSpecifiedWithPointSize[ position ] )
+            {
+                font.setPointSize( originalLeverArmPointSize[ position ] );
+            }
+            else    // font specified with pixel size;
+            {
+                font.setPixelSize( originalLeverArmPixelSize[ position ] );
+            }
+
+            lineEditLeverArms[ position ]->setFont(font);
+
+            // Set precision of the display
+            lineEditLeverArms[ position ]->setText( QString::number( leverArm( position ), 'f', 6 ) );
+
+            // If line edit has the focus, set it to the main window
+            if ( lineEditLeverArms[ position ]->hasFocus() )
+                this->setFocus();
+
+        }
+        else
+        {
+            lineEditLeverArms[ position ]->setFocus();
+        }
+
+    }
+
 }
 
-void MainWindow::on_lineEditLeverArmY_textEdited(const QString &text)
+
+
+void MainWindow::on_lineEditLeverArmX_editingFinished()
 {
-    setLeverArm( text, 1 );
+//    std::cout << "\nBeginning of on_lineEditLeverArmX_editingFinished()\n" << std::endl;
+
+    editingFinished( 0 );
 }
 
-void MainWindow::on_lineEditLeverArmZ_textEdited(const QString &text)
+
+void MainWindow::on_lineEditLeverArmY_editingFinished()
 {
-    setLeverArm( text, 2 );
+    editingFinished( 1 );
 }
+
+void MainWindow::on_lineEditLeverArmZ_editingFinished()
+{
+    editingFinished( 2 );
+}
+
+
+
+
+

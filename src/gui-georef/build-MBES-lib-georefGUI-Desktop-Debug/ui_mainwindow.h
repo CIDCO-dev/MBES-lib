@@ -13,6 +13,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
+#include <QtGui/QGroupBox>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
@@ -36,15 +37,15 @@ public:
     QLabel *labelOutputFile;
     QLineEdit *lineEditOutputFile;
     QPushButton *BrowseOutput;
-    QLabel *labelLeverArm;
+    QGroupBox *groupBoxLeverArm;
+    QPushButton *LeverArmSave;
     QLabel *labelLeverArmX;
+    QPushButton *LeverArmLoad;
     QLabel *labelLeverArmY;
+    QLineEdit *lineEditLeverArmY;
     QLabel *labelLeverArmZ;
     QLineEdit *lineEditLeverArmX;
-    QLineEdit *lineEditLeverArmY;
     QLineEdit *lineEditLeverArmZ;
-    QPushButton *LeverArmLoad;
-    QPushButton *LeverArmSave;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -54,6 +55,21 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QString::fromUtf8("MainWindow"));
         MainWindow->resize(791, 526);
+        MainWindow->setStyleSheet(QString::fromUtf8("QLineEdit:focus\n"
+"{\n"
+"    border: 2px solid blue; \n"
+"}\n"
+"\n"
+"QGroupBox \n"
+"{ \n"
+"	border: 1px solid gray; \n"
+"}\n"
+"\n"
+"QGroupBox::title \n"
+"{\n"
+"	subcontrol-origin: margin;\n"
+"	subcontrol-position: top center;\n"
+"}"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         BrowseInput = new QPushButton(centralWidget);
@@ -77,33 +93,34 @@ public:
         BrowseOutput = new QPushButton(centralWidget);
         BrowseOutput->setObjectName(QString::fromUtf8("BrowseOutput"));
         BrowseOutput->setGeometry(QRect(700, 290, 80, 23));
-        labelLeverArm = new QLabel(centralWidget);
-        labelLeverArm->setObjectName(QString::fromUtf8("labelLeverArm"));
-        labelLeverArm->setGeometry(QRect(150, 10, 71, 16));
-        labelLeverArmX = new QLabel(centralWidget);
-        labelLeverArmX->setObjectName(QString::fromUtf8("labelLeverArmX"));
-        labelLeverArmX->setGeometry(QRect(80, 40, 21, 16));
-        labelLeverArmY = new QLabel(centralWidget);
-        labelLeverArmY->setObjectName(QString::fromUtf8("labelLeverArmY"));
-        labelLeverArmY->setGeometry(QRect(80, 70, 21, 16));
-        labelLeverArmZ = new QLabel(centralWidget);
-        labelLeverArmZ->setObjectName(QString::fromUtf8("labelLeverArmZ"));
-        labelLeverArmZ->setGeometry(QRect(80, 100, 21, 16));
-        lineEditLeverArmX = new QLineEdit(centralWidget);
-        lineEditLeverArmX->setObjectName(QString::fromUtf8("lineEditLeverArmX"));
-        lineEditLeverArmX->setGeometry(QRect(100, 30, 113, 24));
-        lineEditLeverArmY = new QLineEdit(centralWidget);
-        lineEditLeverArmY->setObjectName(QString::fromUtf8("lineEditLeverArmY"));
-        lineEditLeverArmY->setGeometry(QRect(100, 60, 113, 24));
-        lineEditLeverArmZ = new QLineEdit(centralWidget);
-        lineEditLeverArmZ->setObjectName(QString::fromUtf8("lineEditLeverArmZ"));
-        lineEditLeverArmZ->setGeometry(QRect(100, 90, 113, 24));
-        LeverArmLoad = new QPushButton(centralWidget);
-        LeverArmLoad->setObjectName(QString::fromUtf8("LeverArmLoad"));
-        LeverArmLoad->setGeometry(QRect(230, 40, 80, 23));
-        LeverArmSave = new QPushButton(centralWidget);
+        groupBoxLeverArm = new QGroupBox(centralWidget);
+        groupBoxLeverArm->setObjectName(QString::fromUtf8("groupBoxLeverArm"));
+        groupBoxLeverArm->setGeometry(QRect(10, 10, 291, 131));
+        groupBoxLeverArm->setFlat(false);
+        LeverArmSave = new QPushButton(groupBoxLeverArm);
         LeverArmSave->setObjectName(QString::fromUtf8("LeverArmSave"));
-        LeverArmSave->setGeometry(QRect(230, 70, 80, 23));
+        LeverArmSave->setGeometry(QRect(200, 100, 80, 23));
+        labelLeverArmX = new QLabel(groupBoxLeverArm);
+        labelLeverArmX->setObjectName(QString::fromUtf8("labelLeverArmX"));
+        labelLeverArmX->setGeometry(QRect(20, 40, 21, 16));
+        LeverArmLoad = new QPushButton(groupBoxLeverArm);
+        LeverArmLoad->setObjectName(QString::fromUtf8("LeverArmLoad"));
+        LeverArmLoad->setGeometry(QRect(200, 70, 80, 23));
+        labelLeverArmY = new QLabel(groupBoxLeverArm);
+        labelLeverArmY->setObjectName(QString::fromUtf8("labelLeverArmY"));
+        labelLeverArmY->setGeometry(QRect(20, 70, 21, 16));
+        lineEditLeverArmY = new QLineEdit(groupBoxLeverArm);
+        lineEditLeverArmY->setObjectName(QString::fromUtf8("lineEditLeverArmY"));
+        lineEditLeverArmY->setGeometry(QRect(40, 60, 151, 24));
+        labelLeverArmZ = new QLabel(groupBoxLeverArm);
+        labelLeverArmZ->setObjectName(QString::fromUtf8("labelLeverArmZ"));
+        labelLeverArmZ->setGeometry(QRect(20, 100, 21, 16));
+        lineEditLeverArmX = new QLineEdit(groupBoxLeverArm);
+        lineEditLeverArmX->setObjectName(QString::fromUtf8("lineEditLeverArmX"));
+        lineEditLeverArmX->setGeometry(QRect(40, 30, 151, 24));
+        lineEditLeverArmZ = new QLineEdit(groupBoxLeverArm);
+        lineEditLeverArmZ->setObjectName(QString::fromUtf8("lineEditLeverArmZ"));
+        lineEditLeverArmZ->setGeometry(QRect(40, 90, 151, 24));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
@@ -129,12 +146,12 @@ public:
         labelInputFile->setText(QApplication::translate("MainWindow", "Input File", 0, QApplication::UnicodeUTF8));
         labelOutputFile->setText(QApplication::translate("MainWindow", "Output File", 0, QApplication::UnicodeUTF8));
         BrowseOutput->setText(QApplication::translate("MainWindow", "Browse", 0, QApplication::UnicodeUTF8));
-        labelLeverArm->setText(QApplication::translate("MainWindow", "Lever Arm", 0, QApplication::UnicodeUTF8));
+        groupBoxLeverArm->setTitle(QApplication::translate("MainWindow", "Lever Arm", 0, QApplication::UnicodeUTF8));
+        LeverArmSave->setText(QApplication::translate("MainWindow", "Save", 0, QApplication::UnicodeUTF8));
         labelLeverArmX->setText(QApplication::translate("MainWindow", "X", 0, QApplication::UnicodeUTF8));
+        LeverArmLoad->setText(QApplication::translate("MainWindow", "Load", 0, QApplication::UnicodeUTF8));
         labelLeverArmY->setText(QApplication::translate("MainWindow", "Y", 0, QApplication::UnicodeUTF8));
         labelLeverArmZ->setText(QApplication::translate("MainWindow", "Z", 0, QApplication::UnicodeUTF8));
-        LeverArmLoad->setText(QApplication::translate("MainWindow", "Load", 0, QApplication::UnicodeUTF8));
-        LeverArmSave->setText(QApplication::translate("MainWindow", "Save", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

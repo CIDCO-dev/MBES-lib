@@ -6,7 +6,7 @@
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../MBES-lib-georefGUI/mainwindow.h"
+#include "../../../../../Documents/TestProg/QtTestFontSize/src/gui-georef/MBES-lib-georefGUI/mainwindow.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'mainwindow.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 63
@@ -22,7 +22,7 @@ static const uint qt_meta_data_MainWindow[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       9,   14, // methods
+      12,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -39,6 +39,9 @@ static const uint qt_meta_data_MainWindow[] = {
      216,   33,   11,   11, 0x08,
      262,  257,   11,   11, 0x08,
      303,  257,   11,   11, 0x08,
+     344,   11,   11,   11, 0x08,
+     383,   11,   11,   11, 0x08,
+     422,   11,   11,   11, 0x08,
 
        0        // eod
 };
@@ -53,6 +56,9 @@ static const char qt_meta_stringdata_MainWindow[] = {
     "on_lineEditLeverArmX_textEdited(QString)\0"
     "arg1\0on_lineEditLeverArmY_textEdited(QString)\0"
     "on_lineEditLeverArmZ_textEdited(QString)\0"
+    "on_lineEditLeverArmX_editingFinished()\0"
+    "on_lineEditLeverArmY_editingFinished()\0"
+    "on_lineEditLeverArmZ_editingFinished()\0"
 };
 
 void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -70,6 +76,9 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 6: _t->on_lineEditLeverArmX_textEdited((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 7: _t->on_lineEditLeverArmY_textEdited((*reinterpret_cast< const QString(*)>(_a[1]))); break;
         case 8: _t->on_lineEditLeverArmZ_textEdited((*reinterpret_cast< const QString(*)>(_a[1]))); break;
+        case 9: _t->on_lineEditLeverArmX_editingFinished(); break;
+        case 10: _t->on_lineEditLeverArmY_editingFinished(); break;
+        case 11: _t->on_lineEditLeverArmZ_editingFinished(); break;
         default: ;
         }
     }
@@ -107,9 +116,9 @@ int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 9)
+        if (_id < 12)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 9;
+        _id -= 12;
     }
     return _id;
 }
