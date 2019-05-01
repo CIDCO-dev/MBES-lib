@@ -85,7 +85,7 @@ TEST_CASE("test with no parameter")
 TEST_CASE("test with one parameter")
 {
     string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
-    string param = " 190000";
+    string param = " -q 190000";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
     string line;
@@ -102,35 +102,13 @@ TEST_CASE("test with one parameter")
     }
 }
 
-TEST_CASE("test with multiple parameter")
-{
-    string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
-    string param = " 19000 1600 120";
-    std::stringstream ss;
-    ss = DataSystem_call(std::string(output+dataBinexec+param));
-    string line;
-    uint64_t microEpoch;
-    double x,y,z;
-    uint32_t quality;
-    uint32_t intensity;
-    while (getline(ss,line))
-    {
-        if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
-        {
-            REQUIRE(quality>=19000);
-            REQUIRE(quality>=1600);
-            REQUIRE(quality>=120);
-        }
-    }
-}
-
 TEST_CASE("test with invalid parameter")
 {
     string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
-    string param = " 19 oio 12 2>&1";
+    string param = " -q oio 2>&1";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
     string line;
     getline(ss,line);
-    REQUIRE(line=="Error: parameter oio invalid");
+    REQUIRE(line=="Error: parameter QualityFilter invalid");
 }
