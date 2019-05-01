@@ -27,15 +27,16 @@ public:
 
 private slots:
 
-//    void on_Browse_clicked();
-
     void on_Process_clicked();
 
+
     void on_lineEditInputFile_textChanged(const QString &text);
+
 
     void on_lineEditOutputFile_textEdited(const QString &text);
 
     void on_lineEditOutputFile_textChanged(const QString &text);
+
 
     void on_BrowseInput_clicked();
 
@@ -47,6 +48,7 @@ private slots:
     void on_lineEditLeverArmY_textEdited(const QString &arg1);
 
     void on_lineEditLeverArmZ_textEdited(const QString &arg1);
+
 
     void on_lineEditLeverArmX_editingFinished();
 
@@ -60,6 +62,8 @@ private slots:
 
     void on_LeverArmSave_clicked();
 
+    void on_buttonAbout_clicked();
+
 private:
 
     void setStateProcess();
@@ -71,6 +75,7 @@ private:
     void editingFinished( const int position );
 
     void adjustLineEditFontSize( const int position );
+
 
     Ui::MainWindow *ui;
 
@@ -84,7 +89,6 @@ private:
 
     bool outputFileNameEditedByUser;
 
-    Eigen::Vector3d leverArm;
 
     const int lineEditleverArmFontPointSizeChange = 2;
     const int lineEditleverArmFontPixelSizeChange = 2;
@@ -97,6 +101,8 @@ private:
     bool originalLeverArmSpecifiedWithPointSize[ 3 ];
 
     QLineEdit * lineEditLeverArms[ 3 ];
+
+    Eigen::Vector3d leverArm;
 
 
 };

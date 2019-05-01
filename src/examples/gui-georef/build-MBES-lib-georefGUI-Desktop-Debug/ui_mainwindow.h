@@ -46,6 +46,7 @@ public:
     QLabel *labelLeverArmZ;
     QLineEdit *lineEditLeverArmX;
     QLineEdit *lineEditLeverArmZ;
+    QPushButton *buttonAbout;
     QMenuBar *menuBar;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
@@ -121,6 +122,9 @@ public:
         lineEditLeverArmZ = new QLineEdit(groupBoxLeverArm);
         lineEditLeverArmZ->setObjectName(QString::fromUtf8("lineEditLeverArmZ"));
         lineEditLeverArmZ->setGeometry(QRect(40, 90, 151, 24));
+        buttonAbout = new QPushButton(centralWidget);
+        buttonAbout->setObjectName(QString::fromUtf8("buttonAbout"));
+        buttonAbout->setGeometry(QRect(10, 440, 80, 23));
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
@@ -152,6 +156,7 @@ public:
         LeverArmLoad->setText(QApplication::translate("MainWindow", "Load", 0, QApplication::UnicodeUTF8));
         labelLeverArmY->setText(QApplication::translate("MainWindow", "Y", 0, QApplication::UnicodeUTF8));
         labelLeverArmZ->setText(QApplication::translate("MainWindow", "Z", 0, QApplication::UnicodeUTF8));
+        buttonAbout->setText(QApplication::translate("MainWindow", "About", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

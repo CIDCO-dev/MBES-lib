@@ -40,8 +40,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     editingLeverArm{ false, false, false },
 
-    originalLeverArmPointSize{ 12, 12, 12}, // Temporary possible values
-    originalLeverArmPixelSize{ 12, 12, 12}, // Temporary possible values
+    originalLeverArmPointSize{ 12, 12, 12 }, // Temporary possible values
+    originalLeverArmPixelSize{ 12, 12, 12 }, // Temporary possible values
     originalLeverArmSpecifiedWithPointSize{ true, true, true, }
 {
 
@@ -97,7 +97,6 @@ MainWindow::MainWindow(QWidget *parent) :
         lineEditLeverArms[ count ]->setValidator( new QDoubleValidator( lineEditLeverArms[ count ] ) );
         lineEditLeverArms[ count ]->setAlignment(Qt::AlignRight);
     }
-
 
 }
 
@@ -166,6 +165,10 @@ void MainWindow::on_Process_clicked()
                 // TODO: ? Display a dialog indicating that the processing is finished?
 
 
+
+                qDebug() << "Done decoding \n" << tr( inputFileName.c_str() );
+
+
             }
             else
             {
@@ -180,7 +183,6 @@ void MainWindow::on_Process_clicked()
     }
     catch(Exception * error)
     {
-
         std::ostringstream streamToDisplay;
         streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\n" << error->getMessage() << std::endl;
 
@@ -208,7 +210,8 @@ void MainWindow::on_Process_clicked()
     }
 
 
-    if(parser) delete parser;
+    if(parser)
+        delete parser;
 
 }
 
@@ -234,6 +237,7 @@ void MainWindow::possiblyUpdateOutputFileName()
     {
         currentInputPath = infoInput.absolutePath();
 
+        // If the user did not edit the output file name himself using the QLineEdit
         if ( outputFileNameEditedByUser == false )
         {
             // Set an output path/file name based on the input file path / name
@@ -304,8 +308,9 @@ void MainWindow::on_BrowseInput_clicked()
         // Put the file name in the lineEdit
         ui->lineEditInputFile->setText( fileName );
 
-        // If the file name does not change, function MainWindow::on_lineEditInputFile_textChanged() will not be called,
-        // So do here what would be done by the function
+        // If the file name does not change, function MainWindow::on_lineEditInputFile_textChanged()
+        // will not be called when doing "ui->lineEditInputFile->setText( fileName );",
+        // So do here what would be done by the function MainWindow::on_lineEditInputFile_textChanged()
         if ( inputFileName == OldInputFileName )
         {
             possiblyUpdateOutputFileName();
@@ -607,4 +612,15 @@ void MainWindow::on_LeverArmSave_clicked()
 
     }
 
+}
+
+void MainWindow::on_buttonAbout_clicked()
+{
+    std::string text = "\n\nCopyright 2017-2019\n"
+                        "© Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n"
+                       "© Interdisciplinary Centre for the Development of Ocean Mapping (CIDCO), All Rights Reserved\n\n";
+
+
+    QMessageBox::about( this, tr( "About 'MBES-Lib Georeferencing'" ),
+                          QString::fromUtf8( text.c_str() )  );
 }
