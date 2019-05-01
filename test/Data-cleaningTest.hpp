@@ -30,7 +30,7 @@ static string dataOutputdir(".");
 #endif
 
 /**
- * Execute a main function
+ * Execute the data-cleaning main function
  * 
  * @param command the parameters for the execution
  */
@@ -63,6 +63,7 @@ std::stringstream DataSystem_call(const std::string& command){
      return out;
 }
 
+/**Test when there is no parameter*/
 TEST_CASE("test with no parameter")
 {
     string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
@@ -82,6 +83,7 @@ TEST_CASE("test with no parameter")
     }
 }
 
+/**Test when the quality parameter is enter*/
 TEST_CASE("test with the quality parameter")
 {
     string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
@@ -102,6 +104,7 @@ TEST_CASE("test with the quality parameter")
     }
 }
 
+/**Test when there is a invalid quality parameter*/
 TEST_CASE("test with invalid quality parameter")
 {
     string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
@@ -113,6 +116,7 @@ TEST_CASE("test with invalid quality parameter")
     REQUIRE(line=="Error: parameter QualityFilter invalid");
 }
 
+/**Test when there is a invalid line input*/
 TEST_CASE("test with invalid line input")
 {
     string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
