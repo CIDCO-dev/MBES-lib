@@ -32,8 +32,7 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    DatagramGeoreferencerForGUI.hpp \
-    DatagramGeoreferencerToOstream.hpp
+        DatagramGeoreferencerToOstream.hpp
 
 FORMS += \
         mainwindow.ui
