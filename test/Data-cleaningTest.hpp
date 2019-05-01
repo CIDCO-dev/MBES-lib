@@ -66,7 +66,7 @@ std::stringstream DataSystem_call(const std::string& command){
 /**Test when there is no parameter*/
 TEST_CASE("test with no parameter")
 {
-    string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
+    string output = "cat test/data/dataCleanTest.txt | ./";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec));
     string line;
@@ -86,7 +86,7 @@ TEST_CASE("test with no parameter")
 /**Test when the quality parameter is enter*/
 TEST_CASE("test with the quality parameter")
 {
-    string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
+    string output = "cat test/data/dataCleanTest.txt | ./";
     string param = " -q 190000";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
@@ -95,8 +95,6 @@ TEST_CASE("test with the quality parameter")
     double x,y,z;
     uint32_t quality;
     uint32_t intensity;
-
-    int lineCount = 0;
     while (getline(ss,line))
     {
         if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
@@ -104,14 +102,33 @@ TEST_CASE("test with the quality parameter")
             REQUIRE(quality>=190000);
         }
     }
+}
 
-   REQUIRE(lineCount > 0);
+/**Test when the intensity parameter is enter*/
+TEST_CASE("test with the intensity parameter")
+{
+    string output = "cat test/data/dataCleanTest.txt | ./";
+    string param = " -i 1800";
+    std::stringstream ss;
+    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    string line;
+    uint64_t microEpoch;
+    double x,y,z;
+    uint32_t quality;
+    uint32_t intensity;
+    while (getline(ss,line))
+    {
+        if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
+        {
+            REQUIRE(intensity>=1800);
+        }
+    }
 }
 
 /**Test when there is a invalid quality parameter*/
 TEST_CASE("test with invalid quality parameter")
 {
-    string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
+    string output = "cat test/data/dataCleanTest.txt | ./";
     string param = " -q oio 2>&1";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
@@ -120,10 +137,44 @@ TEST_CASE("test with invalid quality parameter")
     REQUIRE(line=="Error: parameter QualityFilter invalid");
 }
 
+/**Test when there is a invalid intensity parameter*/
+TEST_CASE("test with invalid intensity parameter")
+{
+    string output = "cat test/data/dataCleanTest.txt | ./";
+    string param = " -i oek 2>&1";
+    std::stringstream ss;
+    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    string line;
+    getline(ss,line);
+    REQUIRE(line=="Error: parameter IntensityFilter invalid");
+}
+
+/**Test when there is multiple parameter*/
+TEST_CASE("test with multiple character parameter")
+{
+    string output = "cat test/data/dataCleanTest.txt | ./";
+    string param = " -q 19000 -i 1800";
+    std::stringstream ss;
+    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    string line;
+    uint64_t microEpoch;
+    double x,y,z;
+    uint32_t quality;
+    uint32_t intensity;
+    while (getline(ss,line))
+    {
+        if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
+        {
+            REQUIRE(quality>=19000);
+            REQUIRE(intensity>=1800);
+        }
+    }
+}
+
 /**Test when there is a invalid line input*/
 TEST_CASE("test with invalid line input")
 {
-    string output = "./build/bin/georeference test/data/s7k/20141016_150519_FJ-Saucier.s7k | ./";
+    string output = "cat test/data/dataCleanTest.txt | ./";
     string param = " -q 0 2>&1";
     std::stringstream ss;
     ss = DataSystem_call(std::string(output+dataBinexec+param));
