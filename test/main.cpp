@@ -7,3 +7,4 @@
 #include "SurveySystemTest.hpp"
 #include "CoordinateTransformTest.hpp"
 #include "GeoreferenceTest.hpp"
+#include "Data-cleaningTest.hpp"

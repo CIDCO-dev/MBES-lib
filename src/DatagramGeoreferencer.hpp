@@ -87,6 +87,28 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                         unsigned int attitudeIndex=0;
                         unsigned int positionIndex=0;
 
+			//Choose SVP
+                        SoundVelocityProfile * svp = NULL;
+
+                        if(svps.size() == 1){
+	                        svp = svps[0];
+                        }
+                        else{
+	                        if(svps.size() > 0){
+        	                        //TODO: use a strategy (nearest by time, nearest by location, etc)
+                                        std::cerr << "Multiple SVP mode not yet implemented" << std::endl;
+                                        exit(1);
+                                }
+                                else{
+                	                //use default model
+                                        //TODO: allow different models to be used with command line switches
+                                        svp = SoundVelocityProfileFactory::buildSaltWaterModel();
+                                        std::cerr << "Using default model" << std::endl;
+                                }
+                        }
+
+
+			//Georef pings
                         for(auto i=pings.begin();i!=pings.end();i++){
                                 while(attitudeIndex < attitudes.size() && attitudes[attitudeIndex+1].getTimestamp() < (*i).getTimestamp()){
                                         attitudeIndex++;
@@ -113,26 +135,6 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                                 Attitude * interpolatedAttitude = Interpolator::interpolateAttitude(beforeAttitude,afterAttitude,(*i).getTimestamp());
                                 Position * interpolatedPosition = Interpolator::interpolatePosition(beforePosition,afterPosition,(*i).getTimestamp());
 
-                                //get SVP for this ping
-                                SoundVelocityProfile * svp = NULL;
-
-                                if(svps.size() == 1){
-                                        svp = svps[0];
-                                }
-                                else{
-                                        if(svps.size() > 0){
-                                                //TODO: use a strategy (nearest by time, nearest by location, etc)
-                                                std::cerr << "Multiple SVP mode not yet implemented" << std::endl;
-                                                exit(1);
-                                        }
-                                        else{
-                                                //use default model
-                                                //TODO: allow different models to be used with command line switches
-                                                svp = SoundVelocityProfileFactory::buildSaltWaterModel();
-						std::cerr << "Using default model" << std::endl;
-                                        }
-                                }
-
                                 //georeference
                                 Eigen::Vector3d georeferencedPing;
                                 Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm);
@@ -142,14 +144,13 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                                 delete interpolatedAttitude;
                                 delete interpolatedPosition;
                  	}
-                 }
+                }
+
+                virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity){
+                        std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality  << " " << intensity << std::endl;
+                }
 
         protected:
-
-		virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity){
-			std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality  << " " << intensity << std::endl;
-		}
-
 
                 /**the current surface sound speed*/
                 double                                  currentSurfaceSoundSpeed;
