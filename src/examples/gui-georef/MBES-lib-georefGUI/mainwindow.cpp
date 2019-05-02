@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     originalLeverArmPixelSize{ 12, 12, 12 }, // Temporary possible values
     originalLeverArmSpecifiedWithPointSize{ true, true, true, },
 
-    processToolTipWhenDisabled( tr( "'Process' button only enabled when there are input and output files" ) )
+    processToolTipTextWhenDisabled( tr( "'Process' button only enabled when there are input and output files" ) )
 {
 
 #ifdef __GNU__
@@ -130,47 +130,6 @@ void MainWindow::on_Process_clicked()
     QCoreApplication::processEvents();
 
 
-//    // If the user edited the output file name himself using the QLineEdit
-//    if ( outputFileNameEditedByUser == true )
-//    {
-
-//        // TODO: the handler of button "browse" uses function QFileDialog::getSaveFileName().
-//        // This function checks if the file already exists. If change to use a function
-//        // that does not verify that the file exists, don't check "if ( outputFileNameEditedByUser == true )",
-//        // always verify here if the file already exists.
-
-//        QFileInfo infoInput( tr( outputFileName.c_str() ) );
-
-//        if ( infoInput.exists() )
-//        {
-//            std::string absoluteFilePath( infoInput.absoluteFilePath().toLocal8Bit().constData() );
-//            std::string fileName( infoInput.fileName().toLocal8Bit().constData() );
-
-//            QMessageBox msgBox( this );
-
-//            std::string text = "A file named \"" + fileName + "\" already exists. Do\n"
-//                                + "you want to replace it?";
-
-//            std::string informativeText = "The complete file path/name is \n\n\""
-//                                                + absoluteFilePath
-//                                                + "\"\n\nReplacing it will overwrite its contents.";
-
-//            msgBox.setText( tr( text.c_str() ) );
-//            msgBox.setInformativeText( tr( informativeText.c_str() ) );
-
-//            msgBox.setStandardButtons( QMessageBox::Cancel | QMessageBox::Ok );
-//            msgBox.setDefaultButton( QMessageBox::Cancel );
-
-//            msgBox.setIcon( QMessageBox::Question );
-
-//            int userInput = msgBox.exec();
-
-//            if( userInput == QMessageBox::Cancel )
-//                return;
-
-//        }
-//    }
-
     QFileInfo infoInput( tr( outputFileName.c_str() ) );
 
     if ( infoInput.exists() )
@@ -180,8 +139,8 @@ void MainWindow::on_Process_clicked()
 
         QMessageBox msgBox( this );
 
-        std::string text = "A file named \"" + fileName + "\" already exists. Do\n"
-                            + "you want to replace it?";
+        std::string text = "A file named \"" + fileName + "\" already exists.\n"
+                + "Do you want to replace it?";
 
         std::string informativeText = "The complete file path/name is \n\n\""
                                             + absoluteFilePath
@@ -204,7 +163,6 @@ void MainWindow::on_Process_clicked()
 
             return;
         }
-
 
     }
 
@@ -308,57 +266,22 @@ void MainWindow::setStateProcess()
     {
         ui->Process->setEnabled( true );
         ui->Process->setToolTip( "" );
-
     }
     else
     {
         ui->Process->setEnabled( false );
-        ui->Process->setToolTip( processToolTipWhenDisabled );
+        ui->Process->setToolTip( processToolTipTextWhenDisabled );
     }
 
 }
 
-//void MainWindow::possiblyUpdateOutputFileName()
-//{
-//    QFileInfo infoInput( tr( inputFileName.c_str() ) );
-
-//    if ( infoInput.exists() )
-//    {
-//        currentInputPath = infoInput.absolutePath();
-
-//        // If the user did not edit the output file name himself using the QLineEdit
-//        if ( outputFileNameEditedByUser == false )
-//        {
-//            // Set an output path/file name based on the input file path / name
-
-//            std::string absolutePath( infoInput.absolutePath().toLocal8Bit().constData() );
-//            std::string completeBaseName( infoInput.completeBaseName().toLocal8Bit().constData() );
-//            outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
-
-//            // Put the file name in the lineEdit
-//            ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
-//        }
-
-//    }
-
-//}
 
 
 void MainWindow::on_lineEditInputFile_textChanged(const QString &text)
 {
     inputFileName = text.toLocal8Bit().constData();
 
-    // possiblyUpdateOutputFileName();
-
     setStateProcess();
-
-
-//    QFileInfo fileInfo( tr( inputFileName.c_str() ) );
-
-//    if ( QDir( fileInfo.absolutePath() ).exists() )
-//    {
-//        currentInputPath = fileInfo.absolutePath();
-//    }
 
     QFileInfo fileInfo( tr( inputFileName.c_str() ) );
 
@@ -397,14 +320,6 @@ void MainWindow::on_lineEditOutputFile_textChanged(const QString &text)
     setStateProcess();
 
 
-//    QFileInfo fileInfo( tr( outputFileName.c_str() ) );
-
-//    if ( QDir( fileInfo.absolutePath() ).exists() )
-//    {
-//        currentOutputPath = fileInfo.absolutePath();
-//    }
-
-
     QFileInfo fileInfo( tr( outputFileName.c_str() ) );
 
     if ( outputFileName != "" && QDir( fileInfo.absolutePath() ).exists() )
@@ -425,8 +340,6 @@ void MainWindow::on_BrowseInput_clicked()
 
     if ( ! fileName.isEmpty() )
     {
-//        std::string OldInputFileName = inputFileName;
-
         inputFileName = fileName.toLocal8Bit().constData();
 
         // Put the file name in the lineEdit
@@ -444,30 +357,16 @@ void MainWindow::on_BrowseInput_clicked()
 
             std::string absolutePath( infoInput.absolutePath().toLocal8Bit().constData() );
             std::string completeBaseName( infoInput.completeBaseName().toLocal8Bit().constData() );
-//            outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
             outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
 
             // Put the file name in the lineEdit
             ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
 
             currentOutputPath = currentInputPath;
-
-
         }
-
 
         setStateProcess();
 
-
-//        // If the file name does not change, function MainWindow::on_lineEditInputFile_textChanged()
-//        // will not be called when doing "ui->lineEditInputFile->setText( fileName );",
-//        // So do here what would be done by the function MainWindow::on_lineEditInputFile_textChanged()
-//        if ( inputFileName == OldInputFileName )
-//        {
-//            possiblyUpdateOutputFileName();
-
-//            setStateProcess();
-//        }
     }
 }
 
@@ -475,10 +374,6 @@ void MainWindow::on_BrowseInput_clicked()
 
 void MainWindow::on_BrowseOutput_clicked()
 {
-//    QString fileName = QFileDialog::getSaveFileName(this,
-//                                        tr( "Georeferenced Output File"), currentOutputPath );
-
-
     QString fileName = QFileDialog::getSaveFileName( this,
                                         tr( "Georeferenced Output File"), currentOutputPath,
                                         tr( "*.txt;;All Files (*)" ), nullptr,
