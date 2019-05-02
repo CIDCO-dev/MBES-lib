@@ -114,7 +114,7 @@ void printUsage(){
                  * @param quality the ping quality
                  * @param intensity the ping intensity
                  */
-                void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
+                void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,int32_t intensity){
 			currentMicroEpoch = microEpoch;
 			nbBeams++;
 			pingLine << "\t" << twoWayTravelTime << "\t" << beamAngle << "\t" << tiltAngle;

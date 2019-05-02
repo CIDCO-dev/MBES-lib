@@ -33,7 +33,7 @@ private:
     uint32_t quality;
     
     /**Value of the intensity of the ping*/
-    uint32_t intensity;
+    int32_t intensity;
 
     /**The sound speed value of the surface*/
     double surfaceSoundSpeed;
@@ -79,7 +79,7 @@ public:
 	uint64_t microEpoch,
 	long     id,
 	uint32_t quality,
-	uint32_t intensity,
+	int32_t intensity,
 
         double surfaceSoundSpeed,
         double twoWayTravelTime,
