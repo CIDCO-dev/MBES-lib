@@ -8,7 +8,7 @@
 
 #include <QDebug>
 
-#include <sstream>
+// #include <sstream>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -123,6 +123,7 @@ void MainWindow::on_Process_clicked()
 {
     // Disable the button while processing
     ui->Process->setEnabled( false );
+    ui->Process->setText( tr( "Processing" ) );
     this->setFocus();
     QCoreApplication::processEvents();
 
@@ -142,23 +143,6 @@ void MainWindow::on_Process_clicked()
             std::string absoluteFilePath( infoInput.absoluteFilePath().toLocal8Bit().constData() );
             std::string fileName( infoInput.fileName().toLocal8Bit().constData() );
 
-
-//            std::string toDisplay = "A file named \"" + fileName + "\" already exists. Do\n"
-//                            + "you want to replace it?\n\n"
-//                            + "The complete file path/name is \n\n\""
-//                            + absoluteFilePath
-//                            + "\"\n\nReplacing it will overwrite its contents.\n";
-
-//            QMessageBox::StandardButton userInput =  QMessageBox::question(
-//                                        this, tr(""), tr( toDisplay.c_str() ),
-//                                        QMessageBox::Cancel | QMessageBox::Ok, QMessageBox::Cancel );
-
-
-//            if( userInput == QMessageBox::Cancel )
-//                return;
-
-
-
             QMessageBox msgBox( this );
 
             std::string text = "A file named \"" + fileName + "\" already exists. Do\n"
@@ -167,7 +151,6 @@ void MainWindow::on_Process_clicked()
             std::string informativeText = "The complete file path/name is \n\n\""
                                                 + absoluteFilePath
                                                 + "\"\n\nReplacing it will overwrite its contents.";
-
 
             msgBox.setText( tr( text.c_str() ) );
             msgBox.setInformativeText( tr( informativeText.c_str() ) );
@@ -226,12 +209,10 @@ void MainWindow::on_Process_clicked()
                 }
 
 
-
                 parser->parse( inputFileName );
 
                 printer.georeference(leverArm);
 
-                // TODO: ? Display a dialog indicating that the processing is finished?
 
                 qDebug() << "Done decoding \n" << tr( inputFileName.c_str() );
 
@@ -250,36 +231,34 @@ void MainWindow::on_Process_clicked()
     }
     catch(Exception * error)
     {
-        std::ostringstream streamToDisplay;
-        streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\n" << error->getMessage() << std::endl;
+        std::string toDisplay = "Error while parsing file \n\n\"" + inputFileName + "\":\n\n" + error->getMessage() + ".\n";
 
-        qDebug() << tr( streamToDisplay.str().c_str() );
+        qDebug() << tr( toDisplay.c_str() );
 
-        QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+        QMessageBox::warning( this, tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
     }
     catch ( const char * message )
     {
-        std::ostringstream streamToDisplay;
-        streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\n" << message << std::endl;
+        std::string toDisplay = "Error while parsing file \n\n\"" + inputFileName + "\":\n\n" + message + ".\n";
 
-        qDebug() << tr( streamToDisplay.str().c_str() );
+        qDebug() << tr( toDisplay.c_str() );
 
-        QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+        QMessageBox::warning( this, tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
     }
     catch (...)
     {
-        std::ostringstream streamToDisplay;
-        streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\nOther exception" << std::endl;
+        std::string toDisplay = "Error while parsing file \n\n\"" + inputFileName + "\":\n\nOther exception" + ".\n";
 
-        qDebug() << tr( streamToDisplay.str().c_str() );
+        qDebug() << tr( toDisplay.c_str() );
 
-        QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+        QMessageBox::warning( this, tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
     }
 
 
     if(parser)
         delete parser;
 
+    ui->Process->setText( tr( "Process" ) );
     setStateProcess();
 
 }
@@ -492,12 +471,11 @@ bool MainWindow::setLeverArm( const QString &text, const int position )
     }
     else
     {
-        std::ostringstream streamToDisplay;
-        streamToDisplay << "\"" << text.toLocal8Bit().constData() << "\" is not a valid number\n";
+        std::string toDisplay = "\"" + std::string( text.toLocal8Bit().constData() ) + "\" is not a valid number\n";
 
-        qDebug() << tr( streamToDisplay.str().c_str() );
+        qDebug() << tr( toDisplay.c_str() );
 
-        QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+        QMessageBox::warning( this,tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
     }
 
     return OK;
@@ -580,8 +558,8 @@ void MainWindow::on_lineEditLeverArmZ_editingFinished()
 void MainWindow::on_LeverArmLoad_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
-                                        tr( "Load Lever Arm Values from File"), "",
-                                        tr( "Text files (*.txt);;All Files (*)")  );
+                                        tr( "Load Lever Arm Values from File" ), "",
+                                        tr( "Text files (*.txt);;All Files (*)" )  );
 
     if ( ! fileName.isEmpty() )
     {
@@ -606,25 +584,22 @@ void MainWindow::on_LeverArmLoad_clicked()
             }
             else
             {
-                std::ostringstream streamToDisplay;
-                streamToDisplay << "Problem reading the file \n\n\"" << fileName.toLocal8Bit().constData()
-                                   << "\"\n\nCould not read three double values for the lever arms" << std::endl;
+                std::string toDisplay = "Problem reading the file \n\n\"" + std::string( fileName.toLocal8Bit().constData() )
+                                           +"\".\n\nCould not read three double values for the lever arms.\n";
 
-                qDebug() << tr( streamToDisplay.str().c_str() );
+                qDebug() << tr( toDisplay.c_str() );
 
-                QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+                QMessageBox::warning( this,tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
             }
 
         }
         else
         {
-            std::ostringstream streamToDisplay;
-            streamToDisplay << "Could not open file \n\n\"" << fileName.toLocal8Bit().constData()
-                               << "\"" << std::endl;
+            std::string toDisplay = "Could not open file \n\n\"" + std::string( fileName.toLocal8Bit().constData() ) +"\".\n";
 
-            qDebug() << tr( streamToDisplay.str().c_str() );
+            qDebug() << tr( toDisplay.c_str() );
 
-            QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+            QMessageBox::warning( this,tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
 
         }
 
@@ -669,14 +644,11 @@ void MainWindow::on_LeverArmSave_clicked()
         }
         else
         {
+            std::string toDisplay = "Could not save to file \n\n\"" + saveFileName + "\".";
 
-            std::ostringstream streamToDisplay;
-            streamToDisplay << "Could not save to file \n\n\"" << saveFileName
-                               << "\"" << std::endl;
+            qDebug() << tr( toDisplay.c_str() );
 
-            qDebug() << tr( streamToDisplay.str().c_str() );
-
-            QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+            QMessageBox::warning( this,tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
 
         }
 
@@ -689,7 +661,6 @@ void MainWindow::on_buttonAbout_clicked()
     std::string text = "\n\nCopyright 2017-2019\n"
                         "© Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n"
                        "© Interdisciplinary Centre for the Development of Ocean Mapping (CIDCO), All Rights Reserved\n\n";
-
 
     QMessageBox::about( this, tr( "About 'MBES-Lib Georeferencing'" ),
                           QString::fromUtf8( text.c_str() )  );
