@@ -67,7 +67,6 @@ class DatagramEventHandler{
 		 */
 		virtual void processSoundVelocityProfile(SoundVelocityProfile * svp){ delete svp;};
 
-
 };
 
 
