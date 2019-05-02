@@ -24,21 +24,21 @@
  */
 class KongsbergParser : public DatagramParser{
         public:
-                
+
                 /**
-                 * Create an Kongsberg parser 
-                 * 
+                 * Create an Kongsberg parser
+                 *
                  * @param processor the datagram processor
                  */
 	        KongsbergParser(DatagramEventHandler & processor);
-                
+
                 /**Destroy the Kongsberg parser*/
 	        ~KongsbergParser();
 
 	        //interface methods
                 /**
                  * Read a file and change the Kongsberg parser depending on the information
-                 * 
+                 *
                  * @param filename name of the file to read
                  */
 	        void parse(std::string & filename);
@@ -52,7 +52,7 @@ class KongsbergParser : public DatagramParser{
                  * @param datagram the datagram
                  */
 	        void processDatagram(KongsbergHeader & hdr,unsigned char * datagram);
-                
+
                 /**
                  * call the process Depth
                  * 
@@ -60,7 +60,7 @@ class KongsbergParser : public DatagramParser{
                  * @param datagram the datagram
                  */
 	        void processDepth(KongsbergHeader & hdr,unsigned char * datagram);
-                
+
                 /**
                  * call the process Water Height
                  * 
@@ -416,42 +416,25 @@ std::string KongsbergParser::getName(int tag){
 void KongsbergParser::processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned char * datagram){
 	KongsbergRangeAndBeam78 * data = (KongsbergRangeAndBeam78*)datagram;
 
-	processor.processSwathStart((double)data->surfaceSoundSpeed / (double)10);
+	uint64_t microEpoch = convertTime(hdr.date,hdr.time);
 
-	//printf("SSS: %.02f\n",data->surfaceSoundSpeed / (float)10);
-	//printf("RX:%d   TX:%d\n",data->nbRxPackets,data->nbTxPackets);
+	processor.processSwathStart((double)data->surfaceSoundSpeed / (double)10);
 
 	std::map<int,KongsbergRangeAndBeam78TxEntry*>  txEntries;
 
 	KongsbergRangeAndBeam78TxEntry* tx = (KongsbergRangeAndBeam78TxEntry*) (((unsigned char *)data)+sizeof(KongsbergRangeAndBeam78));
 
 	for(unsigned int i=0;i< data->nbTxPackets; i++){
-		txEntries.put(tx[i].txSectorNumber,&tx[i]);
+		txEntries[tx[i].txSectorNumber] = &tx[i];
 		//printf("Tilt: %0.2f\n",(double)tx[i].tiltAngle/(double)100);
 	}
 
+	KongsbergRangeAndBeam78RxEntry * rx = (KongsbergRangeAndBeam78RxEntry*)    ((((unsigned char *)data)+sizeof(KongsbergRangeAndBeam78)) + (data->nbTxPackets * sizeof(KongsbergRangeAndBeam78TxEntry)));
 
-/*
-#pragma pack(1)
-typedef struct{
-    int16_t             beamAngle; //in 0.01 degrees
-    uint8_t             txSectorNumber;
-    uint8_t             detectionInfo;
-    uint16_t            detectionWindowLength; //in samples
-    uint8_t             qualityFactor;
-    int8_t              dcorr;
-    float               twoWayTravelTime;
-    int16_t             reflectivity; //in 0.1 dB
-    int8_t              realTimeCleaningInfo;
-    uint8_t             spare;
-} KongsbergRangeAndBeam78RxEntry;
-#pragma pack()
-
-*/
-
-//	for(unsigned int i=0;i<data->nbRxPackets;i++){
-//		
-//	}
+	for(unsigned int i=0;i<data->nbRxPackets;i++){
+		//We'll hack-in the the beam angle as ID...May Satan forgive us
+		processor.processPing(microEpoch,rx[i].beamAngle,(double)rx[i].beamAngle/(double)100,(double)txEntries[rx[i].txSectorNumber]->tiltAngle/(double)100,rx[i].twoWayTravelTime,rx[i].qualityFactor,rx[i].reflectivity);
+	}
 }
 
 #endif

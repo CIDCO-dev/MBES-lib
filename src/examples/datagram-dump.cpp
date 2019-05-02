@@ -72,8 +72,8 @@ class DatagramPrinter : public DatagramEventHandler{
                  * @param quality the ping quality
                  * @param intensity the ping intensity
                  */
-                void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
-			printf("X %lu %lu %.10lf %.10lf %.10f %u %u\n",microEpoch,id,beamAngle,tiltAngle,twoWayTravelTime,quality,intensity);
+                void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,int32_t intensity){
+			printf("X %lu %lu %.10lf %.10lf %.10f %u %d\n",microEpoch,id,beamAngle,tiltAngle,twoWayTravelTime,quality,intensity);
 		};
 
                 /**

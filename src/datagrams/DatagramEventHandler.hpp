@@ -53,7 +53,7 @@ class DatagramEventHandler{
 		* Beam angle: NEGATIVE to port (left) side, nadir is 0 degrees, POSITIVE to starboard (right) side
 		* Tilt angle: POSITIVE forward, NEGATIVE backward
 		*/
-                virtual void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){};
+                virtual void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,int32_t intensity){};
 
                 /**
                  * Convention for Swath
