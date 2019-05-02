@@ -62,4 +62,46 @@ typedef struct{
 } KongsbergSoundSpeedProfileEntry;
 #pragma pack()
 
+#pragma pack(1)
+typedef struct{
+    uint16_t            surfaceSoundSpeed; //in dm/s
+    uint16_t		nbTxPackets;
+    uint16_t		nbRxPackets;
+    uint16_t		nbValidDetections;
+    float		samplingFrequency; //in Hz
+    uint32_t		dscale;
+} KongsbergRangeAndBeam78;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct{
+    int16_t		tiltAngle; //in 0.01 degrees
+    uint16_t		focusRange; //in 0.1m (0=no focusing)
+    float		signalLength; //in seconds
+    float		txDelay;//in seconds
+    float		centreFrequency; //in Hz
+    uint16_t 		meanAbsorbtionCoefficient;//in 0.01 dB
+    uint8_t		signalWaveformIdentifier; //0-99
+    uint8_t		txSectorNumber; //array index
+    float		signalBandwidth;//in Hz
+} KongsbergRangeAndBeam78TxEntry;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct{
+    int16_t		beamAngle; //in 0.01 degrees
+    uint8_t             txSectorNumber;
+    uint8_t		detectionInfo;
+    uint16_t		detectionWindowLength; //in samples
+    uint8_t		qualityFactor;
+    int8_t		dcorr;
+    float		twoWayTravelTime;
+    int16_t		reflectivity; //in 0.1 dB
+    int8_t		realTimeCleaningInfo;
+    uint8_t		spare;
+} KongsbergRangeAndBeam78RxEntry;
+#pragma pack()
+
+
+
 #endif // KONGSBERGTYPES_HPP

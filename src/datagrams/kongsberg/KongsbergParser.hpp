@@ -11,10 +11,12 @@
 #include <cstdio>
 #include <iostream>
 #include <cmath>
+#include <map>
 
 #include "../DatagramParser.hpp"
 #include "../../utils/NmeaUtils.hpp"
 #include "../../utils/TimeUtils.hpp"
+#include "../../utils/Exception.hpp"
 #include "KongsbergTypes.hpp"
 
 /*!
@@ -107,6 +109,15 @@ class KongsbergParser : public DatagramParser{
                  */
 		void processSoundSpeedProfile(KongsbergHeader & hdr,unsigned char * datagram);
 
+
+		/**
+		 * Process range and beam data
+		 *
+                 * @param hdr the Kongsberg header
+                 * @param datagram the datagram
+		 */
+		void processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned char * datagram);
+
                 /**
                  * Return in microsecond the timestamp
                  * 
@@ -115,6 +126,10 @@ class KongsbergParser : public DatagramParser{
                  */
 	        long convertTime(long datagramDate,long datagramTime);
 
+		/**
+		 * Returns a human readable name for a given datagram tag
+		 */
+		std::string getName(int tag);
 };
 
 /**
@@ -159,7 +174,7 @@ void KongsbergParser::parse(std::string & filename){
 				}
 				else{
 					printf("%02x",hdr.size);
-					throw "Bad datagram";
+					throw new Exception("Bad datagram");
 					//TODO: rejct bad datagram, maybe log it
 				}
             }
@@ -168,7 +183,7 @@ void KongsbergParser::parse(std::string & filename){
 		fclose(file);
 	}
 	else{
-		throw "Couldn't open file " + filename;
+		throw new Exception("Couldn't open file " + filename);
 	}
 }
 
@@ -206,6 +221,10 @@ void KongsbergParser::processDatagram(KongsbergHeader & hdr,unsigned char * data
         	    //process echosounder data
         	    //processDepth(hdr,datagram);
         	break;
+
+		case 'N':
+			processRawRangeAndBeam78(hdr,datagram);
+		break;
 
         	case 'O':
         	    //processQualityFactor(hdr,datagram);
@@ -378,6 +397,61 @@ void KongsbergParser::processQualityFactor(KongsbergHeader & hdr,unsigned char *
  */
 void KongsbergParser::processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram){
 	//printf("TODO: parse Seabed Image Data\n");
+}
+
+std::string KongsbergParser::getName(int tag){
+	switch(tag){
+		case 'k':
+			return "Water column";
+		break;
+
+		//TODO: add others
+
+		default:
+			return "";
+		break;
+	}
+}
+
+void KongsbergParser::processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned char * datagram){
+	KongsbergRangeAndBeam78 * data = (KongsbergRangeAndBeam78*)datagram;
+
+	processor.processSwathStart((double)data->surfaceSoundSpeed / (double)10);
+
+	//printf("SSS: %.02f\n",data->surfaceSoundSpeed / (float)10);
+	//printf("RX:%d   TX:%d\n",data->nbRxPackets,data->nbTxPackets);
+
+	std::map<int,KongsbergRangeAndBeam78TxEntry*>  txEntries;
+
+	KongsbergRangeAndBeam78TxEntry* tx = (KongsbergRangeAndBeam78TxEntry*) (((unsigned char *)data)+sizeof(KongsbergRangeAndBeam78));
+
+	for(unsigned int i=0;i< data->nbTxPackets; i++){
+		txEntries.put(tx[i].txSectorNumber,&tx[i]);
+		//printf("Tilt: %0.2f\n",(double)tx[i].tiltAngle/(double)100);
+	}
+
+
+/*
+#pragma pack(1)
+typedef struct{
+    int16_t             beamAngle; //in 0.01 degrees
+    uint8_t             txSectorNumber;
+    uint8_t             detectionInfo;
+    uint16_t            detectionWindowLength; //in samples
+    uint8_t             qualityFactor;
+    int8_t              dcorr;
+    float               twoWayTravelTime;
+    int16_t             reflectivity; //in 0.1 dB
+    int8_t              realTimeCleaningInfo;
+    uint8_t             spare;
+} KongsbergRangeAndBeam78RxEntry;
+#pragma pack()
+
+*/
+
+//	for(unsigned int i=0;i<data->nbRxPackets;i++){
+//		
+//	}
 }
 
 #endif
