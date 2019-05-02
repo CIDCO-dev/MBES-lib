@@ -427,6 +427,8 @@ void KongsbergParser::processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned ch
 
 	for(unsigned int i=0;i< data->nbTxPackets; i++){
 //		txEntries.put(tx[i].txSectorNumber,&tx[i]);  // 2019/05/02 CB: put in comment as it does not compile
+            txEntries [ tx[i].txSectorNumber ] = &tx[i];    // 2019/05/02 CB: possible fix
+
                 //printf("Tilt: %0.2f\n",(double)tx[i].tiltAngle/(double)100);
 	}
 

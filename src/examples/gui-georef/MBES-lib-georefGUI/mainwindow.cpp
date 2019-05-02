@@ -127,48 +127,84 @@ void MainWindow::on_Process_clicked()
     this->setFocus();
     QCoreApplication::processEvents();
 
-    // If the user edited the output file name himself using the QLineEdit
-    if ( outputFileNameEditedByUser == true )
+
+//    // If the user edited the output file name himself using the QLineEdit
+//    if ( outputFileNameEditedByUser == true )
+//    {
+
+//        // TODO: the handler of button "browse" uses function QFileDialog::getSaveFileName().
+//        // This function checks if the file already exists. If change to use a function
+//        // that does not verify that the file exists, don't check "if ( outputFileNameEditedByUser == true )",
+//        // always verify here if the file already exists.
+
+//        QFileInfo infoInput( tr( outputFileName.c_str() ) );
+
+//        if ( infoInput.exists() )
+//        {
+//            std::string absoluteFilePath( infoInput.absoluteFilePath().toLocal8Bit().constData() );
+//            std::string fileName( infoInput.fileName().toLocal8Bit().constData() );
+
+//            QMessageBox msgBox( this );
+
+//            std::string text = "A file named \"" + fileName + "\" already exists. Do\n"
+//                                + "you want to replace it?";
+
+//            std::string informativeText = "The complete file path/name is \n\n\""
+//                                                + absoluteFilePath
+//                                                + "\"\n\nReplacing it will overwrite its contents.";
+
+//            msgBox.setText( tr( text.c_str() ) );
+//            msgBox.setInformativeText( tr( informativeText.c_str() ) );
+
+//            msgBox.setStandardButtons( QMessageBox::Cancel | QMessageBox::Ok );
+//            msgBox.setDefaultButton( QMessageBox::Cancel );
+
+//            msgBox.setIcon( QMessageBox::Question );
+
+//            int userInput = msgBox.exec();
+
+//            if( userInput == QMessageBox::Cancel )
+//                return;
+
+//        }
+//    }
+
+    QFileInfo infoInput( tr( outputFileName.c_str() ) );
+
+    if ( infoInput.exists() )
     {
+        std::string absoluteFilePath( infoInput.absoluteFilePath().toLocal8Bit().constData() );
+        std::string fileName( infoInput.fileName().toLocal8Bit().constData() );
 
-        // TODO: the handler of button "browse" uses function QFileDialog::getSaveFileName().
-        // This function checks if the file already exists. If change to use a function
-        // that does not verify that the file exists, don't check "if ( outputFileNameEditedByUser == true )",
-        // always verify here if the file already exists.
+        QMessageBox msgBox( this );
 
-        QFileInfo infoInput( tr( outputFileName.c_str() ) );
+        std::string text = "A file named \"" + fileName + "\" already exists. Do\n"
+                            + "you want to replace it?";
 
-        if ( infoInput.exists() )
+        std::string informativeText = "The complete file path/name is \n\n\""
+                                            + absoluteFilePath
+                                            + "\"\n\nReplacing it will overwrite its contents.";
+
+        msgBox.setText( tr( text.c_str() ) );
+        msgBox.setInformativeText( tr( informativeText.c_str() ) );
+
+        msgBox.setStandardButtons( QMessageBox::Cancel | QMessageBox::Ok );
+        msgBox.setDefaultButton( QMessageBox::Cancel );
+
+        msgBox.setIcon( QMessageBox::Question );
+
+        int userInput = msgBox.exec();
+
+        if( userInput == QMessageBox::Cancel )
         {
-            std::string absoluteFilePath( infoInput.absoluteFilePath().toLocal8Bit().constData() );
-            std::string fileName( infoInput.fileName().toLocal8Bit().constData() );
+            ui->Process->setText( tr( "Process" ) );
+            setStateProcess();
 
-            QMessageBox msgBox( this );
-
-            std::string text = "A file named \"" + fileName + "\" already exists. Do\n"
-                                + "you want to replace it?";
-
-            std::string informativeText = "The complete file path/name is \n\n\""
-                                                + absoluteFilePath
-                                                + "\"\n\nReplacing it will overwrite its contents.";
-
-            msgBox.setText( tr( text.c_str() ) );
-            msgBox.setInformativeText( tr( informativeText.c_str() ) );
-
-            msgBox.setStandardButtons( QMessageBox::Cancel | QMessageBox::Ok );
-            msgBox.setDefaultButton( QMessageBox::Cancel );
-
-            msgBox.setIcon( QMessageBox::Question );
-
-            int userInput = msgBox.exec();
-
-            if( userInput == QMessageBox::Cancel )
-                return;
-
+            return;
         }
+
+
     }
-
-
 
 
     DatagramParser * parser = nullptr;
@@ -372,8 +408,14 @@ void MainWindow::on_BrowseInput_clicked()
 
 void MainWindow::on_BrowseOutput_clicked()
 {
-    QString fileName = QFileDialog::getSaveFileName(this,
-                                        tr( "Georeferenced Output File"), currentOutputPath );
+//    QString fileName = QFileDialog::getSaveFileName(this,
+//                                        tr( "Georeferenced Output File"), currentOutputPath );
+
+
+    QString fileName = QFileDialog::getSaveFileName( this,
+                                        tr( "Georeferenced Output File"), currentOutputPath,
+                                        tr( "*.txt;;All Files (*)" ), nullptr,
+                                                    QFileDialog::DontConfirmOverwrite ) ;
 
     if ( ! fileName.isEmpty() )
     {
@@ -559,7 +601,7 @@ void MainWindow::on_LeverArmLoad_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
                                         tr( "Load Lever Arm Values from File" ), "",
-                                        tr( "Text files (*.txt);;All Files (*)" )  );
+                                        tr( "*.txt;;All Files (*)" )  );
 
     if ( ! fileName.isEmpty() )
     {
@@ -613,7 +655,7 @@ void MainWindow::on_LeverArmSave_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
                                         tr( "Save Lever Arm Values to File"), "",
-                                        tr( "Text files (*.txt);;All Files (*)") );
+                                        tr( "*.txt;;All Files (*)") );
 
     if ( ! fileName.isEmpty() )
     {
