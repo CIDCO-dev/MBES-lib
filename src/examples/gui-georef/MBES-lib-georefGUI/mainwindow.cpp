@@ -98,6 +98,7 @@ MainWindow::MainWindow(QWidget *parent) :
         lineEditLeverArms[ count ]->setAlignment(Qt::AlignRight);
     }
 
+
 }
 
 MainWindow::~MainWindow()
@@ -120,6 +121,72 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_Process_clicked()
 {
+    // Disable the button while processing
+    ui->Process->setEnabled( false );
+    this->setFocus();
+    QCoreApplication::processEvents();
+
+    // If the user edited the output file name himself using the QLineEdit
+    if ( outputFileNameEditedByUser == true )
+    {
+
+        // TODO: the handler of button "browse" uses function QFileDialog::getSaveFileName().
+        // This function checks if the file already exists. If change to use a function
+        // that does not verify that the file exists, don't check "if ( outputFileNameEditedByUser == true )",
+        // always verify here if the file already exists.
+
+        QFileInfo infoInput( tr( outputFileName.c_str() ) );
+
+        if ( infoInput.exists() )
+        {
+            std::string absoluteFilePath( infoInput.absoluteFilePath().toLocal8Bit().constData() );
+            std::string fileName( infoInput.fileName().toLocal8Bit().constData() );
+
+
+//            std::string toDisplay = "A file named \"" + fileName + "\" already exists. Do\n"
+//                            + "you want to replace it?\n\n"
+//                            + "The complete file path/name is \n\n\""
+//                            + absoluteFilePath
+//                            + "\"\n\nReplacing it will overwrite its contents.\n";
+
+//            QMessageBox::StandardButton userInput =  QMessageBox::question(
+//                                        this, tr(""), tr( toDisplay.c_str() ),
+//                                        QMessageBox::Cancel | QMessageBox::Ok, QMessageBox::Cancel );
+
+
+//            if( userInput == QMessageBox::Cancel )
+//                return;
+
+
+
+            QMessageBox msgBox( this );
+
+            std::string text = "A file named \"" + fileName + "\" already exists. Do\n"
+                                + "you want to replace it?";
+
+            std::string informativeText = "The complete file path/name is \n\n\""
+                                                + absoluteFilePath
+                                                + "\"\n\nReplacing it will overwrite its contents.";
+
+
+            msgBox.setText( tr( text.c_str() ) );
+            msgBox.setInformativeText( tr( informativeText.c_str() ) );
+
+            msgBox.setStandardButtons( QMessageBox::Cancel | QMessageBox::Ok );
+            msgBox.setDefaultButton( QMessageBox::Cancel );
+
+            msgBox.setIcon( QMessageBox::Question );
+
+            int userInput = msgBox.exec();
+
+            if( userInput == QMessageBox::Cancel )
+                return;
+
+        }
+    }
+
+
+
 
     DatagramParser * parser = nullptr;
 
@@ -158,13 +225,13 @@ void MainWindow::on_Process_clicked()
                     throw new Exception("Unknown extension");
                 }
 
+
+
                 parser->parse( inputFileName );
 
                 printer.georeference(leverArm);
 
                 // TODO: ? Display a dialog indicating that the processing is finished?
-
-
 
                 qDebug() << "Done decoding \n" << tr( inputFileName.c_str() );
 
@@ -212,6 +279,8 @@ void MainWindow::on_Process_clicked()
 
     if(parser)
         delete parser;
+
+    setStateProcess();
 
 }
 
@@ -419,6 +488,7 @@ bool MainWindow::setLeverArm( const QString &text, const int position )
     if ( OK )
     {
         leverArm( position ) = value;
+        //std::cout << "\nleverArm( position ): "<< leverArm( position ) << std::endl;
     }
     else
     {
