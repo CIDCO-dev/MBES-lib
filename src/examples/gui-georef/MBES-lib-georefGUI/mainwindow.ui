@@ -10,6 +10,18 @@
     <height>526</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>791</width>
+    <height>526</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>791</width>
+    <height>526</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -22,13 +34,17 @@
 QGroupBox 
 { 
 	border: 1px solid gray; 
+	border-radius: 6px;
+	margin-top: 6px;
 }
 
 QGroupBox::title 
 {
 	subcontrol-origin: margin;
 	subcontrol-position: top center;
-}</string>
+}
+
+</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QPushButton" name="BrowseInput">
@@ -52,6 +68,9 @@ QGroupBox::title
       <width>80</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="text">
      <string>Process</string>
@@ -121,12 +140,15 @@ QGroupBox::title
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>291</width>
+      <width>311</width>
       <height>131</height>
      </rect>
     </property>
     <property name="title">
-     <string>Lever Arm</string>
+     <string>Lever Arms</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
     </property>
     <property name="flat">
      <bool>false</bool>
@@ -134,11 +156,14 @@ QGroupBox::title
     <widget class="QPushButton" name="LeverArmSave">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>220</x>
        <y>100</y>
        <width>80</width>
        <height>23</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save current lever arm values to a text file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Save</string>
@@ -149,22 +174,25 @@ QGroupBox::title
       <rect>
        <x>20</x>
        <y>40</y>
-       <width>21</width>
+       <width>41</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>X</string>
+      <string>X (m)</string>
      </property>
     </widget>
     <widget class="QPushButton" name="LeverArmLoad">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>220</x>
        <y>70</y>
        <width>80</width>
        <height>23</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load lever arm values from a text file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Load</string>
@@ -175,18 +203,18 @@ QGroupBox::title
       <rect>
        <x>20</x>
        <y>70</y>
-       <width>21</width>
+       <width>41</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Y</string>
+      <string>Y (m)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineEditLeverArmY">
      <property name="geometry">
       <rect>
-       <x>40</x>
+       <x>60</x>
        <y>60</y>
        <width>151</width>
        <height>24</height>
@@ -198,18 +226,18 @@ QGroupBox::title
       <rect>
        <x>20</x>
        <y>100</y>
-       <width>21</width>
+       <width>41</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Z</string>
+      <string>Z (m)</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="lineEditLeverArmX">
      <property name="geometry">
       <rect>
-       <x>40</x>
+       <x>60</x>
        <y>30</y>
        <width>151</width>
        <height>24</height>
@@ -219,7 +247,7 @@ QGroupBox::title
     <widget class="QLineEdit" name="lineEditLeverArmZ">
      <property name="geometry">
       <rect>
-       <x>40</x>
+       <x>60</x>
        <y>90</y>
        <width>151</width>
        <height>24</height>
@@ -241,7 +269,35 @@ QGroupBox::title
     </property>
    </widget>
   </widget>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="sizeGripEnabled">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
   <widget class="QMenuBar" name="menuBar">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -250,16 +306,10 @@ QGroupBox::title
      <height>20</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
+   <property name="nativeMenuBar">
     <bool>false</bool>
-   </attribute>
+   </property>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

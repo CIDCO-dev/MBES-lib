@@ -8,7 +8,7 @@
 
 #include <QDebug>
 
-#include <sstream>
+// #include <sstream>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -42,7 +42,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     originalLeverArmPointSize{ 12, 12, 12 }, // Temporary possible values
     originalLeverArmPixelSize{ 12, 12, 12 }, // Temporary possible values
-    originalLeverArmSpecifiedWithPointSize{ true, true, true, }
+    originalLeverArmSpecifiedWithPointSize{ true, true, true, },
+
+    processToolTipTextWhenDisabled( tr( "'Process' button only enabled when there are input and output files" ) )
 {
 
 #ifdef __GNU__
@@ -59,8 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
 
 
-    // Disable process button
-    ui->Process->setEnabled(false);
+    // Disable process button   
+    setStateProcess();
 
     setWindowTitle( tr( "MBES-Lib Georeferencing" ) );
 
@@ -98,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent) :
         lineEditLeverArms[ count ]->setAlignment(Qt::AlignRight);
     }
 
+
 }
 
 MainWindow::~MainWindow()
@@ -120,6 +123,49 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_Process_clicked()
 {
+    // Disable the button while processing
+    ui->Process->setEnabled( false );
+    ui->Process->setText( tr( "Processing" ) );
+    this->setFocus();
+    QCoreApplication::processEvents();
+
+
+    QFileInfo infoInput( tr( outputFileName.c_str() ) );
+
+    if ( infoInput.exists() )
+    {
+        std::string absoluteFilePath( infoInput.absoluteFilePath().toLocal8Bit().constData() );
+        std::string fileName( infoInput.fileName().toLocal8Bit().constData() );
+
+        QMessageBox msgBox( this );
+
+        std::string text = "A file named \"" + fileName + "\" already exists.\n"
+                + "Do you want to replace it?";
+
+        std::string informativeText = "The complete file path/name is \n\n\""
+                                            + absoluteFilePath
+                                            + "\"\n\nReplacing it will overwrite its contents.";
+
+        msgBox.setText( tr( text.c_str() ) );
+        msgBox.setInformativeText( tr( informativeText.c_str() ) );
+
+        msgBox.setStandardButtons( QMessageBox::Cancel | QMessageBox::Ok );
+        msgBox.setDefaultButton( QMessageBox::Cancel );
+
+        msgBox.setIcon( QMessageBox::Question );
+
+        int userInput = msgBox.exec();
+
+        if( userInput == QMessageBox::Cancel )
+        {
+            ui->Process->setText( tr( "Process" ) );
+            setStateProcess();
+
+            return;
+        }
+
+    }
+
 
     DatagramParser * parser = nullptr;
 
@@ -158,12 +204,10 @@ void MainWindow::on_Process_clicked()
                     throw new Exception("Unknown extension");
                 }
 
+
                 parser->parse( inputFileName );
 
                 printer.georeference(leverArm);
-
-                // TODO: ? Display a dialog indicating that the processing is finished?
-
 
 
                 qDebug() << "Done decoding \n" << tr( inputFileName.c_str() );
@@ -183,35 +227,35 @@ void MainWindow::on_Process_clicked()
     }
     catch(Exception * error)
     {
-        std::ostringstream streamToDisplay;
-        streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\n" << error->getMessage() << std::endl;
+        std::string toDisplay = "Error while parsing file \n\n\"" + inputFileName + "\":\n\n" + error->getMessage() + ".\n";
 
-        qDebug() << tr( streamToDisplay.str().c_str() );
+        qDebug() << tr( toDisplay.c_str() );
 
-        QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+        QMessageBox::warning( this, tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
     }
     catch ( const char * message )
     {
-        std::ostringstream streamToDisplay;
-        streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\n" << message << std::endl;
+        std::string toDisplay = "Error while parsing file \n\n\"" + inputFileName + "\":\n\n" + message + ".\n";
 
-        qDebug() << tr( streamToDisplay.str().c_str() );
+        qDebug() << tr( toDisplay.c_str() );
 
-        QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+        QMessageBox::warning( this, tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
     }
     catch (...)
     {
-        std::ostringstream streamToDisplay;
-        streamToDisplay << "Error while parsing file \n\"" <<inputFileName << "\":\n\nOther exception" << std::endl;
+        std::string toDisplay = "Error while parsing file \n\n\"" + inputFileName + "\":\n\nOther exception" + ".\n";
 
-        qDebug() << tr( streamToDisplay.str().c_str() );
+        qDebug() << tr( toDisplay.c_str() );
 
-        QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+        QMessageBox::warning( this, tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
     }
 
 
     if(parser)
         delete parser;
+
+    ui->Process->setText( tr( "Process" ) );
+    setStateProcess();
 
 }
 
@@ -221,47 +265,36 @@ void MainWindow::setStateProcess()
     if( inputFileName != "" && outputFileName != "" )
     {
         ui->Process->setEnabled( true );
+        ui->Process->setToolTip( "" );
     }
     else
     {
         ui->Process->setEnabled( false );
+        ui->Process->setToolTip( processToolTipTextWhenDisabled );
     }
 
 }
 
-void MainWindow::possiblyUpdateOutputFileName()
-{
-    QFileInfo infoInput( tr( inputFileName.c_str() ) );
-
-    if ( infoInput.exists() )
-    {
-        currentInputPath = infoInput.absolutePath();
-
-        // If the user did not edit the output file name himself using the QLineEdit
-        if ( outputFileNameEditedByUser == false )
-        {
-            // Set an output path/file name based on the input file path / name
-
-            std::string absolutePath( infoInput.absolutePath().toLocal8Bit().constData() );
-            std::string completeBaseName( infoInput.completeBaseName().toLocal8Bit().constData() );
-            outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
-
-            // Put the file name in the lineEdit
-            ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
-        }
-
-    }
-
-}
 
 
 void MainWindow::on_lineEditInputFile_textChanged(const QString &text)
 {
     inputFileName = text.toLocal8Bit().constData();
 
-    possiblyUpdateOutputFileName();
-
     setStateProcess();
+
+    QFileInfo fileInfo( tr( inputFileName.c_str() ) );
+
+    if ( inputFileName != "" && QDir( fileInfo.absolutePath() ).exists() )
+    {
+        currentInputPath = fileInfo.absolutePath();
+    }
+    else
+    {
+        currentInputPath = "";
+    }
+
+
 }
 
 // https://doc.qt.io/qt-5/qlineedit.html#textEdited
@@ -286,11 +319,16 @@ void MainWindow::on_lineEditOutputFile_textChanged(const QString &text)
 
     setStateProcess();
 
-    QFileInfo infoOutput( tr( outputFileName.c_str() ) );
 
-    if ( QDir( infoOutput.absolutePath() ).exists() )
+    QFileInfo fileInfo( tr( outputFileName.c_str() ) );
+
+    if ( outputFileName != "" && QDir( fileInfo.absolutePath() ).exists() )
     {
-        currentOutputPath = infoOutput.absolutePath();
+        currentOutputPath = fileInfo.absolutePath();
+    }
+    else
+    {
+        currentOutputPath = "";
     }
 }
 
@@ -302,21 +340,33 @@ void MainWindow::on_BrowseInput_clicked()
 
     if ( ! fileName.isEmpty() )
     {
-        std::string OldInputFileName = inputFileName;
         inputFileName = fileName.toLocal8Bit().constData();
 
         // Put the file name in the lineEdit
         ui->lineEditInputFile->setText( fileName );
 
-        // If the file name does not change, function MainWindow::on_lineEditInputFile_textChanged()
-        // will not be called when doing "ui->lineEditInputFile->setText( fileName );",
-        // So do here what would be done by the function MainWindow::on_lineEditInputFile_textChanged()
-        if ( inputFileName == OldInputFileName )
-        {
-            possiblyUpdateOutputFileName();
+        QFileInfo infoInput( tr( inputFileName.c_str() ) );
 
-            setStateProcess();
+        currentInputPath = infoInput.absolutePath();
+
+
+        // If the user did not edit the output file name himself using the QLineEdit
+        if ( outputFileNameEditedByUser == false )
+        {
+            // Set an output path/file name based on the input file path / name
+
+            std::string absolutePath( infoInput.absolutePath().toLocal8Bit().constData() );
+            std::string completeBaseName( infoInput.completeBaseName().toLocal8Bit().constData() );
+            outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
+
+            // Put the file name in the lineEdit
+            ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
+
+            currentOutputPath = currentInputPath;
         }
+
+        setStateProcess();
+
     }
 }
 
@@ -324,8 +374,10 @@ void MainWindow::on_BrowseInput_clicked()
 
 void MainWindow::on_BrowseOutput_clicked()
 {
-    QString fileName = QFileDialog::getSaveFileName(this,
-                                        tr( "Georeferenced Output File"), currentOutputPath );
+    QString fileName = QFileDialog::getSaveFileName( this,
+                                        tr( "Georeferenced Output File"), currentOutputPath,
+                                        tr( "*.txt;;All Files (*)" ), nullptr,
+                                                    QFileDialog::DontConfirmOverwrite ) ;
 
     if ( ! fileName.isEmpty() )
     {
@@ -419,15 +471,15 @@ bool MainWindow::setLeverArm( const QString &text, const int position )
     if ( OK )
     {
         leverArm( position ) = value;
+        //std::cout << "\nleverArm( position ): "<< leverArm( position ) << std::endl;
     }
     else
     {
-        std::ostringstream streamToDisplay;
-        streamToDisplay << "\"" << text.toLocal8Bit().constData() << "\" is not a valid number\n";
+        std::string toDisplay = "\"" + std::string( text.toLocal8Bit().constData() ) + "\" is not a valid number\n";
 
-        qDebug() << tr( streamToDisplay.str().c_str() );
+        qDebug() << tr( toDisplay.c_str() );
 
-        QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+        QMessageBox::warning( this,tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
     }
 
     return OK;
@@ -510,8 +562,8 @@ void MainWindow::on_lineEditLeverArmZ_editingFinished()
 void MainWindow::on_LeverArmLoad_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
-                                        tr( "Load Lever Arm Values from File"), "",
-                                        tr( "Text files (*.txt);;All Files (*)")  );
+                                        tr( "Load Lever Arm Values from File" ), "",
+                                        tr( "*.txt;;All Files (*)" )  );
 
     if ( ! fileName.isEmpty() )
     {
@@ -536,25 +588,22 @@ void MainWindow::on_LeverArmLoad_clicked()
             }
             else
             {
-                std::ostringstream streamToDisplay;
-                streamToDisplay << "Problem reading the file \n\n\"" << fileName.toLocal8Bit().constData()
-                                   << "\"\n\nCould not read three double values for the lever arms" << std::endl;
+                std::string toDisplay = "Problem reading the file \n\n\"" + std::string( fileName.toLocal8Bit().constData() )
+                                           +"\".\n\nCould not read three double values for the lever arms.\n";
 
-                qDebug() << tr( streamToDisplay.str().c_str() );
+                qDebug() << tr( toDisplay.c_str() );
 
-                QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+                QMessageBox::warning( this,tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
             }
 
         }
         else
         {
-            std::ostringstream streamToDisplay;
-            streamToDisplay << "Could not open file \n\n\"" << fileName.toLocal8Bit().constData()
-                               << "\"" << std::endl;
+            std::string toDisplay = "Could not open file \n\n\"" + std::string( fileName.toLocal8Bit().constData() ) +"\".\n";
 
-            qDebug() << tr( streamToDisplay.str().c_str() );
+            qDebug() << tr( toDisplay.c_str() );
 
-            QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+            QMessageBox::warning( this,tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
 
         }
 
@@ -568,7 +617,7 @@ void MainWindow::on_LeverArmSave_clicked()
 {
     QString fileName = QFileDialog::getSaveFileName(this,
                                         tr( "Save Lever Arm Values to File"), "",
-                                        tr( "Text files (*.txt);;All Files (*)") );
+                                        tr( "*.txt;;All Files (*)") );
 
     if ( ! fileName.isEmpty() )
     {
@@ -599,14 +648,11 @@ void MainWindow::on_LeverArmSave_clicked()
         }
         else
         {
+            std::string toDisplay = "Could not save to file \n\n\"" + saveFileName + "\".";
 
-            std::ostringstream streamToDisplay;
-            streamToDisplay << "Could not save to file \n\n\"" << saveFileName
-                               << "\"" << std::endl;
+            qDebug() << tr( toDisplay.c_str() );
 
-            qDebug() << tr( streamToDisplay.str().c_str() );
-
-            QMessageBox::warning( this,tr("Warning"), tr( streamToDisplay.str().c_str() ), QMessageBox::Ok );
+            QMessageBox::warning( this,tr("Warning"), tr( toDisplay.c_str() ), QMessageBox::Ok );
 
         }
 
@@ -619,7 +665,6 @@ void MainWindow::on_buttonAbout_clicked()
     std::string text = "\n\nCopyright 2017-2019\n"
                         "© Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n"
                        "© Interdisciplinary Centre for the Development of Ocean Mapping (CIDCO), All Rights Reserved\n\n";
-
 
     QMessageBox::about( this, tr( "About 'MBES-Lib Georeferencing'" ),
                           QString::fromUtf8( text.c_str() )  );

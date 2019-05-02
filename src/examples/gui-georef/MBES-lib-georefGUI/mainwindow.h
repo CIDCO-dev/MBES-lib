@@ -68,8 +68,6 @@ private:
 
     void setStateProcess();
 
-    void possiblyUpdateOutputFileName();
-
     bool setLeverArm( const QString &text, const int position );
 
     void editingFinished( const int position );
@@ -103,6 +101,8 @@ private:
     QLineEdit * lineEditLeverArms[ 3 ];
 
     Eigen::Vector3d leverArm;
+
+    QString processToolTipTextWhenDisabled;
 
 
 };
