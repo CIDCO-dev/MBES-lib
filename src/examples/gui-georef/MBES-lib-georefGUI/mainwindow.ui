@@ -42,7 +42,9 @@ QGroupBox::title
 {
 	subcontrol-origin: margin;
 	subcontrol-position: top center;
-}</string>
+}
+
+</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QPushButton" name="BrowseInput">
@@ -66,6 +68,9 @@ QGroupBox::title
       <width>80</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="text">
      <string>Process</string>
@@ -157,6 +162,9 @@ QGroupBox::title
        <height>23</height>
       </rect>
      </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save current lever arm values to a text file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>Save</string>
      </property>
@@ -182,6 +190,9 @@ QGroupBox::title
        <width>80</width>
        <height>23</height>
       </rect>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load lever arm values from a text file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Load</string>
@@ -258,19 +269,11 @@ QGroupBox::title
     </property>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menuBar">
+  <widget class="QStatusBar" name="statusBar">
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>791</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="nativeMenuBar">
+   <property name="sizeGripEnabled">
     <bool>false</bool>
    </property>
   </widget>
@@ -291,11 +294,19 @@ QGroupBox::title
     <bool>false</bool>
    </attribute>
   </widget>
-  <widget class="QStatusBar" name="statusBar">
+  <widget class="QMenuBar" name="menuBar">
    <property name="enabled">
     <bool>false</bool>
    </property>
-   <property name="sizeGripEnabled">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>791</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="nativeMenuBar">
     <bool>false</bool>
    </property>
   </widget>

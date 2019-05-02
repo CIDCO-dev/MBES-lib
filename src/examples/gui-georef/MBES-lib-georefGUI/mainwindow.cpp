@@ -42,7 +42,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     originalLeverArmPointSize{ 12, 12, 12 }, // Temporary possible values
     originalLeverArmPixelSize{ 12, 12, 12 }, // Temporary possible values
-    originalLeverArmSpecifiedWithPointSize{ true, true, true, }
+    originalLeverArmSpecifiedWithPointSize{ true, true, true, },
+
+    processToolTipWhenDisabled( tr( "'Process' button only enabled when there are input and output files" ) )
 {
 
 #ifdef __GNU__
@@ -59,8 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
 
 
-    // Disable process button
-    ui->Process->setEnabled(false);
+    // Disable process button   
+    setStateProcess();
 
     setWindowTitle( tr( "MBES-Lib Georeferencing" ) );
 
@@ -305,47 +307,71 @@ void MainWindow::setStateProcess()
     if( inputFileName != "" && outputFileName != "" )
     {
         ui->Process->setEnabled( true );
+        ui->Process->setToolTip( "" );
+
     }
     else
     {
         ui->Process->setEnabled( false );
+        ui->Process->setToolTip( processToolTipWhenDisabled );
     }
 
 }
 
-void MainWindow::possiblyUpdateOutputFileName()
-{
-    QFileInfo infoInput( tr( inputFileName.c_str() ) );
+//void MainWindow::possiblyUpdateOutputFileName()
+//{
+//    QFileInfo infoInput( tr( inputFileName.c_str() ) );
 
-    if ( infoInput.exists() )
-    {
-        currentInputPath = infoInput.absolutePath();
+//    if ( infoInput.exists() )
+//    {
+//        currentInputPath = infoInput.absolutePath();
 
-        // If the user did not edit the output file name himself using the QLineEdit
-        if ( outputFileNameEditedByUser == false )
-        {
-            // Set an output path/file name based on the input file path / name
+//        // If the user did not edit the output file name himself using the QLineEdit
+//        if ( outputFileNameEditedByUser == false )
+//        {
+//            // Set an output path/file name based on the input file path / name
 
-            std::string absolutePath( infoInput.absolutePath().toLocal8Bit().constData() );
-            std::string completeBaseName( infoInput.completeBaseName().toLocal8Bit().constData() );
-            outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
+//            std::string absolutePath( infoInput.absolutePath().toLocal8Bit().constData() );
+//            std::string completeBaseName( infoInput.completeBaseName().toLocal8Bit().constData() );
+//            outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
 
-            // Put the file name in the lineEdit
-            ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
-        }
+//            // Put the file name in the lineEdit
+//            ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
+//        }
 
-    }
+//    }
 
-}
+//}
 
 
 void MainWindow::on_lineEditInputFile_textChanged(const QString &text)
 {
     inputFileName = text.toLocal8Bit().constData();
 
-    possiblyUpdateOutputFileName();
+    // possiblyUpdateOutputFileName();
 
     setStateProcess();
+
+
+//    QFileInfo fileInfo( tr( inputFileName.c_str() ) );
+
+//    if ( QDir( fileInfo.absolutePath() ).exists() )
+//    {
+//        currentInputPath = fileInfo.absolutePath();
+//    }
+
+    QFileInfo fileInfo( tr( inputFileName.c_str() ) );
+
+    if ( inputFileName != "" && QDir( fileInfo.absolutePath() ).exists() )
+    {
+        currentInputPath = fileInfo.absolutePath();
+    }
+    else
+    {
+        currentInputPath = "";
+    }
+
+
 }
 
 // https://doc.qt.io/qt-5/qlineedit.html#textEdited
@@ -370,11 +396,24 @@ void MainWindow::on_lineEditOutputFile_textChanged(const QString &text)
 
     setStateProcess();
 
-    QFileInfo infoOutput( tr( outputFileName.c_str() ) );
 
-    if ( QDir( infoOutput.absolutePath() ).exists() )
+//    QFileInfo fileInfo( tr( outputFileName.c_str() ) );
+
+//    if ( QDir( fileInfo.absolutePath() ).exists() )
+//    {
+//        currentOutputPath = fileInfo.absolutePath();
+//    }
+
+
+    QFileInfo fileInfo( tr( outputFileName.c_str() ) );
+
+    if ( outputFileName != "" && QDir( fileInfo.absolutePath() ).exists() )
     {
-        currentOutputPath = infoOutput.absolutePath();
+        currentOutputPath = fileInfo.absolutePath();
+    }
+    else
+    {
+        currentOutputPath = "";
     }
 }
 
@@ -386,21 +425,49 @@ void MainWindow::on_BrowseInput_clicked()
 
     if ( ! fileName.isEmpty() )
     {
-        std::string OldInputFileName = inputFileName;
+//        std::string OldInputFileName = inputFileName;
+
         inputFileName = fileName.toLocal8Bit().constData();
 
         // Put the file name in the lineEdit
         ui->lineEditInputFile->setText( fileName );
 
-        // If the file name does not change, function MainWindow::on_lineEditInputFile_textChanged()
-        // will not be called when doing "ui->lineEditInputFile->setText( fileName );",
-        // So do here what would be done by the function MainWindow::on_lineEditInputFile_textChanged()
-        if ( inputFileName == OldInputFileName )
-        {
-            possiblyUpdateOutputFileName();
+        QFileInfo infoInput( tr( inputFileName.c_str() ) );
 
-            setStateProcess();
+        currentInputPath = infoInput.absolutePath();
+
+
+        // If the user did not edit the output file name himself using the QLineEdit
+        if ( outputFileNameEditedByUser == false )
+        {
+            // Set an output path/file name based on the input file path / name
+
+            std::string absolutePath( infoInput.absolutePath().toLocal8Bit().constData() );
+            std::string completeBaseName( infoInput.completeBaseName().toLocal8Bit().constData() );
+//            outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
+            outputFileName = absolutePath + "/" + completeBaseName + ".MBES-libGeoref.txt";
+
+            // Put the file name in the lineEdit
+            ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
+
+            currentOutputPath = currentInputPath;
+
+
         }
+
+
+        setStateProcess();
+
+
+//        // If the file name does not change, function MainWindow::on_lineEditInputFile_textChanged()
+//        // will not be called when doing "ui->lineEditInputFile->setText( fileName );",
+//        // So do here what would be done by the function MainWindow::on_lineEditInputFile_textChanged()
+//        if ( inputFileName == OldInputFileName )
+//        {
+//            possiblyUpdateOutputFileName();
+
+//            setStateProcess();
+//        }
     }
 }
 
