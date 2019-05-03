@@ -25,14 +25,14 @@ public:
      * Create a georeferencing
      * 
      * @param georeferencedPing vector of a ping georeferenced
-     * @param attitude the attitude of the georeference
-     * @param position the position of the georeference
-     * @param ping the ping of the georeference
-     * @param svp the song velocity of the georeference
-     * @param leverArm vector of the leverArm who goes from the reference point to the transmitter 
+     * @param attitude the attitude of the ship in the IM frame
+     * @param position the position of the ship in the TRF
+     * @param ping the ping of the georeference in the sonar frame
+     * @param svp the sound velocity profile
+     * @param leverArm vector from the position reference point (PRP) to the acoustic center
      * 
      */
-    static void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm) {
+    static void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
 	//Compute transform matrixes
         Eigen::Matrix3d ned2ecef;
         CoordinateTransform::ned2ecef(ned2ecef,position);
@@ -48,32 +48,13 @@ public:
 	Eigen::Vector3d pingVector;
 	Raytracing::rayTrace(pingVector,ping,svp);
 
-	Eigen::Vector3d pingECEF = ned2ecef * pingVector;
+	Eigen::Vector3d pingECEF = ned2ecef * (imu2ned * boresight * pingVector);
 
 	//Convert lever arm to ECEF
 	Eigen::Vector3d leverArmECEF =  ned2ecef * (imu2ned * leverArm);
 
 	//Compute total ECEF vector
 
-/*
-        std::cerr <<"NED-to-ECEF" << std::endl;
-        std::cerr << ned2ecef <<std::endl;
-        std::cerr << "-------------" << std::endl;
-
-
-	std::cerr <<"Position" << std::endl;
-	std::cerr << positionECEF<<std::endl;
-	std::cerr << "-------------" << std::endl;
-
-        std::cerr << "Ping" << std::endl;
-        std::cerr << pingECEF << std::endl;
-        std::cerr << "-------------" << std::endl;
-
-
-        std::cerr << "LA" << std::endl;
-        std::cerr << leverArmECEF << std::endl;
-        std::cerr << "-------------" << std::endl;
-*/
 	georeferencedPing = positionECEF + pingECEF + leverArmECEF;
     }
 };

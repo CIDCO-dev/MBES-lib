@@ -81,8 +81,11 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                         svps.push_back(svp);
                 }
 
-                /**Return the georeference (the three ping, the quality and the intensity)*/
-                void georeference(Eigen::Vector3d & leverArm){
+                /**
+                 * Georeferences all pings
+		 * @param boresight boresight (dPhi,dTheta,dPsi)
+                 */
+                void georeference(Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight){
                         //interpolate attitudes and positions around pings
                         unsigned int attitudeIndex=0;
                         unsigned int positionIndex=0;
@@ -137,7 +140,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
                                 //georeference
                                 Eigen::Vector3d georeferencedPing;
-                                Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm);
+                                Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm,boresight);
 
 				processGeoreferencedPing(georeferencedPing,(*i).getQuality(),(*i).getIntensity());
 

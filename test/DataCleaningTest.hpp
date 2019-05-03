@@ -160,7 +160,7 @@ TEST_CASE("test with invalid quality parameter")
     ss = DataSystem_call(std::string(output+dataBinexec+param));
     string line;
     getline(ss,line);
-    REQUIRE(line=="Error: parameter QualityFilter invalid");
+    REQUIRE(line=="Error: -q invalid quality parameter");
 }
 
 /**Test when there is a invalid intensity parameter*/
@@ -175,7 +175,7 @@ TEST_CASE("test with invalid intensity parameter")
     ss = DataSystem_call(std::string(output+dataBinexec+param));
     string line;
     getline(ss,line);
-    REQUIRE(line=="Error: parameter IntensityFilter invalid");
+    REQUIRE(line=="Error: -i invalid intensity parameter");
 }
 
 /**Test when there is multiple parameter*/

@@ -195,7 +195,7 @@ int main(int argc,char** argv){
                 case 'q':
                     if(sscanf(optarg,"%d", &quality) != 1)
                     {
-                        std::cerr << "Error: parameter QualityFilter invalid" << std::endl;
+                        std::cerr << "Error: -q invalid quality parameter" << std::endl;
                         printUsage();
                     }
                     else
@@ -207,7 +207,7 @@ int main(int argc,char** argv){
                 case 'i':
                     if(sscanf(optarg,"%d", &intensity) != 1)
                     {
-                        std::cerr << "Error: parameter IntensityFilter invalid" << std::endl;
+                        std::cerr << "Error: -i invalid intensity parameter" << std::endl;
                         printUsage();
                     }
                     else
@@ -219,30 +219,28 @@ int main(int argc,char** argv){
         }
         unsigned int lineCount = 1;
         while((std::getline(std::cin,line))&&(line!="0")){
-            uint64_t microEpoch;
             double x,y,z;
             uint32_t quality;
             uint32_t intensity;
 
-            if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6){
+            if(sscanf(line.c_str(),"%lf %lf %lf %d %d",&x,&y,&z,&quality,&intensity)==5){
 		bool doFilter = false;
 
 			//Apply filter chain
 		for(auto i = filters.begin();i!= filters.end();i++){
-                    if( (*i)->filterPoint(microEpoch,x,y,z,quality,intensity) ){
+                    if( (*i)->filterPoint(0,x,y,z,quality,intensity) ){
 			doFilter = true;
                         break;
                     }
 		}
 
 		if(!doFilter){
-                    printf("%lu %.6lf %.6lf %.6lf %d %d\r\n",microEpoch,x,y,z,quality,intensity);
+                    printf("%.6lf %.6lf %.6lf %d %d\n",x,y,z,quality,intensity);
 		}
             }
             else{
 		std::cerr << "Error at line " << lineCount << std::endl;
             }
-                
             lineCount++;
         }
     }

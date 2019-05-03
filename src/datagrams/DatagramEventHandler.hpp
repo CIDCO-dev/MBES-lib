@@ -31,7 +31,7 @@ class DatagramEventHandler{
 		 * 
 		 * Pitch: Positive value is nose up (0 to 360)
 		 * Roll: Positive value is roll to starboard (right) (0 to 360)
-		 * Heading: gyro (magnetic north) (NORMALIZED TO 0 to 360)
+		 * Heading: Positive clockwise (magnetic north) (NORMALIZED TO 0 to 360)
 		 */
                 virtual void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){};
 
