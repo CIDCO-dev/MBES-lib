@@ -178,250 +178,131 @@ std::string KongsbergParser::getName(int tag)
 {
     switch(tag)
     {
-        case 1:
-            return "GGA Datagram";
-        break;
-        
-        case 2:
-            return "PTNL Datagram";
-        break;
-        
-        case 3:
-            return "GGK Datagram";
-        break;
-        
-        case 4:
-            return "VTG Datagram";
-        break;
-        
-        case 5:
-            return "SSB-SSBL Position Datagram";
-        break;
-        
-        case 6:
-            return "Simrad 90 Datagram";
-        break;
-        
-        case 7:
-            return "";
-        break;
-        
-        case 8:
-            return "Tide input datagrams";
-        break;
-        
-        case 9:
-            return "Depth pressure or height input datagrams";
-        break;
-        
-        case 10:
-            return "HDT Format";
-        break;
-        
-        case 11:
-            return "ZDA format";
-        break;
-        
-        case 12:
-            return "SSP format";
-        break;
-        
-        case 13:
-            return "SSP format";
-        break;
-        
-        case 14:
-            return "SV Format";
-        break;
-        
-        case 15:
-            return "SV&P Format";
-        break;
-        
-        case 16:
-            return "SV&T Format";
-        break;
-        
-        case 17:
-            return "DBS Format";
-        break;
-        
-        case 18:
-            return "DPT Format";
-        break;
-        
-        case 19:
-            return "Simrad format";
-        break;
-        
-        case 20:
-            return "Remote Control datagrams";
-        break;
-        
-        case 21:
-            return "KSSIS 80 input datagram";
-        break;
-        
-        case 22:
-            return "Depth datagram";
-        break;
-        
-        case 23:
-            return "EM 3000D";
-        break;
-        
-        case 24:
-            return "XYZ 88";
-        break;
-        
-        case 25:
-            return "Extra detections";
-        break;
-        
-        case 26:
-            return "Central beams echogram";
-        break;
-        
-        case 27:
-            return "Raw range and beam angle datagrams";
-        break;
-        
-        case 28:
-            return "Raw range and beam angle datagrams";
-        break;
-        
-        case 29:
-            return "Raw range and beam angle 78 datagram";
-        break;
-        
-        case 30:
-            return "Seabed image datagram";
-        break;
-        
-        case 31:
-            return "Seabed image data 89 datagram";
-        break;
-        
-        case 32:
-            return "Water column datagram";
-        break;
-        
-        case 33:
-            return "Quality factor datagram 79";
-        break;
-        
-        case 34:
-            return "Attitude datagram";
-        break;
-        
-        case 35:
-            return "Network attitude velocity datagram 110";
-        break;
-        
-        case 36:
-            return "Clock datagrams";
-        break;
-        
-        case 37:
-            return "Depth (pressure) or height datagram";
-        break;
-        
-        case 38:
-            return "Heading datagrams";
-        break;
-        
-        case 39:
-            return "Position datagrams";
-        break;
-        
-        case 40:
-            return "Single beam echo sounder depth datagram";
-        break;
-        
-        case 41:
-            return "Tide datagram";
-        break;
-        
-        case 42:
-            return "Surface sound speed datagram";
-        break;
-        
-        case 43:
-            return "Sound speed profile datagram";
-        break;
-        
-        case 44:
-            return "Kongsberg Maritime SSP output datagram";
-        break;
-        
-        case 45:
-            return "Installation parameters";
-        break;
-        
-        case 46:
-            return "Runtime parameters";
-        break;
-        
-        case 47:
-            return "Multi beam system status";
-        break;
-        
+      
         case 48:
-            return "Mechanical transducer tilt datagrams";
-        break;
-        
-        case 49:
-            return "ExtraParameters 3";
-        break;
-        
-        case 50:
-            return "Current sound velocity";
-        break;
-        
-        case 51:
-            return "SOUNDSPEEDPROFILE_DATA";
-        break;
-        
-        case 52:
-            return "Common data types";
-        break;
-        
-        case 53:
-            return "Multicast input status";
-        break;
-        
-        case 54:
             return "PU Id output datagrams";
         break;
         
-        case 55:
+        case 49:
             return "PU Status output";
         break;
+                        
+        case 51:
+            return "ExtraParameters 3";
+        break;
+                   
+        case 53:
+            return "Seabed image datagram";
+        break;
+                
+        case 65:
+            return "Attitude datagram";
+        break;
         
-        case 56:
+        case 66:
             return "PU BIST result output";
         break;
         
-        case 57:
-            return "APB output datagram";
+        case 67:
+            return "Clock datagrams";
         break;
         
-        case 58:
-            return "DPT output datagram";
+        case 68:
+            return "Depth datagram";
+        break;
+                
+        case 69:
+            return "Single beam echo sounder depth datagram";
+        break;
+                
+        case 70:
+            return "Raw range and beam angle datagrams";
+        break;
+                 
+        case 71:
+            return "Surface sound speed datagram";
+        break;
+               
+        case 72:
+            return "Heading datagrams";
+        break;
+               
+        case 73:
+            return "Installation parameters";
         break;
         
-        case 59:
-            return "RTE output datagram";
+        case 74:
+            return "Mechanical transducer tilt datagrams";
+        break;
+                 
+        case 75:
+            return "Central beams echogram";
         break;
         
-        case 60:
-            return "WPL output datagram";
+        case 78:
+            return "Raw range and beam angle 78 datagram";
         break;
         
-        case 61:
-            return "KSSIS 31 output datagram";
+        case 79:
+            return "Quality factor datagram 79";
+        break;
+
+        case 80:
+            return "Position datagrams";
+        break;
+
+        case 82:
+            return "Runtime parameters";
+        break;
+
+        case 84:
+            return "Tide datagram";
+        break;
+
+        case 85:
+            return "Sound speed profile datagram";
         break;
         
+        case 87:
+            return "Kongsberg Maritime SSP output datagram";
+        break;
+        
+        case 88:
+            return "XYZ 88";
+        break;
+        
+        case 89:
+            return "Seabed image data 89 datagram";
+        break;
+
+        case 102:
+            return "Raw range and beam angle datagrams";
+        break;
+
+        case 104:
+            return "Depth (pressure) or height datagram";
+        break;
+
+        case 105:
+            return "Installation parameters";
+        break;
+        
+        case 107:
+            return "Water column datagram";
+        break;
+        
+        case 108:
+            return "Extra detections";
+        break;
+
+        case 110:
+            return "Network attitude velocity datagram 110";
+        break;
+
+        case 114:
+            return "Installation parameters or remote information";
+        break;
+
         default:
             return "Invalid tag";
 	break;
