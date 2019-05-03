@@ -43,6 +43,8 @@ public:
      * @param filename name of the file to read
      */
     void parse(std::string & filename);
+    
+    std::string getName(int tag);
 
 protected:
     
@@ -212,6 +214,276 @@ void S7kParser::parse(std::string & filename) {
         }
     } else {
         throw "File not found";
+    }
+}
+
+std::string S7kParser::getName(int tag)
+{
+    switch(tag)
+    {
+        case 1000:
+            return "Reference Point";
+        break;
+        
+        case 1001:
+            return "Sensor Offset Position";
+        break;
+        
+        case 1002:
+            return "Sensor Offset Position Calibrated";
+        break;
+        
+        case 1003:
+            return "Position";
+        break;
+        
+        case 1004:
+            return "Custom Attitude Information";
+        break;
+        
+        case 1005:
+            return "Tide";
+        break;
+        
+        case 1006:
+            return "Altitude";
+        break;
+        
+        case 1007:
+            return "Motion Over Ground";
+        break;
+        
+        case 1008:
+            return "Depth";
+        break;
+        
+        case 1009:
+            return "Sound Velocity Profile";
+        break;
+        
+        case 1010:
+            return "CTD";
+        break;
+        
+        case 1011:
+            return "Geodesy";
+        break;
+        
+        case 1012:
+            return "Roll Pitch Heave";
+        break;
+        
+        case 1013:
+            return "Heading";
+        break;
+        
+        case 1014:
+            return "Survey Line";
+        break;
+        
+        case 1015:
+            return "Navigation";
+        break;
+        
+        case 1016:
+            return "Attitude";
+        break;
+        
+        case 1017:
+            return "Pan Tilt";
+        break;
+        
+        case 1020:
+            return "Sonar Installation Identifiers";
+        break;
+        
+        case 2004:
+            return "Sonar Pipe Environment";
+        break;
+        
+        case 7000:
+            return "7k Sonar Settings";
+        break;
+        
+        case 7001:
+            return "7k Configuration";
+        break;
+        
+        case 7002:
+            return "7k Match Filter";
+        break;
+        
+        case 7003:
+            return "7k Firmware and Hardware Configuration";
+        break;
+        
+        case 7004:
+            return "7k Beam Geometry";
+        break;
+        
+        case 7006:
+            return "7k Bathymetric Data";
+        break;
+        
+        case 7007:
+            return "7k Side Scan Data";
+        break;
+        
+        case 7008:
+            return "7k Generic Water Column Data";
+        break;
+        
+        case 7010:
+            return "TVQ Values";
+        break;
+        
+        case 7011:
+            return "7k Image Data";
+        break;
+        
+        case 7012:
+            return "7k Ping Motion Data";
+        break;
+        
+        case 7017:
+            return "7k Detection Data Setup";
+        break;
+        
+        case 7018:
+            return "7k Beamformed Data";
+        break;
+        
+        case 7019:
+            return "Vernier Processing Data";
+        break;
+        
+        case 7021:
+            return "7k Built-In Test Environment Data";
+        break;
+        
+        case 7022:
+            return "7kCenter Version";
+        break;
+        
+        case 7023:
+            return "8k Wet End Version";
+        break;
+        
+        case 7027:
+            return "7k RAW Detection Data";
+        break;
+        
+        case 7028:
+            return "7k Snippet Data";
+        break;
+        
+        case 7030:
+            return "Sonar Installation Parameters";
+        break;
+        
+        case 7031:
+            return "7k Built-In Test Environment Data (Summary)";
+        break;
+        
+        case 7041:
+            return "Compressed Beamformed Magnitude Data";
+        break;
+        
+        case 7042:
+            return "Compressed Watercolumn Data";
+        break;
+        
+        case 7048:
+            return "7k Calibrated Beam Data";
+        break;
+        
+        case 7050:
+            return "7k System Events";
+        break;
+        
+        case 7051:
+            return "7k System Event Message";
+        break;
+        
+        case 7052:
+            return "RDR Recording Status";
+        break;
+        
+        case 7053:
+            return "7k Subscriptions";
+        break;
+        
+        case 7055:
+            return "Calibration Status";
+        break;
+        
+        case 7057:
+            return "Calibrated Side-Scan Data";
+        break;
+        
+        case 7058:
+            return "Calibrated Snippet Data";
+        break;
+        
+        case 7059:
+            return "MB2 specific status";
+        break;
+        
+        case 7200:
+            return "7k File Header";
+        break;
+                
+        case 7300:
+            return "7k File Catalog Record";
+        break;
+                
+        case 7400:
+            return "7k Time Message";
+        break;
+                
+        case 7500:
+            return "7k Remote Control";
+        break;
+                
+        case 7501:
+            return "7k Remote Control Acknowledge";
+        break;
+                
+        case 7502:
+            return "7k Remote Control Not Acknowledge";
+        break;
+                
+        case 7503:
+            return "Remote Control Sonar Settings";
+        break;
+                
+        case 7504:
+            return "7P Common System Settings";
+        break;
+                
+        case 7510:
+            return "SV Filtering";
+        break;
+                
+        case 7511:
+            return "System Lock Status";
+        break;
+                
+        case 7610:
+            return "7k Sound Velocity";
+        break;
+                
+        case 7611:
+            return "7k Absorption Loss";
+        break;
+                
+        case 7612:
+            return "7k Spreading Loss";
+        break;
+
+        default:
+            return "Invalid tag";
+	break;
     }
 }
 
