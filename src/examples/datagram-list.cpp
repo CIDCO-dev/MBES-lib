@@ -41,7 +41,14 @@ class DatagramPrinter : public DatagramEventHandler{
                  * tag the tag
                  */
 		void processDatagramTag(int tag){
-			printf("%d\n",tag);
+			//also display character value for printable characters
+			std::stringstream printableValue;
+
+			if(tag >= 48 && tag <= 122){
+				printableValue << " (" << (char)tag << ")";
+			}
+
+			printf("%d%s\n",tag,printableValue.str().c_str());
 		}
 };
 

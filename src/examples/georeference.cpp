@@ -13,7 +13,7 @@
 #include <iostream>
 #include <string>
 #include "../utils/Exception.hpp"
-
+#include "../math/Boresight.hpp"
 
 using namespace std;
 
@@ -103,10 +103,19 @@ else
 	std::cout << std::setprecision(6);
 	std::cout << std::fixed;
 
+	//Lever arm
 	Eigen::Vector3d leverArm;
 	leverArm << leverArmX,leverArmY,leverArmZ;
 
-        printer.georeference(leverArm);
+	//Boresight
+	double roll,pitch,heading;roll=pitch=heading=0; //TODO: get from CLI
+
+	Attitude boresightAngles(0,roll,pitch,heading);
+	Eigen::Matrix3d boresight;
+	Boresight::buildMatrix(boresight,boresightAngles);
+
+	//Do the georeference dance
+        printer.georeference(leverArm,boresight);
     }
     catch(Exception * error)
     {

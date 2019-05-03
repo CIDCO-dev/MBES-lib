@@ -59,7 +59,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                  * @param quality the ping quality
                  * @param intensity the ping intensity
                  */
-                void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,uint32_t intensity){
+                void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,int32_t intensity){
                         pings.push_back(Ping(microEpoch,id,quality,intensity,currentSurfaceSoundSpeed,twoWayTravelTime,tiltAngle,beamAngle));
                 };
 
@@ -81,8 +81,11 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                         svps.push_back(svp);
                 }
 
-                /**Return the georeference (the three ping, the quality and the intensity)*/
-                void georeference(Eigen::Vector3d & leverArm){
+                /**
+                 * Georeferences all pings
+		 * @param boresight boresight (dPhi,dTheta,dPsi)
+                 */
+                void georeference(Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight){
                         //interpolate attitudes and positions around pings
                         unsigned int attitudeIndex=0;
                         unsigned int positionIndex=0;
@@ -137,7 +140,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
                                 //georeference
                                 Eigen::Vector3d georeferencedPing;
-                                Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm);
+                                Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm,boresight);
 
 				processGeoreferencedPing(georeferencedPing,(*i).getQuality(),(*i).getIntensity());
 
@@ -146,10 +149,9 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                  	}
                 }
 
-                virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity){
+                virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,int32_t intensity){
                         std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality  << " " << intensity << std::endl;
                 }
-
 
         protected:
 

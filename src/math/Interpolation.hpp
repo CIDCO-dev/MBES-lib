@@ -17,6 +17,7 @@
 
 #include "../Position.hpp"
 #include "../Attitude.hpp"
+#include "../utils/Exception.hpp"
 
 /*!
  * \brief Interpolator class
@@ -77,7 +78,7 @@ public:
     static double linearAngleInterpolation(double psi1, double psi2, uint64_t t, uint64_t t1, uint64_t t2) {
 
         if (psi1 < 0 || psi1 >= 360 || psi2 < 0 || psi2 >= 360) {
-            throw std::invalid_argument("Angles need to be between 0 (inclusive) and 360 (exclusive) degrees");
+            throw new Exception("Angles need to be between 0 (inclusive) and 360 (exclusive) degrees");
         }
 
         if (psi1 == psi2) {

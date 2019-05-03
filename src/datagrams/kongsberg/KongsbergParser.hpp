@@ -11,10 +11,12 @@
 #include <cstdio>
 #include <iostream>
 #include <cmath>
+#include <map>
 
 #include "../DatagramParser.hpp"
 #include "../../utils/NmeaUtils.hpp"
 #include "../../utils/TimeUtils.hpp"
+#include "../../utils/Exception.hpp"
 #include "KongsbergTypes.hpp"
 
 /*!
@@ -22,21 +24,21 @@
  */
 class KongsbergParser : public DatagramParser{
         public:
-                
+
                 /**
-                 * Create an Kongsberg parser 
-                 * 
+                 * Create an Kongsberg parser
+                 *
                  * @param processor the datagram processor
                  */
 	        KongsbergParser(DatagramEventHandler & processor);
-                
+
                 /**Destroy the Kongsberg parser*/
 	        ~KongsbergParser();
 
 	        //interface methods
                 /**
                  * Read a file and change the Kongsberg parser depending on the information
-                 * 
+                 *
                  * @param filename name of the file to read
                  */
 	        void parse(std::string & filename);
@@ -52,7 +54,7 @@ class KongsbergParser : public DatagramParser{
                  * @param datagram the datagram
                  */
 	        void processDatagram(KongsbergHeader & hdr,unsigned char * datagram);
-                
+
                 /**
                  * call the process Depth
                  * 
@@ -60,7 +62,7 @@ class KongsbergParser : public DatagramParser{
                  * @param datagram the datagram
                  */
 	        void processDepth(KongsbergHeader & hdr,unsigned char * datagram);
-                
+
                 /**
                  * call the process Water Height
                  * 
@@ -109,6 +111,15 @@ class KongsbergParser : public DatagramParser{
                  */
 		void processSoundSpeedProfile(KongsbergHeader & hdr,unsigned char * datagram);
 
+
+		/**
+		 * Process range and beam data
+		 *
+                 * @param hdr the Kongsberg header
+                 * @param datagram the datagram
+		 */
+		void processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned char * datagram);
+
                 /**
                  * Return in microsecond the timestamp
                  * 
@@ -117,6 +128,10 @@ class KongsbergParser : public DatagramParser{
                  */
 	        long convertTime(long datagramDate,long datagramTime);
 
+		/**
+		 * Returns a human readable name for a given datagram tag
+		 */
+		std::string getName(int tag);
 };
 
 /**
@@ -161,7 +176,7 @@ void KongsbergParser::parse(std::string & filename){
 				}
 				else{
 					printf("%02x",hdr.size);
-					throw "Bad datagram";
+					throw new Exception("Bad datagram");
 					//TODO: rejct bad datagram, maybe log it
 				}
             }
@@ -170,7 +185,7 @@ void KongsbergParser::parse(std::string & filename){
 		fclose(file);
 	}
 	else{
-		throw "Couldn't open file " + filename;
+		throw new Exception("Couldn't open file " + filename);
 	}
 }
 
@@ -344,6 +359,10 @@ void KongsbergParser::processDatagram(KongsbergHeader & hdr,unsigned char * data
         	    //processDepth(hdr,datagram);
         	break;
 
+		case 'N':
+			processRawRangeAndBeam78(hdr,datagram);
+		break;
+
         	case 'O':
         	    //processQualityFactor(hdr,datagram);
         	break;
@@ -515,6 +534,44 @@ void KongsbergParser::processQualityFactor(KongsbergHeader & hdr,unsigned char *
  */
 void KongsbergParser::processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram){
 	//printf("TODO: parse Seabed Image Data\n");
+}
+
+std::string KongsbergParser::getName(int tag){
+	switch(tag){
+		case 'k':
+			return "Water column";
+		break;
+
+		//TODO: add others
+
+		default:
+			return "";
+		break;
+	}
+}
+
+void KongsbergParser::processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned char * datagram){
+	KongsbergRangeAndBeam78 * data = (KongsbergRangeAndBeam78*)datagram;
+
+	uint64_t microEpoch = convertTime(hdr.date,hdr.time);
+
+	processor.processSwathStart((double)data->surfaceSoundSpeed / (double)10);
+
+	std::map<int,KongsbergRangeAndBeam78TxEntry*>  txEntries;
+
+	KongsbergRangeAndBeam78TxEntry* tx = (KongsbergRangeAndBeam78TxEntry*) (((unsigned char *)data)+sizeof(KongsbergRangeAndBeam78));
+
+	for(unsigned int i=0;i< data->nbTxPackets; i++){
+		txEntries[tx[i].txSectorNumber] = &tx[i];
+		//printf("Tilt: %0.2f\n",(double)tx[i].tiltAngle/(double)100);
+	}
+
+	KongsbergRangeAndBeam78RxEntry * rx = (KongsbergRangeAndBeam78RxEntry*)    ((((unsigned char *)data)+sizeof(KongsbergRangeAndBeam78)) + (data->nbTxPackets * sizeof(KongsbergRangeAndBeam78TxEntry)));
+
+	for(unsigned int i=0;i<data->nbRxPackets;i++){
+		//We'll hack-in the the beam angle as ID...May Satan forgive us
+		processor.processPing(microEpoch,rx[i].beamAngle,(double)rx[i].beamAngle/(double)100,(double)txEntries[rx[i].txSectorNumber]->tiltAngle/(double)100,rx[i].twoWayTravelTime,rx[i].qualityFactor,rx[i].reflectivity);
+	}
 }
 
 #endif

@@ -192,18 +192,18 @@ void XtfParser::parse(std::string & filename){
 			}
 			else{
 				fclose(file);
-				throw "Invalid file format";
+				throw new Exception("Invalid file format");
 			}
 		}
 		else{
 			fclose(file);
-			throw "Couldn't read from file";
+			throw new Exception("Couldn't read from file");
 		}
 
 		fclose(file);
 	}
 	else{
-		throw "File not found";
+		throw new Exception("File not found");
 	}
 }
 
