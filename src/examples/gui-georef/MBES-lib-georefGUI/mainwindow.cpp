@@ -620,6 +620,13 @@ void MainWindow::on_lineEditYaw_editingFinished()
 
 void MainWindow::on_LeverArmLoad_clicked()
 {
+    leverArmBoresightLoad();
+}
+
+
+
+void MainWindow::leverArmBoresightLoad()
+{
     QString fileName = QFileDialog::getOpenFileName(this,
                                         tr( "Load Lever Arm and Boresight Values from File" ), "",
                                         tr( "*.txt;;All Files (*)" )  );
@@ -676,6 +683,11 @@ void MainWindow::on_LeverArmLoad_clicked()
 
 void MainWindow::on_LeverArmSave_clicked()
 {
+    leverArmBoresightSave();
+}
+
+void MainWindow::leverArmBoresightSave()
+{
     QString fileName = QFileDialog::getSaveFileName(this,
                                         tr( "Save Lever Arm and Boresight Values to File"), "",
                                         tr( "*.txt;;All Files (*)") );
@@ -720,15 +732,29 @@ void MainWindow::on_LeverArmSave_clicked()
 
 }
 
-void MainWindow::on_buttonAbout_clicked()
+
+void MainWindow::on_actionAbout_triggered()
 {
-    std::string text = "\n\nCopyright 2017-2019\n"
+    std::string text = "\n\nProduces a point cloud from a multibeam echosounder datagram file.\n\n"
+                       "Copyright 2017-2019\n"
                         "© Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n"
                        "© Interdisciplinary Centre for the Development of Ocean Mapping (CIDCO), All Rights Reserved\n\n";
 
     QMessageBox::about( this, tr( "About 'MBES-Lib Georeferencing'" ),
                           QString::fromUtf8( text.c_str() )  );
-
 }
 
+void MainWindow::on_actionExit_triggered()
+{
+    QCoreApplication::quit();
+}
 
+void MainWindow::on_actionLoad_Lever_Arms_and_Boresight_Angles_triggered()
+{
+    leverArmBoresightLoad();
+}
+
+void MainWindow::on_actionSave_Arms_and_Boresight_Angles_triggered()
+{
+    leverArmBoresightSave();
+}

@@ -65,11 +65,14 @@ private slots:
 
     void on_LeverArmSave_clicked();
 
-    void on_buttonAbout_clicked();
 
+    void on_actionAbout_triggered();
 
+    void on_actionExit_triggered();
 
+    void on_actionLoad_Lever_Arms_and_Boresight_Angles_triggered();
 
+    void on_actionSave_Arms_and_Boresight_Angles_triggered();
 
 private:
 
@@ -80,6 +83,10 @@ private:
     void editingFinished( const int position );
 
     void adjustLineEditFontSize( const int position );
+
+
+    void leverArmBoresightLoad();
+    void leverArmBoresightSave();
 
 
     Ui::MainWindow *ui;
