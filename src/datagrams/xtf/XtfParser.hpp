@@ -40,6 +40,8 @@ class XtfParser : public DatagramParser{
                  */
 		void parse(std::string & filename);
                 
+                std::string getName(int tag);
+                
                 /**Return the number channels in the file*/
 		int getTotalNumberOfChannels();
 
@@ -203,6 +205,216 @@ void XtfParser::parse(std::string & filename){
 	else{
 		throw "File not found";
 	}
+}
+
+std::string XtfParser::getName(int tag)
+{
+    switch(tag)
+    {
+        case 0:
+            return "XTF_HEADER_SONAR";
+        break;
+        
+        case 1:
+            return "XTF_HEADER_NOTES";
+        break;
+        
+        case 2:
+            return "XTF_HEADER_BATHY";
+        break;
+        
+        case 3:
+            return "XTF_HEADER_ATTITUDE";
+        break;
+        
+        case 4:
+            return "XTF_HEADER_FORWARD";
+        break;
+        
+        case 5:
+            return "XTF_HEADER_ELAC";
+        break;
+        
+        case 6:
+            return "XTF_HEADER_RAW_SERIAL";
+        break;
+        
+        case 7:
+            return "XTF_HEADER_EMBED_HEAD";
+        break;
+        
+        case 8:
+            return "XTF_HEADER_HIDDEN_SONAR";
+        break;
+        
+        case 9:
+            return "XTF_HEADER_SEAVIEW_PROCESSED_BATHY";
+        break;
+        
+        case 10:
+            return "XTF_HEADER_SEAVIEW_DEPTHS";
+        break;
+        
+        case 11:
+            return "XTF_HEADER_RSVD_HIGHSPEED_SENSOR";
+        break;
+        
+        case 12:
+            return "XTF_HEADER_ECHOSTRENGTH";
+        break;
+        
+        case 13:
+            return "XTF_HEADER_GEOREC";
+        break;
+        
+        case 14:
+            return "XTF_HEADER_KLEIN_RAW_BATHY";
+        break;
+        
+        case 15:
+            return "XTF_HEADER_HIGHSPEED_SENSOR2";
+        break;
+        
+        case 16:
+            return "XTF_HEADER_ELAC_XSE";
+        break;
+        
+        case 17:
+            return "XTF_HEADER_BATHY_XYZA";
+        break;
+        
+        case 18:
+            return "XTF_HEADER_K5000_BATHY_IQ";
+        break;
+        
+        case 19:
+            return "XTF_HEADER_BATHY_SNIPPET";
+        break;
+        
+        case 20:
+            return "XTF_HEADER_GPS";
+        break;
+        
+        case 21:
+            return "XTF_HEADER_STAT";
+        break;
+        
+        case 22:
+            return "XTF_HEADER_SINGLEBEAM";
+        break;
+        
+        case 23:
+            return "XTF_HEADER_GYRO";
+        break;
+        
+        case 24:
+            return "XTF_HEADER_TRACKPOINT";
+        break;
+        
+        case 25:
+            return "XTF_HEADER_MULTIBEAM";
+        break;
+        
+        case 26:
+            return "XTF_HEADER_Q_SINGLEBEAM";
+        break;
+        
+        case 27:
+            return "XTF_HEADER_Q_MULTITX";
+        break;
+        
+        case 28:
+            return "XTF_HEADER_Q_MULTIBEAM";
+        break;
+        
+        case 50:
+            return "XTF_HEADER_TIME";
+        break;
+        
+        case 60:
+            return "XTF_HEADER_BENTHOS_CAATI_SARA";
+        break;
+        
+        case 61:
+            return "XTF_HEADER_7125";
+        break;
+        
+        case 62:
+            return "XTF_HEADER_7125_SNIPPET";
+        break;
+        
+        case 65:
+            return "XTF_HEADER_QINSY_R2SONIC_BATHY";
+        break;
+        
+        case 66:
+            return "XTF_HEADER_QINSY_R2SONIC_FTS";
+        break;
+        
+        case 68:
+            return "XTF_HEADER_R2SONIC_BATHY";
+        break;
+        
+        case 69:
+            return "XTF_HEADER_R2SONIC_FTS";
+        break;
+        
+        case 70:
+            return "XTF_HEADER_CODA_ECHOSCOPE_DATA";
+        break;
+        
+        case 71:
+            return "XTF_HEADER_CODA_ECHOSCOPE_CONFIG";
+        break;
+        
+        case 72:
+            return "XTF_HEADER_CODA_ECHOSCOPE_IMAGE";
+        break;
+        
+        case 73:
+            return "XTF_HEADER_EDGETECH_4600";
+        break;
+        
+        case 78:
+            return "XTF_HEADER_RESON_7018_WATERCOLUMN";
+        break;
+        
+        case 100:
+            return "XTF_HEADER_POSITION";
+        break;
+        
+        case 102:
+            return "XTF_HEADER_BATHY_PROC";
+        break;
+        
+        case 103:
+            return "XTF_HEADER_ATTITUDE_PROC";
+        break;
+        
+        case 104:
+            return "XTF_HEADER_SINGLEBEAM_PROC";
+        break;
+        
+        case 105:
+            return "XTF_HEADER_AUX_PROC";
+        break;
+        
+        case 107:
+            return "XTF_HEADER_POS_RAW_NAVIGATION";
+        break;
+        
+        case 108:
+            return "XTF_HEADER_KLEINV4_DATA_PAGE";
+        break;
+        
+        case 200:
+            return "XTF_HEADER_USERDEFINED";
+        break;
+        
+        default:
+            return "Invalid tag";
+	break;
+    }
 }
 
 /**Return the number channels in the file header*/
