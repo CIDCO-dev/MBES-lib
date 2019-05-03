@@ -102,6 +102,10 @@ private:
 
     Eigen::Vector3d leverArm;
 
+    Eigen::Vector3d boresightRPH; // boresight roll, pitch, heading
+
+
+
     QString processToolTipTextWhenDisabled;
 
 

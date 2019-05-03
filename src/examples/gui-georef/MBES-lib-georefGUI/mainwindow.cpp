@@ -22,6 +22,7 @@
 
 #include "../../../utils/StringUtils.hpp"
 #include "../../../utils/Exception.hpp"
+#include "../../../math/Boresight.hpp"
 
 
 
@@ -68,6 +69,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
 
     leverArm << 0.0, 0.0, 0.0;
+
+    boresightRPH << 0.0, 0.0, 0.0;
 
     // Try and read from file the last lever arm values used.
     std::ifstream inFile;
@@ -207,7 +210,12 @@ void MainWindow::on_Process_clicked()
 
                 parser->parse( inputFileName );
 
-                printer.georeference(leverArm);
+
+                Attitude boresightAngles( 0, boresightRPH(0) , boresightRPH(1), boresightRPH(2) );
+                Eigen::Matrix3d boresight;
+                Boresight::buildMatrix( boresight, boresightAngles );
+
+                printer.georeference( leverArm, boresight );
 
 
                 qDebug() << "Done decoding \n" << tr( inputFileName.c_str() );
@@ -458,8 +466,8 @@ void MainWindow::on_lineEditLeverArmZ_textEdited(const QString &text)
 bool MainWindow::setLeverArm( const QString &text, const int position )
 {
 
-//    std::cout << "\nBeginning of setLeverArm(), text: \"" << text.toLocal8Bit().constData()
-//              << "\", position: " << position << std::endl;
+    std::cout << "\nBeginning of setLeverArm(), text: \"" << text.toLocal8Bit().constData()
+              << "\", position: " << position << std::endl;
 
     // TODO: how to deal with precision of the double in memory and used for the
     // georeferencing vs. what is displayed in the GUI?
@@ -538,7 +546,7 @@ void MainWindow::editingFinished( const int position )
 
 void MainWindow::on_lineEditLeverArmX_editingFinished()
 {
-//    std::cout << "\nBeginning of on_lineEditLeverArmX_editingFinished()\n" << std::endl;
+    std::cout << "\nBeginning of on_lineEditLeverArmX_editingFinished()\n" << std::endl;
 
     editingFinished( 0 );
 }
