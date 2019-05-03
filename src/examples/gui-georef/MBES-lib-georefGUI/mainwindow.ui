@@ -140,12 +140,12 @@ QGroupBox::title
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>311</width>
-      <height>131</height>
+      <width>501</width>
+      <height>141</height>
      </rect>
     </property>
     <property name="title">
-     <string>Lever Arms</string>
+     <string/>
     </property>
     <property name="alignment">
      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -156,8 +156,8 @@ QGroupBox::title
     <widget class="QPushButton" name="LeverArmSave">
      <property name="geometry">
       <rect>
-       <x>220</x>
-       <y>100</y>
+       <x>410</x>
+       <y>110</y>
        <width>80</width>
        <height>23</height>
       </rect>
@@ -172,8 +172,8 @@ QGroupBox::title
     <widget class="QLabel" name="labelLeverArmX">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>40</y>
+       <x>10</x>
+       <y>50</y>
        <width>41</width>
        <height>16</height>
       </rect>
@@ -185,8 +185,8 @@ QGroupBox::title
     <widget class="QPushButton" name="LeverArmLoad">
      <property name="geometry">
       <rect>
-       <x>220</x>
-       <y>70</y>
+       <x>410</x>
+       <y>80</y>
        <width>80</width>
        <height>23</height>
       </rect>
@@ -201,8 +201,8 @@ QGroupBox::title
     <widget class="QLabel" name="labelLeverArmY">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>70</y>
+       <x>10</x>
+       <y>80</y>
        <width>41</width>
        <height>16</height>
       </rect>
@@ -214,8 +214,8 @@ QGroupBox::title
     <widget class="QLineEdit" name="lineEditLeverArmY">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>60</y>
+       <x>50</x>
+       <y>70</y>
        <width>151</width>
        <height>24</height>
       </rect>
@@ -224,8 +224,8 @@ QGroupBox::title
     <widget class="QLabel" name="labelLeverArmZ">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>100</y>
+       <x>10</x>
+       <y>110</y>
        <width>41</width>
        <height>16</height>
       </rect>
@@ -237,8 +237,8 @@ QGroupBox::title
     <widget class="QLineEdit" name="lineEditLeverArmX">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>30</y>
+       <x>50</x>
+       <y>40</y>
        <width>151</width>
        <height>24</height>
       </rect>
@@ -247,11 +247,106 @@ QGroupBox::title
     <widget class="QLineEdit" name="lineEditLeverArmZ">
      <property name="geometry">
       <rect>
-       <x>60</x>
-       <y>90</y>
+       <x>50</x>
+       <y>100</y>
        <width>151</width>
        <height>24</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelYaw">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>110</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Yaw (deg.)</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelRoll">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>50</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Roll (deg.)</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEditRoll">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>40</y>
+       <width>101</width>
+       <height>24</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEditYaw">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>100</y>
+       <width>101</width>
+       <height>24</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEditPitch">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>70</y>
+       <width>101</width>
+       <height>24</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelPitch">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>80</y>
+       <width>71</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Pitch (deg.)</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelLeverArm">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>20</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Lever Arms</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="labelBoresight">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>20</y>
+       <width>111</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Boresight Angles</string>
      </property>
     </widget>
    </widget>
