@@ -10,11 +10,20 @@
  *
  * Created on May 3, 2019, 2:03 PM
  */
+#include "catch.hpp"
+#include "../src/datagrams/DatagramEventHandler.hpp"
+#include "../src/datagrams/xtf/XtfParser.hpp"
 
-#ifndef XTFPARSERTEST_HPP
-#define XTFPARSERTEST_HPP
-
-
-
-#endif /* XTFPARSERTEST_HPP */
-
+TEST_CASE("test the function getName")
+{
+    DatagramEventHandler handler;
+    XtfParser parser(handler);
+    REQUIRE(parser.getName(3)=="XTF_HEADER_ATTITUDE");
+    REQUIRE(parser.getName(56)=="Invalid tag");
+    REQUIRE(parser.getName(108)=="XTF_HEADER_KLEINV4_DATA_PAGE");
+    REQUIRE(parser.getName(78)=="XTF_HEADER_RESON_7018_WATERCOLUMN");
+    REQUIRE(parser.getName(23)=="XTF_HEADER_GYRO");
+    REQUIRE(parser.getName(28)=="XTF_HEADER_Q_MULTIBEAM");
+    REQUIRE(parser.getName(69)=="XTF_HEADER_R2SONIC_FTS");
+    REQUIRE(parser.getName(209)=="Invalid tag");
+}
