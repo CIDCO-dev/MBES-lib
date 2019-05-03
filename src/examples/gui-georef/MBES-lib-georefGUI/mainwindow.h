@@ -94,6 +94,7 @@ private:
 
     bool outputFileNameEditedByUser;
 
+    static const QString processToolTipTextWhenDisabled;
 
     static const int nbValuesD = 6; // Number of lineEdit double values
     static const std::string lineEditNames[ nbValuesD ];
@@ -110,12 +111,7 @@ private:
 
     QLineEdit * lineEditPointers[ nbValuesD ];
 
-
-
     Eigen::VectorXd valuesD;
-
-    QString processToolTipTextWhenDisabled;
-
 
 };
 

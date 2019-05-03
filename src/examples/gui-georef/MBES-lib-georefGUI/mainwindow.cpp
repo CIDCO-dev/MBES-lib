@@ -28,6 +28,9 @@
 const std::string MainWindow::lineEditNames[ nbValuesD ] = { "Lever arm X", "Lever arm Y", "Lever arm Z",
                                                                 "Roll", "Pitch", "Yaw" };
 
+const QString MainWindow::processToolTipTextWhenDisabled( tr( "'Process' button only enabled when there are input and output files" ) );
+
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -38,9 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     currentInputPath( "" ),
     currentOutputPath( "" ),
 
-    outputFileNameEditedByUser( false ),
-
-    processToolTipTextWhenDisabled( tr( "'Process' button only enabled when there are input and output files" ) )
+    outputFileNameEditedByUser( false )
 {
 
 #ifdef __GNU__
@@ -84,7 +85,6 @@ MainWindow::MainWindow(QWidget *parent) :
             for ( int count= 0; count < nbValuesD; count++ )
                 valuesD( count ) = values[ count ];
         }
-
     }
 
 
@@ -95,7 +95,6 @@ MainWindow::MainWindow(QWidget *parent) :
     lineEditPointers[ 3 ] = ui->lineEditRoll;
     lineEditPointers[ 4 ] = ui->lineEditPitch;
     lineEditPointers[ 5 ] = ui->lineEditYaw;
-
 
     for ( int count = 0; count < nbValuesD; count++ )
     {
@@ -649,14 +648,10 @@ void MainWindow::on_LeverArmLoad_clicked()
             }
             else
             {
-
                 std::ostringstream streamToDisplay;
 
                 streamToDisplay << "Problem reading the file \n\n\"" << fileName.toLocal8Bit().constData()
                                 << "\".\n\nCould not read " << nbValuesD << " double values for the lever arms and boresight angles.\n";
-
-//                std::string toDisplay = "Problem reading the file \n\n\"" + std::string( fileName.toLocal8Bit().constData() )
-//                                           +"\".\n\nCould not read six double values for the lever arms and boresight angles.\n";
 
                 qDebug() << tr( streamToDisplay.str().c_str() );
 
@@ -675,7 +670,6 @@ void MainWindow::on_LeverArmLoad_clicked()
         }
 
     }
-
 
 }
 
@@ -736,7 +730,5 @@ void MainWindow::on_buttonAbout_clicked()
                           QString::fromUtf8( text.c_str() )  );
 
 }
-
-
 
 
