@@ -131,7 +131,7 @@ class KongsbergParser : public DatagramParser{
 		/**
 		 * Returns a human readable name for a given datagram tag
 		 */
-		std::string getName(int tag);
+		/*std::string getName(int tag);*/
 };
 
 /**
@@ -189,7 +189,7 @@ void KongsbergParser::parse(std::string & filename){
 	}
 }
 
-std::string KongsbergParser::getName(int tag)
+std::string getName(int tag)
 {
     switch(tag)
     {
