@@ -125,7 +125,7 @@ TEST_CASE("test if file parameter is not present")
   NAME\n\n\
      georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
   SYNOPSIS\n \
-	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] fichier\n\n\
+	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-p roll_angle] [-P heading_angle] [-t pitch_angle] fichier\n\n\
   DESCRIPTION\n\n \
   Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n";
     REQUIRE(ss.str()==result);
