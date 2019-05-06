@@ -153,3 +153,26 @@ TEST_CASE("test if the parameter x y z are invalid")
     getline(ss,line);
     REQUIRE(line=="Invalid lever arm Z offset (-z)");
 }
+
+/**Test with parameter p P t invalid*/
+TEST_CASE("test if parameter p P t are invalid")
+{
+    string commp = " -p sjdhsd";
+    string commP = " -P gyhgj";
+    string commt = " -t gyigkb";
+    string commFile = " test/data/all/example.all 2>&1";
+    string commTest = GeoBinexec+commp+commFile;
+    std::stringstream ss;
+    ss = GeoSystem_call(std::string(commTest));
+    std::string line;
+    getline(ss,line);
+    REQUIRE(line=="Invalid roll angle offset (-p)");
+    commTest = GeoBinexec+commP+commFile;
+    ss = GeoSystem_call(std::string(commTest));
+    getline(ss,line);
+    REQUIRE(line=="Invalid heading angle offset (-P)");
+    commTest = GeoBinexec+commt+commFile;
+    ss = GeoSystem_call(std::string(commTest));
+    getline(ss,line);
+    REQUIRE(line=="Invalid pitch angle offset (-t)");
+}
