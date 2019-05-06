@@ -41,7 +41,9 @@ MainWindow::MainWindow(QWidget *parent) :
     currentInputPath( "" ),
     currentOutputPath( "" ),
 
-    outputFileNameEditedByUser( false )
+    outputFileNameEditedByUser( false ),
+
+    currentlyProcessing( false )
 {
 
 #ifdef __GNU__
@@ -129,6 +131,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_Process_clicked()
 {
+
+    currentlyProcessing = true;
+
     // Disable the button while processing
     ui->Process->setEnabled( false );
     ui->Process->setText( tr( "Processing" ) );
@@ -165,6 +170,9 @@ void MainWindow::on_Process_clicked()
         if( userInput == QMessageBox::Cancel )
         {
             ui->Process->setText( tr( "Process" ) );
+
+            currentlyProcessing = false;
+
             setStateProcess();
 
             return;
@@ -213,6 +221,11 @@ void MainWindow::on_Process_clicked()
                 parser->parse( inputFileName );
 
                 Eigen::Vector3d leverArm = valuesD.head( 3 );
+
+//                std::cout << "\n" << valuesD(3)
+//                          << "\n" <<valuesD(4)
+//                          << "\n" <<valuesD(5) << "\n" << std::endl;
+
 
                 Attitude boresightAngles( 0, valuesD(3), valuesD(4), valuesD(5) ); //Attitude boresightAngles(0,roll,pitch,heading);
                 Eigen::Matrix3d boresight;
@@ -265,6 +278,9 @@ void MainWindow::on_Process_clicked()
         delete parser;
 
     ui->Process->setText( tr( "Process" ) );
+
+    currentlyProcessing = false;
+
     setStateProcess();
 
 }
@@ -272,24 +288,121 @@ void MainWindow::on_Process_clicked()
 
 void MainWindow::setStateProcess()
 {
-    if( inputFileName != "" && outputFileName != "" )
+    if ( currentlyProcessing == false )
     {
-        ui->Process->setEnabled( true );
-        ui->Process->setToolTip( "" );
+        if( inputFileName != "" && outputFileName != "" )
+        {
+            ui->Process->setEnabled( true );
+            ui->Process->setToolTip( "" );
+        }
+        else
+        {
+            ui->Process->setEnabled( false );
+            ui->Process->setToolTip( processToolTipTextWhenDisabled );
+        }
     }
-    else
-    {
-        ui->Process->setEnabled( false );
-        ui->Process->setToolTip( processToolTipTextWhenDisabled );
-    }
+
+}
+
+std::string MainWindow::removeLeadingTrailingWhitespaces( const std::string &text )
+{
+    const std::string whitespace = " \t";
+
+//    std::cout << "\n\n'" << text << "\'\n\n";
+
+    const size_t first = text.find_first_not_of( whitespace );
+
+    if ( first == std::string::npos )
+        return "";
+
+    const size_t last = text.find_last_not_of( whitespace );
+
+    const size_t length = last - first + 1;
+
+//    std::cout << "first:  " << first
+//            << "\nlast:   " << last
+//            << "\nlength: " << length
+//            << "\n'" << text.substr( first, length ) << "\'\n" << std::endl;
+
+    return text.substr( first, length );
 
 }
 
 
 
-void MainWindow::on_lineEditInputFile_textChanged(const QString &text)
+//void MainWindow::on_lineEditInputFile_textChanged(const QString &text)
+//{
+//    inputFileName = text.toLocal8Bit().constData();
+
+//    setStateProcess();
+
+//    QFileInfo fileInfo( tr( inputFileName.c_str() ) );
+
+//    if ( inputFileName != "" && QDir( fileInfo.absolutePath() ).exists() )
+//    {
+//        currentInputPath = fileInfo.absolutePath();
+//    }
+//    else
+//    {
+//        currentInputPath = "";
+//    }
+
+
+//}
+
+// https://doc.qt.io/qt-5/qlineedit.html#textEdited
+// This function is called when the text is not changed programmatically (that is, when it is edited)
+void MainWindow::on_lineEditOutputFile_textEdited(const QString &text)
 {
-    inputFileName = text.toLocal8Bit().constData();
+//    std::cout << "\nBeginning of on_lineEditOutputFile_textEdited\n" << std::endl;
+
+    if( text.isEmpty()  )
+        outputFileNameEditedByUser = false; // Reset variable
+    else
+        outputFileNameEditedByUser = true;
+
+}
+
+
+
+
+
+
+//// This function is called when the text is edited and when it is changed programmatically
+//void MainWindow::on_lineEditOutputFile_textChanged(const QString &text)
+//{
+////    std::cout << "\nBeginning of on_lineEditOutputFile_textChanged\n" << std::endl;
+
+//    outputFileName = text.toLocal8Bit().constData();
+
+//    setStateProcess();
+
+
+//    QFileInfo fileInfo( tr( outputFileName.c_str() ) );
+
+//    if ( outputFileName != "" && QDir( fileInfo.absolutePath() ).exists() )
+//    {
+//        currentOutputPath = fileInfo.absolutePath();
+//    }
+//    else
+//    {
+//        currentOutputPath = "";
+//    }
+//}
+
+
+
+
+
+
+void MainWindow::on_lineEditInputFile_editingFinished()
+{
+//    std::cout << "\nBeginning of on_lineEditInputFile_editingFinished()\n" << std::endl;
+
+
+//    inputFileName = ui->lineEditInputFile->text().toLocal8Bit().constData();
+
+    inputFileName = removeLeadingTrailingWhitespaces( ui->lineEditInputFile->text().toLocal8Bit().constData() );
 
     setStateProcess();
 
@@ -305,27 +418,19 @@ void MainWindow::on_lineEditInputFile_textChanged(const QString &text)
     }
 
 
+    // If line edit has the focus, set it to the main window
+    if ( ui->lineEditInputFile->hasFocus() )
+        this->setFocus();
+
+//    std::cout << "\nEnd of on_lineEditInputFile_editingFinished()\n" << std::endl;
 }
 
-// https://doc.qt.io/qt-5/qlineedit.html#textEdited
-// This function is called when the text is not changed programmatically (that is, when it is edited)
-void MainWindow::on_lineEditOutputFile_textEdited(const QString &text)
+void MainWindow::on_lineEditOutputFile_editingFinished()
 {
-//    std::cout << "\nBeginning of on_lineEditOutputFile_textEdited\n" << std::endl;
 
-    if( text.isEmpty()  )
-        outputFileNameEditedByUser = false; // Reset variable
-    else
-        outputFileNameEditedByUser = true;
+    //    std::cout << "\nBeginning of on_lineEditOutputFile_editingFinished()\n" << std::endl;
 
-}
-
-// This function is called when the text is edited and when it is changed programmatically
-void MainWindow::on_lineEditOutputFile_textChanged(const QString &text)
-{
-//    std::cout << "\nBeginning of on_lineEditOutputFile_textChanged\n" << std::endl;
-
-    outputFileName = text.toLocal8Bit().constData();
+    outputFileName = removeLeadingTrailingWhitespaces( ui->lineEditOutputFile->text().toLocal8Bit().constData() );
 
     setStateProcess();
 
@@ -340,7 +445,15 @@ void MainWindow::on_lineEditOutputFile_textChanged(const QString &text)
     {
         currentOutputPath = "";
     }
+
+
+    // If line edit has the focus, set it to the main window
+    if ( ui->lineEditOutputFile->hasFocus() )
+        this->setFocus();
 }
+
+
+
 
 void MainWindow::on_BrowseInput_clicked()
 {
@@ -396,6 +509,8 @@ void MainWindow::on_BrowseOutput_clicked()
         // Put the file name in the lineEdit
         ui->lineEditOutputFile->setText( fileName );
     }
+
+    setStateProcess();
 }
 
 
@@ -543,7 +658,9 @@ void MainWindow::editingFinished( const int position )
     {
 
         // Validate if the text is the line edit is a double, set variable's value if so
-
+        // If line edit has the focus, set it to the main window
+        if ( lineEditPointers[ position ]->hasFocus() )
+            this->setFocus();
         bool validNumber = setValueDouble( lineEditPointers[ position ]->text(), position );
 
 //        std::cout << "\nvaluesD( position ): " << valuesD( position ) << std::endl;
@@ -758,3 +875,5 @@ void MainWindow::on_actionSave_Arms_and_Boresight_Angles_triggered()
 {
     leverArmBoresightSave();
 }
+
+
