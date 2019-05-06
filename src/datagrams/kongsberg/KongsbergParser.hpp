@@ -189,7 +189,7 @@ void KongsbergParser::parse(std::string & filename){
 	}
 }
 
-std::string getName(int tag)
+std::string KongsbergParser::getName(int tag)
 {
     switch(tag)
     {
@@ -534,20 +534,6 @@ void KongsbergParser::processQualityFactor(KongsbergHeader & hdr,unsigned char *
  */
 void KongsbergParser::processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram){
 	//printf("TODO: parse Seabed Image Data\n");
-}
-
-std::string KongsbergParser::getName(int tag){
-	switch(tag){
-		case 'k':
-			return "Water column";
-		break;
-
-		//TODO: add others
-
-		default:
-			return "";
-		break;
-	}
 }
 
 void KongsbergParser::processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned char * datagram){
