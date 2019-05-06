@@ -136,6 +136,7 @@ void MainWindow::on_Process_clicked()
 
     // Disable the button while processing
     ui->Process->setEnabled( false );
+
     ui->Process->setText( tr( "Processing" ) );
     this->setFocus();
     QCoreApplication::processEvents();
@@ -308,8 +309,6 @@ std::string MainWindow::removeLeadingTrailingWhitespaces( const std::string &tex
 {
     const std::string whitespace = " \t";
 
-//    std::cout << "\n\n'" << text << "\'\n\n";
-
     const size_t first = text.find_first_not_of( whitespace );
 
     if ( first == std::string::npos )
@@ -319,39 +318,15 @@ std::string MainWindow::removeLeadingTrailingWhitespaces( const std::string &tex
 
     const size_t length = last - first + 1;
 
-//    std::cout << "first:  " << first
-//            << "\nlast:   " << last
-//            << "\nlength: " << length
-//            << "\n'" << text.substr( first, length ) << "\'\n" << std::endl;
-
     return text.substr( first, length );
 
 }
 
 
 
-//void MainWindow::on_lineEditInputFile_textChanged(const QString &text)
-//{
-//    inputFileName = text.toLocal8Bit().constData();
-
-//    setStateProcess();
-
-//    QFileInfo fileInfo( tr( inputFileName.c_str() ) );
-
-//    if ( inputFileName != "" && QDir( fileInfo.absolutePath() ).exists() )
-//    {
-//        currentInputPath = fileInfo.absolutePath();
-//    }
-//    else
-//    {
-//        currentInputPath = "";
-//    }
-
-
-//}
-
 // https://doc.qt.io/qt-5/qlineedit.html#textEdited
-// This function is called when the text is not changed programmatically (that is, when it is edited)
+// This function is called when the text is not changed programmatically
+// (that is, the function is called when the text is edited)
 void MainWindow::on_lineEditOutputFile_textEdited(const QString &text)
 {
 //    std::cout << "\nBeginning of on_lineEditOutputFile_textEdited\n" << std::endl;
@@ -365,42 +340,9 @@ void MainWindow::on_lineEditOutputFile_textEdited(const QString &text)
 
 
 
-
-
-
-//// This function is called when the text is edited and when it is changed programmatically
-//void MainWindow::on_lineEditOutputFile_textChanged(const QString &text)
-//{
-////    std::cout << "\nBeginning of on_lineEditOutputFile_textChanged\n" << std::endl;
-
-//    outputFileName = text.toLocal8Bit().constData();
-
-//    setStateProcess();
-
-
-//    QFileInfo fileInfo( tr( outputFileName.c_str() ) );
-
-//    if ( outputFileName != "" && QDir( fileInfo.absolutePath() ).exists() )
-//    {
-//        currentOutputPath = fileInfo.absolutePath();
-//    }
-//    else
-//    {
-//        currentOutputPath = "";
-//    }
-//}
-
-
-
-
-
-
 void MainWindow::on_lineEditInputFile_editingFinished()
 {
 //    std::cout << "\nBeginning of on_lineEditInputFile_editingFinished()\n" << std::endl;
-
-
-//    inputFileName = ui->lineEditInputFile->text().toLocal8Bit().constData();
 
     inputFileName = removeLeadingTrailingWhitespaces( ui->lineEditInputFile->text().toLocal8Bit().constData() );
 
@@ -427,7 +369,6 @@ void MainWindow::on_lineEditInputFile_editingFinished()
 
 void MainWindow::on_lineEditOutputFile_editingFinished()
 {
-
     //    std::cout << "\nBeginning of on_lineEditOutputFile_editingFinished()\n" << std::endl;
 
     outputFileName = removeLeadingTrailingWhitespaces( ui->lineEditOutputFile->text().toLocal8Bit().constData() );
@@ -457,8 +398,19 @@ void MainWindow::on_lineEditOutputFile_editingFinished()
 
 void MainWindow::on_BrowseInput_clicked()
 {
+
+    QString preSelect = tr( inputFileName .c_str() );
+
+    QFileInfo fileInfoPreDialog( preSelect );
+
+    if ( inputFileName == "" || fileInfoPreDialog.exists() == false  )
+    {
+        preSelect = currentInputPath;
+    }
+
+
     QString fileName = QFileDialog::getOpenFileName(this,
-                                        tr( "File to Georeference"), currentInputPath,
+                                        tr( "File to Georeference"), preSelect,
                                         tr( "*.all *.xtf *.s7k;;*.all;;*.xtf;;*.s7k;;All Files (*)") );
 
     if ( ! fileName.isEmpty() )
@@ -497,8 +449,18 @@ void MainWindow::on_BrowseInput_clicked()
 
 void MainWindow::on_BrowseOutput_clicked()
 {
+    QString preSelect = tr( outputFileName .c_str() );
+
+    QFileInfo fileInfoPreDialog( preSelect );
+
+    if ( outputFileName == "" || fileInfoPreDialog.exists() == false  )
+    {
+        preSelect = currentOutputPath;
+    }
+
+
     QString fileName = QFileDialog::getSaveFileName( this,
-                                        tr( "Georeferenced Output File"), currentOutputPath,
+                                        tr( "Georeferenced Output File"), preSelect,
                                         tr( "*.txt;;All Files (*)" ), nullptr,
                                                     QFileDialog::DontConfirmOverwrite ) ;
 
@@ -656,11 +618,11 @@ void MainWindow::editingFinished( const int position )
 
     if ( lineEditUserEditing[ position ] == true )
     {
-
-        // Validate if the text is the line edit is a double, set variable's value if so
         // If line edit has the focus, set it to the main window
         if ( lineEditPointers[ position ]->hasFocus() )
             this->setFocus();
+
+        // Validate if the text in the line edit is a double, if it is: set variable's value
         bool validNumber = setValueDouble( lineEditPointers[ position ]->text(), position );
 
 //        std::cout << "\nvaluesD( position ): " << valuesD( position ) << std::endl;
@@ -852,7 +814,7 @@ void MainWindow::leverArmBoresightSave()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    std::string text = "\n\nProduces a point cloud from a multibeam echosounder datagram file.\n\n"
+    std::string text = "\n\nSave to a text file the point cloud from a multibeam echosounder datagram file.\n\n"
                        "Copyright 2017-2019\n"
                         "© Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n"
                        "© Interdisciplinary Centre for the Development of Ocean Mapping (CIDCO), All Rights Reserved\n\n";

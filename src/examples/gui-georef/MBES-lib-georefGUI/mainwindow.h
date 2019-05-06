@@ -30,21 +30,13 @@ private slots:
     void on_Process_clicked();
 
 
-//    void on_lineEditInputFile_textChanged(const QString &text);
-
-
     void on_lineEditOutputFile_textEdited(const QString &text);
-
-//    void on_lineEditOutputFile_textChanged(const QString &text);
-
-
     void on_lineEditInputFile_editingFinished();
 
     void on_lineEditOutputFile_editingFinished();
 
 
     void on_BrowseInput_clicked();
-
     void on_BrowseOutput_clicked();
 
 
@@ -99,8 +91,8 @@ private:
 
     Ui::MainWindow *ui;
 
+    // File names including the absolute path
     std::string inputFileName;
-
     std::string outputFileName;
 
     QString currentInputPath;
