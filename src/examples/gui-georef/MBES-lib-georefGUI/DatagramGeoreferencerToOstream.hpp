@@ -32,9 +32,9 @@ class DatagramGeoreferencerToOstream : public DatagramGeoreferencer{
                 /**Destroy the datagram georeferencer*/
                 virtual ~DatagramGeoreferencerToOstream() {}
 
-        protected:
 
-            virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity);
+
+            virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,int32_t intensity);
 
         private:
             std::ostream & out; // ostream: can be used for a file or for std::cout
@@ -42,7 +42,7 @@ class DatagramGeoreferencerToOstream : public DatagramGeoreferencer{
 
 };
 
-void DatagramGeoreferencerToOstream::processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,uint32_t intensity){
+void DatagramGeoreferencerToOstream::processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,int32_t intensity){
     out << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2)
               << " " << quality  << " " << intensity << std::endl;
 }
