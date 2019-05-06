@@ -8,3 +8,7 @@
 #include "CoordinateTransformTest.hpp"
 #include "GeoreferenceTest.hpp"
 #include "DataCleaningTest.hpp"
+#include "KongsbergParserTest.hpp"
+#include "S7kParserTest.hpp"
+#include "XtfParserTest.hpp"
+

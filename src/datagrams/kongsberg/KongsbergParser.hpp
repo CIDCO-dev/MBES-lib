@@ -42,6 +42,8 @@ class KongsbergParser : public DatagramParser{
                  * @param filename name of the file to read
                  */
 	        void parse(std::string & filename);
+                
+                std::string getName(int tag);
 
         private:
 
@@ -129,7 +131,7 @@ class KongsbergParser : public DatagramParser{
 		/**
 		 * Returns a human readable name for a given datagram tag
 		 */
-		std::string getName(int tag);
+		/*std::string getName(int tag);*/
 };
 
 /**
@@ -185,6 +187,141 @@ void KongsbergParser::parse(std::string & filename){
 	else{
 		throw new Exception("Couldn't open file " + filename);
 	}
+}
+
+std::string getName(int tag)
+{
+    switch(tag)
+    {
+      
+        case 48:
+            return "PU Id output datagrams";
+        break;
+        
+        case 49:
+            return "PU Status output";
+        break;
+                        
+        case 51:
+            return "ExtraParameters 3";
+        break;
+                   
+        case 53:
+            return "Seabed image datagram";
+        break;
+                
+        case 65:
+            return "Attitude datagram";
+        break;
+        
+        case 66:
+            return "PU BIST result output";
+        break;
+        
+        case 67:
+            return "Clock datagrams";
+        break;
+        
+        case 68:
+            return "Depth datagram";
+        break;
+                
+        case 69:
+            return "Single beam echo sounder depth datagram";
+        break;
+                
+        case 70:
+            return "Raw range and beam angle datagrams";
+        break;
+                 
+        case 71:
+            return "Surface sound speed datagram";
+        break;
+               
+        case 72:
+            return "Heading datagrams";
+        break;
+               
+        case 73:
+            return "Installation parameters";
+        break;
+        
+        case 74:
+            return "Mechanical transducer tilt datagrams";
+        break;
+                 
+        case 75:
+            return "Central beams echogram";
+        break;
+        
+        case 78:
+            return "Raw range and beam angle 78 datagram";
+        break;
+        
+        case 79:
+            return "Quality factor datagram 79";
+        break;
+
+        case 80:
+            return "Position datagrams";
+        break;
+
+        case 82:
+            return "Runtime parameters";
+        break;
+
+        case 84:
+            return "Tide datagram";
+        break;
+
+        case 85:
+            return "Sound speed profile datagram";
+        break;
+        
+        case 87:
+            return "Kongsberg Maritime SSP output datagram";
+        break;
+        
+        case 88:
+            return "XYZ 88";
+        break;
+        
+        case 89:
+            return "Seabed image data 89 datagram";
+        break;
+
+        case 102:
+            return "Raw range and beam angle datagrams";
+        break;
+
+        case 104:
+            return "Depth (pressure) or height datagram";
+        break;
+
+        case 105:
+            return "Installation parameters";
+        break;
+        
+        case 107:
+            return "Water column datagram";
+        break;
+        
+        case 108:
+            return "Extra detections";
+        break;
+
+        case 110:
+            return "Network attitude velocity datagram 110";
+        break;
+
+        case 114:
+            return "Installation parameters or remote information";
+        break;
+
+        default:
+            return "Invalid tag";
+	break;
+    }
 }
 
 /**
