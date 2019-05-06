@@ -23,7 +23,7 @@ void printUsage(){
   NAME\n\n\
      georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
   SYNOPSIS\n \
-	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] fichier\n\n\
+	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-p roll_angle] [-P heading_angle] [-t pitch_angle] fichier\n\n\
   DESCRIPTION\n\n \
   Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
@@ -57,8 +57,10 @@ else
     double leverArmX = 0.0;
     double leverArmY = 0.0;
     double leverArmZ = 0.0;
+    //Boresight
+    double roll,pitch,heading;roll=pitch=heading=0; //TODO: get from CLI
     int index;
-    while((index=getopt(argc,argv,"x:y:z:"))!=-1)
+    while((index=getopt(argc,argv,"x:y:z:p:P:t:"))!=-1)
     {
         switch(index)
         {
@@ -85,6 +87,30 @@ else
                     printUsage();
                 }
             break;
+            
+            case 'p':
+                if (sscanf(optarg,"%lf", &roll) != 1)
+                {
+                    std::cerr << "Invalid roll angle offset (-p)" << std::endl;
+                    printUsage();
+                }
+            break;
+            
+            case 'P':
+                if (sscanf(optarg,"%lf", &heading) != 1)
+                {
+                    std::cerr << "Invalid heading angle offset (-P)" << std::endl;
+                    printUsage();
+                }
+            break;
+            
+            case 't':
+                if (sscanf(optarg,"%lf", &pitch) != 1)
+                {
+                    std::cerr << "Invalid pitch angle offset (-t)" << std::endl;
+                    printUsage();
+                }
+            break;
         }
     }
     try
@@ -106,9 +132,6 @@ else
 	//Lever arm
 	Eigen::Vector3d leverArm;
 	leverArm << leverArmX,leverArmY,leverArmZ;
-
-	//Boresight
-	double roll,pitch,heading;roll=pitch=heading=0; //TODO: get from CLI
 
 	Attitude boresightAngles(0,roll,pitch,heading);
 	Eigen::Matrix3d boresight;
