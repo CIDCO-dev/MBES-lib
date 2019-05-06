@@ -31,7 +31,7 @@ class DatagramParser{
 		/**
 		 * Returns a human-readable datagram name
 		 */
-		virtual std::string getName(int tag){ return "";};
+		virtual std::string getName(int tag){return "";};
 	protected:
 
             /**The datagram processor*/

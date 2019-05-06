@@ -98,7 +98,7 @@ protected:
     /**
      * Returns a human readable name for a given datagram tag
      */
-     std::string getName(int tag);
+     /*std::string getName(int tag);*/
 
 
 private:
@@ -678,24 +678,6 @@ void S7kParser::processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data
 
 		processor.processSoundVelocityProfile(svp);
 	}
-}
-
-std::string S7kParser::getName(int tag){
-        switch(tag){
-                case 1016:
-                        return "Attitude Data";
-                break;
-
-		case 1003:
-			return "Position Data";
-		break;
-
-                //TODO: add others
-
-                default:
-                        return "";
-                break;
-        }
 }
 
 #endif /* S7KPARSER_HPP */

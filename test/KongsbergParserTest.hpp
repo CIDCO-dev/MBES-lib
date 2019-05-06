@@ -14,7 +14,7 @@
 #include "../src/datagrams/DatagramEventHandler.hpp"
 #include "../src/datagrams/kongsberg/KongsbergParser.hpp"
 
-TEST_CASE("test the function getName")
+TEST_CASE("test the function KongsbergParser::getName")
 {
     DatagramEventHandler handler;
     KongsbergParser parser(handler);

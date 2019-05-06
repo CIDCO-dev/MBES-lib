@@ -14,7 +14,7 @@
 #include "../src/datagrams/DatagramEventHandler.hpp"
 #include "../src/datagrams/s7k/S7kParser.hpp"
 
-TEST_CASE("test the function getName")
+TEST_CASE("test the function S7kParser::getName")
 {
     DatagramEventHandler handler;
     S7kParser parser(handler);

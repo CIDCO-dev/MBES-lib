@@ -14,7 +14,7 @@
 #include "../src/datagrams/DatagramEventHandler.hpp"
 #include "../src/datagrams/xtf/XtfParser.hpp"
 
-TEST_CASE("test the function getName")
+TEST_CASE("test the function XtfParser::getName")
 {
     DatagramEventHandler handler;
     XtfParser parser(handler);
