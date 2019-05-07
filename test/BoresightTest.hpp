@@ -46,3 +46,21 @@ TEST_CASE("Test with the angle 1,2,3")
                     -sp   , cp*sr             , cp*cr;
     REQUIRE(boresight == matrixSearch);
 }
+
+TEST_CASE("Test with the angle 10,26,39")
+{
+    Attitude boresightAngles(0,10,26,39);
+    Eigen::Matrix3d boresight;
+    Boresight::buildMatrix(boresight,boresightAngles);
+    double ch = cos(39*D2R);
+    double sh = sin(39*D2R);
+    double cp = cos(26*D2R);
+    double sp = sin(26*D2R);
+    double cr = cos(10*D2R);
+    double sr = sin(10*D2R);
+    Eigen::Matrix3d matrixSearch;
+    matrixSearch << ch*cp , ch*sp*sr - sh*cr  , ch*sp*cr + sh*sr,
+                    sh*cp , sh*sp*sr + ch*cr  , sh*sp*cr - ch*sr,
+                    -sp   , cp*sr             , cp*cr;
+    REQUIRE(boresight == matrixSearch);
+}
