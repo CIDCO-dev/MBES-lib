@@ -15,7 +15,7 @@
 class DatagramGeoreferencer : public DatagramEventHandler{
         public:
                 /**Create a datagram georeferencer*/
-                DatagramGeoreferencer(){
+                DatagramGeoreferencer(Georeferencing & geo) : georef(geo){
 
                 }
 
@@ -140,7 +140,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
                                 //georeference
                                 Eigen::Vector3d georeferencedPing;
-                                Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm,boresight);
+                                georef.georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm,boresight);
 
 				processGeoreferencedPing(georeferencedPing,(*i).getQuality(),(*i).getIntensity());
 
@@ -154,6 +154,8 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                 }
 
         protected:
+		/**the georeferencing method */
+		Georeferencing & georef;
 
                 /**the current surface sound speed*/
                 double                                  currentSurfaceSoundSpeed;
