@@ -655,9 +655,23 @@ void S7kParser::processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data
 
 	SoundVelocityProfile * svp = new SoundVelocityProfile();
 
-	uint64_t timestamp = extractMicroEpoch(drf);
+	/*uint64_t timestamp = extractMicroEpoch(drf);
 
-	svp->setTimestamp(timestamp);
+	svp->setTimestamp(timestamp);*/
+        
+        struct tm * timeinfo;
+        time_t date = time(0);
+        timeinfo = gmtime(&date);
+        uint64_t nbrM = 0;
+        nbrM = nbrM+timeinfo->tm_year-70;
+        nbrM = nbrM*365 + (timeinfo->tm_yday-1);
+        nbrM = nbrM*24 + timeinfo->tm_hour;
+        nbrM = nbrM*60 + timeinfo->tm_min;
+        nbrM = nbrM*60 + timeinfo->tm_sec;
+        nbrM = nbrM*1000000;
+        svp->setTimestamp(nbrM);
+        svp->setLatitude(0);
+        svp->setLongitude(0);
 
 	if(
 		ctd->sampleContentValidity & 0x0C //depth & sound velocity OK
@@ -666,8 +680,8 @@ void S7kParser::processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data
           ){
 		//Get position if available
 		if(ctd->positionFlag){
-			svp->setLongitude(ctd->longitude);
-			svp->setLatitude(ctd->latitude);
+			/*svp->setLongitude(ctd->longitude);
+			svp->setLatitude(ctd->latitude);*/
 		}
 
 		//Get SVP samples
