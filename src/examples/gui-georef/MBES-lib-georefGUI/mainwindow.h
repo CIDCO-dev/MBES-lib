@@ -30,55 +30,69 @@ private slots:
     void on_Process_clicked();
 
 
-    void on_lineEditInputFile_textChanged(const QString &text);
-
-
     void on_lineEditOutputFile_textEdited(const QString &text);
+    void on_lineEditInputFile_editingFinished();
 
-    void on_lineEditOutputFile_textChanged(const QString &text);
+    void on_lineEditOutputFile_editingFinished();
 
 
     void on_BrowseInput_clicked();
-
     void on_BrowseOutput_clicked();
 
 
     void on_lineEditLeverArmX_textEdited(const QString &text);
-
     void on_lineEditLeverArmY_textEdited(const QString &arg1);
-
     void on_lineEditLeverArmZ_textEdited(const QString &arg1);
+
+    void on_lineEditRoll_textEdited(const QString &arg1);
+    void on_lineEditPitch_textEdited(const QString &arg1);
+    void on_lineEditYaw_textEdited(const QString &arg1);
 
 
     void on_lineEditLeverArmX_editingFinished();
-
     void on_lineEditLeverArmY_editingFinished();
-
     void on_lineEditLeverArmZ_editingFinished();
 
+    void on_lineEditRoll_editingFinished();
+    void on_lineEditPitch_editingFinished();
+    void on_lineEditYaw_editingFinished();
 
 
     void on_LeverArmLoad_clicked();
 
     void on_LeverArmSave_clicked();
 
-    void on_buttonAbout_clicked();
+
+    void on_actionAbout_triggered();
+
+    void on_actionExit_triggered();
+
+    void on_actionLoad_Lever_Arms_and_Boresight_Angles_triggered();
+
+    void on_actionSave_Arms_and_Boresight_Angles_triggered();
+
+
 
 private:
 
     void setStateProcess();
 
-    bool setLeverArm( const QString &text, const int position );
+    bool setValueDouble( const QString &text, const int position );
 
     void editingFinished( const int position );
 
     void adjustLineEditFontSize( const int position );
 
 
+    void leverArmBoresightLoad();
+    void leverArmBoresightSave();
+
+    std::string removeLeadingTrailingWhitespaces( const std::string &text );
+
     Ui::MainWindow *ui;
 
+    // File names including the absolute path
     std::string inputFileName;
-
     std::string outputFileName;
 
     QString currentInputPath;
@@ -87,24 +101,26 @@ private:
 
     bool outputFileNameEditedByUser;
 
+    static const QString processToolTipTextWhenDisabled;
 
-    const int lineEditleverArmFontPointSizeChange = 2;
-    const int lineEditleverArmFontPixelSizeChange = 2;
+    static const int nbValuesD = 6; // Number of lineEdit double values
+    static const std::string lineEditNames[ nbValuesD ];
 
-    bool editingLeverArm[ 3 ];
+    const int lineEditFontPointSizeChange = 2;
+    const int lineEditFontPixelSizeChange = 2;
 
-    int originalLeverArmPointSize[ 3 ];
-    int originalLeverArmPixelSize[ 3 ];
+    bool lineEditUserEditing[ nbValuesD ];
 
-    bool originalLeverArmSpecifiedWithPointSize[ 3 ];
+    int lineEditOriginalPointSize[ nbValuesD ];
+    int lineEditOriginalPixelSize[ nbValuesD ];
 
-    QLineEdit * lineEditLeverArms[ 3 ];
+    bool lineEditSpecifiedWithPointSize[ nbValuesD ];
 
-    Eigen::Vector3d leverArm;
+    QLineEdit * lineEditPointers[ nbValuesD ];
 
-    QString processToolTipTextWhenDisabled;
+    Eigen::VectorXd valuesD;
 
-
+    bool currentlyProcessing;
 };
 
 #endif // MAINWINDOW_H

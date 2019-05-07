@@ -42,6 +42,8 @@ class KongsbergParser : public DatagramParser{
                  * @param filename name of the file to read
                  */
 	        void parse(std::string & filename);
+                
+                std::string getName(int tag);
 
         private:
 
@@ -129,7 +131,7 @@ class KongsbergParser : public DatagramParser{
 		/**
 		 * Returns a human readable name for a given datagram tag
 		 */
-		std::string getName(int tag);
+		/*std::string getName(int tag);*/
 };
 
 /**
@@ -185,6 +187,141 @@ void KongsbergParser::parse(std::string & filename){
 	else{
 		throw new Exception("Couldn't open file " + filename);
 	}
+}
+
+std::string KongsbergParser::getName(int tag)
+{
+    switch(tag)
+    {
+      
+        case 48:
+            return "PU Id output datagrams";
+        break;
+        
+        case 49:
+            return "PU Status output";
+        break;
+                        
+        case 51:
+            return "ExtraParameters 3";
+        break;
+                   
+        case 53:
+            return "Seabed image datagram";
+        break;
+                
+        case 65:
+            return "Attitude datagram";
+        break;
+        
+        case 66:
+            return "PU BIST result output";
+        break;
+        
+        case 67:
+            return "Clock datagrams";
+        break;
+        
+        case 68:
+            return "Depth datagram";
+        break;
+                
+        case 69:
+            return "Single beam echo sounder depth datagram";
+        break;
+                
+        case 70:
+            return "Raw range and beam angle datagrams";
+        break;
+                 
+        case 71:
+            return "Surface sound speed datagram";
+        break;
+               
+        case 72:
+            return "Heading datagrams";
+        break;
+               
+        case 73:
+            return "Installation parameters";
+        break;
+        
+        case 74:
+            return "Mechanical transducer tilt datagrams";
+        break;
+                 
+        case 75:
+            return "Central beams echogram";
+        break;
+        
+        case 78:
+            return "Raw range and beam angle 78 datagram";
+        break;
+        
+        case 79:
+            return "Quality factor datagram 79";
+        break;
+
+        case 80:
+            return "Position datagrams";
+        break;
+
+        case 82:
+            return "Runtime parameters";
+        break;
+
+        case 84:
+            return "Tide datagram";
+        break;
+
+        case 85:
+            return "Sound speed profile datagram";
+        break;
+        
+        case 87:
+            return "Kongsberg Maritime SSP output datagram";
+        break;
+        
+        case 88:
+            return "XYZ 88";
+        break;
+        
+        case 89:
+            return "Seabed image data 89 datagram";
+        break;
+
+        case 102:
+            return "Raw range and beam angle datagrams";
+        break;
+
+        case 104:
+            return "Depth (pressure) or height datagram";
+        break;
+
+        case 105:
+            return "Installation parameters";
+        break;
+        
+        case 107:
+            return "Water column datagram";
+        break;
+        
+        case 108:
+            return "Extra detections";
+        break;
+
+        case 110:
+            return "Network attitude velocity datagram 110";
+        break;
+
+        case 114:
+            return "Installation parameters or remote information";
+        break;
+
+        default:
+            return "Invalid tag";
+	break;
+    }
 }
 
 /**
@@ -310,11 +447,23 @@ void KongsbergParser::processSoundSpeedProfile(KongsbergHeader & hdr,unsigned ch
 
     KongsbergSoundSpeedProfile * ssp = (KongsbergSoundSpeedProfile*) datagram;
 
-    uint64_t microEpoch = convertTime(ssp->profileDate,ssp->profileTime);
+    /*uint64_t microEpoch = convertTime(ssp->profileDate,ssp->profileTime);*/
 
     KongsbergSoundSpeedProfileEntry * entry = (KongsbergSoundSpeedProfileEntry*)((unsigned char*)(&ssp->depthResolution)+sizeof(uint16_t));
 
-    svp->setTimestamp(microEpoch);
+    /*svp->setTimestamp(microEpoch);*/
+    
+    struct tm * timeinfo;
+    time_t date = time(0);
+    timeinfo = gmtime(&date);
+    uint64_t nbrM = 0;
+    nbrM = nbrM+timeinfo->tm_year-70;
+    nbrM = nbrM*365 + (timeinfo->tm_yday-1);
+    nbrM = nbrM*24 + timeinfo->tm_hour;
+    nbrM = nbrM*60 + timeinfo->tm_min;
+    nbrM = nbrM*60 + timeinfo->tm_sec;
+    nbrM = nbrM*1000000;
+    svp->setTimestamp(nbrM);
 
     for(unsigned int i = 0;i< ssp->nbEntries;i++){
 	double depth = (double)entry[i].depth / ((double)100 / (double)ssp->depthResolution );
@@ -397,20 +546,6 @@ void KongsbergParser::processQualityFactor(KongsbergHeader & hdr,unsigned char *
  */
 void KongsbergParser::processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram){
 	//printf("TODO: parse Seabed Image Data\n");
-}
-
-std::string KongsbergParser::getName(int tag){
-	switch(tag){
-		case 'k':
-			return "Water column";
-		break;
-
-		//TODO: add others
-
-		default:
-			return "";
-		break;
-	}
 }
 
 void KongsbergParser::processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned char * datagram){

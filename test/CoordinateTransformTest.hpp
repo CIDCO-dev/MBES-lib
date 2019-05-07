@@ -12,6 +12,7 @@
 #include "../src/math/CoordinateTransform.hpp"
 #include <Eigen/Dense>
 #include "../src/Position.hpp"
+#include <math.h>
 
 #define POSITION_PRECISION 0.00000001
 
@@ -57,7 +58,107 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     std::cout << "expectedPosition:" << std::endl;
     std::cout << expectedPosition << std::endl;
 
-    REQUIRE(1==2); //TODO: FIXME bogus test
+    REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getEllipsoidalHeight()*100)/100)-testPosition.getEllipsoidalHeight())<1e-10);
+    
+    testPosition = Position(0, 60, 79, -100);
+
+    CoordinateTransform::getPositionECEF(testPositionECEF,testPosition);
+
+    expectedPosition = Position(0,0,0,0);
+    CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
+
+    std::cout << "expectedPosition:" << std::endl;
+    std::cout << expectedPosition << std::endl;
+
+    REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getEllipsoidalHeight()*100)/100)-testPosition.getEllipsoidalHeight())<1e-10);
+    
+    testPosition = Position(0, -60, -79, 100);
+
+    CoordinateTransform::getPositionECEF(testPositionECEF,testPosition);
+
+    expectedPosition = Position(0,0,0,0);
+    CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
+
+    std::cout << "expectedPosition:" << std::endl;
+    std::cout << expectedPosition << std::endl;
+
+    REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getEllipsoidalHeight()*100)/100)-testPosition.getEllipsoidalHeight())<1e-10);
+    
+    testPosition = Position(0, -70, 48, 90);
+
+    CoordinateTransform::getPositionECEF(testPositionECEF,testPosition);
+
+    expectedPosition = Position(0,0,0,0);
+    CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
+
+    std::cout << "expectedPosition:" << std::endl;
+    std::cout << expectedPosition << std::endl;
+
+    REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getEllipsoidalHeight()*100)/100)-testPosition.getEllipsoidalHeight())<1e-10);
+    
+    testPosition = Position(0, 70, 60, 80);
+
+    CoordinateTransform::getPositionECEF(testPositionECEF,testPosition);
+
+    expectedPosition = Position(0,0,0,0);
+    CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
+
+    std::cout << "expectedPosition:" << std::endl;
+    std::cout << expectedPosition << std::endl;
+
+    REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getEllipsoidalHeight()*100)/100)-testPosition.getEllipsoidalHeight())<1e-10);
+    
+    testPosition = Position(0, 0, 0, 0);
+
+    CoordinateTransform::getPositionECEF(testPositionECEF,testPosition);
+
+    expectedPosition = Position(0,0,0,0);
+    CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
+
+    std::cout << "expectedPosition:" << std::endl;
+    std::cout << expectedPosition << std::endl;
+
+    REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getEllipsoidalHeight()*100)/100)-testPosition.getEllipsoidalHeight())<1e-10);
+    
+    testPosition = Position(0, -80, -40, -50);
+
+    CoordinateTransform::getPositionECEF(testPositionECEF,testPosition);
+
+    expectedPosition = Position(0,0,0,0);
+    CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
+
+    std::cout << "expectedPosition:" << std::endl;
+    std::cout << expectedPosition << std::endl;
+
+    REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getEllipsoidalHeight()*100)/100)-testPosition.getEllipsoidalHeight())<1e-10);
+    
+    testPosition = Position(0, 87, -43, -59);
+
+    CoordinateTransform::getPositionECEF(testPositionECEF,testPosition);
+
+    expectedPosition = Position(0,0,0,0);
+    CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
+
+    std::cout << "expectedPosition:" << std::endl;
+    std::cout << expectedPosition << std::endl;
+
+    REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
+    REQUIRE(abs((roundf(expectedPosition.getEllipsoidalHeight()*100)/100)-testPosition.getEllipsoidalHeight())<1e-10);
 }
 
 
