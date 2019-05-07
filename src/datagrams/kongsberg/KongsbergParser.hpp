@@ -454,7 +454,8 @@ void KongsbergParser::processSoundSpeedProfile(KongsbergHeader & hdr,unsigned ch
     /*svp->setTimestamp(microEpoch);*/
     
     struct tm * timeinfo;
-    timeinfo = gmtime();
+    time_t date = time(0);
+    timeinfo = gmtime(&date);
     uint64_t nbrM = 0;
     nbrM = nbrM+timeinfo->tm_year-70;
     nbrM = nbrM*365 + (timeinfo->tm_yday-1);
