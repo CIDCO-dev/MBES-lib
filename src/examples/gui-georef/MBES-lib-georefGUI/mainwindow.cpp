@@ -409,12 +409,25 @@ void MainWindow::on_BrowseInput_clicked()
     }
 
 
-    QString fileName = QFileDialog::getOpenFileName(this,
-                                        tr( "File to Georeference"), preSelect,
-                                        tr( "*.all *.xtf *.s7k;;*.all;;*.xtf;;*.s7k;;All Files (*)") );
+    QFileDialog dialog( this,
+                         tr( "File to Georeference"), preSelect,
+                        tr( "*.all *.xtf *.s7k;;*.all;;*.xtf;;*.s7k;;All Files (*)") );
 
-    if ( ! fileName.isEmpty() )
+    dialog.setFileMode( QFileDialog::AnyFile ); // Get a single file, whether it exists or not
+    dialog.setLabelText( QFileDialog::Accept, tr( "Select" ) ) ; // Name of the button, to replace the default "Open"
+    dialog.setViewMode( QFileDialog::Detail );
+    dialog.setOptions( QFileDialog::DontConfirmOverwrite );
+
+    QStringList fileNames;
+
+    if ( dialog.exec() )
+        fileNames = dialog.selectedFiles();
+
+
+    if ( fileNames.size() > 0 )
     {
+        QString fileName = fileNames.at( 0 );
+
         inputFileName = fileName.toLocal8Bit().constData();
 
         // Put the file name in the lineEdit
@@ -455,17 +468,38 @@ void MainWindow::on_BrowseOutput_clicked()
 
     if ( outputFileName == "" || fileInfoPreDialog.exists() == false  )
     {
-        preSelect = currentOutputPath;
+        std::string fileNameIncludingSuffix( fileInfoPreDialog.fileName().toLocal8Bit().constData() );
+
+        if ( fileNameIncludingSuffix == "" )
+            preSelect = currentOutputPath;
+        else
+        {
+            std::string absolutePath( fileInfoPreDialog.absolutePath().toLocal8Bit().constData() );
+
+            std::string name = absolutePath + "/" + fileNameIncludingSuffix;
+
+            preSelect = tr( name.c_str() );
+        }
     }
 
 
-    QString fileName = QFileDialog::getSaveFileName( this,
-                                        tr( "Georeferenced Output File"), preSelect,
-                                        tr( "*.txt;;All Files (*)" ), nullptr,
-                                                    QFileDialog::DontConfirmOverwrite ) ;
+    QFileDialog dialog( this,
+                        tr( "Georeferenced Output File"), preSelect,
+                        tr( "*.txt;;All Files (*)" ) );
 
-    if ( ! fileName.isEmpty() )
+    dialog.setFileMode( QFileDialog::AnyFile ); // Get a single file, whether it exists or not
+    dialog.setLabelText( QFileDialog::Accept, tr( "Select" ) ) ; // Name of the button, to replace the default "Open"
+    dialog.setViewMode( QFileDialog::Detail );
+    dialog.setOptions( QFileDialog::DontConfirmOverwrite );
+
+    QStringList fileNames;
+    if ( dialog.exec() )
+        fileNames = dialog.selectedFiles();
+
+    if ( fileNames.size() > 0 )
     {
+        QString fileName = fileNames.at( 0 );
+
         outputFileName = fileName.toLocal8Bit().constData();
 
         // Put the file name in the lineEdit
