@@ -9,6 +9,10 @@
 #include <Eigen/Dense>
 #include <fstream>
 #include "../math/Interpolation.hpp"
+#include "../filter/QualityFilter.hpp"
+#include "../filter/IntensityFilter.hpp"
+#include "../filter/InsanePositionFilter.hpp"
+
 using namespace std;
 
 /**Show the usage information about data-cleaning*/
@@ -23,155 +27,8 @@ void printUsage(){
 	exit(1);
 }
 
-/*!
- * \brief Point filter class
- */
-class PointFilter{
-   public:
-       
-       /**Create a point filter*/
-	PointFilter(){
-
-	}
-
-        /**Destroy the point filter*/
-	~PointFilter(){
-
-	}
-        
-        /**
-         * return true if we remove this point
-         * 
-         * @param microEpoch timestamp of the point
-         * @param x x position of the point
-         * @param y y position of the point
-         * @param z z position of the point
-         * @param quality quality of the point
-         * @param intensity intensity of the point
-         */
-	virtual bool filterPoint(uint64_t microEpoch,double x,double y,double z, uint32_t quality,uint32_t intensity) = 0;
-};
-
-/*!
- * \brief Quality filter class extend of the Point filter class
- */
-class QualityFilter : public PointFilter{
-   public:
-
-       /**
-        * Create a quality filter
-        * 
-        * @param minimumQuality the minimal quality accepted
-        */
-	QualityFilter(int minimumQuality) : minimumQuality(minimumQuality){
-
-	}
-
-        /**Destroy the quality filter*/
-	~QualityFilter(){
-
-	}
-
-        /**
-         * return true if the quality receive is low then the minimum accepted
-         * 
-         * @param microEpoch timestamp of the point
-         * @param x x position of the point
-         * @param y y position of the point
-         * @param z z position of the point
-         * @param quality quality of the point
-         * @param intensity intensity of the point
-         */
-	bool filterPoint(uint64_t microEpoch,double x,double y,double z, uint32_t quality,uint32_t intensity){
-		return quality < minimumQuality;
-	}
-
-  private:
-        
-      /**minimal quality accepted*/
-	unsigned int minimumQuality;
-
-};
-
-/*!
- * \brief Intensity filter class extend of the Point filter class
- */
-class IntensityFilter : public PointFilter{
-   public:
-
-       /**
-        * Create a intensity filter
-        * 
-        * @param minimumIntensity the minimal intensity accepted
-        */
-	IntensityFilter(int minimumIntensity) : minimumIntensity(minimumIntensity){
-
-	}
-
-        /**Destroy the intensity filter*/
-	~IntensityFilter(){
-
-	}
-
-        /**
-         * return true if the intensity receive is low then the minimum accepted
-         * 
-         * @param microEpoch timestamp of the point
-         * @param x x position of the point
-         * @param y y position of the point
-         * @param z z position of the point
-         * @param quality quality of the point
-         * @param intensity intensity of the point
-         */
-	bool filterPoint(uint64_t microEpoch,double x,double y,double z, uint32_t quality,uint32_t intensity){
-		return intensity < minimumIntensity;
-	}
-
-  private:
-        
-      /**minimal intensity accepted*/
-	unsigned int minimumIntensity;
-
-};
-
-/*!
- * \brief Insane position filter class extend of the Point filter class
- */
-class InsanePositionFilter : public PointFilter{
-   public:
-
-       /**
-        * Create a insane position filter
-        */
-	InsanePositionFilter(){
-
-	}
-
-        /**Destroy the insane position filter*/
-	~InsanePositionFilter(){
-
-	}
-
-        /**
-         * return true if the position receive seem insane
-         * 
-         * @param microEpoch timestamp of the point
-         * @param x x position of the point
-         * @param y y position of the point
-         * @param z z position of the point
-         * @param quality quality of the point
-         * @param intensity intensity of the point
-         */
-	bool filterPoint(uint64_t microEpoch,double x,double y,double z, uint32_t quality,uint32_t intensity){
-            bool insaneX = ((x>1.00*100000000)||(x<-1.00*100000000));
-            bool insaneY = ((y>1.00*100000000)||(y<-1.00*100000000));
-            bool insaneZ = ((z>1.00*100000000)||(z<-1.00*100000000));
-            return (insaneX||insaneY||insaneZ);
-	}
-};
-
 /**
- * Filter all point receive in the terminal
+ * Filter all point received on standard input
  * 
  * @param argc number of parameter
  * @param argv value of the parameters
