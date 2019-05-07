@@ -185,18 +185,16 @@ public:
 
     /**
      * Converts sonar coordinates (alpha,beta,r) to cartesian (NED)
-     * 
+     *
      * @param outputVector the cartesian coordinates
      * @param aphaDegrees the alpha degree
      * @param betaDegrees the beta degree
      * @param r the radical distance
      */
      static void sonar2cartesian(Eigen::Vector3d & outputVector,double alphaDegrees,double betaDegrees,double r){
-        //FIXME: This is just for quick testing purposes and assumes a null tilt angle
-
-        outputVector(0)=0;
-        outputVector(1)=(r/sin(D2R*(double)90)) * sin(D2R*betaDegrees);
-        outputVector(2)=(r/sin(D2R*(double)90)) * sin(D2R*((double)90-betaDegrees));
+        outputVector(0)=r * sin(alphaDegrees*D2R);
+        outputVector(1)=r * cos(alphaDegrees*D2R) * sin(betaDegrees*D2R);
+        outputVector(2)=r * cos(alphaDegrees*D2R) * cos(betaDegrees*D2R);
      }
 };
 

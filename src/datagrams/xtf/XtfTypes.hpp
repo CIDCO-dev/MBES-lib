@@ -505,6 +505,7 @@ typedef struct {
 #define XTF_HEADER_ATTITUDE 3
 #define XTF_HEADER_Q_MULTIBEAM 28
 #define XTF_HEADER_POSITION 107
+#define XTF_HEADER_QUINSY_R2SONIC_BATHY 65
 
 const std::string SonarTypes[]{
 	"NONE , default",

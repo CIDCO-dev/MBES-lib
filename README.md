@@ -28,4 +28,7 @@ Lists the internal IDs of the packets found inside a binary datagram. Useful for
 
 Converts a binary file to a 3D point cloud in the WGS84 cartesian frame
 
+### data-cleaning
+
+Removes outliers from georeferenced data using various parameterizable filters such as quality, backscatter, etc
 
