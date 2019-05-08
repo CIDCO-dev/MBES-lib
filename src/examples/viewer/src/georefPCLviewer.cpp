@@ -184,7 +184,7 @@ int main(int argc, char ** argv){
 	std::cout << "Min y: " << minPt.y << std::endl;
 
 	std::cout << "\nMax z: " << maxPt.z << std::endl;
-	std::cout << "Min z: " << minPt.z << std::endl;
+	std::cout << "Min z: " << minPt.z << std::endl; 
 
 
 	//Load viewer
