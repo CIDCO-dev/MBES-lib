@@ -110,41 +110,63 @@ int main(int argc, char ** argv){
 
 	DatagramParser * parser = nullptr;
 
-
-	std::cout << "\nReading sonar file" << std::endl;
-
-	std::ifstream inFile;
-	inFile.open( filename1 );
-
-
-	if ( ends_with( filename1.c_str(),".all" ) )
+	try
 	{
-		parser = new KongsbergParser( line1 );
+
+		std::cout << "\nReading sonar file" << std::endl;
+
+		std::ifstream inFile;
+		inFile.open( filename1 );
+
+		if (inFile)
+		{
+			parser = DatagramParserFactory::build( filename1, line1 );
+		}
+		else
+		{
+			throw new Exception("Unknown extension");
+		}		
+
+		parser->parse( filename1 );
+
+		if(parser)
+			delete parser;
+
+
+		//loadCloudFromFile(filename1,line1);
+
+		std::cout << "\nGeoreferencing point cloud" << std::endl;
+
+		// line1.georeference(leverArm);
+
+		Attitude boresightAngles( 0, 0, 0, 0 ); //Attitude boresightAngles(0,roll,pitch,heading);
+		Eigen::Matrix3d boresight;
+		Boresight::buildMatrix( boresight, boresightAngles );
+
+		line1.georeference( leverArm , boresight  );
+
 	}
-	else if ( ends_with( filename1.c_str(),".xtf") )
-	{
-		parser = new XtfParser( line1 );
-	}
-	else if ( ends_with( filename1.c_str(),".s7k") )
-	{
-		parser = new S7kParser( line1 );
-	}
+    catch(Exception * error)
+    {
+		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\n" << error->getMessage() <<  ".\n";
 
+		if(parser)
+			delete parser;
+    }
+    catch ( const char * message )
+    {
+		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\n" << message <<  ".\n";
 
-	parser->parse( filename1 );
+		if(parser)
+			delete parser;
+    }
+    catch (...)
+    {
+		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\nOther exception.\n";
 
-
-	//loadCloudFromFile(filename1,line1);
-
-	std::cout << "\nGeoreferencing point cloud" << std::endl;
-
-	// line1.georeference(leverArm);
-
-	Attitude boresightAngles( 0, 0, 0, 0 ); //Attitude boresightAngles(0,roll,pitch,heading);
-	Eigen::Matrix3d boresight;
-	Boresight::buildMatrix( boresight, boresightAngles );
-
-	line1.georeference( leverArm , boresight  );
+		if(parser)
+			delete parser;
+    }
 
 
 	//Display point cloud stats
@@ -232,12 +254,12 @@ int main(int argc, char ** argv){
 		<< "You can use the scroll wheel, or right-click and drag up and down, to zoom in and out.\n"
 		<< "Middle-clicking and dragging will move the camera.\n\n";
 
-
 	while ( !viewer->wasStopped() ){
 
 		viewer->spinOnce (100);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
+
 }
 
 #endif
