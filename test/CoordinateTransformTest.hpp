@@ -296,3 +296,8 @@ TEST_CASE("getDCM Test") {
     dcmDifferences = dcmDifferences.cwiseAbs();
     REQUIRE(dcmDifferences.maxCoeff() < randomPrecision);
 };
+
+TEST_CASE("Conversion get the navigation position frame")
+{
+    REQUIRE(1==2);
+}
