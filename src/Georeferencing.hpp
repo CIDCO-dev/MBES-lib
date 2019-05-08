@@ -20,6 +20,7 @@
  * \brief Georeferencing class
  */
 class Georeferencing{
+public:
     /**
      * Georeference a ping
      * 
@@ -31,13 +32,13 @@ class Georeferencing{
      * @param leverArm vector from the position reference point (PRP) to the acoustic center
      * 
      */
-    static virtual void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight){};
+    virtual void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight){};
 };
 
 /*!
  * \brief TRF Georeferencing class
  */
-class GeoreferencingTRF{
+class GeoreferencingTRF : public Georeferencing{
 public:
 
     /**
@@ -51,7 +52,7 @@ public:
      * @param leverArm vector from the position reference point (PRP) to the acoustic center
      * 
      */
-    static void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
+    void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
 	//Compute transform matrixes
         Eigen::Matrix3d ned2ecef;
         CoordinateTransform::ned2ecef(ned2ecef,position);
@@ -82,7 +83,7 @@ public:
 /*!
  * \brief TRF Georeferencing class
  */
-class GeoreferencingLGF{
+class GeoreferencingLGF : public Georeferencing{
 public:
 
     /**
@@ -96,18 +97,19 @@ public:
      * @param leverArm vector from the position reference point (PRP) to the acoustic center
      * 
      */
-    static void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
-        //Compute transform matrixes
-        Eigen::Matrix3d ned2ecef;
-        CoordinateTransform::ned2ecef(ned2ecef,position);
-
+    void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
         Eigen::Matrix3d imu2ned;
         CoordinateTransform::getDCM(imu2ned,attitude);
 
         //Convert position to NED
+	Position pos;
+	pos.setLatitude(position.getLatitude()-centroid(0));
+	pos.setLongitude(position.getLongitude()-centroid(1));
+	pos.setEllipsoidalHeight(position.getEllipsoidalHeight()-centroid(2));
+
         Eigen::Vector3d positionECEF;
-        CoordinateTransform::getPositionECEF(positionECEF,position);
-	Eigen::Vector3d positionNED = positionECEF * ned2ecef.transpose();
+        CoordinateTransform::getPositionECEF(positionECEF,pos);
+	Eigen::Vector3d positionNED = ned2ecef * positionECEF;
 
         //Convert ping to NED
         Eigen::Vector3d pingVector;
@@ -122,6 +124,18 @@ public:
 
         georeferencedPing = positionNED + pingNED + leverArmNED;
     }
+
+    /**
+     * Sets centroid and inits ECEF 2 NED matrix
+     */
+    void setCentroid(Eigen::Vector3d & centroid){
+	CoordinateTransform::ned2ecef(ned2ecef,centroid);
+        ned2ecef.transposeInPlace();
+    }
+
+private:
+	Eigen::Vector3d & centroid; //in geographic coordinates
+	Eigen::Matrix3d ned2ecef;
 };
 
 #endif

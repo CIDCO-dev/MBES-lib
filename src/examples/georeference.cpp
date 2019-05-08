@@ -17,18 +17,19 @@
 
 using namespace std;
 
-/**Write the information about the georeference*/
+/**Write the information about the program*/
 void printUsage(){
 	std::cerr << "\n\
   NAME\n\n\
      georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
   SYNOPSIS\n \
 	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-p roll_angle] [-P heading_angle] [-t pitch_angle] fichier\n\n\
-  DESCRIPTION\n\n \
+  DESCRIPTION\n \
+	   -L Use a local geographic frame (NED)\n \
+	   -T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
   Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
 }
-
 
 
 /**
@@ -38,8 +39,6 @@ void printUsage(){
   * @param argv value of the arguments
   */
 int main (int argc , char ** argv){
-	DatagramParser * parser = NULL;
-	DatagramGeoreferencer  printer;
 
 #ifdef __GNU__
 	setenv("TZ", "UTC", 1);
@@ -54,13 +53,23 @@ if(argc < 2)
 else
 {
     std::string fileName(argv[argc-1]);
+
+    //Lever arm
     double leverArmX = 0.0;
     double leverArmY = 0.0;
     double leverArmZ = 0.0;
+
     //Boresight
-    double roll,pitch,heading;roll=pitch=heading=0; //TODO: get from CLI
+    double roll     = 0.0;
+    double pitch    = 0.0;
+    double heading  = 0.0;
+
+    //Georeference method
+    Georeferencing * georef;
+
     int index;
-    while((index=getopt(argc,argv,"x:y:z:p:P:t:"))!=-1)
+
+    while((index=getopt(argc,argv,"x:y:z:r:p:h:LT"))!=-1)
     {
         switch(index)
         {
@@ -88,7 +97,7 @@ else
                 }
             break;
             
-            case 'p':
+            case 'r':
                 if (sscanf(optarg,"%lf", &roll) != 1)
                 {
                     std::cerr << "Invalid roll angle offset (-p)" << std::endl;
@@ -96,7 +105,7 @@ else
                 }
             break;
             
-            case 'P':
+            case 'h':
                 if (sscanf(optarg,"%lf", &heading) != 1)
                 {
                     std::cerr << "Invalid heading angle offset (-P)" << std::endl;
@@ -104,17 +113,34 @@ else
                 }
             break;
             
-            case 't':
+            case 'p':
                 if (sscanf(optarg,"%lf", &pitch) != 1)
                 {
                     std::cerr << "Invalid pitch angle offset (-t)" << std::endl;
                     printUsage();
                 }
             break;
+
+            case 'L':
+		georef = new GeoreferencingLGF();
+            break;
+
+            case 'T':
+		georef = new GeoreferencingTRF();
+            break;
         }
     }
+
+    if(georef == NULL){
+	std::cerr << "No georeferencing method defined (-L or -T)" << std::endl;
+	printUsage();
+    }
+
     try
     {
+	DatagramParser * parser = NULL;
+	DatagramGeoreferencer  printer(*georef);
+
 	std::cerr << "Decoding " << fileName << std::endl;
         std::ifstream inFile;
         inFile.open(fileName);
@@ -133,18 +159,20 @@ else
 	Eigen::Vector3d leverArm;
 	leverArm << leverArmX,leverArmY,leverArmZ;
 
+	//Boresight
 	Attitude boresightAngles(0,roll,pitch,heading);
 	Eigen::Matrix3d boresight;
 	Boresight::buildMatrix(boresight,boresightAngles);
 
 	//Do the georeference dance
         printer.georeference(leverArm,boresight);
+
+	delete parser;
     }
     catch(Exception * error)
     {
 	std::cerr << "Error while parsing " << fileName << ": " << error->getMessage() << std::endl;
     }
-    if(parser) delete parser;
 }
 }
 

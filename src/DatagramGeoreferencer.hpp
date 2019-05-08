@@ -95,6 +95,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
                         if(svps.size() == 1){
 	                        svp = svps[0];
+				std::cerr << "Using SVP from sonar file" << std::endl;
                         }
                         else{
 	                        if(svps.size() > 0){
@@ -106,10 +107,23 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                 	                //use default model
                                         //TODO: allow different models to be used with command line switches
                                         svp = SoundVelocityProfileFactory::buildSaltWaterModel();
-                                        std::cerr << "Using default model" << std::endl;
+                                        std::cerr << "Using default SVP model" << std::endl;
                                 }
                         }
 
+			//If LGF, compute centroid
+			if(GeoreferencingLGF * lgf = dynamic_cast<GeoreferencingLGF*>(&georef)){
+				Eigen::Vector3d centroid;
+
+				for(auto i=positions.begin();i!=positions.end();i++){
+					Eigen::Vector3d pos;
+					pos << (*i).getLatitude(),(*i).getLongitude(),(*i).getEllipsoidalHeight();
+					centroid += pos;
+				}
+				centroid /= (double) positions.size();
+
+				lgf->setCentroid(centroid);
+			}
 
 			//Georef pings
                         for(auto i=pings.begin();i!=pings.end();i++){
