@@ -76,7 +76,7 @@ class PointCloudGeoreferencer : public DatagramGeoreferencer{
 
 
 	private:
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud;
+		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud;
 };
 
 // void loadCloudFromFile(std::string & fileName,PointCloudGeoreferencer & cloud){
@@ -146,27 +146,27 @@ int main(int argc, char ** argv){
 		line1.georeference( leverArm , boresight  );
 
 	}
-    catch(Exception * error)
-    {
+	catch(Exception * error)
+	{
 		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\n" << error->getMessage() <<  ".\n";
 
 		if(parser)
 			delete parser;
-    }
-    catch ( const char * message )
-    {
+	}
+	catch ( const char * message )
+	{
 		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\n" << message <<  ".\n";
 
 		if(parser)
 			delete parser;
-    }
-    catch (...)
-    {
+	}
+	catch (...)
+	{
 		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\nOther exception.\n";
 
 		if(parser)
 			delete parser;
-    }
+	}
 
 
 	//Display point cloud stats
