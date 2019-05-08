@@ -68,3 +68,23 @@ TEST_CASE("Test with the angle 10,26,39")
     REQUIRE(abs(boresight(2,1)-matrixSearch(2,1))< 1e-10);
     REQUIRE(abs(boresight(2,2)-matrixSearch(2,2))< 1e-10);
 }
+
+TEST_CASE("Test with the angle 56,67,91")
+{
+    Attitude boresightAngles(0,56,67,91);
+    Eigen::Matrix3d boresight;
+    Boresight::buildMatrix(boresight,boresightAngles);
+    Eigen::Matrix3d matrixSearch;
+    matrixSearch << -0.00681919846209329,-0.572426244871090,0.819927858238222,
+                    0.390671618245856,0.753257618534275,0.529130084967049,
+                    -0.920504853452440,0.323930786284440,0.218494074216318;
+    REQUIRE(abs(boresight(0,0)-matrixSearch(0,0))< 1e-10);
+    REQUIRE(abs(boresight(0,1)-matrixSearch(0,1))< 1e-10);
+    REQUIRE(abs(boresight(0,2)-matrixSearch(0,2))< 1e-10);
+    REQUIRE(abs(boresight(1,0)-matrixSearch(1,0))< 1e-10);
+    REQUIRE(abs(boresight(1,1)-matrixSearch(1,1))< 1e-10);
+    REQUIRE(abs(boresight(1,2)-matrixSearch(1,2))< 1e-10);
+    REQUIRE(abs(boresight(2,0)-matrixSearch(2,0))< 1e-10);
+    REQUIRE(abs(boresight(2,1)-matrixSearch(2,1))< 1e-10);
+    REQUIRE(abs(boresight(2,2)-matrixSearch(2,2))< 1e-10);
+}
