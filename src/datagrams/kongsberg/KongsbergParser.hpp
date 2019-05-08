@@ -444,27 +444,19 @@ void KongsbergParser::processAttitudeDatagram(KongsbergHeader & hdr,unsigned cha
  */
 void KongsbergParser::processSoundSpeedProfile(KongsbergHeader & hdr,unsigned char * datagram){
     SoundVelocityProfile * svp = new SoundVelocityProfile();
+    uint64_t microEpoch = convertTime(hdr.date,hdr.time);
 
     KongsbergSoundSpeedProfile * ssp = (KongsbergSoundSpeedProfile*) datagram;
 
-    /*uint64_t microEpoch = convertTime(ssp->profileDate,ssp->profileTime);*/
+    if((ssp->profileDate != 0)&&(ssp->profileTime != 0))
+    {
+        microEpoch = convertTime(ssp->profileDate,ssp->profileTime);
+    }
 
-    KongsbergSoundSpeedProfileEntry * entry = (KongsbergSoundSpeedProfileEntry*)((unsigned char*)(&ssp->depthResolution)+sizeof(uint16_t));
-
-    /*svp->setTimestamp(microEpoch);*/
+    svp->setTimestamp(microEpoch);
     
-    struct tm * timeinfo;
-    time_t date = time(0);
-    timeinfo = gmtime(&date);
-    uint64_t nbrM = 0;
-    nbrM = nbrM+timeinfo->tm_year-70;
-    nbrM = nbrM*365 + (timeinfo->tm_yday-1);
-    nbrM = nbrM*24 + timeinfo->tm_hour;
-    nbrM = nbrM*60 + timeinfo->tm_min;
-    nbrM = nbrM*60 + timeinfo->tm_sec;
-    nbrM = nbrM*1000000;
-    svp->setTimestamp(nbrM);
-
+    KongsbergSoundSpeedProfileEntry * entry = (KongsbergSoundSpeedProfileEntry*)((unsigned char*)(&ssp->depthResolution)+sizeof(uint16_t));
+    
     for(unsigned int i = 0;i< ssp->nbEntries;i++){
 	double depth = (double)entry[i].depth / ((double)100 / (double)ssp->depthResolution );
 	double soundSpeed = (double) entry[i].soundSpeed / (double) 10; //speed is in dm/s
