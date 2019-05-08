@@ -1,5 +1,9 @@
-#ifndef EEG_CPP
-#define EEG_CPP
+/*
+ *  Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+ */
+
+#ifndef GEOREFPCLVIEWER_CPP
+#define GEOREFPCLVIEWER_CPP
 
 #include <cstdio>
 #include <cstdlib>
@@ -7,11 +11,8 @@
 #include <iostream>
 #include <thread>
 
-
-
-#include <algorithm>			// for max
-#include <initializer_list>		// To use inside function max
-
+#include <algorithm>			// For max
+#include <initializer_list>		// To use as parameters to function max 
 
 #include <pcl/common/common_headers.h>
 #include <pcl/features/normal_3d.h>
@@ -19,10 +20,6 @@
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/console/parse.h>
 
-
-// #include "thirdParty/MBES-lib/src/DatagramGeoreferencer.hpp"
-// #include "thirdParty/MBES-lib/src/datagrams/DatagramParserFactory.hpp"
-// #include "thirdParty/MBES-lib/src/utils/StringUtils.hpp"
 
 #include "../../../DatagramGeoreferencer.hpp"
 #include "../../../datagrams/DatagramParserFactory.hpp"
@@ -176,7 +173,7 @@ int main(int argc, char ** argv){
 	// viewer->setBackgroundColor (0, 0, 0);
 
 	// White background
-	viewer->setBackgroundColor ( 1.0, 1.0, 1.0 ); // doubles between 0.0 and 1.0			  
+	viewer->setBackgroundColor ( 1.0, 1.0, 1.0 ); // Doubles between 0.0 and 1.0			  
 	
 	
 	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(line1.getCloud());
@@ -184,9 +181,6 @@ int main(int argc, char ** argv){
 	viewer->addPointCloud<pcl::PointXYZRGB> (line1.getCloud(), rgb, "sample cloud");
 
 	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "sample cloud");
-
-
-	// viewer->addCoordinateSystem (1.0);
 
 
 	// viewer->setPosition( 300, 100 ); // Position of the window on the screen
@@ -206,21 +200,11 @@ int main(int argc, char ** argv){
 
 	cout << "\nmaxExtent: " << maxExtent << endl;
 
-	// Focus position of the camera
+
 	// Center of the point cloud 
-	double view_x = ( minPt.x + maxPt.x ) / 2;;
-	double view_y = ( minPt.y + maxPt.y ) / 2;;
-	double view_z = ( minPt.z + maxPt.z ) / 2;;
-
-	// Position of the camera
-	double pos_x = view_x;
-	double pos_y = view_y - maxExtent;
-	double pos_z = view_z;
-
-	// A vector in space indicating the direction of the top of the camera window plane
-	double up_x = 0;
-	double up_y = 0;
-	double up_z = 1;
+	double view_x = ( minPt.x + maxPt.x ) / 2;
+	double view_y = ( minPt.y + maxPt.y ) / 2;
+	double view_z = ( minPt.z + maxPt.z ) / 2;
 
 	
 	// There are discrepancies between 
@@ -238,29 +222,7 @@ int main(int argc, char ** argv){
 	// In class pcl::visualization::Camera, this is the array "view[3]"
 
 
-	viewer->setCameraPosition( pos_x, pos_y, pos_z, view_x, view_y, view_z, up_x, up_y, up_z );
-
-
-	pcl::visualization::Camera cam; 
-
-	viewer->getCameraParameters(cam);
-
-	double cameraToFocalDistance = 0;
-
-	for ( int countAxis = 0; countAxis < 3; countAxis++ ) 
-		cameraToFocalDistance += ( cam.focal[ countAxis ] - cam.pos[ countAxis ] )
-								* ( cam.focal[ countAxis ] - cam.pos[ countAxis ] );
-	
-	cameraToFocalDistance = sqrt( cameraToFocalDistance );
-
-	viewer->setCameraClipDistances( 0.001, cameraToFocalDistance + 2 * maxExtent );
-
-
-
-	// viewer->setCameraFieldOfView( 1.7150 );
-
-
-	viewer->addCoordinateSystem( maxExtent/5.0, view_x, view_y, view_z );
+	viewer->addCoordinateSystem( maxExtent / 5.0, view_x, view_y, view_z );
 
 
 	// http://pointclouds.org/documentation/tutorials/pcl_visualizer.php
@@ -271,45 +233,10 @@ int main(int argc, char ** argv){
 		<< "Middle-clicking and dragging will move the camera.\n\n";
 
 
-	int count = 0;
-
-	while (!viewer->wasStopped()){
-
-
-		viewer->getCameraParameters(cam);
-
-		double cameraToFocalDistance = 0;
-
-		for ( int countAxis = 0; countAxis < 3; countAxis++ ) 
-			cameraToFocalDistance += ( cam.focal[ countAxis ] - cam.pos[ countAxis ] )
-									* ( cam.focal[ countAxis ] - cam.pos[ countAxis ] );
-				
-		cameraToFocalDistance = sqrt( cameraToFocalDistance );
-
-
-		viewer->setCameraClipDistances( 0.001, cameraToFocalDistance + 2* maxExtent );
-
-
-		if ( count % 50 == 0 )
-		{			
-			cout << "Cam: " << endl 
-						<< " - pos: (" << cam.pos[0] << ", " << cam.pos[1] << ", " << cam.pos[2] << ")" << endl 
-						<< " - view: (" << cam.view[0] << ", " << cam.view[1] << ", " << cam.view[2] << ")" << endl
-						<< " - focal: (" << cam.focal[0] << ", " << cam.focal[1] << ", "<< cam.focal[2] << ")" << endl
-						<< " - clip: (" << cam.clip[0] << ", " << cam.clip[1] << ")" << endl
-						<< " - fovy: (" << cam.fovy << ")" << endl
-						<< " - window_size: (" << cam.window_size[0] << ", " << cam.window_size[1] << ")" << endl
-						<< " - window_pos: (" << cam.window_pos[0] << ", " << cam.window_pos[1] << ")" << endl
-						<< "- Camera to Focal: " << cameraToFocalDistance << endl;
-
-			count = 0;
-		}
-
+	while ( !viewer->wasStopped() ){
 
 		viewer->spinOnce (100);
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-		count++;
 	}
 }
 
