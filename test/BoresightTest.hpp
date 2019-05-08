@@ -38,7 +38,15 @@ TEST_CASE("Test with the angle 1,2,3")
     matrixSearch << 0.998021196624068,-0.0517197397456515,0.0357597484569552,
                     0.0523040745924708,0.998509315434203,-0.0156022681730626,
                     -0.0348994967025010,0.0174417749028302,0.999238614955483;
-    REQUIRE(boresight == matrixSearch);
+    REQUIRE(abs(boresight(0,0)-matrixSearch(0,0))< 1e-10);
+    REQUIRE(abs(boresight(0,1)-matrixSearch(0,1))< 1e-10);
+    REQUIRE(abs(boresight(0,2)-matrixSearch(0,2))< 1e-10);
+    REQUIRE(abs(boresight(1,0)-matrixSearch(1,0))< 1e-10);
+    REQUIRE(abs(boresight(1,1)-matrixSearch(1,1))< 1e-10);
+    REQUIRE(abs(boresight(1,2)-matrixSearch(1,2))< 1e-10);
+    REQUIRE(abs(boresight(2,0)-matrixSearch(2,0))< 1e-10);
+    REQUIRE(abs(boresight(2,1)-matrixSearch(2,1))< 1e-10);
+    REQUIRE(abs(boresight(2,2)-matrixSearch(2,2))< 1e-10);
 }
 
 TEST_CASE("Test with the angle 10,26,39")
@@ -50,5 +58,13 @@ TEST_CASE("Test with the angle 10,26,39")
     matrixSearch << 0.698494163262967,-0.560601422747957,0.444783035535905,
                     0.565629420690258,0.813244715626515,0.136734746700144,
                     -0.438371146789077,0.156073948237737,0.885139345156633;
-    REQUIRE(boresight == matrixSearch);
+    REQUIRE(abs(boresight(0,0)-matrixSearch(0,0))< 1e-10);
+    REQUIRE(abs(boresight(0,1)-matrixSearch(0,1))< 1e-10);
+    REQUIRE(abs(boresight(0,2)-matrixSearch(0,2))< 1e-10);
+    REQUIRE(abs(boresight(1,0)-matrixSearch(1,0))< 1e-10);
+    REQUIRE(abs(boresight(1,1)-matrixSearch(1,1))< 1e-10);
+    REQUIRE(abs(boresight(1,2)-matrixSearch(1,2))< 1e-10);
+    REQUIRE(abs(boresight(2,0)-matrixSearch(2,0))< 1e-10);
+    REQUIRE(abs(boresight(2,1)-matrixSearch(2,1))< 1e-10);
+    REQUIRE(abs(boresight(2,2)-matrixSearch(2,2))< 1e-10);
 }
