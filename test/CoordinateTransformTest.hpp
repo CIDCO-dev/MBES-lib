@@ -161,7 +161,6 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     REQUIRE(abs((roundf(expectedPosition.getEllipsoidalHeight()*100)/100)-testPosition.getEllipsoidalHeight())<1e-10);
 }
 
-
 /**Test if the conversion between spherical to cartesian works*/
 TEST_CASE("Conversion between spherical to cartesian"){
     Eigen::Vector3d v;
@@ -180,6 +179,61 @@ TEST_CASE("Conversion between sonar to cartesian"){
     REQUIRE(1==2); //TODO FIXME: implementation is dead wrong
 }
 
+/**Test if the conversion between NED to ECEF position works*/
+TEST_CASE("Conversion between NED to ECEF position")
+{
+    Position nedPos(0,0,0,0);
+    Eigen::Matrix3d mECEF;
+    CoordinateTransform::ned2ecef(mECEF,nedPos);
+    Eigen::Matrix3d matrixSearch;
+    matrixSearch << 0,0,-1,
+                    0,1,0,
+                    1,0,0;
+    REQUIRE(mECEF == matrixSearch);
+    
+    nedPos = Position(0,16,19,0);
+    CoordinateTransform::ned2ecef(mECEF,nedPos);
+    matrixSearch << -0.260620240054051,-0.325568154457157,-0.908890789521783,
+                    -0.0897387452327910,0.945518575599317,-0.312956196296995,
+                    0.961261695938319,0,-0.275637355816999;
+    REQUIRE(abs(mECEF(0,0)-matrixSearch(0,0))< 1e-10);
+    REQUIRE(abs(mECEF(0,1)-matrixSearch(0,1))< 1e-10);
+    REQUIRE(abs(mECEF(0,2)-matrixSearch(0,2))< 1e-10);
+    REQUIRE(abs(mECEF(1,0)-matrixSearch(1,0))< 1e-10);
+    REQUIRE(abs(mECEF(1,1)-matrixSearch(1,1))< 1e-10);
+    REQUIRE(abs(mECEF(1,2)-matrixSearch(1,2))< 1e-10);
+    REQUIRE(abs(mECEF(2,0)-matrixSearch(2,0))< 1e-10);
+    REQUIRE(abs(mECEF(2,1)-matrixSearch(2,1))< 1e-10);
+    REQUIRE(abs(mECEF(2,2)-matrixSearch(2,2))< 1e-10);
+}
+
+/**Test if the conversion between Terrestial to Geodetic works*/
+TEST_CASE("Conversion between Terrestial to Geodetic")
+{
+    Position pos(0,0,0,0);
+    Eigen::Matrix3d mGeo;
+    CoordinateTransform::getTerrestialToLocalGeodeticReferenceFrameMatrix(mGeo,pos);
+    Eigen::Matrix3d matrixSearch;
+    matrixSearch << 0,0,1,
+                    0,1,0,
+                    -1,0,0;
+    REQUIRE(mGeo == matrixSearch);
+    
+    pos = Position(0,45,56,0);
+    CoordinateTransform::getTerrestialToLocalGeodeticReferenceFrameMatrix(mGeo,pos);
+    matrixSearch << -0.395409094035560,-0.586218089412104,0.707106781186548,
+                    -0.829037572555042,0.559192903470747,0,
+                    -0.395409094035560,-0.586218089412104,-0.707106781186548;
+    REQUIRE(abs(mGeo(0,0)-matrixSearch(0,0))< 1e-10);
+    REQUIRE(abs(mGeo(0,1)-matrixSearch(0,1))< 1e-10);
+    REQUIRE(abs(mGeo(0,2)-matrixSearch(0,2))< 1e-10);
+    REQUIRE(abs(mGeo(1,0)-matrixSearch(1,0))< 1e-10);
+    REQUIRE(abs(mGeo(1,1)-matrixSearch(1,1))< 1e-10);
+    REQUIRE(abs(mGeo(1,2)-matrixSearch(1,2))< 1e-10);
+    REQUIRE(abs(mGeo(2,0)-matrixSearch(2,0))< 1e-10);
+    REQUIRE(abs(mGeo(2,1)-matrixSearch(2,1))< 1e-10);
+    REQUIRE(abs(mGeo(2,2)-matrixSearch(2,2))< 1e-10);
+}
 
 /**Test if CoordinateTransform get a valid DCM*/
 TEST_CASE("getDCM Test") {
