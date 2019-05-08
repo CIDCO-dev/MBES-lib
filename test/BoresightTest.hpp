@@ -17,6 +17,7 @@
 #include "../src/math/Boresight.hpp"
 #include "../src/utils/Constants.hpp"
 
+/*Test the Boresight::buildMatrix with the angles 0,0,0*/
 TEST_CASE("Test if the angles 0,0,0 return the matrix identity")
 {
     Attitude boresightAngles(0,0,0,0);
@@ -29,6 +30,7 @@ TEST_CASE("Test if the angles 0,0,0 return the matrix identity")
     REQUIRE(boresight == matrixSearch);
 }
 
+/*Test the Boresight::buildMatrix with the angles 1,2,3*/
 TEST_CASE("Test with the angle 1,2,3")
 {
     Attitude boresightAngles(0,1,2,3);
@@ -49,6 +51,7 @@ TEST_CASE("Test with the angle 1,2,3")
     REQUIRE(abs(boresight(2,2)-matrixSearch(2,2))< 1e-10);
 }
 
+/*Test the Boresight::buildMatrix with the angles 10,26,39*/
 TEST_CASE("Test with the angle 10,26,39")
 {
     Attitude boresightAngles(0,10,26,39);
@@ -69,6 +72,7 @@ TEST_CASE("Test with the angle 10,26,39")
     REQUIRE(abs(boresight(2,2)-matrixSearch(2,2))< 1e-10);
 }
 
+/*Test the Boresight::buildMatrix with the angles 56,67,91*/
 TEST_CASE("Test with the angle 56,67,91")
 {
     Attitude boresightAngles(0,56,67,91);
