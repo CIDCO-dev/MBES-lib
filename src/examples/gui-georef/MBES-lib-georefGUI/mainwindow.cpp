@@ -20,7 +20,7 @@
 #include "../../../datagrams/s7k/S7kParser.hpp"
 
 
-#include "../../../utils/StringUtils.hpp"
+#include "../../../utils/StringUtils.hpp" 
 #include "../../../utils/Exception.hpp"
 #include "../../../math/Boresight.hpp"
 
