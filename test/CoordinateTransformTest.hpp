@@ -299,5 +299,28 @@ TEST_CASE("getDCM Test") {
 
 TEST_CASE("Conversion get the navigation position frame")
 {
-    REQUIRE(1==2);
+    Eigen::Vector3d posNav;
+    Position pos(0,0,0,0);
+    Eigen::Matrix3d dcm;
+    dcm << 0,0,0,
+           0,0,0,
+           0,0,0;
+    Eigen::Vector3d origin(0,0,0);
+    CoordinateTransform::getPositionInNavigationFrame(posNav,pos,dcm,origin);
+    REQUIRE(posNav(0) == 0);
+    REQUIRE(posNav(1) == 0);
+    REQUIRE(posNav(2) == 0);
+    
+    pos = Position(0,180,180,0);
+    dcm << 1,0,0,
+           0,1,0,
+           0,0,1;
+    origin(0) = 0;
+    origin(1) = 0;
+    origin(2) = 0;
+    CoordinateTransform::getPositionInNavigationFrame(posNav,pos,dcm,origin);
+    Eigen::Vector3d vectorSearch(6378137,-0.0000000008,0.0000000008);
+    REQUIRE(abs(posNav(0) - vectorSearch(0))< 1e-10);
+    REQUIRE(abs(posNav(1) - vectorSearch(1))< 1e-10);
+    REQUIRE(abs(posNav(2) - vectorSearch(2))< 1e-10);
 }
