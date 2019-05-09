@@ -16,7 +16,6 @@
  */
 class Raytracing{
 public:
-    
     /**
      * Make a raytracing
      * 

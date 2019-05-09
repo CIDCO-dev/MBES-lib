@@ -7,3 +7,8 @@ nbproject/*
 
 src/examples/gui-georef/build-MBES-lib-georefGUI-Desktop-Debug
 src/examples/gui-georef/build-MBES-lib-georefGUI-Desktop-Debug/*
+
+
+src/examples/viewer/build
+
+!CMakeLists.txt

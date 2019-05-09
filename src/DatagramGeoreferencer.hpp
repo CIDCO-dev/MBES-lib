@@ -15,7 +15,7 @@
 class DatagramGeoreferencer : public DatagramEventHandler{
         public:
                 /**Create a datagram georeferencer*/
-                DatagramGeoreferencer(){
+                DatagramGeoreferencer(Georeferencing & geo) : georef(geo){
 
                 }
 
@@ -95,6 +95,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
                         if(svps.size() == 1){
 	                        svp = svps[0];
+				std::cerr << "Using SVP from sonar file" << std::endl;
                         }
                         else{
 	                        if(svps.size() > 0){
@@ -106,28 +107,56 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                 	                //use default model
                                         //TODO: allow different models to be used with command line switches
                                         svp = SoundVelocityProfileFactory::buildSaltWaterModel();
-                                        std::cerr << "Using default model" << std::endl;
+                                        std::cerr << "Using default SVP model" << std::endl;
                                 }
                         }
 
+			//If LGF, compute centroid
+			if(GeoreferencingLGF * lgf = dynamic_cast<GeoreferencingLGF*>(&georef)){
+				Position centroid(0,0,0,0);
+
+				for(auto i=positions.begin();i!=positions.end();i++){
+					centroid.getVector() += i->getVector();
+				}
+
+				centroid.getVector() /= (double)positions.size();
+
+				lgf->setCentroid(&centroid);
+
+				std::cerr << "LGF centroid:" << centroid << std::endl;
+			}
+
+			//Sort everything
+			std::sort(positions.begin(),positions.end(),&Position::sortByTimestamp);
+			std::sort(attitudes.begin(),attitudes.begin(),&Attitude::sortByTimestamp);
+			std::sort(pings.begin(),pings.end(),&Ping::sortByTimestamp);
 
 			//Georef pings
                         for(auto i=pings.begin();i!=pings.end();i++){
-                                while(attitudeIndex < attitudes.size() && attitudes[attitudeIndex+1].getTimestamp() < (*i).getTimestamp()){
+
+
+                                while(attitudeIndex + 1 < attitudes.size() && attitudes[attitudeIndex + 1].getTimestamp() < (*i).getTimestamp()){
                                         attitudeIndex++;
                                 }
-
-                                if(attitudeIndex == attitudes.size() - 1  && attitudes[attitudeIndex+1].getTimestamp() < (*i).getTimestamp()){
+				
+				//No more attitudes available
+                                if(attitudeIndex >= attitudes.size() - 1){
                                         break;
                                 }
 
-                                while(positionIndex < positions.size() && positions[positionIndex+1].getTimestamp() < (*i).getTimestamp()){
+                                while(positionIndex + 1 < positions.size() && positions[positionIndex + 1].getTimestamp() < (*i).getTimestamp()){
                                         positionIndex++;
                                 }
 
-                                if(positionIndex == positions.size() - 1  && positions[positionIndex+1].getTimestamp() < (*i).getTimestamp()){
+				//No more positions available
+                                if( positionIndex >= positions.size() - 1){
                                         break;
                                 }
+
+				//No position or attitude smaller than ping, so discard this ping
+				if(positions[positionIndex].getTimestamp() > (*i).getTimestamp() || attitudes[attitudeIndex].getTimestamp() > (*i).getTimestamp()){
+					continue;
+				}
 
                                 Attitude & beforeAttitude = attitudes[attitudeIndex];
                                 Attitude & afterAttitude = attitudes[attitudeIndex+1];
@@ -140,7 +169,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
                                 //georeference
                                 Eigen::Vector3d georeferencedPing;
-                                Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm,boresight);
+                                georef.georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm,boresight);
 
 				processGeoreferencedPing(georeferencedPing,(*i).getQuality(),(*i).getIntensity());
 
@@ -154,6 +183,8 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                 }
 
         protected:
+		/**the georeferencing method */
+		Georeferencing & georef;
 
                 /**the current surface sound speed*/
                 double                                  currentSurfaceSoundSpeed;

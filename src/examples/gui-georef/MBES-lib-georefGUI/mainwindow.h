@@ -30,16 +30,13 @@ private slots:
     void on_Process_clicked();
 
 
-    void on_lineEditInputFile_textChanged(const QString &text);
-
-
     void on_lineEditOutputFile_textEdited(const QString &text);
+    void on_lineEditInputFile_editingFinished();
 
-    void on_lineEditOutputFile_textChanged(const QString &text);
+    void on_lineEditOutputFile_editingFinished();
 
 
     void on_BrowseInput_clicked();
-
     void on_BrowseOutput_clicked();
 
 
@@ -74,6 +71,8 @@ private slots:
 
     void on_actionSave_Arms_and_Boresight_Angles_triggered();
 
+
+
 private:
 
     void setStateProcess();
@@ -88,11 +87,12 @@ private:
     void leverArmBoresightLoad();
     void leverArmBoresightSave();
 
+    std::string removeLeadingTrailingWhitespaces( const std::string &text );
 
     Ui::MainWindow *ui;
 
+    // File names including the absolute path
     std::string inputFileName;
-
     std::string outputFileName;
 
     QString currentInputPath;
@@ -120,6 +120,7 @@ private:
 
     Eigen::VectorXd valuesD;
 
+    bool currentlyProcessing;
 };
 
 #endif // MAINWINDOW_H
