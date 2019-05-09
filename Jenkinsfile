@@ -19,21 +19,6 @@ pipeline {
 
   agent none
   stages {
-
-    stage('DOCUMENTATION'){
-      agent { label 'master'}
-      steps {
-        sh "make doc"
-      }
-      post {
-        always {
-          sh 'mkdir -p $publishDocDir'
-          sh 'mkdir -p $publishDoxygenDocDir'
-          sh 'cp -r build/doxygen/* $publishDoxygenDocDir/'
-        }
-      }
-    }
-
     stage('TEST MASTER'){
       agent { label 'master'}
       steps {
@@ -47,6 +32,20 @@ pipeline {
           junit 'build/test-report/*.xml'
           sh 'mkdir -p $publishCoberturaDir'
           sh 'cp -r build/coverage/report/*.html $publishCoberturaDir/'
+        }
+      }
+    }
+
+    stage('DOCUMENTATION'){
+      agent { label 'master'}
+      steps {
+        sh "make doc"
+      }
+      post {
+        always {
+          sh 'mkdir -p $publishDocDir'
+          sh 'mkdir -p $publishDoxygenDocDir'
+          sh 'cp -r build/doxygen/* $publishDoxygenDocDir/'
         }
       }
     }
