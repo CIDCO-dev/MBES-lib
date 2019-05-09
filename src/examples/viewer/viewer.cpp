@@ -21,15 +21,15 @@
 #include <pcl/console/parse.h>
 
 
-#include "../../../DatagramGeoreferencer.hpp"
-#include "../../../datagrams/DatagramParserFactory.hpp"
-#include "../../../utils/StringUtils.hpp"
-#include "../../../math/Boresight.hpp"
+#include "../../DatagramGeoreferencer.hpp"
+#include "../../datagrams/DatagramParserFactory.hpp"
+#include "../../utils/StringUtils.hpp"
+#include "../../math/Boresight.hpp"
 
 
 void printUsage(){
 	//TODO: better synopsis
-	printf("eeg file1\n");
+	printf("viewer file\n");
 	exit(1);
 }
 
@@ -52,8 +52,6 @@ class PointCloudGeoreferencer : public DatagramGeoreferencer{
 
 		virtual void processGeoreferencedPing(Eigen::Vector3d & ping,uint32_t quality,int32_t intensity){
 
-			if(quality >= 3 && ping(0) > -6.29301e+8 && ping(1) > -6.29301e+8){
-
 				pcl::PointXYZRGB point;
 
 				point.x = ping(0);
@@ -71,7 +69,6 @@ class PointCloudGeoreferencer : public DatagramGeoreferencer{
 				point.rgb = *reinterpret_cast<float*>(&rgb);
 
 				cloud->push_back(point);
-			}
 		}
 
 
@@ -79,17 +76,9 @@ class PointCloudGeoreferencer : public DatagramGeoreferencer{
 		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud;
 };
 
-// void loadCloudFromFile(std::string & fileName,PointCloudGeoreferencer & cloud){
-// 	DatagramParser * parser = DatagramParserFactory::build(fileName,cloud);
-//
-//	parser->parse(fileName);
-//
-//	delete parser;
-//}
 
 int main(int argc, char ** argv){
 	//Check CLI parameters for filenames
-	// if(argc != 3){
 	if(argc != 2){
 		printUsage();
 	}
@@ -130,13 +119,9 @@ int main(int argc, char ** argv){
 		else
 		{
 			throw new Exception("Unknown extension");
-		}		
+		}
 
 		parser->parse( filename1 );
-
-		if(parser)
-			delete parser;
-
 
 		//loadCloudFromFile(filename1,line1);
 
@@ -206,7 +191,6 @@ int main(int argc, char ** argv){
 
 	// viewer->setPosition( 300, 100 ); // Position of the window on the screen
 	viewer->setSize( 1800, 1200 );		// Size of the window on the screen
-	
 
 	viewer->initCameraParameters();
 
@@ -227,7 +211,6 @@ int main(int argc, char ** argv){
 	double view_y = ( minPt.y + maxPt.y ) / 2;
 	double view_z = ( minPt.z + maxPt.z ) / 2;
 
-	
 	// There are discrepancies between 
 	// pcl::visualization::PCLVisualizer   and     pcl::visualization::Camera
 	// about what "view" is:
