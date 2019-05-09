@@ -1,0 +1,266 @@
+        -:    0:Source:test/DataCleaningTest.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:/*
+        -:    2: * To change this license header, choose License Headers in Project Properties.
+        -:    3: * To change this template file, choose Tools | Templates
+        -:    4: * and open the template in the editor.
+        -:    5: */
+        -:    6:
+        -:    7:/* 
+        -:    8: * File:   data-cleaningTest.hpp
+        -:    9: * Author: emile
+        -:   10: *
+        -:   11: * Created on April 29, 2019, 2:22 PM
+        -:   12: */
+        -:   13:
+        -:   14:#include <Eigen/Dense>
+        -:   15:#include <Eigen/src/Core/Matrix.h>
+        -:   16:#include <iostream>
+        -:   17:#include <iomanip>
+        -:   18:#include <string>
+        -:   19:#include <sstream>
+        -:   20:#include <fstream>
+        -:   21:#include "catch.hpp"
+        -:   22:#include "../src/utils/Exception.hpp"
+        -:   23:using namespace std;
+        -:   24:#ifdef _WIN32
+        -:   25:static string DataBinexec("..\\bin\\data-cleaning.exe");
+        -:   26:static string outputdir(".");
+        -:   27:#else
+    #####:   28:static string dataBinexec("build/bin/data-cleaning");
+    #####:   29:static string dataOutputdir(".");
+        -:   30:#endif
+        -:   31:
+        -:   32:/**
+        -:   33: * Execute the data-cleaning main function
+        -:   34: * 
+        -:   35: * @param command the parameters for the execution
+        -:   36: */
+    #####:   37:std::stringstream DataSystem_call(const std::string& command){
+        -:   38:
+    #####:   39:     std::stringstream out;
+        -:   40:     FILE *fp;
+        -:   41:     char path[1035];
+        -:   42:
+        -:   43:#ifdef _WIN32
+        -:   44:     fp = _popen(command.c_str(), "r");
+        -:   45:#else
+    #####:   46:     fp = popen(command.c_str(), "r");
+        -:   47:#endif
+    #####:   48:     if (fp == NULL) {
+    #####:   49:	printf("Failed to run command\n" );
+    #####:   50:	exit(1);
+        -:   51:     }
+        -:   52:
+    #####:   53:     while (fgets(path, sizeof(path)-1, fp) != NULL) {
+    #####:   54:	     out<<path;
+        -:   55:     }
+        -:   56:
+        -:   57:#ifdef _WIN32
+        -:   58:     _pclose(fp);
+        -:   59:#else
+    #####:   60:     pclose(fp);
+        -:   61:#endif
+        -:   62:
+    #####:   63:     return out;
+        -:   64:}
+        -:   65:
+        -:   66:/**Test the insane position filter*/
+    #####:   67:TEST_CASE("test insane position filter")
+        -:   68:{
+    #####:   69:    std::ifstream inFile;
+    #####:   70:    inFile.open("test/data/dataCleanTest.dat");
+    #####:   71:    REQUIRE(inFile);
+    #####:   72:    string output = "cat test/data/dataCleanTest.dat | ./";
+    #####:   73:    std::stringstream ss;
+    #####:   74:    ss = DataSystem_call(std::string(output+dataBinexec));
+    #####:   75:    string line;
+        -:   76:    uint64_t microEpoch;
+        -:   77:    double x,y,z;
+        -:   78:    uint32_t quality;
+        -:   79:    uint32_t intensity;
+    #####:   80:    int lineCount = 0;
+    #####:   81:    while (getline(ss,line))
+        -:   82:    {
+    #####:   83:        if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
+        -:   84:        {
+    #####:   85:            REQUIRE(x<=1.00*100000000);
+    #####:   86:            REQUIRE(x>=-1.00*100000000);
+    #####:   87:            REQUIRE(y<=1.00*100000000);
+    #####:   88:            REQUIRE(y>=-1.00*100000000);
+    #####:   89:            REQUIRE(z<=1.00*100000000);
+    #####:   90:            REQUIRE(z>=-1.00*100000000);
+    #####:   91:            lineCount = lineCount+1;
+        -:   92:        }
+        -:   93:    }
+    #####:   94:    REQUIRE(lineCount>0);
+    #####:   95:}
+        -:   96:
+        -:   97:/**Test when the quality parameter is enter*/
+    #####:   98:TEST_CASE("test with the quality parameter")
+        -:   99:{
+    #####:  100:    std::ifstream inFile;
+    #####:  101:    inFile.open("test/data/dataCleanTest.dat");
+    #####:  102:    REQUIRE(inFile);
+    #####:  103:    string output = "cat test/data/dataCleanTest.dat | ./";
+    #####:  104:    string param = " -q 8";
+    #####:  105:    std::stringstream ss;
+    #####:  106:    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    #####:  107:    string line;
+        -:  108:    uint64_t microEpoch;
+        -:  109:    double x,y,z;
+        -:  110:    uint32_t quality;
+        -:  111:    uint32_t intensity;
+    #####:  112:    int lineCount = 0;
+    #####:  113:    while (getline(ss,line))
+        -:  114:    {
+    #####:  115:        if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
+        -:  116:        {
+    #####:  117:            REQUIRE(quality>=8);
+    #####:  118:            lineCount = lineCount+1;
+        -:  119:        }
+        -:  120:    }
+    #####:  121:    REQUIRE(lineCount>0);
+    #####:  122:}
+        -:  123:
+        -:  124:/**Test when the intensity parameter is enter*/
+    #####:  125:TEST_CASE("test with the intensity parameter")
+        -:  126:{
+    #####:  127:    std::ifstream inFile;
+    #####:  128:    inFile.open("test/data/dataCleanTest.dat");
+    #####:  129:    REQUIRE(inFile);
+    #####:  130:    string output = "cat test/data/dataCleanTest.dat | ./";
+    #####:  131:    string param = " -i 9";
+    #####:  132:    std::stringstream ss;
+    #####:  133:    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    #####:  134:    string line;
+        -:  135:    uint64_t microEpoch;
+        -:  136:    double x,y,z;
+        -:  137:    uint32_t quality;
+        -:  138:    uint32_t intensity;
+    #####:  139:    int lineCount = 0;
+    #####:  140:    while (getline(ss,line))
+        -:  141:    {
+    #####:  142:        if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
+        -:  143:        {
+    #####:  144:            REQUIRE(intensity>=9);
+    #####:  145:            lineCount = lineCount+1;
+        -:  146:        }
+        -:  147:    }
+    #####:  148:    REQUIRE(lineCount>0);
+    #####:  149:}
+        -:  150:
+        -:  151:/**Test when there is a invalid quality parameter*/
+    #####:  152:TEST_CASE("test with invalid quality parameter")
+        -:  153:{
+    #####:  154:    std::ifstream inFile;
+    #####:  155:    inFile.open("test/data/dataCleanTest.dat");
+    #####:  156:    REQUIRE(inFile);
+    #####:  157:    string output = "cat test/data/dataCleanTest.dat | ./";
+    #####:  158:    string param = " -q oio 2>&1";
+    #####:  159:    std::stringstream ss;
+    #####:  160:    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    #####:  161:    string line;
+    #####:  162:    getline(ss,line);
+    #####:  163:    REQUIRE(line=="Error: -q invalid quality parameter");
+    #####:  164:}
+        -:  165:
+        -:  166:/**Test when there is a invalid intensity parameter*/
+    #####:  167:TEST_CASE("test with invalid intensity parameter")
+        -:  168:{
+    #####:  169:    std::ifstream inFile;
+    #####:  170:    inFile.open("test/data/dataCleanTest.dat");
+    #####:  171:    REQUIRE(inFile);
+    #####:  172:    string output = "cat test/data/dataCleanTest.dat | ./";
+    #####:  173:    string param = " -i oek 2>&1";
+    #####:  174:    std::stringstream ss;
+    #####:  175:    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    #####:  176:    string line;
+    #####:  177:    getline(ss,line);
+    #####:  178:    REQUIRE(line=="Error: -i invalid intensity parameter");
+    #####:  179:}
+        -:  180:
+        -:  181:/**Test when there is multiple parameter*/
+    #####:  182:TEST_CASE("test with multiple character parameter")
+        -:  183:{
+    #####:  184:    std::ifstream inFile;
+    #####:  185:    inFile.open("test/data/dataCleanTest.dat");
+    #####:  186:    REQUIRE(inFile);
+    #####:  187:    string output = "cat test/data/dataCleanTest.dat | ./";
+    #####:  188:    string param = " -q 9 -i 10";
+    #####:  189:    std::stringstream ss;
+    #####:  190:    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    #####:  191:    string line;
+        -:  192:    uint64_t microEpoch;
+        -:  193:    double x,y,z;
+        -:  194:    uint32_t quality;
+        -:  195:    uint32_t intensity;
+    #####:  196:    int lineCount = 0;
+    #####:  197:    while (getline(ss,line))
+        -:  198:    {
+    #####:  199:        if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
+        -:  200:        {
+    #####:  201:            REQUIRE(quality>=9);
+    #####:  202:            REQUIRE(intensity>=10);
+    #####:  203:            lineCount = lineCount+1;
+        -:  204:        }
+        -:  205:    }
+    #####:  206:    REQUIRE(lineCount>0);
+    #####:  207:}
+        -:  208:
+        -:  209:/**Test when there is a invalid line input*/
+    #####:  210:TEST_CASE("test with invalid line input")
+        -:  211:{
+    #####:  212:    std::ifstream inFile;
+    #####:  213:    inFile.open("test/data/dataCleanTest.dat");
+    #####:  214:    REQUIRE(inFile);
+    #####:  215:    string output = "cat test/data/dataCleanTest.dat | ./";
+    #####:  216:    string param = " -q 0 2>&1";
+    #####:  217:    std::stringstream ss;
+    #####:  218:    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    #####:  219:    string line;
+        -:  220:    uint64_t microEpoch;
+        -:  221:    double x,y,z;
+        -:  222:    uint32_t quality;
+        -:  223:    uint32_t intensity;
+    #####:  224:    int lineCount = 0;
+    #####:  225:    while (getline(ss,line))
+        -:  226:    {
+    #####:  227:        if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)!=6)
+        -:  228:        {
+        -:  229:            int count;
+    #####:  230:            REQUIRE(sscanf(line.c_str(),"Error at line %d",&count)==1);
+    #####:  231:            lineCount = lineCount+1;
+        -:  232:        }
+        -:  233:    }
+    #####:  234:    REQUIRE(lineCount>0);
+    #####:  235:}
+        -:  236:
+        -:  237:/**Test when all the lines do not respect the filters*/
+    #####:  238:TEST_CASE("test with no lines who respect the filters")
+        -:  239:{
+    #####:  240:    std::ifstream inFile;
+    #####:  241:    inFile.open("test/data/dataCleanTest.dat");
+    #####:  242:    REQUIRE(inFile);
+    #####:  243:    string output = "cat test/data/dataCleanTest.dat | ./";
+    #####:  244:    string param = " -q 100 -i 100";
+    #####:  245:    std::stringstream ss;
+    #####:  246:    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    #####:  247:    string line;
+        -:  248:    uint64_t microEpoch;
+        -:  249:    double x,y,z;
+        -:  250:    uint32_t quality;
+        -:  251:    uint32_t intensity;
+    #####:  252:    int lineCount = 0;
+    #####:  253:    while (getline(ss,line))
+        -:  254:    {
+    #####:  255:        if(sscanf(line.c_str(),"%lu %lf %lf %lf %d %d",&microEpoch,&x,&y,&z,&quality,&intensity)==6)
+        -:  256:        {
+    #####:  257:            lineCount = lineCount+1;
+        -:  258:        }
+        -:  259:    }
+    #####:  260:    REQUIRE(lineCount==0);
+    #####:  261:}

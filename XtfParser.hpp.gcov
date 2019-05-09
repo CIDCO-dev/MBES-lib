@@ -1,0 +1,597 @@
+        -:    0:Source:src/datagrams/xtf/XtfParser.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:#ifndef XTFPARSER_HPP
+        -:    2:#define XTFPARSER_HPP
+        -:    3:
+        -:    4:#include <string>
+        -:    5:#include <stdio.h>
+        -:    6:#include <string.h>
+        -:    7:#include <cstdio>
+        -:    8:#include "XtfTypes.hpp"
+        -:    9:#include "../DatagramParser.hpp"
+        -:   10:#include "../../utils/TimeUtils.hpp"
+        -:   11:
+        -:   12:#define MAGIC_NUMBER 123
+        -:   13:#define PACKET_MAGIC_NUMBER 0xFACE
+        -:   14:
+        -:   15:/**
+        -:   16: * @author Guillaume Morissette
+        -:   17: *
+        -:   18: */
+        -:   19:
+        -:   20:/*!
+        -:   21: * \brief XTF parser class extention datagram parser
+        -:   22: */
+        -:   23:class XtfParser : public DatagramParser{
+        -:   24:	public:
+        -:   25:
+        -:   26:                /**
+        -:   27:                 * Create an XTF parser 
+        -:   28:                 * 
+        -:   29:                 * @param processor the datagram processor
+        -:   30:                 */
+        -:   31:		XtfParser(DatagramEventHandler & processor);
+        -:   32:                
+        -:   33:                /**Destroy the XTF parser*/
+        -:   34:		~XtfParser();
+        -:   35:
+        -:   36:                /**
+        -:   37:                 * Parse an XTF file
+        -:   38:                 * 
+        -:   39:                 * @param filename name of the file to read
+        -:   40:                 */
+        -:   41:		void parse(std::string & filename);
+        -:   42:                
+        -:   43:                std::string getName(int tag);
+        -:   44:                
+        -:   45:                /**Return the number channels in the file*/
+        -:   46:		int getTotalNumberOfChannels();
+        -:   47:
+        -:   48:	protected:
+        -:   49:                
+        -:   50:                /**
+        -:   51:                 * Process the contents of the XtfPacketHeader
+        -:   52:                 * 
+        -:   53:                 * @param hdr the XTF PacketHeader
+        -:   54:                 */
+        -:   55:		void processPacketHeader(XtfPacketHeader & hdr);
+        -:   56:                
+        -:   57:                /**
+        -:   58:                 * Dispatch processing to the appropriate callback depending on the content of the XTF Packet header
+        -:   59:                 * 
+        -:   60:                 * @param hdr the XTF Packet Header 
+        -:   61:                 * @param packet the packet
+        -:   62:                 */
+        -:   63:		void processPacket(XtfPacketHeader & hdr,unsigned char * packet);
+        -:   64:                
+        -:   65:                /**
+        -:   66:                 * Process the contents of the PingHeader
+        -:   67:                 * 
+        -:   68:                 * @param hdr the XTF PingHeader
+        -:   69:                 */
+        -:   70:	        void processPingHeader(XtfPingHeader & hdr);
+        -:   71:                
+        -:   72:                /**
+        -:   73:                 * Process the contents of the FileHeader
+        -:   74:                 * 
+        -:   75:                 * @param hdr the XTF FileHeader
+        -:   76:                 */
+        -:   77:	        void processFileHeader(XtfFileHeader & hdr);
+        -:   78:                
+        -:   79:                /**
+        -:   80:                 * Process the contents of the file ChanInfo
+        -:   81:                 * 
+        -:   82:                 * @param c the XTF ChanInfo
+        -:   83:                 */
+        -:   84:	        void processChanInfo(XtfChanInfo & c);
+        -:   85:
+        -:   86:                /**the XTF FileHeader*/
+        -:   87:		XtfFileHeader fileHeader;
+        -:   88:};
+        -:   89:
+        -:   90:/**
+        -:   91: * Create an XTF parser 
+        -:   92: * 
+        -:   93: * @param processor the datagram processor
+        -:   94: */
+    #####:   95:XtfParser::XtfParser(DatagramEventHandler & processor):DatagramParser(processor){
+        -:   96:
+    #####:   97:}
+        -:   98:
+        -:   99:/**Destroy the XTF parser*/
+    #####:  100:XtfParser::~XtfParser(){
+        -:  101:
+    #####:  102:}
+        -:  103:
+        -:  104:/**
+        -:  105: * Read a file and change the XTF parser depending on the information
+        -:  106: * 
+        -:  107: * @param filename name of the file to read
+        -:  108: */
+    #####:  109:void XtfParser::parse(std::string & filename){
+    #####:  110:	FILE * file = fopen(filename.c_str(),"rb");
+        -:  111:
+    #####:  112:        if(file){
+        -:  113:                //Lire Header
+    #####:  114:		memset(&fileHeader,0,sizeof(XtfFileHeader));
+    #####:  115:		int elementsRead = fread (&fileHeader,sizeof(XtfFileHeader),1,file);
+        -:  116:
+    #####:  117:		if(elementsRead==1){
+    #####:  118:			if(fileHeader.FileFormat == MAGIC_NUMBER){
+        -:  119:
+    #####:  120:				processFileHeader(fileHeader);
+        -:  121:
+    #####:  122:				int channels = this->getTotalNumberOfChannels();
+        -:  123:
+        -:  124:				//Lire structs CHANINFO dans le header
+    #####:  125:				int channelsInHeader = (channels > 6)?6:channels;
+        -:  126:
+    #####:  127:				for(int i=0;i<channelsInHeader;i++){
+    #####:  128:					processChanInfo(fileHeader.Channels[i]);
+        -:  129:				}
+        -:  130:
+        -:  131:				//Lire les structs CHANINFO qui suivent le header
+    #####:  132:				if(channels>6){
+    #####:  133:					int channelsLeft = channels;
+        -:  134:					XtfChanInfo buf[8];
+        -:  135:
+    #####:  136:					do{
+    #####:  137:						memset(buf,0,sizeof(XtfChanInfo)*8);
+    #####:  138:						elementsRead = fread(&buf,sizeof(XtfChanInfo),8,file);
+        -:  139:
+    #####:  140:						if(elementsRead == 8){
+    #####:  141:							for(int i=0;i<8;i++){
+    #####:  142:								if(channelsLeft > 0){
+    #####:  143:									processChanInfo(buf[i]);
+    #####:  144:									channelsLeft--;
+        -:  145:								}
+        -:  146:								else{
+    #####:  147:									break;
+        -:  148:								}
+        -:  149:							}
+        -:  150:						}
+        -:  151:						else{
+        -:  152:							//TODO: whine and log error while reading
+    #####:  153:							printf("Error while reading CHANINFO\n");
+        -:  154:						}
+        -:  155:					}
+    #####:  156:					while(channelsLeft > 0);
+        -:  157:				}
+        -:  158:
+        -:  159:				//Lire packets
+    #####:  160:				while(!feof(file)){
+        -:  161:					// parse a packet header
+        -:  162:					XtfPacketHeader packetHeader;
+        -:  163:
+    #####:  164:					elementsRead = fread (&packetHeader,sizeof(XtfPacketHeader),1,file);
+        -:  165:
+    #####:  166:					if(elementsRead == 1){
+    #####:  167:						if (packetHeader.MagicNumber==PACKET_MAGIC_NUMBER){
+    #####:  168:							processPacketHeader(packetHeader);
+        -:  169:
+    #####:  170:							unsigned char * packet = (unsigned char*) malloc(packetHeader.NumBytesThisRecord-sizeof(XtfPacketHeader));
+        -:  171:
+    #####:  172:							elementsRead = fread (packet,packetHeader.NumBytesThisRecord-sizeof(XtfPacketHeader),1,file);
+        -:  173:
+    #####:  174:							if(elementsRead == 1){
+    #####:  175:								processPacket(packetHeader,packet);
+        -:  176:							}
+        -:  177:							else{
+    #####:  178:								printf("Error while reading packet\n");
+        -:  179:							}
+        -:  180:
+    #####:  181:							free(packet);
+        -:  182:						}
+        -:  183:						else{
+    #####:  184:							printf("Invalid packet header\n");
+        -:  185:						}
+        -:  186:					}
+        -:  187:					else{
+        -:  188:						//TODO: whine and log error while reading
+        -:  189:						//printf("Error while reading packet header\n");
+        -:  190:					}
+        -:  191:				}
+        -:  192:			}
+        -:  193:			else{
+    #####:  194:				fclose(file);
+    #####:  195:				throw new Exception("Invalid file format");
+        -:  196:			}
+        -:  197:		}
+        -:  198:		else{
+    #####:  199:			fclose(file);
+    #####:  200:			throw new Exception("Couldn't read from file");
+        -:  201:		}
+        -:  202:
+    #####:  203:		fclose(file);
+        -:  204:	}
+        -:  205:	else{
+    #####:  206:		throw new Exception("File not found");
+        -:  207:	}
+    #####:  208:}
+        -:  209:
+    #####:  210:std::string XtfParser::getName(int tag)
+        -:  211:{
+    #####:  212:    switch(tag)
+        -:  213:    {
+        -:  214:        case 0:
+    #####:  215:            return "XTF_HEADER_SONAR";
+        -:  216:        break;
+        -:  217:        
+        -:  218:        case 1:
+    #####:  219:            return "XTF_HEADER_NOTES";
+        -:  220:        break;
+        -:  221:        
+        -:  222:        case 2:
+    #####:  223:            return "XTF_HEADER_BATHY";
+        -:  224:        break;
+        -:  225:        
+        -:  226:        case 3:
+    #####:  227:            return "XTF_HEADER_ATTITUDE";
+        -:  228:        break;
+        -:  229:        
+        -:  230:        case 4:
+    #####:  231:            return "XTF_HEADER_FORWARD";
+        -:  232:        break;
+        -:  233:        
+        -:  234:        case 5:
+    #####:  235:            return "XTF_HEADER_ELAC";
+        -:  236:        break;
+        -:  237:        
+        -:  238:        case 6:
+    #####:  239:            return "XTF_HEADER_RAW_SERIAL";
+        -:  240:        break;
+        -:  241:        
+        -:  242:        case 7:
+    #####:  243:            return "XTF_HEADER_EMBED_HEAD";
+        -:  244:        break;
+        -:  245:        
+        -:  246:        case 8:
+    #####:  247:            return "XTF_HEADER_HIDDEN_SONAR";
+        -:  248:        break;
+        -:  249:        
+        -:  250:        case 9:
+    #####:  251:            return "XTF_HEADER_SEAVIEW_PROCESSED_BATHY";
+        -:  252:        break;
+        -:  253:        
+        -:  254:        case 10:
+    #####:  255:            return "XTF_HEADER_SEAVIEW_DEPTHS";
+        -:  256:        break;
+        -:  257:        
+        -:  258:        case 11:
+    #####:  259:            return "XTF_HEADER_RSVD_HIGHSPEED_SENSOR";
+        -:  260:        break;
+        -:  261:        
+        -:  262:        case 12:
+    #####:  263:            return "XTF_HEADER_ECHOSTRENGTH";
+        -:  264:        break;
+        -:  265:        
+        -:  266:        case 13:
+    #####:  267:            return "XTF_HEADER_GEOREC";
+        -:  268:        break;
+        -:  269:        
+        -:  270:        case 14:
+    #####:  271:            return "XTF_HEADER_KLEIN_RAW_BATHY";
+        -:  272:        break;
+        -:  273:        
+        -:  274:        case 15:
+    #####:  275:            return "XTF_HEADER_HIGHSPEED_SENSOR2";
+        -:  276:        break;
+        -:  277:        
+        -:  278:        case 16:
+    #####:  279:            return "XTF_HEADER_ELAC_XSE";
+        -:  280:        break;
+        -:  281:        
+        -:  282:        case 17:
+    #####:  283:            return "XTF_HEADER_BATHY_XYZA";
+        -:  284:        break;
+        -:  285:        
+        -:  286:        case 18:
+    #####:  287:            return "XTF_HEADER_K5000_BATHY_IQ";
+        -:  288:        break;
+        -:  289:        
+        -:  290:        case 19:
+    #####:  291:            return "XTF_HEADER_BATHY_SNIPPET";
+        -:  292:        break;
+        -:  293:        
+        -:  294:        case 20:
+    #####:  295:            return "XTF_HEADER_GPS";
+        -:  296:        break;
+        -:  297:        
+        -:  298:        case 21:
+    #####:  299:            return "XTF_HEADER_STAT";
+        -:  300:        break;
+        -:  301:        
+        -:  302:        case 22:
+    #####:  303:            return "XTF_HEADER_SINGLEBEAM";
+        -:  304:        break;
+        -:  305:        
+        -:  306:        case 23:
+    #####:  307:            return "XTF_HEADER_GYRO";
+        -:  308:        break;
+        -:  309:        
+        -:  310:        case 24:
+    #####:  311:            return "XTF_HEADER_TRACKPOINT";
+        -:  312:        break;
+        -:  313:        
+        -:  314:        case 25:
+    #####:  315:            return "XTF_HEADER_MULTIBEAM";
+        -:  316:        break;
+        -:  317:        
+        -:  318:        case 26:
+    #####:  319:            return "XTF_HEADER_Q_SINGLEBEAM";
+        -:  320:        break;
+        -:  321:        
+        -:  322:        case 27:
+    #####:  323:            return "XTF_HEADER_Q_MULTITX";
+        -:  324:        break;
+        -:  325:        
+        -:  326:        case 28:
+    #####:  327:            return "XTF_HEADER_Q_MULTIBEAM";
+        -:  328:        break;
+        -:  329:        
+        -:  330:        case 50:
+    #####:  331:            return "XTF_HEADER_TIME";
+        -:  332:        break;
+        -:  333:        
+        -:  334:        case 60:
+    #####:  335:            return "XTF_HEADER_BENTHOS_CAATI_SARA";
+        -:  336:        break;
+        -:  337:        
+        -:  338:        case 61:
+    #####:  339:            return "XTF_HEADER_7125";
+        -:  340:        break;
+        -:  341:        
+        -:  342:        case 62:
+    #####:  343:            return "XTF_HEADER_7125_SNIPPET";
+        -:  344:        break;
+        -:  345:        
+        -:  346:        case 65:
+    #####:  347:            return "XTF_HEADER_QINSY_R2SONIC_BATHY";
+        -:  348:        break;
+        -:  349:        
+        -:  350:        case 66:
+    #####:  351:            return "XTF_HEADER_QINSY_R2SONIC_FTS";
+        -:  352:        break;
+        -:  353:        
+        -:  354:        case 68:
+    #####:  355:            return "XTF_HEADER_R2SONIC_BATHY";
+        -:  356:        break;
+        -:  357:        
+        -:  358:        case 69:
+    #####:  359:            return "XTF_HEADER_R2SONIC_FTS";
+        -:  360:        break;
+        -:  361:        
+        -:  362:        case 70:
+    #####:  363:            return "XTF_HEADER_CODA_ECHOSCOPE_DATA";
+        -:  364:        break;
+        -:  365:        
+        -:  366:        case 71:
+    #####:  367:            return "XTF_HEADER_CODA_ECHOSCOPE_CONFIG";
+        -:  368:        break;
+        -:  369:        
+        -:  370:        case 72:
+    #####:  371:            return "XTF_HEADER_CODA_ECHOSCOPE_IMAGE";
+        -:  372:        break;
+        -:  373:        
+        -:  374:        case 73:
+    #####:  375:            return "XTF_HEADER_EDGETECH_4600";
+        -:  376:        break;
+        -:  377:        
+        -:  378:        case 78:
+    #####:  379:            return "XTF_HEADER_RESON_7018_WATERCOLUMN";
+        -:  380:        break;
+        -:  381:        
+        -:  382:        case 100:
+    #####:  383:            return "XTF_HEADER_POSITION";
+        -:  384:        break;
+        -:  385:        
+        -:  386:        case 102:
+    #####:  387:            return "XTF_HEADER_BATHY_PROC";
+        -:  388:        break;
+        -:  389:        
+        -:  390:        case 103:
+    #####:  391:            return "XTF_HEADER_ATTITUDE_PROC";
+        -:  392:        break;
+        -:  393:        
+        -:  394:        case 104:
+    #####:  395:            return "XTF_HEADER_SINGLEBEAM_PROC";
+        -:  396:        break;
+        -:  397:        
+        -:  398:        case 105:
+    #####:  399:            return "XTF_HEADER_AUX_PROC";
+        -:  400:        break;
+        -:  401:        
+        -:  402:        case 107:
+    #####:  403:            return "XTF_HEADER_POS_RAW_NAVIGATION";
+        -:  404:        break;
+        -:  405:        
+        -:  406:        case 108:
+    #####:  407:            return "XTF_HEADER_KLEINV4_DATA_PAGE";
+        -:  408:        break;
+        -:  409:        
+        -:  410:        case 200:
+    #####:  411:            return "XTF_HEADER_USERDEFINED";
+        -:  412:        break;
+        -:  413:        
+        -:  414:        default:
+    #####:  415:            return "Invalid tag";
+        -:  416:	break;
+        -:  417:    }
+        -:  418:}
+        -:  419:
+        -:  420:/**Return the number channels in the file header*/
+    #####:  421:int XtfParser::getTotalNumberOfChannels(){
+    #####:  422:	return  this->fileHeader.NumberOfSonarChannels+
+    #####:  423:		this->fileHeader.NumberOfBathymetryChannels+
+    #####:  424:		this->fileHeader.NumberOfSnippetChannels+
+    #####:  425:		this->fileHeader.NumberOfEchoStrengthChannels+
+    #####:  426:		this->fileHeader.NumberOfInterferometryChannels;
+        -:  427:};
+        -:  428:
+        -:  429:/**
+        -:  430: * show the contain of the file FileHeader
+        -:  431: * 
+        -:  432: * @param f the XTF FileHeader
+        -:  433: */
+    #####:  434:void XtfParser::processFileHeader(XtfFileHeader & f){
+        -:  435:    /*
+        -:  436:        printf("------------\n");
+        -:  437:        printf("FileFormat: %d\n",f.FileFormat);
+        -:  438:        printf("SystemType: %d\n",f.SystemType);
+        -:  439:        printf("RecordingProgramName: %s\n",f.RecordingProgramName);
+        -:  440:        printf("RecordingProgramVersion: %s\n",f.RecordingProgramVersion);
+        -:  441:        printf("SonarName: %s\n",f.SonarName);
+        -:  442:        printf("sonarType: %d (%s)\n",f.SonarType,SonarTypes[f.SonarType].c_str());
+        -:  443:        printf("NoteString: %s\n",f.NoteString);
+        -:  444:        printf("ThisFileName: %s\n",f.ThisFileName);
+        -:  445:        printf("NavUnits: %d\n",f.NavUnits);
+        -:  446:        printf("NumberOfSonarChannels: %d\n",f.NumberOfSonarChannels);
+        -:  447:        printf("NumberOfBathymetryChannels: %d\n",f.NumberOfBathymetryChannels);
+        -:  448:        printf("NumberOfSnippetChannels: %d\n",f.NumberOfSnippetChannels);
+        -:  449:        printf("NumberOfForwardLookArrays: %d\n",f.NumberOfForwardLookArrays);
+        -:  450:        printf("NumberOfEchoStrengthChannels: %d\n",f.NumberOfEchoStrengthChannels);
+        -:  451:        printf("NumberOfInterferometryChannels: %d\n",f.NumberOfInterferometryChannels);
+        -:  452:        printf("Reserved1: %d\n",f.Reserved1);
+        -:  453:        printf("Reserved2: %d\n",f.Reserved2);
+        -:  454:        printf("ReferencePointHeight: %f\n",f.ReferencePointHeight);
+        -:  455:        //TODO
+        -:  456:        //printf("ProjectionType: ");
+        -:  457:        //print(f.ProjectionType,12);
+        -:  458:        //printf("\n");
+        -:  459:        //printf("SpheriodType: ");
+        -:  460:        //print(f.SpheriodType,10);
+        -:  461:        //printf("\n");
+        -:  462:
+        -:  463:        printf("NavigationLatency: %d\n",f.NavigationLatency);
+        -:  464:        printf("OriginY: %f\n",f.OriginY);
+        -:  465:        printf("OriginX: %f\n",f.OriginX);
+        -:  466:        printf("NavOffsetY: %f\n",f.NavOffsetY);
+        -:  467:        printf("NavOffsetX: %f\n",f.NavOffsetX);
+        -:  468:        printf("NavOffsetZ: %f\n",f.NavOffsetZ);
+        -:  469:        printf("NavOffsetYaw: %f\n",f.NavOffsetYaw);
+        -:  470:        printf("MRUOffsetY: %f\n",f.MRUOffsetY);
+        -:  471:        printf("MRUOffsetX: %f\n",f.MRUOffsetX);
+        -:  472:        printf("MRUOffsetZ: %f\n",f.MRUOffsetZ);
+        -:  473:        printf("MRUOffsetYaw: %f\n",f.MRUOffsetYaw);
+        -:  474:        printf("MRUOffsetPitch: %f\n",f.MRUOffsetPitch);
+        -:  475:        printf("MRUOffsetRoll: %f\n",f.MRUOffsetRoll);
+        -:  476:        printf("------------\n");
+        -:  477:        */
+    #####:  478:}
+        -:  479:
+        -:  480:/**
+        -:  481: * show the contain of the file ChanInfo
+        -:  482: * 
+        -:  483: * @param c the XTF ChanInfo
+        -:  484: */
+    #####:  485:void XtfParser::processChanInfo(XtfChanInfo & c){
+        -:  486:    /*
+        -:  487:        printf("------------\n");
+        -:  488:        printf("TypeOfChannel: %d\n",c.TypeOfChannel);
+        -:  489:        printf("SubChannelNumber: %d\n",c.SubChannelNumber);
+        -:  490:        printf("CorrectionFlags: %d\n",c.CorrectionFlags);
+        -:  491:        printf("UniPolar: %d\n",c.UniPolar);
+        -:  492:        printf("BytesPerSample: %d\n",c.BytesPerSample);
+        -:  493:        printf("Reserved: %d\n",c.Reserved);
+        -:  494:        printf("ChannelName: %s\n",c.ChannelName);
+        -:  495:        printf("VoltScale: %f\n",c.VoltScale);
+        -:  496:        printf("Frequency: %f\n",c.Frequency);
+        -:  497:        printf("HorizBeamAngle: %f\n",c.HorizBeamAngle);
+        -:  498:        printf("TiltAngle: %f\n",c.TiltAngle);
+        -:  499:        printf("BeamWidth: %f\n",c.BeamWidth);
+        -:  500:        printf("OffsetX: %f\n",c.OffsetX));
+        -:  501:        printf("OffsetY: %f\n",c.OffsetY);
+        -:  502:        printf("OffsetZ: %f\n",c.OffsetZ);
+        -:  503:        printf("OffsetYaw: %f\n",c.OffsetYaw);
+        -:  504:        printf("OffsetPitch: %f\n",c.OffsetPitch);
+        -:  505:        printf("OffsetRoll: %f\n",c.OffsetRoll);
+        -:  506:        printf("BeamsPerArray: %d\n",c.BeamsPerArray);
+        -:  507:        printf("ReservedArea2: %s\n",c.ReservedArea2);
+        -:  508:        printf("------------\n");
+        -:  509:        */
+    #####:  510:}
+        -:  511:
+        -:  512:/**
+        -:  513: * show the contain of the file PacketHeader
+        -:  514: * 
+        -:  515: * @param hdr the XTF PacketHeader
+        -:  516: */
+    #####:  517:void XtfParser::processPacketHeader(XtfPacketHeader & hdr){
+        -:  518:    /*
+        -:  519:        printf("------------\n");
+        -:  520:        printf("MagicNumber: %d (%s)\n",hdr.MagicNumber,(hdr.MagicNumber==PACKET_MAGIC_NUMBER)?"OK":"FAIL");
+        -:  521:        printf("HeaderType: %d\n",hdr.HeaderType);
+        -:  522:        printf("SubChannelNumber: %d\n",hdr.SubChannelNumber);
+        -:  523:        printf("NumChansToFollow: %d\n",hdr.NumChansToFollow);
+        -:  524:        //printf("Reserved: %",x.Reserved);
+        -:  525:        printf("NumBytesThisRecord: %d\n",hdr.NumBytesThisRecord);
+        -:  526:        printf("------------\n");
+        -:  527:*/
+    #####:  528:}
+        -:  529:
+        -:  530:/**
+        -:  531: * show the contain of the file PingHeader
+        -:  532: * 
+        -:  533: * @param hdr the XTF PingHeader
+        -:  534: */
+    #####:  535:void XtfParser::processPingHeader(XtfPingHeader & hdr){
+    #####:  536:    processor.processSwathStart(hdr.SoundVelocity);
+    #####:  537:}
+        -:  538:
+        -:  539:/**
+        -:  540: * Set the processor depending by the content of the XTF Packet header
+        -:  541: * 
+        -:  542: * @param hdr the XTF Packet Header 
+        -:  543: * @param packet the packet
+        -:  544: */
+    #####:  545:void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
+    #####:  546:	processor.processDatagramTag(hdr.HeaderType);
+        -:  547:
+    #####:  548:	if(hdr.HeaderType==XTF_HEADER_ATTITUDE){
+    #####:  549:		uint64_t microEpoch = 0;
+    #####:  550:		XtfAttitudeData* attitude = (XtfAttitudeData*)packet;
+        -:  551:
+    #####:  552:		if(attitude->SourceEpoch){
+    #####:  553:			microEpoch = attitude->SourceEpoch * 1000000 + attitude->EpochMicroseconds;
+        -:  554:		}
+        -:  555:		else{
+    #####:  556:			microEpoch = TimeUtils::build_time(attitude->Year,attitude->Month-1,attitude->Day,attitude->Hour,attitude->Minutes,attitude->Seconds,attitude->Milliseconds,0);
+        -:  557:		}
+        -:  558:
+    #####:  559:        	processor.processAttitude(
+        -:  560:			microEpoch,
+    #####:  561:			attitude->Heading,
+    #####:  562:			(attitude->Pitch < 0) ? attitude->Pitch + 360 : attitude->Pitch,
+    #####:  563:			(attitude->Roll  < 0) ? attitude->Roll  + 360 : attitude->Pitch
+    #####:  564:		);
+        -:  565:
+        -:  566:	}
+    #####:  567:	else if(hdr.HeaderType==XTF_HEADER_Q_MULTIBEAM){
+    #####:  568:		XtfPingHeader * pingHdr = (XtfPingHeader*) packet;
+        -:  569:
+    #####:  570:		processPingHeader(*pingHdr);
+        -:  571:
+        -:  572:	        //printf("%d Pings\n",hdr.NumChansToFollow);
+        -:  573:
+    #####:  574:		XtfQpsMbEntry * ping = (XtfQpsMbEntry*) ((uint8_t*)packet + sizeof(XtfPingHeader));
+        -:  575:
+    #####:  576:	        uint64_t microEpoch = TimeUtils::build_time(pingHdr->Year,pingHdr->Month-1,pingHdr->Day,pingHdr->Hour,pingHdr->Minute,pingHdr->Second,pingHdr->HSeconds * 10,0);
+        -:  577:
+    #####:  578:		for(unsigned int i = 0;i < hdr.NumChansToFollow;i++){
+    #####:  579:            		processor.processPing(microEpoch,ping[i].Id,ping[i].BeamAngle,ping[i].TiltAngle,ping[i].TwoWayTravelTime,ping[i].Quality,ping[i].Intensity);
+        -:  580:		}
+        -:  581:	}
+    #####:  582:	else if(hdr.HeaderType==XTF_HEADER_POSITION){
+    #####:  583:		XtfPosRawNavigation* position = (XtfPosRawNavigation*)packet;
+    #####:  584:        	uint64_t microEpoch = TimeUtils::build_time(position->Year,position->Month-1,position->Day,position->Hour,position->Minutes,position->Seconds,position->MicroSeconds/1000,position->MicroSeconds%1000);
+    #####:  585:        	processor.processPosition(microEpoch,position->RawXcoordinate,position->RawYcoordinate,position->RawAltitude);
+        -:  586:	}
+        -:  587:	else{
+    #####:  588:		printf("Unknown packet type: %d\n",hdr.HeaderType);
+        -:  589:	}
+    #####:  590:}
+        -:  591:
+        -:  592:#endif

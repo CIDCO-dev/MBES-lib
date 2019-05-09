@@ -1,0 +1,55 @@
+        -:    0:Source:src/datagrams/DatagramParser.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:#ifndef DATAGRAMPARSER_HPP
+        -:    2:#define DATAGRAMPARSER_HPP
+        -:    3:
+        -:    4:#include <cstdint>
+        -:    5:#include "DatagramEventHandler.hpp"
+        -:    6:
+        -:    7:/*!
+        -:    8: * \brief Datagram parser class
+        -:    9: */
+        -:   10:class DatagramParser{
+        -:   11:	public:
+        -:   12:                /**
+        -:   13:                 * Create a datagram parser
+        -:   14:                 * 
+        -:   15:                 * @param processor the datagram processor
+        -:   16:                 */
+        -:   17:		DatagramParser(DatagramEventHandler & processor);
+        -:   18:
+        -:   19:                /**
+        -:   20:                 * Destroy the datagram parser
+        -:   21:                 */
+    #####:   22:		virtual ~DatagramParser(){};
+        -:   23:
+        -:   24:                /**
+        -:   25:                 * Read a file and change the datagram parser depending on the information
+        -:   26:                 * 
+        -:   27:                 * @param filename name of the file to read
+        -:   28:                 */
+    #####:   29:        	virtual void parse(std::string & filename){};
+        -:   30:
+        -:   31:		/**
+        -:   32:		 * Returns a human-readable datagram name
+        -:   33:		 */
+    #####:   34:		virtual std::string getName(int tag){return "";};
+        -:   35:	protected:
+        -:   36:
+        -:   37:            /**The datagram processor*/
+        -:   38:		DatagramEventHandler & processor;
+        -:   39:};
+        -:   40:
+        -:   41:/**
+        -:   42: * Create a datagram parser
+        -:   43: * 
+        -:   44: * @param processor the datagram processor
+        -:   45: */
+    #####:   46:DatagramParser::DatagramParser(DatagramEventHandler & processor) : processor(processor){
+        -:   47:
+    #####:   48:}
+        -:   49:
+        -:   50:#endif

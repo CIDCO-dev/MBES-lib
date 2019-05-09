@@ -1,0 +1,78 @@
+        -:    0:Source:src/datagrams/DatagramEventHandler.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:#ifndef DATAGRAMPROCESSOR_HPP
+        -:    2:#define DATAGRAMPROCESSOR_HPP
+        -:    3:
+        -:    4:#include "../svp/SoundVelocityProfile.hpp"
+        -:    5:
+        -:    6:/**
+        -:    7: * @author Guillaume Morissette
+        -:    8: * Fournit des methodes virtuelles pour le traitement des contenus des datagrammes de sonar
+        -:    9: */
+        -:   10:
+        -:   11:/*!
+        -:   12: * \brief Datagram event handler class
+        -:   13: */
+        -:   14:class DatagramEventHandler{
+        -:   15:	public:
+        -:   16:
+        -:   17:                /**Create an event handler*/
+    #####:   18:		DatagramEventHandler(){};
+        -:   19:
+        -:   20:                /**Destroy the event handler*/
+    #####:   21:		virtual ~DatagramEventHandler(){};
+        -:   22:
+        -:   23:
+        -:   24:		/*
+        -:   25:                 * Datagrams either use numerical IDs or characters
+        -:   26:                 */
+    #####:   27:		virtual void processDatagramTag(int id){};
+        -:   28:
+        -:   29:
+        -:   30:		/* Convention for attitude angles (in degrees)
+        -:   31:		 * 
+        -:   32:		 * Pitch: Positive value is nose up (0 to 360)
+        -:   33:		 * Roll: Positive value is roll to starboard (right) (0 to 360)
+        -:   34:		 * Heading: Positive clockwise (magnetic north) (NORMALIZED TO 0 to 360)
+        -:   35:		 */
+    #####:   36:                virtual void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){};
+        -:   37:
+        -:   38:
+        -:   39:                /**
+        -:   40:                 * Convention for position
+        -:   41:                 * 
+        -:   42:                 * @param microEpoch the position timestamp
+        -:   43:                 * @param longitude the position longitude
+        -:   44:                 * @param latitude the position latitude
+        -:   45:                 * @param height the position ellipsoidal Height
+        -:   46:                 */
+    #####:   47:                virtual void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){};
+        -:   48:
+        -:   49:
+        -:   50:		/**
+        -:   51:		* Convention for ping angles (in degrees)
+        -:   52:		* NED
+        -:   53:		* Beam angle: NEGATIVE to port (left) side, nadir is 0 degrees, POSITIVE to starboard (right) side
+        -:   54:		* Tilt angle: POSITIVE forward, NEGATIVE backward
+        -:   55:		*/
+    #####:   56:                virtual void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,int32_t intensity){};
+        -:   57:
+        -:   58:                /**
+        -:   59:                 * Convention for Swath
+        -:   60:                 * 
+        -:   61:                 * @param surfaceSoundSpeed the swath surface sound speed
+        -:   62:                 */
+    #####:   63:                virtual void processSwathStart(double surfaceSoundSpeed){};
+        -:   64:
+        -:   65:		/*
+        -:   66:                 * Processes a sound velocity profile, from a SSP profiler or CTD profiler
+        -:   67:		 */
+    #####:   68:		virtual void processSoundVelocityProfile(SoundVelocityProfile * svp){ delete svp;};
+        -:   69:
+        -:   70:};
+        -:   71:
+        -:   72:
+        -:   73:#endif

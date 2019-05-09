@@ -1,0 +1,230 @@
+        -:    0:Source:/usr/include/c++/6/bits/regex_executor.h
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// class template regex -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 2013-2016 Free Software Foundation, Inc.
+        -:    4://
+        -:    5:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    6:// software; you can redistribute it and/or modify it under the
+        -:    7:// terms of the GNU General Public License as published by the
+        -:    8:// Free Software Foundation; either version 3, or (at your option)
+        -:    9:// any later version.
+        -:   10:
+        -:   11:// This library is distributed in the hope that it will be useful,
+        -:   12:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   13:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   14:// GNU General Public License for more details.
+        -:   15:
+        -:   16:// Under Section 7 of GPL version 3, you are granted additional
+        -:   17:// permissions described in the GCC Runtime Library Exception, version
+        -:   18:// 3.1, as published by the Free Software Foundation.
+        -:   19:
+        -:   20:// You should have received a copy of the GNU General Public License and
+        -:   21:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   22:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   23:// <http://www.gnu.org/licenses/>.
+        -:   24:
+        -:   25:/**
+        -:   26: *  @file bits/regex_executor.h
+        -:   27: *  This is an internal header file, included by other library headers.
+        -:   28: *  Do not attempt to use it directly. @headername{regex}
+        -:   29: */
+        -:   30:
+        -:   31:// FIXME convert comments to doxygen format.
+        -:   32:
+        -:   33:namespace std _GLIBCXX_VISIBILITY(default)
+        -:   34:{
+        -:   35:namespace __detail
+        -:   36:{
+        -:   37:_GLIBCXX_BEGIN_NAMESPACE_VERSION
+        -:   38:
+        -:   39:  /**
+        -:   40:   * @addtogroup regex-detail
+        -:   41:   * @{
+        -:   42:   */
+        -:   43:
+        -:   44:  /**
+        -:   45:   * @brief Takes a regex and an input string and does the matching.
+        -:   46:   *
+        -:   47:   * The %_Executor class has two modes: DFS mode and BFS mode, controlled
+        -:   48:   * by the template parameter %__dfs_mode.
+        -:   49:   */
+        -:   50:  template<typename _BiIter, typename _Alloc, typename _TraitsT,
+        -:   51:	   bool __dfs_mode>
+    #####:   52:    class _Executor
+        -:   53:    {
+        -:   54:      using __search_mode = integral_constant<bool, __dfs_mode>;
+        -:   55:      using __dfs = true_type;
+        -:   56:      using __bfs = false_type;
+        -:   57:
+        -:   58:      enum class _Match_mode : unsigned char { _Exact, _Prefix };
+        -:   59:
+        -:   60:    public:
+        -:   61:      typedef typename iterator_traits<_BiIter>::value_type _CharT;
+        -:   62:      typedef basic_regex<_CharT, _TraitsT>                 _RegexT;
+        -:   63:      typedef std::vector<sub_match<_BiIter>, _Alloc>       _ResultsVec;
+        -:   64:      typedef regex_constants::match_flag_type              _FlagT;
+        -:   65:      typedef typename _TraitsT::char_class_type            _ClassT;
+        -:   66:      typedef _NFA<_TraitsT>                                _NFAT;
+        -:   67:
+        -:   68:    public:
+    #####:   69:      _Executor(_BiIter         __begin,
+        -:   70:		_BiIter         __end,
+        -:   71:		_ResultsVec&    __results,
+        -:   72:		const _RegexT&  __re,
+        -:   73:		_FlagT          __flags)
+        -:   74:      : _M_begin(__begin),
+        -:   75:      _M_end(__end),
+        -:   76:      _M_re(__re),
+    #####:   77:      _M_nfa(*__re._M_automaton),
+        -:   78:      _M_results(__results),
+    #####:   79:      _M_rep_count(_M_nfa.size()),
+    #####:   80:      _M_states(_M_nfa._M_start(), _M_nfa.size()),
+    #####:   81:      _M_flags((__flags & regex_constants::match_prev_avail)
+        -:   82:	       ? (__flags
+        -:   83:		  & ~regex_constants::match_not_bol
+    #####:   84:		  & ~regex_constants::match_not_bow)
+    #####:   85:	       : __flags)
+    #####:   86:      { }
+        -:   87:
+        -:   88:      // Set matched when string exactly matches the pattern.
+        -:   89:      bool
+    #####:   90:      _M_match()
+        -:   91:      {
+    #####:   92:	_M_current = _M_begin;
+    #####:   93:	return _M_main(_Match_mode::_Exact);
+        -:   94:      }
+        -:   95:
+        -:   96:      // Set matched when some prefix of the string matches the pattern.
+        -:   97:      bool
+    #####:   98:      _M_search_from_first()
+        -:   99:      {
+    #####:  100:	_M_current = _M_begin;
+    #####:  101:	return _M_main(_Match_mode::_Prefix);
+        -:  102:      }
+        -:  103:
+        -:  104:      bool
+        -:  105:      _M_search();
+        -:  106:
+        -:  107:    private:
+        -:  108:      void
+        -:  109:      _M_rep_once_more(_Match_mode __match_mode, _StateIdT);
+        -:  110:
+        -:  111:      void
+        -:  112:      _M_dfs(_Match_mode __match_mode, _StateIdT __start);
+        -:  113:
+        -:  114:      bool
+    #####:  115:      _M_main(_Match_mode __match_mode)
+    #####:  116:      { return _M_main_dispatch(__match_mode, __search_mode{}); }
+        -:  117:
+        -:  118:      bool
+        -:  119:      _M_main_dispatch(_Match_mode __match_mode, __dfs);
+        -:  120:
+        -:  121:      bool
+        -:  122:      _M_main_dispatch(_Match_mode __match_mode, __bfs);
+        -:  123:
+        -:  124:      bool
+    #####:  125:      _M_is_word(_CharT __ch) const
+        -:  126:      {
+        -:  127:	static const _CharT __s[2] = { 'w' };
+    #####:  128:	return _M_re._M_automaton->_M_traits.isctype
+    #####:  129:	  (__ch, _M_re._M_automaton->_M_traits.lookup_classname(__s, __s+1));
+        -:  130:      }
+        -:  131:
+        -:  132:      bool
+    #####:  133:      _M_at_begin() const
+        -:  134:      {
+    #####:  135:	return _M_current == _M_begin
+    #####:  136:	  && !(_M_flags & (regex_constants::match_not_bol
+    #####:  137:			   | regex_constants::match_prev_avail));
+        -:  138:      }
+        -:  139:
+        -:  140:      bool
+    #####:  141:      _M_at_end() const
+        -:  142:      {
+    #####:  143:	return _M_current == _M_end
+    #####:  144:	  && !(_M_flags & regex_constants::match_not_eol);
+        -:  145:      }
+        -:  146:
+        -:  147:      bool
+        -:  148:      _M_word_boundary() const;
+        -:  149:
+        -:  150:      bool
+        -:  151:      _M_lookahead(_StateIdT __next);
+        -:  152:
+        -:  153:       // Holds additional information used in BFS-mode.
+        -:  154:      template<typename _SearchMode, typename _ResultsVec>
+        -:  155:	struct _State_info;
+        -:  156:
+        -:  157:      template<typename _ResultsVec>
+    #####:  158:	struct _State_info<__bfs, _ResultsVec>
+        -:  159:	{
+        -:  160:	  explicit
+    #####:  161:	  _State_info(_StateIdT __start, size_t __n)
+    #####:  162:	  : _M_visited_states(new bool[__n]()), _M_start(__start)
+    #####:  163:	  { }
+        -:  164:
+    #####:  165:	  bool _M_visited(_StateIdT __i)
+        -:  166:	  {
+    #####:  167:	    if (_M_visited_states[__i])
+    #####:  168:	      return true;
+    #####:  169:	    _M_visited_states[__i] = true;
+    #####:  170:	    return false;
+        -:  171:	  }
+        -:  172:
+    #####:  173:	  void _M_queue(_StateIdT __i, const _ResultsVec& __res)
+    #####:  174:	  { _M_match_queue.emplace_back(__i, __res); }
+        -:  175:
+        -:  176:	  // Dummy implementations for BFS mode.
+        -:  177:	  _BiIter* _M_get_sol_pos() { return nullptr; }
+        -:  178:
+        -:  179:	  // Saves states that need to be considered for the next character.
+        -:  180:	  vector<pair<_StateIdT, _ResultsVec>>	_M_match_queue;
+        -:  181:	  // Indicates which states are already visited.
+        -:  182:	  unique_ptr<bool[]>			_M_visited_states;
+        -:  183:	  // To record current solution.
+        -:  184:	  _StateIdT _M_start;
+        -:  185:	};
+        -:  186:
+        -:  187:      template<typename _ResultsVec>
+        -:  188:	struct _State_info<__dfs, _ResultsVec>
+        -:  189:	{
+        -:  190:	  explicit
+    #####:  191:	  _State_info(_StateIdT __start, size_t) : _M_start(__start)
+    #####:  192:	  { }
+        -:  193:
+        -:  194:	  // Dummy implementations for DFS mode.
+    #####:  195:	  bool _M_visited(_StateIdT) const { return false; }
+        -:  196:	  void _M_queue(_StateIdT, const _ResultsVec&) { }
+        -:  197:
+    #####:  198:	  _BiIter* _M_get_sol_pos() { return &_M_sol_pos; }
+        -:  199:
+        -:  200:	  // To record current solution.
+        -:  201:	  _StateIdT _M_start;
+        -:  202:	  _BiIter   _M_sol_pos;
+        -:  203:	};
+        -:  204:
+        -:  205:    public:
+        -:  206:      _ResultsVec                                           _M_cur_results;
+        -:  207:      _BiIter                                               _M_current;
+        -:  208:      _BiIter                                               _M_begin;
+        -:  209:      const _BiIter                                         _M_end;
+        -:  210:      const _RegexT&                                        _M_re;
+        -:  211:      const _NFAT&                                          _M_nfa;
+        -:  212:      _ResultsVec&                                          _M_results;
+        -:  213:      vector<pair<_BiIter, int>>                            _M_rep_count;
+        -:  214:      _State_info<__search_mode, _ResultsVec>		    _M_states;
+        -:  215:      _FlagT                                                _M_flags;
+        -:  216:      // Do we have a solution so far?
+        -:  217:      bool                                                  _M_has_sol;
+        -:  218:    };
+        -:  219:
+        -:  220: //@} regex-detail
+        -:  221:_GLIBCXX_END_NAMESPACE_VERSION
+        -:  222:} // namespace __detail
+        -:  223:} // namespace std
+        -:  224:
+        -:  225:#include <bits/regex_executor.tcc>

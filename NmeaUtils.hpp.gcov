@@ -1,0 +1,73 @@
+        -:    0:Source:src/utils/NmeaUtils.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:#ifndef NMEAUTILS_HPP
+        -:    2:#define NMEAUTILS_HPP
+        -:    3:
+        -:    4:#include <limits>
+        -:    5:#include <string>
+        -:    6:#include <sstream>
+        -:    7:#include <iostream>
+        -:    8:#include <cstdlib>
+        -:    9:
+        -:   10:class NmeaUtils{
+        -:   11:public:
+        -:   12:    static double extractHeightFromGGK(std::string & ggkString);
+        -:   13:    static double extractHeightFromGGA(std::string & ggaString);
+        -:   14:};
+        -:   15:
+        -:   16:/**
+        -:   17: * @brief extractHeightFromGGK Extracts ellipsoidal height from GGK
+        -:   18: * @param ggkString
+        -:   19: * @return
+        -:   20: */
+    #####:   21:double NmeaUtils::extractHeightFromGGK(std::string & ggkString){
+    #####:   22:    std::stringstream ss(ggkString);
+    #####:   23:    std::string token;
+        -:   24:
+    #####:   25:    while(std::getline(ss,token,',')){
+    #####:   26:        if(token.find("EHT")!= std::string::npos){
+    #####:   27:            return atof(token.substr(3).c_str());
+        -:   28:        }
+        -:   29:    }
+        -:   30:
+    #####:   31:    return std::numeric_limits<double>::quiet_NaN();
+        -:   32:}
+        -:   33:
+        -:   34:/**
+        -:   35: * @brief extractHeightFromGGA Extracts ellipsoidal height from GGA
+        -:   36: * @param ggaString
+        -:   37: * @return
+        -:   38: */
+    #####:   39:double NmeaUtils::extractHeightFromGGA(std::string & ggaString){
+    #####:   40:    std::stringstream ss(ggaString);
+    #####:   41:    std::string token;
+        -:   42:
+    #####:   43:    double orthometricHeight = std::numeric_limits<double>::quiet_NaN();
+    #####:   44:    double geoidSeperation   = std::numeric_limits<double>::quiet_NaN();
+        -:   45:
+    #####:   46:    int i=0;
+        -:   47:
+    #####:   48:    while(std::getline(ss,token,',')){
+    #####:   49:        if(i==9){
+        -:   50:            //orthometric height
+    #####:   51:            orthometricHeight = atof(token.c_str());
+        -:   52:        }
+    #####:   53:        else if(i==11){
+        -:   54:            //geoid seperation
+    #####:   55:            geoidSeperation = atof(token.c_str());
+        -:   56:        }
+        -:   57:
+    #####:   58:        if(!std::isnan(orthometricHeight) && !std::isnan(geoidSeperation)){
+    #####:   59:            return orthometricHeight + geoidSeperation;
+        -:   60:        }
+        -:   61:
+    #####:   62:        i++;
+        -:   63:    }
+        -:   64:
+    #####:   65:    return std::numeric_limits<double>::quiet_NaN();
+        -:   66:}
+        -:   67:
+        -:   68:#endif

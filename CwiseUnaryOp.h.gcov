@@ -1,0 +1,108 @@
+        -:    0:Source:/usr/include/eigen3/Eigen/src/Core/CwiseUnaryOp.h
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// This file is part of Eigen, a lightweight C++ template library
+        -:    2:// for linear algebra.
+        -:    3://
+        -:    4:// Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
+        -:    5:// Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
+        -:    6://
+        -:    7:// This Source Code Form is subject to the terms of the Mozilla
+        -:    8:// Public License v. 2.0. If a copy of the MPL was not distributed
+        -:    9:// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+        -:   10:
+        -:   11:#ifndef EIGEN_CWISE_UNARY_OP_H
+        -:   12:#define EIGEN_CWISE_UNARY_OP_H
+        -:   13:
+        -:   14:namespace Eigen { 
+        -:   15:
+        -:   16:namespace internal {
+        -:   17:template<typename UnaryOp, typename XprType>
+        -:   18:struct traits<CwiseUnaryOp<UnaryOp, XprType> >
+        -:   19: : traits<XprType>
+        -:   20:{
+        -:   21:  typedef typename result_of<
+        -:   22:                     UnaryOp(const typename XprType::Scalar&)
+        -:   23:                   >::type Scalar;
+        -:   24:  typedef typename XprType::Nested XprTypeNested;
+        -:   25:  typedef typename remove_reference<XprTypeNested>::type _XprTypeNested;
+        -:   26:  enum {
+        -:   27:    Flags = _XprTypeNested::Flags & RowMajorBit 
+        -:   28:  };
+        -:   29:};
+        -:   30:}
+        -:   31:
+        -:   32:template<typename UnaryOp, typename XprType, typename StorageKind>
+        -:   33:class CwiseUnaryOpImpl;
+        -:   34:
+        -:   35:/** \class CwiseUnaryOp
+        -:   36:  * \ingroup Core_Module
+        -:   37:  *
+        -:   38:  * \brief Generic expression where a coefficient-wise unary operator is applied to an expression
+        -:   39:  *
+        -:   40:  * \tparam UnaryOp template functor implementing the operator
+        -:   41:  * \tparam XprType the type of the expression to which we are applying the unary operator
+        -:   42:  *
+        -:   43:  * This class represents an expression where a unary operator is applied to an expression.
+        -:   44:  * It is the return type of all operations taking exactly 1 input expression, regardless of the
+        -:   45:  * presence of other inputs such as scalars. For example, the operator* in the expression 3*matrix
+        -:   46:  * is considered unary, because only the right-hand side is an expression, and its
+        -:   47:  * return type is a specialization of CwiseUnaryOp.
+        -:   48:  *
+        -:   49:  * Most of the time, this is the only way that it is used, so you typically don't have to name
+        -:   50:  * CwiseUnaryOp types explicitly.
+        -:   51:  *
+        -:   52:  * \sa MatrixBase::unaryExpr(const CustomUnaryOp &) const, class CwiseBinaryOp, class CwiseNullaryOp
+        -:   53:  */
+        -:   54:template<typename UnaryOp, typename XprType>
+        -:   55:class CwiseUnaryOp : public CwiseUnaryOpImpl<UnaryOp, XprType, typename internal::traits<XprType>::StorageKind>, internal::no_assignment_operator
+        -:   56:{
+        -:   57:  public:
+        -:   58:
+        -:   59:    typedef typename CwiseUnaryOpImpl<UnaryOp, XprType,typename internal::traits<XprType>::StorageKind>::Base Base;
+        -:   60:    EIGEN_GENERIC_PUBLIC_INTERFACE(CwiseUnaryOp)
+        -:   61:    typedef typename internal::ref_selector<XprType>::type XprTypeNested;
+        -:   62:    typedef typename internal::remove_all<XprType>::type NestedExpression;
+        -:   63:
+        -:   64:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+    #####:   65:    explicit CwiseUnaryOp(const XprType& xpr, const UnaryOp& func = UnaryOp())
+    #####:   66:      : m_xpr(xpr), m_functor(func) {}
+        -:   67:
+        -:   68:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+    #####:   69:    Index rows() const { return m_xpr.rows(); }
+        -:   70:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+    #####:   71:    Index cols() const { return m_xpr.cols(); }
+        -:   72:
+        -:   73:    /** \returns the functor representing the unary operation */
+        -:   74:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+    #####:   75:    const UnaryOp& functor() const { return m_functor; }
+        -:   76:
+        -:   77:    /** \returns the nested expression */
+        -:   78:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+        -:   79:    const typename internal::remove_all<XprTypeNested>::type&
+    #####:   80:    nestedExpression() const { return m_xpr; }
+        -:   81:
+        -:   82:    /** \returns the nested expression */
+        -:   83:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+        -:   84:    typename internal::remove_all<XprTypeNested>::type&
+        -:   85:    nestedExpression() { return m_xpr; }
+        -:   86:
+        -:   87:  protected:
+        -:   88:    XprTypeNested m_xpr;
+        -:   89:    const UnaryOp m_functor;
+        -:   90:};
+        -:   91:
+        -:   92:// Generic API dispatcher
+        -:   93:template<typename UnaryOp, typename XprType, typename StorageKind>
+    #####:   94:class CwiseUnaryOpImpl
+        -:   95:  : public internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type
+        -:   96:{
+        -:   97:public:
+        -:   98:  typedef typename internal::generic_xpr_base<CwiseUnaryOp<UnaryOp, XprType> >::type Base;
+        -:   99:};
+        -:  100:
+        -:  101:} // end namespace Eigen
+        -:  102:
+        -:  103:#endif // EIGEN_CWISE_UNARY_OP_H

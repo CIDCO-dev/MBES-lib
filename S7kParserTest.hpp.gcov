@@ -1,0 +1,34 @@
+        -:    0:Source:test/S7kParserTest.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:/*
+        -:    2: * To change this license header, choose License Headers in Project Properties.
+        -:    3: * To change this template file, choose Tools | Templates
+        -:    4: * and open the template in the editor.
+        -:    5: */
+        -:    6:
+        -:    7:/* 
+        -:    8: * File:   S7kParserTest.hpp
+        -:    9: * Author: emile
+        -:   10: *
+        -:   11: * Created on May 3, 2019, 2:03 PM
+        -:   12: */
+        -:   13:#include "catch.hpp"
+        -:   14:#include "../src/datagrams/DatagramEventHandler.hpp"
+        -:   15:#include "../src/datagrams/s7k/S7kParser.hpp"
+        -:   16:
+    #####:   17:TEST_CASE("test the function S7kParser::getName")
+        -:   18:{
+    #####:   19:    DatagramEventHandler handler;
+    #####:   20:    S7kParser parser(handler);
+    #####:   21:    REQUIRE(parser.getName(1004)=="Custom Attitude Information");
+    #####:   22:    REQUIRE(parser.getName(1020)=="Sonar Installation Identifiers");
+    #####:   23:    REQUIRE(parser.getName(2000)=="Invalid tag");
+    #####:   24:    REQUIRE(parser.getName(7000)=="7k Sonar Settings");
+    #####:   25:    REQUIRE(parser.getName(7007)=="7k Side Scan Data");
+    #####:   26:    REQUIRE(parser.getName(7030)=="Sonar Installation Parameters");
+    #####:   27:    REQUIRE(parser.getName(7050)=="7k System Events");
+    #####:   28:    REQUIRE(parser.getName(7700)=="Invalid tag");
+    #####:   29:}

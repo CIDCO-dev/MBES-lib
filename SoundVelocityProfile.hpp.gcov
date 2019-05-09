@@ -1,0 +1,419 @@
+        -:    0:Source:src/svp/SoundVelocityProfile.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:/*
+        -:    2: * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+        -:    3: */
+        -:    4:
+        -:    5:/*
+        -:    6: * File:   SoundVelocityProfile.h
+        -:    7: * Author: glm,jordan, emilegagne
+        -:    8: *
+        -:    9: * Created on August 22, 2018, 10:30 AM
+        -:   10: */
+        -:   11:
+        -:   12:#ifndef SOUNDVELOCITYPROFILE_HPP
+        -:   13:#define SOUNDVELOCITYPROFILE_HPP
+        -:   14:
+        -:   15:#include <list>
+        -:   16:#include <Eigen/Dense>
+        -:   17:#include <iostream>
+        -:   18:#include <fstream>
+        -:   19:#include <sstream>
+        -:   20:#include <cmath>
+        -:   21:#include <vector>
+        -:   22:#include <ctime>
+        -:   23:#include <string>
+        -:   24:#include "../utils/TimeUtils.hpp"
+        -:   25:
+        -:   26:/*!
+        -:   27: * \brief Sound velocity profile class
+        -:   28: */
+        -:   29:class SoundVelocityProfile {
+        -:   30:public:
+        -:   31:
+        -:   32:    /**Create a sound velocity*/
+        -:   33:    SoundVelocityProfile();
+        -:   34:
+        -:   35:    /**Destroy a sound velocity*/
+        -:   36:    ~SoundVelocityProfile();
+        -:   37:
+        -:   38:
+        -:   39:    /**
+        -:   40:     * Write the informations of the sound velocity profile in a file
+        -:   41:     * 
+        -:   42:     * @param filename the name of the file that will be use to write
+        -:   43:     */
+        -:   44:    void write(std::string & filename); 
+        -:   45:    
+        -:   46:    /**
+        -:   47:     * Read a file who contains the information of a sound velocity profile
+        -:   48:     * return true if the reading has been made successfully
+        -:   49:     * 
+        -:   50:     * @param filename the name of the that will use to read
+        -:   51:     */
+        -:   52:    bool read(std::string filename);
+        -:   53:    
+        -:   54:    /**Return the size of the sound velocity profile*/
+        -:   55:    unsigned int getSize() {
+        -:   56:        return size;
+        -:   57:    };
+        -:   58:
+        -:   59:    /**Return the latitude of the sound velocity profile*/
+    #####:   60:    double getLatitude() 	 { return latitude; }
+        -:   61:    
+        -:   62:    /**
+        -:   63:     * Change the latitude of the sound velocity profile
+        -:   64:     * 
+        -:   65:     * @param l the new latitude
+        -:   66:     */
+    #####:   67:    void   setLatitude(double l) { latitude=l;}
+        -:   68:
+        -:   69:    /**Return the longitude of the sound velocity*/
+    #####:   70:    double getLongitude()	 { return longitude;}
+        -:   71:    
+        -:   72:    /**
+        -:   73:     * Change the longitude of the sound velocity profile
+        -:   74:     * 
+        -:   75:     * @param l the new longitude of the sound velocity profile
+        -:   76:     */
+    #####:   77:    void   setLongitude(double l){ longitude=l;}
+        -:   78:
+        -:   79:    /**Return the timestamp of the sound velocity*/
+    #####:   80:    uint64_t getTimestamp(){ return microEpoch;};
+        -:   81:    
+        -:   82:    /**
+        -:   83:     * Change the timestamp of the sound velocity profile
+        -:   84:     * 
+        -:   85:     * @param t the new timestamp
+        -:   86:     */
+    #####:   87:    void     setTimestamp(uint64_t t) { microEpoch=t;};
+        -:   88:    
+        -:   89:    /**
+        -:   90:     * Return the timestamp in julian time format (yyyy-ddd hh:mm:ss) 
+        -:   91:     * 
+        -:   92:     * @param microEpoch number of microsecond of the timestamp 
+        -:   93:     */
+    #####:   94:    static std::string julianTime(uint64_t microEpoch)
+        -:   95:    {
+    #####:   96:    time_t date = microEpoch/1000000;
+        -:   97:    struct tm * timeinfo;
+    #####:   98:    timeinfo = gmtime(&date);
+    #####:   99:    std::stringstream ssDate;
+    #####:  100:    ssDate << timeinfo->tm_year + 1900 << "-" << timeinfo->tm_yday + 1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
+    #####:  101:    return ssDate.str();
+        -:  102:    }
+        -:  103:    
+        -:  104:    /**
+        -:  105:     * Return the latitude in text form
+        -:  106:     * 
+        -:  107:     * @param value the latitude
+        -:  108:     */
+    #####:  109:    std::string latFormat(double value)
+        -:  110:    {
+    #####:  111:        std::string direction;
+    #####:  112:        if (value<0)
+        -:  113:        {
+    #####:  114:            direction = "South";
+        -:  115:        }
+        -:  116:        else
+        -:  117:        {
+    #####:  118:            direction = "North";
+        -:  119:        }
+    #####:  120:        return latlongFormat(value,direction);
+        -:  121:    }
+        -:  122:    
+        -:  123:    /**
+        -:  124:     * Return the longitude in text form
+        -:  125:     * 
+        -:  126:     * @param value the longitude
+        -:  127:     */
+    #####:  128:    std::string longFormat(double value)
+        -:  129:    {
+    #####:  130:        std::string direction;
+    #####:  131:        if (value<0)
+        -:  132:        {
+    #####:  133:            direction = "West";
+        -:  134:        }
+        -:  135:        else
+        -:  136:        {
+    #####:  137:            direction = "East";
+        -:  138:        }
+    #####:  139:        return latlongFormat(value,direction);
+        -:  140:    }
+        -:  141:    
+        -:  142:    /**
+        -:  143:     * Return the latitude or the longitude in format dd:mm:ss
+        -:  144:     * 
+        -:  145:     * @param value the latitude or longitude to convert
+        -:  146:     * @param direction direction(N,W,E,S) of the latitude or longitude
+        -:  147:     */
+    #####:  148:    std::string latlongFormat(double value, std::string direction)
+        -:  149:    {
+    #####:  150:        std::stringstream ss;
+    #####:  151:                value = std::abs(value);
+    #####:  152:                double degrees = std::trunc(value);
+    #####:  153:                value = (value - degrees) * 60;
+    #####:  154:                double minutes = std::trunc(value);
+    #####:  155:                double second = (value - minutes) * 60;
+    #####:  156:                ss << direction << " " << degrees << ":" << minutes << ":" << second;
+    #####:  157:                return ss.str();
+        -:  158:    }
+        -:  159:
+        -:  160:    /**
+        -:  161:     * Read a row of text who contains the timestamp, the latitude and longitude of 
+        -:  162:     * the song velocity  profile and return true if the reading has been made successfully
+        -:  163:     * 
+        -:  164:     * @param row the row who must be read 
+        -:  165:     * @param nbrM value of the timestamp we get after the reading
+        -:  166:     * @param lat value of the latitude we get after the reading
+        -:  167:     * @param lon value of the longitude we get after the reading
+        -:  168:     */
+    #####:  169:    bool readTimeLatLong(std::string & row, uint64_t &nbrM,double &lat, double &lon)
+        -:  170:    {
+        -:  171:        char latdirection[5];
+        -:  172:        double latdegrees;
+        -:  173:        double latminute;
+        -:  174:        double latsecond;
+        -:  175:        char londirection[4];
+        -:  176:        double londegrees;
+        -:  177:        double lonminute;
+        -:  178:        double lonsecond;
+        -:  179:        int year;
+        -:  180:        int yday;
+        -:  181:        int hour;
+        -:  182:        int minute;
+        -:  183:        int second;
+    #####:  184:        if (std::sscanf(row.c_str(), "Section %d-%d %d:%d:%d %5s %lf:%lf:%lf %4s %lf:%lf:%lf",
+        -:  185:                &year,&yday,&hour,&minute,&second,latdirection,&latdegrees,&latminute,&latsecond,
+        -:  186:                londirection,&londegrees,&lonminute,&lonsecond)==13)
+        -:  187:        {
+    #####:  188:            year = year-1970;
+    #####:  189:            yday = yday-1;
+    #####:  190:            nbrM = nbrM+year;
+    #####:  191:            nbrM = nbrM*365 + yday;
+    #####:  192:            nbrM = nbrM*24 + hour;
+    #####:  193:            nbrM = nbrM*60 + minute;
+    #####:  194:            nbrM = nbrM*60 + second;
+    #####:  195:            nbrM = nbrM*1000000;
+    #####:  196:            lat = latsecond/60 + latminute;
+    #####:  197:            lat = lat/60 + latdegrees;
+    #####:  198:            std::string sdirection;
+    #####:  199:            sdirection = latdirection;
+    #####:  200:            if (sdirection.compare("South") == 0)
+        -:  201:            {
+    #####:  202:                lat = -lat;
+        -:  203:            }
+    #####:  204:            else if (sdirection.compare("North")!=0)
+        -:  205:            {
+    #####:  206:                return false;
+        -:  207:            }
+    #####:  208:            lon = lonsecond/60 + lonminute;
+    #####:  209:            lon = lon/60 + londegrees;
+    #####:  210:            sdirection = londirection;
+    #####:  211:            if (sdirection.compare("West") == 0)
+        -:  212:            {
+    #####:  213:                lon = -lon;
+        -:  214:            }
+    #####:  215:            else if (sdirection.compare("East")!=0)
+        -:  216:            {
+    #####:  217:                return false;
+        -:  218:            }
+    #####:  219:            return true;
+        -:  220:        }
+        -:  221:        else
+        -:  222:        {
+    #####:  223:            return false;   
+        -:  224:        }
+        -:  225:    }
+        -:  226:    
+        -:  227:    /**
+        -:  228:     * Add a new value in the vector depths and speeds
+        -:  229:     * 
+        -:  230:     * @param depth value to add in depths
+        -:  231:     * @param soundSpeed value to add in speeds
+        -:  232:     */
+        -:  233:    void     add(double depth,double soundSpeed);
+        -:  234:
+        -:  235:    /**Return the vector depths*/
+        -:  236:    Eigen::VectorXd & getDepths();
+        -:  237:    
+        -:  238:    /**Return the vector speeds*/
+        -:  239:    Eigen::VectorXd & getSpeeds();
+        -:  240:
+        -:  241:private:
+        -:  242:
+        -:  243:    /**value of the sound velocity profile size*/
+        -:  244:    unsigned int size;
+        -:  245:
+        -:  246:    /**timestamp value of the sound velocity profile (micro-second)*/
+        -:  247:    uint64_t  microEpoch; //timestamp
+        -:  248:
+        -:  249:    /**latitude value of the sound velocity profile*/
+        -:  250:    double latitude;
+        -:  251:
+        -:  252:    /**longitude value of the sound velocity profile*/
+        -:  253:    double longitude;
+        -:  254:
+        -:  255:    /**vector who contain the dephts of the sound velocity profile*/
+        -:  256:    Eigen::VectorXd depths;
+        -:  257:
+        -:  258:    /**vector who contain the speeds of the sound velocity profile*/
+        -:  259:    Eigen::VectorXd speeds;
+        -:  260:
+        -:  261:    /**vector who contain the depths and the speeds*/
+        -:  262:    std::vector<std::pair<double,double>> samples;
+        -:  263:};
+        -:  264:
+        -:  265:    /**Create a sound velocity profile*/
+    #####:  266:SoundVelocityProfile::SoundVelocityProfile() {
+    #####:  267:    longitude = latitude = nan("");
+    #####:  268:};
+        -:  269:
+        -:  270:/**Destroy the sound velocity*/
+    #####:  271:SoundVelocityProfile::~SoundVelocityProfile() {
+    #####:  272:};
+        -:  273:
+        -:  274:     /**
+        -:  275:     * Add a new value in the vector depths and speeds
+        -:  276:     * 
+        -:  277:     * @param depth value to add in depths
+        -:  278:     * @param soundSpeed value to add in speeds
+        -:  279:     */
+    #####:  280:void SoundVelocityProfile::add (double depth,double soundSpeed){
+    #####:  281:	samples.push_back(std::make_pair(depth,soundSpeed));
+    #####:  282:}
+        -:  283:
+        -:  284:     /**
+        -:  285:     * Write the information of the sound velocity profile in a file
+        -:  286:     * 
+        -:  287:     * @param filename the name of the file that will be use to write
+        -:  288:     */
+    #####:  289:void SoundVelocityProfile::write(std::string & filename){
+    #####:  290:	std::ofstream out;
+    #####:  291:        out.open(filename);
+    #####:  292:	if(out.is_open()){
+        -:  293:		//TODO: write proper date and lat/lon
+    #####:  294:                std::string sDate;
+    #####:  295:                sDate = julianTime(microEpoch);
+    #####:  296:                std::string slat;
+    #####:  297:                slat = latFormat(latitude);
+    #####:  298:                std::string slong;
+    #####:  299:                slong = longFormat(longitude);
+    #####:  300:		out << "[SVP_VERSION_2]" << "\r\n";
+    #####:  301:		out << filename << " \r\n";
+    #####:  302:                out << "Section " << sDate << " " << slat << " " << slong << " \r\n" ;//FIXME: put date as yyyy-ddd hh:mm:ss dd:mm:ss (lat) dd:mm:ss (lon)
+    #####:  303:		for(unsigned int i=0;i<samples.size();i++){
+    #####:  304:			out << samples[i].first << " " << samples[i].second << " \r\n";
+        -:  305:		}
+    #####:  306:		out.close();
+        -:  307:	}
+    #####:  308:}
+        -:  309:
+        -:  310:/**
+        -:  311:     * Read a file who contains the information of a sound velocity profile
+        -:  312:     * return true if the reading has been made successfully
+        -:  313:     * 
+        -:  314:     * @param filename the name of the that will use to read
+        -:  315:     */
+    #####:  316:bool SoundVelocityProfile::read(std::string filename)
+        -:  317:{
+    #####:  318:    std::ifstream inFile;
+    #####:  319:    inFile.open(filename);
+    #####:  320:    std::string row;
+    #####:  321:    std::string cont;
+    #####:  322:    bool valide = true;
+    #####:  323:    if(inFile)
+        -:  324:    {
+    #####:  325:        int i = 0;
+    #####:  326:        while ((std::getline(inFile,row))&&(valide))
+        -:  327:        {
+    #####:  328:            if (i == 0)
+        -:  329:            {
+        -:  330:                int ver;
+    #####:  331:                if (std::sscanf(row.c_str(),"[SVP_VERSION_%d]",&ver)!=1)
+        -:  332:                {
+    #####:  333:                    valide = false;
+        -:  334:                }
+        -:  335:            }
+    #####:  336:            else if (i==1)
+        -:  337:            {
+    #####:  338:                std::string name;
+    #####:  339:                name = row.substr(0,row.find(" "));
+    #####:  340:                if(name.compare(filename)!=0)
+        -:  341:                {
+    #####:  342:                    valide = false;
+        -:  343:                }
+        -:  344:            }
+    #####:  345:            else if (i==2)
+        -:  346:            {
+    #####:  347:                uint64_t ms = 0;
+    #####:  348:                double lat = 0;
+    #####:  349:                double lon = 0;
+    #####:  350:                if(readTimeLatLong(row,ms,lat,lon))
+        -:  351:                {
+    #####:  352:                    microEpoch = ms;
+    #####:  353:                    latitude = lat;
+    #####:  354:                    longitude = lon;
+        -:  355:                }
+        -:  356:                else
+        -:  357:                {
+    #####:  358:                    valide = false;
+        -:  359:                }
+    #####:  360:                samples = std::vector<std::pair<double,double>>();
+        -:  361:            }
+        -:  362:            else
+        -:  363:            {
+        -:  364:                double deph;
+        -:  365:                double speed;
+    #####:  366:                if (std::sscanf(row.c_str(), "%lf %lf",&deph,&speed)==2)
+        -:  367:                {
+    #####:  368:                    add(deph,speed);
+        -:  369:                }
+        -:  370:                else
+        -:  371:                {
+    #####:  372:                    valide = false;
+        -:  373:                }
+        -:  374:            }
+    #####:  375:            i = i+1;
+        -:  376:        }
+        -:  377:    }
+        -:  378:    else
+        -:  379:    {
+    #####:  380:        valide = false;
+        -:  381:    }
+    #####:  382:    inFile.close();
+    #####:  383:    return valide;
+        -:  384:}
+        -:  385:
+        -:  386:/**Return the vector depths*/
+    #####:  387:Eigen::VectorXd & SoundVelocityProfile::getDepths(){
+        -:  388:	//lazy load internal vector
+    #####:  389:	if((unsigned int)depths.size() != samples.size()){
+    #####:  390:		depths.resize(samples.size());
+        -:  391:
+    #####:  392:		for(unsigned int i = 0;i<samples.size();i++){
+    #####:  393:			depths(i)=samples[i].first;
+        -:  394:		}
+        -:  395:	}
+        -:  396:
+    #####:  397:	return depths;
+        -:  398:}
+        -:  399:
+        -:  400:/**Return the vector speeds*/
+    #####:  401:Eigen::VectorXd & SoundVelocityProfile::getSpeeds(){
+        -:  402:	//lazy load internal vector
+    #####:  403:	if((unsigned int)speeds.size() != samples.size()){
+    #####:  404:		speeds.resize(samples.size());
+        -:  405:
+    #####:  406:		for(unsigned int i=0;i<samples.size();i++){
+    #####:  407:			speeds(i)=samples[i].second;
+        -:  408:		}
+        -:  409:	}
+        -:  410:
+    #####:  411:	return speeds;
+        -:  412:}
+        -:  413:
+        -:  414:#endif /* SOUNDVELOCITYPROFILE_HPP */

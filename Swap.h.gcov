@@ -1,0 +1,72 @@
+        -:    0:Source:/usr/include/eigen3/Eigen/src/Core/Swap.h
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// This file is part of Eigen, a lightweight C++ template library
+        -:    2:// for linear algebra.
+        -:    3://
+        -:    4:// Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
+        -:    5://
+        -:    6:// This Source Code Form is subject to the terms of the Mozilla
+        -:    7:// Public License v. 2.0. If a copy of the MPL was not distributed
+        -:    8:// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+        -:    9:
+        -:   10:#ifndef EIGEN_SWAP_H
+        -:   11:#define EIGEN_SWAP_H
+        -:   12:
+        -:   13:namespace Eigen { 
+        -:   14:
+        -:   15:namespace internal {
+        -:   16:
+        -:   17:// Overload default assignPacket behavior for swapping them
+        -:   18:template<typename DstEvaluatorTypeT, typename SrcEvaluatorTypeT>
+        -:   19:class generic_dense_assignment_kernel<DstEvaluatorTypeT, SrcEvaluatorTypeT, swap_assign_op<typename DstEvaluatorTypeT::Scalar>, Specialized>
+        -:   20: : public generic_dense_assignment_kernel<DstEvaluatorTypeT, SrcEvaluatorTypeT, swap_assign_op<typename DstEvaluatorTypeT::Scalar>, BuiltIn>
+        -:   21:{
+        -:   22:protected:
+        -:   23:  typedef generic_dense_assignment_kernel<DstEvaluatorTypeT, SrcEvaluatorTypeT, swap_assign_op<typename DstEvaluatorTypeT::Scalar>, BuiltIn> Base;
+        -:   24:  using Base::m_dst;
+        -:   25:  using Base::m_src;
+        -:   26:  using Base::m_functor;
+        -:   27:  
+        -:   28:public:
+        -:   29:  typedef typename Base::Scalar Scalar;
+        -:   30:  typedef typename Base::DstXprType DstXprType;
+        -:   31:  typedef swap_assign_op<Scalar> Functor;
+        -:   32:  
+    #####:   33:  EIGEN_DEVICE_FUNC generic_dense_assignment_kernel(DstEvaluatorTypeT &dst, const SrcEvaluatorTypeT &src, const Functor &func, DstXprType& dstExpr)
+    #####:   34:    : Base(dst, src, func, dstExpr)
+    #####:   35:  {}
+        -:   36:  
+        -:   37:  template<int StoreMode, int LoadMode, typename PacketType>
+    #####:   38:  void assignPacket(Index row, Index col)
+        -:   39:  {
+    #####:   40:    PacketType tmp = m_src.template packet<LoadMode,PacketType>(row,col);
+    #####:   41:    const_cast<SrcEvaluatorTypeT&>(m_src).template writePacket<LoadMode>(row,col, m_dst.template packet<StoreMode,PacketType>(row,col));
+    #####:   42:    m_dst.template writePacket<StoreMode>(row,col,tmp);
+    #####:   43:  }
+        -:   44:  
+        -:   45:  template<int StoreMode, int LoadMode, typename PacketType>
+        -:   46:  void assignPacket(Index index)
+        -:   47:  {
+        -:   48:    PacketType tmp = m_src.template packet<LoadMode,PacketType>(index);
+        -:   49:    const_cast<SrcEvaluatorTypeT&>(m_src).template writePacket<LoadMode>(index, m_dst.template packet<StoreMode,PacketType>(index));
+        -:   50:    m_dst.template writePacket<StoreMode>(index,tmp);
+        -:   51:  }
+        -:   52:  
+        -:   53:  // TODO find a simple way not to have to copy/paste this function from generic_dense_assignment_kernel, by simple I mean no CRTP (Gael)
+        -:   54:  template<int StoreMode, int LoadMode, typename PacketType>
+    #####:   55:  void assignPacketByOuterInner(Index outer, Index inner)
+        -:   56:  {
+    #####:   57:    Index row = Base::rowIndexByOuterInner(outer, inner); 
+    #####:   58:    Index col = Base::colIndexByOuterInner(outer, inner);
+    #####:   59:    assignPacket<StoreMode,LoadMode,PacketType>(row, col);
+    #####:   60:  }
+        -:   61:};
+        -:   62:
+        -:   63:} // namespace internal
+        -:   64:
+        -:   65:} // end namespace Eigen
+        -:   66:
+        -:   67:#endif // EIGEN_SWAP_H

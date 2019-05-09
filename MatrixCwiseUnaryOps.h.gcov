@@ -1,0 +1,90 @@
+        -:    0:Source:/usr/include/eigen3/Eigen/src/plugins/MatrixCwiseUnaryOps.h
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// This file is part of Eigen, a lightweight C++ template library
+        -:    2:// for linear algebra.
+        -:    3://
+        -:    4:// Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
+        -:    5:// Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
+        -:    6://
+        -:    7:// This Source Code Form is subject to the terms of the Mozilla
+        -:    8:// Public License v. 2.0. If a copy of the MPL was not distributed
+        -:    9:// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+        -:   10:
+        -:   11:// This file is included into the body of the base classes supporting matrix specific coefficient-wise functions.
+        -:   12:// This include MatrixBase and SparseMatrixBase.
+        -:   13:
+        -:   14:
+        -:   15:typedef CwiseUnaryOp<internal::scalar_abs_op<Scalar>, const Derived> CwiseAbsReturnType;
+        -:   16:typedef CwiseUnaryOp<internal::scalar_abs2_op<Scalar>, const Derived> CwiseAbs2ReturnType;
+        -:   17:typedef CwiseUnaryOp<internal::scalar_sqrt_op<Scalar>, const Derived> CwiseSqrtReturnType;
+        -:   18:typedef CwiseUnaryOp<internal::scalar_sign_op<Scalar>, const Derived> CwiseSignReturnType;
+        -:   19:typedef CwiseUnaryOp<internal::scalar_inverse_op<Scalar>, const Derived> CwiseInverseReturnType;
+        -:   20:
+        -:   21:/// \returns an expression of the coefficient-wise absolute value of \c *this
+        -:   22:///
+        -:   23:/// Example: \include MatrixBase_cwiseAbs.cpp
+        -:   24:/// Output: \verbinclude MatrixBase_cwiseAbs.out
+        -:   25:///
+        -:   26:EIGEN_DOC_UNARY_ADDONS(cwiseAbs,absolute value)
+        -:   27:///
+        -:   28:/// \sa cwiseAbs2()
+        -:   29:///
+        -:   30:EIGEN_DEVICE_FUNC
+        -:   31:EIGEN_STRONG_INLINE const CwiseAbsReturnType
+    #####:   32:cwiseAbs() const { return CwiseAbsReturnType(derived()); }
+        -:   33:
+        -:   34:/// \returns an expression of the coefficient-wise squared absolute value of \c *this
+        -:   35:///
+        -:   36:/// Example: \include MatrixBase_cwiseAbs2.cpp
+        -:   37:/// Output: \verbinclude MatrixBase_cwiseAbs2.out
+        -:   38:///
+        -:   39:EIGEN_DOC_UNARY_ADDONS(cwiseAbs2,squared absolute value)
+        -:   40:///
+        -:   41:/// \sa cwiseAbs()
+        -:   42:///
+        -:   43:EIGEN_DEVICE_FUNC
+        -:   44:EIGEN_STRONG_INLINE const CwiseAbs2ReturnType
+    #####:   45:cwiseAbs2() const { return CwiseAbs2ReturnType(derived()); }
+        -:   46:
+        -:   47:/// \returns an expression of the coefficient-wise square root of *this.
+        -:   48:///
+        -:   49:/// Example: \include MatrixBase_cwiseSqrt.cpp
+        -:   50:/// Output: \verbinclude MatrixBase_cwiseSqrt.out
+        -:   51:///
+        -:   52:EIGEN_DOC_UNARY_ADDONS(cwiseSqrt,square-root)
+        -:   53:///
+        -:   54:/// \sa cwisePow(), cwiseSquare()
+        -:   55:///
+        -:   56:EIGEN_DEVICE_FUNC
+        -:   57:inline const CwiseSqrtReturnType
+        -:   58:cwiseSqrt() const { return CwiseSqrtReturnType(derived()); }
+        -:   59:
+        -:   60:/// \returns an expression of the coefficient-wise signum of *this.
+        -:   61:///
+        -:   62:/// Example: \include MatrixBase_cwiseSign.cpp
+        -:   63:/// Output: \verbinclude MatrixBase_cwiseSign.out
+        -:   64:///
+        -:   65:EIGEN_DOC_UNARY_ADDONS(cwiseSign,sign function)
+        -:   66:///
+        -:   67:EIGEN_DEVICE_FUNC
+        -:   68:inline const CwiseSignReturnType
+        -:   69:cwiseSign() const { return CwiseSignReturnType(derived()); }
+        -:   70:
+        -:   71:
+        -:   72:/// \returns an expression of the coefficient-wise inverse of *this.
+        -:   73:///
+        -:   74:/// Example: \include MatrixBase_cwiseInverse.cpp
+        -:   75:/// Output: \verbinclude MatrixBase_cwiseInverse.out
+        -:   76:///
+        -:   77:EIGEN_DOC_UNARY_ADDONS(cwiseInverse,inverse)
+        -:   78:///
+        -:   79:/// \sa cwiseProduct()
+        -:   80:///
+        -:   81:EIGEN_DEVICE_FUNC
+        -:   82:inline const CwiseInverseReturnType
+        -:   83:cwiseInverse() const { return CwiseInverseReturnType(derived()); }
+        -:   84:
+        -:   85:

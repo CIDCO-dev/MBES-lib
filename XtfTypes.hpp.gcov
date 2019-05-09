@@ -1,0 +1,586 @@
+        -:    0:Source:src/datagrams/xtf/XtfTypes.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:#ifndef XTFTYPES_HPP
+        -:    2:#define XTFTYPES_HPP
+        -:    3:/**
+        -:    4: *  Description des datagrammes pour le format XTF
+        -:    5: *  Référence: Triton Imaging, Inc. eXtended Triton Format (XTF) Rev. 40 (9/22/2015)
+        -:    6: *  Auteurs: Jérémy Viau Trudel,Guillaume Morissette
+        -:    7: *
+        -:    8: *  Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+        -:    9: */
+        -:   10:
+        -:   11:
+        -:   12:#include <stdint.h>
+        -:   13:#include <string>
+        -:   14:
+        -:   15:#pragma pack(1)
+        -:   16:typedef struct {
+        -:   17:	uint8_t TypeOfChannel;
+        -:   18:	uint8_t SubChannelNumber;
+        -:   19:	uint16_t CorrectionFlags;
+        -:   20:	uint16_t UniPolar;
+        -:   21:	uint16_t BytesPerSample;
+        -:   22:	uint32_t Reserved;
+        -:   23:	char ChannelName[16];
+        -:   24:	float VoltScale;
+        -:   25:	float Frequency;
+        -:   26:	float HorizBeamAngle;
+        -:   27:	float TiltAngle;
+        -:   28:	float BeamWidth;
+        -:   29:	float OffsetX;
+        -:   30:	float OffsetY;
+        -:   31:	float OffsetZ;
+        -:   32:	float OffsetYaw;
+        -:   33:	float OffsetPitch;
+        -:   34:	float OffsetRoll;
+        -:   35:	uint16_t BeamsPerArray;
+        -:   36:	char ReservedArea2[54];
+        -:   37:} XtfChanInfo;
+        -:   38:#pragma pack()
+        -:   39:
+        -:   40:
+        -:   41:#pragma pack(1)
+        -:   42:typedef struct{
+        -:   43:	uint8_t FileFormat;
+        -:   44:	uint8_t SystemType;
+        -:   45:	char RecordingProgramName[8];
+        -:   46:	char RecordingProgramVersion[8];
+        -:   47:	char SonarName[16];
+        -:   48:	uint16_t SonarType;
+        -:   49:
+        -:   50:	char NoteString[64];
+        -:   51:	char ThisFileName[64];
+        -:   52:	uint16_t NavUnits;
+        -:   53:	uint16_t NumberOfSonarChannels;
+        -:   54:	uint16_t NumberOfBathymetryChannels;
+        -:   55:	uint8_t NumberOfSnippetChannels;
+        -:   56:	uint8_t NumberOfForwardLookArrays;
+        -:   57:	uint16_t NumberOfEchoStrengthChannels;
+        -:   58:	uint8_t NumberOfInterferometryChannels;
+        -:   59:	uint8_t Reserved1;
+        -:   60:	uint16_t Reserved2;
+        -:   61:	float ReferencePointHeight;
+        -:   62:	// navigation system parameters
+        -:   63:	int8_t ProjectionType[12];
+        -:   64:	int8_t SpheriodType[10];
+        -:   65:	int32_t NavigationLatency;
+        -:   66:	float OriginY;
+        -:   67:	float OriginX;
+        -:   68:	float NavOffsetY;
+        -:   69:	float NavOffsetX;
+        -:   70:	float NavOffsetZ;
+        -:   71:	float NavOffsetYaw;
+        -:   72:	float MRUOffsetY;
+        -:   73:	float MRUOffsetX;
+        -:   74:	float MRUOffsetZ;
+        -:   75:	float MRUOffsetYaw;
+        -:   76:	float MRUOffsetPitch;
+        -:   77:	float MRUOffsetRoll;
+        -:   78:	XtfChanInfo Channels[6];
+        -:   79:} XtfFileHeader;
+        -:   80:#pragma pack()
+        -:   81:
+        -:   82:
+        -:   83:#pragma pack(1)
+        -:   84:typedef struct{
+        -:   85:        uint16_t MagicNumber;
+        -:   86:        uint8_t HeaderType;
+        -:   87:        uint8_t SubChannelNumber;
+        -:   88:        uint16_t NumChansToFollow;
+        -:   89:        uint16_t Reserved1[2];
+        -:   90:        uint32_t NumBytesThisRecord;
+        -:   91:} XtfPacketHeader;
+        -:   92:#pragma pack()
+        -:   93:
+        -:   94:#pragma pack(1)
+        -:   95:typedef struct {
+        -:   96:	uint16_t Year;
+        -:   97:	uint8_t Month;
+        -:   98:	uint8_t Day;
+        -:   99:	uint8_t Hour;
+        -:  100:	uint8_t Minute;
+        -:  101:	uint8_t Second;
+        -:  102:	uint8_t HSeconds;
+        -:  103:	uint16_t JulianDay;
+        -:  104:	uint32_t EventNumber;
+        -:  105:	uint32_t PingNumber;
+        -:  106:	float SoundVelocity;
+        -:  107:	float OceanTide;
+        -:  108:	uint32_t Reserved2;
+        -:  109:	float ConductivityFreq;
+        -:  110:	float TemperatureFreq;
+        -:  111:	float PressureFreq;
+        -:  112:	float PressureTemp;
+        -:  113:	float Conductivity;
+        -:  114:	float WaterTemperature;
+        -:  115:	float Pressure;
+        -:  116:	float ComputedSoundVelocity;
+        -:  117:	float MagX;
+        -:  118:	float MagY;
+        -:  119:	float MagZ;
+        -:  120:	float AuxVal1;
+        -:  121:	float AuxVal2;
+        -:  122:	float AuxVal3;
+        -:  123:	float AuxVal4;
+        -:  124:	float AuxVal5;
+        -:  125:	float AuxVal6;
+        -:  126:	float SpeedLog;
+        -:  127:	float Turbidity;
+        -:  128:	float ShipSpeed;
+        -:  129:	float ShipGyro;
+        -:  130:	double ShipYcoordinate;
+        -:  131:	double ShipXcoordinate;
+        -:  132:	uint16_t ShipAltitude;
+        -:  133:	uint16_t ShipDepth;
+        -:  134:	uint8_t FixTimeHour;
+        -:  135:	uint8_t FixTimeMinute;
+        -:  136:	uint8_t FixTimeSecond;
+        -:  137:	uint8_t FixTimeHsecond;
+        -:  138:	float SensorSpeed;
+        -:  139:	float KP;
+        -:  140:	double SensorYcoordinate;
+        -:  141:	double SensorXcoordinate;
+        -:  142:	uint16_t SonarStatus;
+        -:  143:	uint16_t RangeToFish;
+        -:  144:	uint16_t BearingToFish;
+        -:  145:	uint16_t CableOut;
+        -:  146:	float Layback;
+        -:  147:	float CableTension;
+        -:  148:	float SensorDepth;
+        -:  149:	float SensorPrimaryAltitude;
+        -:  150:	float SensorAuxAltitude;
+        -:  151:	float SensorPitch;
+        -:  152:	float SensorRoll;
+        -:  153:	float SensorHeading;
+        -:  154:	float Heave;
+        -:  155:	float Yaw;
+        -:  156:	uint32_t AttitudeTimeTag;
+        -:  157:	float DOT;
+        -:  158:	uint32_t NavFixMilliseconds;
+        -:  159:	uint8_t ComputerClockHour;
+        -:  160:	uint8_t ComputerClockMinute;
+        -:  161:	uint8_t ComputerClockSecond;
+        -:  162:	uint8_t ComputerClockHsec;
+        -:  163:	short FishPositionDeltaX;
+        -:  164:	short FishPositionDeltaY;
+        -:  165:	unsigned char FishPositionErrorCode;
+        -:  166:	unsigned int OptionalOffsey;  // triton 7125 only
+        -:  167:	uint8_t CableOutHundredths;
+        -:  168:	uint8_t ReservedSpace2[6];
+        -:  169:} XtfPingHeader;
+        -:  170:#pragma pack()
+        -:  171:
+        -:  172:
+        -:  173:#pragma pack(1)
+        -:  174:typedef struct {
+        -:  175:	uint16_t ChannelNumber;
+        -:  176:	uint16_t DownsampleMethod;
+        -:  177:	float SlantRange;
+        -:  178:	float GroundRange;
+        -:  179:	float TimeDelay;
+        -:  180:	float TimeDuration;
+        -:  181:	float SecondsPerPing;
+        -:  182:	uint16_t ProcessingFlags;
+        -:  183:	uint16_t Frequency;
+        -:  184:	uint16_t InitialGainCode;
+        -:  185:	uint16_t GainCode;
+        -:  186:	uint16_t BandWidth;
+        -:  187:	uint32_t ContactNumber;
+        -:  188:	uint16_t ContactClassification;
+        -:  189:	uint8_t ContactSubNumber;
+        -:  190:	uint8_t ContactType;
+        -:  191:	uint32_t NumSamples;
+        -:  192:	uint16_t MillivoltScale;
+        -:  193:	float ContactTimeOffTrack;
+        -:  194:	uint8_t ContactCloseNumber;
+        -:  195:	uint8_t Reserved2;
+        -:  196:	float FixedVSOP;
+        -:  197:	int16_t Weight;
+        -:  198:	uint8_t ReservedSpace[4];
+        -:  199:} XtfPingChanHeader;
+        -:  200:#pragma pack()
+        -:  201:
+        -:  202:#pragma pack(1)
+        -:  203:typedef struct {
+        -:  204:	uint16_t Year;
+        -:  205:	uint8_t Month;
+        -:  206:	uint8_t Day;
+        -:  207:	uint8_t Hour;
+        -:  208:	uint8_t Minute;
+        -:  209:	uint8_t Second;
+        -:  210:	uint8_t ReservedBytes[35];
+        -:  211:	char NotesText[200];
+        -:  212:}XtfNotesHeader;
+        -:  213:#pragma pack()
+        -:  214:
+        -:  215:#pragma pack(1)
+        -:  216:typedef struct {
+        -:  217:	uint32_t Reserved2[2];
+        -:  218:	uint32_t EpochMicroseconds;
+        -:  219:	uint32_t SourceEpoch;
+        -:  220:	float Pitch;
+        -:  221:	float Roll;
+        -:  222:	float Heave;
+        -:  223:	float Yaw;
+        -:  224:	uint32_t TimeTag;
+        -:  225:	float Heading;
+        -:  226:	uint16_t Year;
+        -:  227:	uint8_t Month;
+        -:  228:	uint8_t Day;
+        -:  229:	uint8_t Hour;
+        -:  230:	uint8_t Minutes;
+        -:  231:	uint8_t Seconds;
+        -:  232:	uint16_t Milliseconds;
+        -:  233:	uint8_t Reserved3[1];
+        -:  234:} XtfAttitudeData;
+        -:  235:#pragma pack()
+        -:  236:
+        -:  237:#pragma pack(1)
+        -:  238:typedef struct {
+        -:  239:	uint16_t MagicNumber;
+        -:  240:	uint8_t HeaderType;
+        -:  241:	uint8_t SerialPort;
+        -:  242:	uint16_t NumChansToFollow;
+        -:  243:	uint16_t Reserved[2];
+        -:  244:	uint32_t NumBytesThisRecord;
+        -:  245:	uint16_t Year;
+        -:  246:	uint8_t Month;
+        -:  247:	uint8_t Day;
+        -:  248:	uint8_t Hour;
+        -:  249:	uint8_t Minute;
+        -:  250:	uint8_t Second;
+        -:  251:	uint8_t HSeconds;
+        -:  252:	uint16_t JulianDay;
+        -:  253:	uint32_t TimeTag;
+        -:  254:	uint16_t StringSize;
+        -:  255:}XtfRawSerialHeader;
+        -:  256:#pragma pack()
+        -:  257:
+        -:  258:#pragma pack(1)
+        -:  259:typedef struct {
+        -:  260:	uint16_t MagicNumber;
+        -:  261:	uint8_t HeaderType;
+        -:  262:	uint8_t SubChannelNumber;
+        -:  263:	uint16_t NumChansToFollow;
+        -:  264:	uint16_t Reserved1[2];
+        -:  265:	uint32_t NumBytesThisRecord;
+        -:  266:	uint16_t Year;
+        -:  267:	uint8_t Month;
+        -:  268:	uint8_t Day;
+        -:  269:	uint8_t Hour;
+        -:  270:	uint8_t Minute;
+        -:  271:	uint8_t Second;
+        -:  272:	uint8_t HSeconds;
+        -:  273:	uint32_t NumSensorBytes;
+        -:  274:	uint32_t RelativeBathyPingNum;
+        -:  275:	uint8_t Reserved3[34];
+        -:  276:}XtfHighSpeedSensor;
+        -:  277:#pragma pack()
+        -:  278:
+        -:  279:#pragma pack(1)
+        -:  280:typedef struct {
+        -:  281:	double dPosOffsetTrX;
+        -:  282:	double dPosOffsetTrY;
+        -:  283:	float fDepth;
+        -:  284:	double dTime;
+        -:  285:	short usAmpl;
+        -:  286:	uint8_t ucQuality;
+        -:  287:}XtfBeamXYZA;
+        -:  288:#pragma pack()
+        -:  289:
+        -:  290:#pragma pack(1)
+        -:  291:typedef struct {
+        -:  292:	uint32_t Id;
+        -:  293:	uint16_t  HeaderSize;
+        -:  294:	uint16_t  DataSize;
+        -:  295:	uint32_t  PingNumber;
+        -:  296:	uint32_t Seconds;
+        -:  297:	uint32_t Millisec;
+        -:  298:	uint16_t Latency;
+        -:  299:	uint16_t SonarID[2];
+        -:  300:	uint16_t SonarModel;
+        -:  301:	uint16_t Frequency;
+        -:  302:	uint16_t SSpeed;
+        -:  303:	uint16_t SampleRate;
+        -:  304:	uint16_t PingRate;
+        -:  305:	uint16_t Range;
+        -:  306:	uint16_t Power;
+        -:  307:	uint16_t Gain;
+        -:  308:	uint16_t  PulseWidth;
+        -:  309:	uint16_t Spread;
+        -:  310:	uint16_t Absorb;
+        -:  311:	uint16_t Proj;
+        -:  312:	uint16_t ProjWidth;
+        -:  313:	uint16_t SpacingNum;
+        -:  314:	uint16_t SpacingDen;
+        -:  315:	int16_t ProjAngle;
+        -:  316:	uint16_t MinRange;
+        -:  317:	uint16_t MaxRange;
+        -:  318:	uint16_t MinDepth;
+        -:  319:	uint16_t MaxDepth;
+        -:  320:	uint16_t Filters;
+        -:  321:	uint8_t bFlags[2];
+        -:  322:	int16_t HeadTemp;
+        -:  323:	uint16_t BeamCnt;
+        -:  324:}SNP0;
+        -:  325:#pragma pack()
+        -:  326:
+        -:  327:
+        -:  328:#pragma pack(1)
+        -:  329:typedef struct {
+        -:  330:	uint32_t ID;
+        -:  331:	uint16_t HeaderSize;
+        -:  332:	uint16_t DataSize;
+        -:  333:	uint32_t PingNumber;
+        -:  334:	uint16_t Beam;
+        -:  335:	uint16_t SnipSamples;
+        -:  336:	uint16_t GainStart;
+        -:  337:	uint16_t GainEnd;
+        -:  338:	uint16_t FragOffset;
+        -:  339:	uint16_t FragSamples;
+        -:  340:}SNP1;
+        -:  341:#pragma pack()
+        -:  342:
+        -:  343:#pragma pack(1)
+        -:  344:typedef struct {
+        -:  345:	uint16_t Year;
+        -:  346:	uint8_t Month;
+        -:  347:	uint8_t Day;
+        -:  348:	uint8_t Hour;
+        -:  349:	uint8_t Minutes;
+        -:  350:	uint8_t Seconds;
+        -:  351:	uint16_t MicroSeconds; //Hundredths of microseconds (0-9999)
+        -:  352:	double RawYcoordinate;
+        -:  353:	double RawXcoordinate;
+        -:  354:	double RawAltitude;
+        -:  355:	float Pitch;
+        -:  356:	float Roll;
+        -:  357:	float Heave;
+        -:  358:	float Heading;
+        -:  359:	uint8_t Reserved2;
+        -:  360:}XtfPosRawNavigation;
+        -:  361:#pragma pack()
+        -:  362:
+        -:  363:#pragma pack(1)
+        -:  364:typedef struct {
+        -:  365:	uint16_t MagicNumber;
+        -:  366:	uint8_t HeaderType;
+        -:  367:	uint8_t SubChannelNumber;
+        -:  368:	uint16_t NumChansToFollow;
+        -:  369:	uint16_t Reserved1[2];
+        -:  370:	uint32_t NumBytesThisRecord;
+        -:  371:	uint32_t TimeTag;
+        -:  372:	int32_t Id;
+        -:  373:	float SoundVelocity;
+        -:  374:	float Intensity;
+        -:  375:	int32_t Quality;
+        -:  376:	float TwoWayTravelTime;
+        -:  377:	uint16_t Year;
+        -:  378:	uint8_t Month;
+        -:  379:	uint8_t Day;
+        -:  380:	uint8_t Hour;
+        -:  381:	uint8_t Minute;
+        -:  382:	uint8_t Second;
+        -:  383:	uint16_t MilliSeconds;
+        -:  384:	uint8_t Reserved[7];
+        -:  385:}XtfQpsSingleBeam;
+        -:  386:#pragma pack()
+        -:  387:
+        -:  388:#pragma pack(1)
+        -:  389:typedef struct {
+        -:  390:	int32_t Id;
+        -:  391:	float Intensity;
+        -:  392:	int32_t Quality;
+        -:  393:	float TwoWayTravelTime;
+        -:  394:	float DeltaTime;
+        -:  395:	float OffsetX;
+        -:  396:	float OffsetY;
+        -:  397:	float OffsetZ;
+        -:  398:	float Reserved[4];
+        -:  399:}XtfQpsMultiTxEntry;
+        -:  400:#pragma pack()
+        -:  401:
+        -:  402:#pragma pack(1)
+        -:  403:typedef struct {
+        -:  404:	int32_t Id;
+        -:  405:	double Intensity;
+        -:  406:	int32_t Quality;
+        -:  407:	double TwoWayTravelTime;
+        -:  408:	double DeltaTime;
+        -:  409:	double BeamAngle;
+        -:  410:	double TiltAngle;
+        -:  411:	float Reserved[4];
+        -:  412:}XtfQpsMbEntry;
+        -:  413:#pragma pack()
+        -:  414:
+        -:  415:#pragma pack(1)
+        -:  416:typedef struct {
+        -:  417:	uint16_t MagicNumber;
+        -:  418:	uint8_t HeaderType;
+        -:  419:	uint8_t ManufacturerID;
+        -:  420:	uint16_t SonarID;
+        -:  421:	uint16_t PacketID;
+        -:  422:	uint16_t Reserved1[1];
+        -:  423:	uint32_t NumBytesThisRecord;
+        -:  424:	uint16_t Year;
+        -:  425:	uint8_t Month;
+        -:  426:	uint8_t Day;
+        -:  427:	uint8_t Hour;
+        -:  428:	uint8_t Minute;
+        -:  429:	uint8_t Second;
+        -:  430:	uint8_t Hseconds;
+        -:  431:	uint16_t JulianDay;
+        -:  432:	uint16_t Reserved2[2];
+        -:  433:	uint32_t PingNumber;
+        -:  434:	uint32_t TimeTag;
+        -:  435:	uint32_t NumCustomerB;
+        -:  436:	uint8_t Reserved3[24];
+        -:  437:}XtfRawCustomHeader;
+        -:  438:#pragma pack()
+        -:  439:
+        -:  440:#pragma pack(1)
+        -:  441:typedef struct {
+        -:  442:	uint16_t MagicNumber;
+        -:  443:	uint8_t HeaderType;
+        -:  444:	uint8_t Reserved[7];
+        -:  445:	uint32_t NumBytesThisRecord;
+        -:  446:	uint16_t Year;
+        -:  447:	uint8_t Month;
+        -:  448:	uint8_t Day;
+        -:  449:	uint8_t Hour;
+        -:  450:	uint8_t Minute;
+        -:  451:	uint8_t Second;
+        -:  452:	uint32_t Microseconds;
+        -:  453:	uint32_t SourceEpoch;
+        -:  454:	uint32_t TimeTag;
+        -:  455:	double RawYCoordinate;
+        -:  456:	double RawXCoordinate;
+        -:  457:	double RawAltitude;
+        -:  458:	uint8_t TimeFlag;
+        -:  459:	uint8_t Reserved1[6];
+        -:  460:}XtfHeaderNavigation_type42;
+        -:  461:#pragma pack()
+        -:  462:
+        -:  463:#pragma pack(1)
+        -:  464:typedef struct {
+        -:  465:	uint16_t MagicNumber;
+        -:  466:	uint8_t HeaderType;
+        -:  467:	uint8_t Reserved[7];
+        -:  468:	uint32_t NumBytesThisRecord;
+        -:  469:	uint16_t Year;
+        -:  470:	uint8_t Month;
+        -:  471:	uint8_t Day;
+        -:  472:	uint8_t Hour;
+        -:  473:	uint8_t Minute;
+        -:  474:	uint8_t Second;
+        -:  475:	uint32_t Microseconds;
+        -:  476:	uint32_t SourceEpoch;
+        -:  477:	uint32_t TimeTag;
+        -:  478:	float Gyro;
+        -:  479:	uint8_t TimeFlag;
+        -:  480:	uint8_t Reserved1[26];
+        -:  481:}XtfHeaderNavigation_type84;
+        -:  482:#pragma pack()
+        -:  483:
+        -:  484:#pragma pack(1)
+        -:  485:typedef struct {
+        -:  486:	uint16_t MagicNumber;
+        -:  487:	uint8_t HeaderType;
+        -:  488:	uint8_t Reserved [7];
+        -:  489:	uint32_t NumBytesThisRecord;
+        -:  490:	uint16_t Year;
+        -:  491:	uint8_t Month;
+        -:  492:	uint8_t Day;
+        -:  493:	uint8_t Hour;
+        -:  494:	uint8_t Minute;
+        -:  495:	uint8_t Second;
+        -:  496:	uint32_t Microseconds;
+        -:  497:	uint32_t SourceEpoch;
+        -:  498:	uint32_t TimeTag;
+        -:  499:	float Gyro;
+        -:  500:	uint8_t TimeFlag;
+        -:  501:	uint8_t Reserved1[26];
+        -:  502:}XtfHeaderGyro;
+        -:  503:#pragma pack()
+        -:  504:
+        -:  505:#define XTF_HEADER_ATTITUDE 3
+        -:  506:#define XTF_HEADER_Q_MULTIBEAM 28
+        -:  507:#define XTF_HEADER_POSITION 107
+        -:  508:
+    #####:  509:const std::string SonarTypes[]{
+        -:  510:	"NONE , default",
+        -:  511:	"JAMSTEC, Jamstec chirp 2-channel subbottom",
+        -:  512:	"ANALOG_C31, PC31 8-channel",
+        -:  513:	"SIS1000, Chirp SIS-1000 sonar",
+        -:  514:	"ANALOG_32CHAN, Spectrum with 32-channel DSPlink card",
+        -:  515:	"KLEIN2000, Klein system 2000 with digital interface",
+        -:  516:	"RWS, Standard PC31 analog with special nav code",
+        -:  517:	"DF1000, EG&G DF1000 digitalinterface",
+        -:  518:	"SEABAT, Reson SEABAT 900x analog/serial",
+        -:  519:	"KLEIN595, 4-chan Klein 595, same as ANALOG_C31",
+        -:  520:	"EGG260, 2-channel EGG260, same as ANALOG_C31",
+        -:  521:	"SONATECH_DDS, Sonatech Diver Detection System on Spectrum DSP32C",
+        -:  522:	"ECHOSCAN, Odom EchoScanII multibeam (with simultaneous analog sidescan)",
+        -:  523:	"ELAC, Elac multibeam system",
+        -:  524:	"KLEIN5000, Klein system 5000 with digital interface",
+        -:  525:	"Reson Seabat 8101",
+        -:  526:	"Imagenex model 858",
+        -:  527:	"USN SILOS with 3-channel analog",
+        -:  528:	"Sonatech Super-high res sidescan sonar",
+        -:  529:	"Delph AU32 Analog input (2 channel)",
+        -:  530:	"Generic sonar using the memory-mapped file interface",
+        -:  531:	"Simrad SM200",
+        -:  532:	"0 Multibeam Echo Sounder",
+        -:  533:	"Standard multimedia audio",
+        -:  534:	"Edgetech (EG&G) ACI card for 260 sonar through PC31 card",
+        -:  535:	"Edgetech Black Box",
+        -:  536:	"Fugro deeptow",
+        -:  537:	"C&C's Edgetech Chirp conversion program",
+        -:  538:	"DTI SAS Synthetic Aperture processor (memmap file)",
+        -:  539:	"Fugro's Osiris AUV Sidescan data",
+        -:  540:	"Fugro's Osiris AUV Multibeam data",
+        -:  541:	"Geoacoustics SLS",
+        -:  542:	"Simrad EM2000/EM3000",
+        -:  543:	"Klein system 3000",
+        -:  544:	"SHRSSS Chirp system",
+        -:  545:	"Benthos C3D SARA/CAATI",
+        -:  546:	"Edgetech MP-X",
+        -:  547:	"CMAX",
+        -:  548:	"Benthos sis1624",
+        -:  549:	"Edgetech 4200",
+        -:  550:	"Benthos SIS1500",
+        -:  551:	"Benthos SIS1502",
+        -:  552:	"Benthos SIS3000",
+        -:  553:	"Benthos SIS7000",
+        -:  554:	"DF1000 DCU",
+        -:  555:	"NONE_SIDESCAN",
+        -:  556:	"NONE_MULTIBEAM",
+        -:  557:	"Reson 7125",
+        -:  558:	"CODA Echoscope",
+        -:  559:	"Kongsberg SAS",
+        -:  560:	"QINSy",
+        -:  561:	"GeoAcoustics DSSS",
+        -:  562:	"CMAX_USB",
+        -:  563:	"SwathPlus Bathy",
+        -:  564:	"R2Sonic QINSy",
+        -:  565:	"R2Sonic Triton",
+        -:  566:	"Converted SwathPlus Bathy",
+        -:  567:	"Edgetech 4600",
+        -:  568:	"Klein 3500",
+        -:  569:	"Klein 5900",
+        -:  570:	"EM2040",
+        -:  571:	"Klein5Kv2",
+        -:  572:	"DT100",
+        -:  573:	"Kraken",
+        -:  574:	"Kraken",
+        -:  575:	"Klein 4900",
+        -:  576:	"FSI HMS622",
+        -:  577:	"SI HMS6x4",
+        -:  578:	"FSI HMS6x5"
+    #####:  579:};
+        -:  580:
+        -:  581:#endif

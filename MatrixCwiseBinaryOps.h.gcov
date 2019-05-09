@@ -1,0 +1,157 @@
+        -:    0:Source:/usr/include/eigen3/Eigen/src/plugins/MatrixCwiseBinaryOps.h
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// This file is part of Eigen, a lightweight C++ template library
+        -:    2:// for linear algebra.
+        -:    3://
+        -:    4:// Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
+        -:    5:// Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
+        -:    6://
+        -:    7:// This Source Code Form is subject to the terms of the Mozilla
+        -:    8:// Public License v. 2.0. If a copy of the MPL was not distributed
+        -:    9:// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+        -:   10:
+        -:   11:// This file is a base class plugin containing matrix specifics coefficient wise functions.
+        -:   12:
+        -:   13:/** \returns an expression of the Schur product (coefficient wise product) of *this and \a other
+        -:   14:  *
+        -:   15:  * Example: \include MatrixBase_cwiseProduct.cpp
+        -:   16:  * Output: \verbinclude MatrixBase_cwiseProduct.out
+        -:   17:  *
+        -:   18:  * \sa class CwiseBinaryOp, cwiseAbs2
+        -:   19:  */
+        -:   20:template<typename OtherDerived>
+        -:   21:EIGEN_DEVICE_FUNC
+        -:   22:EIGEN_STRONG_INLINE const EIGEN_CWISE_BINARY_RETURN_TYPE(Derived,OtherDerived,product)
+    #####:   23:cwiseProduct(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
+        -:   24:{
+    #####:   25:  return EIGEN_CWISE_BINARY_RETURN_TYPE(Derived,OtherDerived,product)(derived(), other.derived());
+        -:   26:}
+        -:   27:
+        -:   28:/** \returns an expression of the coefficient-wise == operator of *this and \a other
+        -:   29:  *
+        -:   30:  * \warning this performs an exact comparison, which is generally a bad idea with floating-point types.
+        -:   31:  * In order to check for equality between two vectors or matrices with floating-point coefficients, it is
+        -:   32:  * generally a far better idea to use a fuzzy comparison as provided by isApprox() and
+        -:   33:  * isMuchSmallerThan().
+        -:   34:  *
+        -:   35:  * Example: \include MatrixBase_cwiseEqual.cpp
+        -:   36:  * Output: \verbinclude MatrixBase_cwiseEqual.out
+        -:   37:  *
+        -:   38:  * \sa cwiseNotEqual(), isApprox(), isMuchSmallerThan()
+        -:   39:  */
+        -:   40:template<typename OtherDerived>
+        -:   41:EIGEN_DEVICE_FUNC
+        -:   42:inline const CwiseBinaryOp<std::equal_to<Scalar>, const Derived, const OtherDerived>
+    #####:   43:cwiseEqual(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
+        -:   44:{
+    #####:   45:  return CwiseBinaryOp<std::equal_to<Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
+        -:   46:}
+        -:   47:
+        -:   48:/** \returns an expression of the coefficient-wise != operator of *this and \a other
+        -:   49:  *
+        -:   50:  * \warning this performs an exact comparison, which is generally a bad idea with floating-point types.
+        -:   51:  * In order to check for equality between two vectors or matrices with floating-point coefficients, it is
+        -:   52:  * generally a far better idea to use a fuzzy comparison as provided by isApprox() and
+        -:   53:  * isMuchSmallerThan().
+        -:   54:  *
+        -:   55:  * Example: \include MatrixBase_cwiseNotEqual.cpp
+        -:   56:  * Output: \verbinclude MatrixBase_cwiseNotEqual.out
+        -:   57:  *
+        -:   58:  * \sa cwiseEqual(), isApprox(), isMuchSmallerThan()
+        -:   59:  */
+        -:   60:template<typename OtherDerived>
+        -:   61:EIGEN_DEVICE_FUNC
+        -:   62:inline const CwiseBinaryOp<std::not_equal_to<Scalar>, const Derived, const OtherDerived>
+        -:   63:cwiseNotEqual(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
+        -:   64:{
+        -:   65:  return CwiseBinaryOp<std::not_equal_to<Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
+        -:   66:}
+        -:   67:
+        -:   68:/** \returns an expression of the coefficient-wise min of *this and \a other
+        -:   69:  *
+        -:   70:  * Example: \include MatrixBase_cwiseMin.cpp
+        -:   71:  * Output: \verbinclude MatrixBase_cwiseMin.out
+        -:   72:  *
+        -:   73:  * \sa class CwiseBinaryOp, max()
+        -:   74:  */
+        -:   75:template<typename OtherDerived>
+        -:   76:EIGEN_DEVICE_FUNC
+        -:   77:EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_min_op<Scalar,Scalar>, const Derived, const OtherDerived>
+        -:   78:cwiseMin(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
+        -:   79:{
+        -:   80:  return CwiseBinaryOp<internal::scalar_min_op<Scalar,Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
+        -:   81:}
+        -:   82:
+        -:   83:/** \returns an expression of the coefficient-wise min of *this and scalar \a other
+        -:   84:  *
+        -:   85:  * \sa class CwiseBinaryOp, min()
+        -:   86:  */
+        -:   87:EIGEN_DEVICE_FUNC
+        -:   88:EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_min_op<Scalar,Scalar>, const Derived, const ConstantReturnType>
+        -:   89:cwiseMin(const Scalar &other) const
+        -:   90:{
+        -:   91:  return cwiseMin(Derived::Constant(rows(), cols(), other));
+        -:   92:}
+        -:   93:
+        -:   94:/** \returns an expression of the coefficient-wise max of *this and \a other
+        -:   95:  *
+        -:   96:  * Example: \include MatrixBase_cwiseMax.cpp
+        -:   97:  * Output: \verbinclude MatrixBase_cwiseMax.out
+        -:   98:  *
+        -:   99:  * \sa class CwiseBinaryOp, min()
+        -:  100:  */
+        -:  101:template<typename OtherDerived>
+        -:  102:EIGEN_DEVICE_FUNC
+        -:  103:EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_max_op<Scalar,Scalar>, const Derived, const OtherDerived>
+        -:  104:cwiseMax(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
+        -:  105:{
+        -:  106:  return CwiseBinaryOp<internal::scalar_max_op<Scalar,Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
+        -:  107:}
+        -:  108:
+        -:  109:/** \returns an expression of the coefficient-wise max of *this and scalar \a other
+        -:  110:  *
+        -:  111:  * \sa class CwiseBinaryOp, min()
+        -:  112:  */
+        -:  113:EIGEN_DEVICE_FUNC
+        -:  114:EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_max_op<Scalar,Scalar>, const Derived, const ConstantReturnType>
+        -:  115:cwiseMax(const Scalar &other) const
+        -:  116:{
+        -:  117:  return cwiseMax(Derived::Constant(rows(), cols(), other));
+        -:  118:}
+        -:  119:
+        -:  120:
+        -:  121:/** \returns an expression of the coefficient-wise quotient of *this and \a other
+        -:  122:  *
+        -:  123:  * Example: \include MatrixBase_cwiseQuotient.cpp
+        -:  124:  * Output: \verbinclude MatrixBase_cwiseQuotient.out
+        -:  125:  *
+        -:  126:  * \sa class CwiseBinaryOp, cwiseProduct(), cwiseInverse()
+        -:  127:  */
+        -:  128:template<typename OtherDerived>
+        -:  129:EIGEN_DEVICE_FUNC
+        -:  130:EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_quotient_op<Scalar>, const Derived, const OtherDerived>
+        -:  131:cwiseQuotient(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
+        -:  132:{
+        -:  133:  return CwiseBinaryOp<internal::scalar_quotient_op<Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
+        -:  134:}
+        -:  135:
+        -:  136:typedef CwiseBinaryOp<internal::scalar_cmp_op<Scalar,Scalar,internal::cmp_EQ>, const Derived, const ConstantReturnType> CwiseScalarEqualReturnType;
+        -:  137:
+        -:  138:/** \returns an expression of the coefficient-wise == operator of \c *this and a scalar \a s
+        -:  139:  *
+        -:  140:  * \warning this performs an exact comparison, which is generally a bad idea with floating-point types.
+        -:  141:  * In order to check for equality between two vectors or matrices with floating-point coefficients, it is
+        -:  142:  * generally a far better idea to use a fuzzy comparison as provided by isApprox() and
+        -:  143:  * isMuchSmallerThan().
+        -:  144:  *
+        -:  145:  * \sa cwiseEqual(const MatrixBase<OtherDerived> &) const
+        -:  146:  */
+        -:  147:EIGEN_DEVICE_FUNC
+        -:  148:inline const CwiseScalarEqualReturnType
+        -:  149:cwiseEqual(const Scalar& s) const
+        -:  150:{
+        -:  151:  return CwiseScalarEqualReturnType(derived(), Derived::Constant(rows(), cols(), s), internal::scalar_cmp_op<Scalar,Scalar,internal::cmp_EQ>());
+        -:  152:}

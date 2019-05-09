@@ -1,0 +1,408 @@
+        -:    0:Source:/usr/include/eigen3/Eigen/src/Core/Transpose.h
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// This file is part of Eigen, a lightweight C++ template library
+        -:    2:// for linear algebra.
+        -:    3://
+        -:    4:// Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
+        -:    5:// Copyright (C) 2009-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
+        -:    6://
+        -:    7:// This Source Code Form is subject to the terms of the Mozilla
+        -:    8:// Public License v. 2.0. If a copy of the MPL was not distributed
+        -:    9:// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+        -:   10:
+        -:   11:#ifndef EIGEN_TRANSPOSE_H
+        -:   12:#define EIGEN_TRANSPOSE_H
+        -:   13:
+        -:   14:namespace Eigen { 
+        -:   15:
+        -:   16:namespace internal {
+        -:   17:template<typename MatrixType>
+        -:   18:struct traits<Transpose<MatrixType> > : public traits<MatrixType>
+        -:   19:{
+        -:   20:  typedef typename ref_selector<MatrixType>::type MatrixTypeNested;
+        -:   21:  typedef typename remove_reference<MatrixTypeNested>::type MatrixTypeNestedPlain;
+        -:   22:  enum {
+        -:   23:    RowsAtCompileTime = MatrixType::ColsAtCompileTime,
+        -:   24:    ColsAtCompileTime = MatrixType::RowsAtCompileTime,
+        -:   25:    MaxRowsAtCompileTime = MatrixType::MaxColsAtCompileTime,
+        -:   26:    MaxColsAtCompileTime = MatrixType::MaxRowsAtCompileTime,
+        -:   27:    FlagsLvalueBit = is_lvalue<MatrixType>::value ? LvalueBit : 0,
+        -:   28:    Flags0 = traits<MatrixTypeNestedPlain>::Flags & ~(LvalueBit | NestByRefBit),
+        -:   29:    Flags1 = Flags0 | FlagsLvalueBit,
+        -:   30:    Flags = Flags1 ^ RowMajorBit,
+        -:   31:    InnerStrideAtCompileTime = inner_stride_at_compile_time<MatrixType>::ret,
+        -:   32:    OuterStrideAtCompileTime = outer_stride_at_compile_time<MatrixType>::ret
+        -:   33:  };
+        -:   34:};
+        -:   35:}
+        -:   36:
+        -:   37:template<typename MatrixType, typename StorageKind> class TransposeImpl;
+        -:   38:
+        -:   39:/** \class Transpose
+        -:   40:  * \ingroup Core_Module
+        -:   41:  *
+        -:   42:  * \brief Expression of the transpose of a matrix
+        -:   43:  *
+        -:   44:  * \tparam MatrixType the type of the object of which we are taking the transpose
+        -:   45:  *
+        -:   46:  * This class represents an expression of the transpose of a matrix.
+        -:   47:  * It is the return type of MatrixBase::transpose() and MatrixBase::adjoint()
+        -:   48:  * and most of the time this is the only way it is used.
+        -:   49:  *
+        -:   50:  * \sa MatrixBase::transpose(), MatrixBase::adjoint()
+        -:   51:  */
+    #####:   52:template<typename MatrixType> class Transpose
+        -:   53:  : public TransposeImpl<MatrixType,typename internal::traits<MatrixType>::StorageKind>
+        -:   54:{
+        -:   55:  public:
+        -:   56:
+        -:   57:    typedef typename internal::ref_selector<MatrixType>::non_const_type MatrixTypeNested;
+        -:   58:
+        -:   59:    typedef typename TransposeImpl<MatrixType,typename internal::traits<MatrixType>::StorageKind>::Base Base;
+        -:   60:    EIGEN_GENERIC_PUBLIC_INTERFACE(Transpose)
+        -:   61:    typedef typename internal::remove_all<MatrixType>::type NestedExpression;
+        -:   62:
+        -:   63:    EIGEN_DEVICE_FUNC
+    #####:   64:    explicit inline Transpose(MatrixType& matrix) : m_matrix(matrix) {}
+        -:   65:
+        -:   66:    EIGEN_INHERIT_ASSIGNMENT_OPERATORS(Transpose)
+        -:   67:
+    #####:   68:    EIGEN_DEVICE_FUNC inline Index rows() const { return m_matrix.cols(); }
+    #####:   69:    EIGEN_DEVICE_FUNC inline Index cols() const { return m_matrix.rows(); }
+        -:   70:
+        -:   71:    /** \returns the nested expression */
+        -:   72:    EIGEN_DEVICE_FUNC
+        -:   73:    const typename internal::remove_all<MatrixTypeNested>::type&
+    #####:   74:    nestedExpression() const { return m_matrix; }
+        -:   75:
+        -:   76:    /** \returns the nested expression */
+        -:   77:    EIGEN_DEVICE_FUNC
+        -:   78:    typename internal::remove_reference<MatrixTypeNested>::type&
+        -:   79:    nestedExpression() { return m_matrix; }
+        -:   80:
+        -:   81:    /** \internal */
+        -:   82:    void resize(Index nrows, Index ncols) {
+        -:   83:      m_matrix.resize(ncols,nrows);
+        -:   84:    }
+        -:   85:
+        -:   86:  protected:
+        -:   87:    typename internal::ref_selector<MatrixType>::non_const_type m_matrix;
+        -:   88:};
+        -:   89:
+        -:   90:namespace internal {
+        -:   91:
+        -:   92:template<typename MatrixType, bool HasDirectAccess = has_direct_access<MatrixType>::ret>
+        -:   93:struct TransposeImpl_base
+        -:   94:{
+        -:   95:  typedef typename dense_xpr_base<Transpose<MatrixType> >::type type;
+        -:   96:};
+        -:   97:
+        -:   98:template<typename MatrixType>
+        -:   99:struct TransposeImpl_base<MatrixType, false>
+        -:  100:{
+        -:  101:  typedef typename dense_xpr_base<Transpose<MatrixType> >::type type;
+        -:  102:};
+        -:  103:
+        -:  104:} // end namespace internal
+        -:  105:
+        -:  106:// Generic API dispatcher
+        -:  107:template<typename XprType, typename StorageKind>
+        -:  108:class TransposeImpl
+        -:  109:  : public internal::generic_xpr_base<Transpose<XprType> >::type
+        -:  110:{
+        -:  111:public:
+        -:  112:  typedef typename internal::generic_xpr_base<Transpose<XprType> >::type Base;
+        -:  113:};
+        -:  114:
+    #####:  115:template<typename MatrixType> class TransposeImpl<MatrixType,Dense>
+        -:  116:  : public internal::TransposeImpl_base<MatrixType>::type
+        -:  117:{
+        -:  118:  public:
+        -:  119:
+        -:  120:    typedef typename internal::TransposeImpl_base<MatrixType>::type Base;
+        -:  121:    using Base::coeffRef;
+        -:  122:    EIGEN_DENSE_PUBLIC_INTERFACE(Transpose<MatrixType>)
+        -:  123:    EIGEN_INHERIT_ASSIGNMENT_OPERATORS(TransposeImpl)
+        -:  124:
+        -:  125:    EIGEN_DEVICE_FUNC inline Index innerStride() const { return derived().nestedExpression().innerStride(); }
+        -:  126:    EIGEN_DEVICE_FUNC inline Index outerStride() const { return derived().nestedExpression().outerStride(); }
+        -:  127:
+        -:  128:    typedef typename internal::conditional<
+        -:  129:                       internal::is_lvalue<MatrixType>::value,
+        -:  130:                       Scalar,
+        -:  131:                       const Scalar
+        -:  132:                     >::type ScalarWithConstIfNotLvalue;
+        -:  133:
+        -:  134:    EIGEN_DEVICE_FUNC inline ScalarWithConstIfNotLvalue* data() { return derived().nestedExpression().data(); }
+        -:  135:    EIGEN_DEVICE_FUNC inline const Scalar* data() const { return derived().nestedExpression().data(); }
+        -:  136:
+        -:  137:    // FIXME: shall we keep the const version of coeffRef?
+        -:  138:    EIGEN_DEVICE_FUNC
+        -:  139:    inline const Scalar& coeffRef(Index rowId, Index colId) const
+        -:  140:    {
+        -:  141:      return derived().nestedExpression().coeffRef(colId, rowId);
+        -:  142:    }
+        -:  143:
+        -:  144:    EIGEN_DEVICE_FUNC
+        -:  145:    inline const Scalar& coeffRef(Index index) const
+        -:  146:    {
+        -:  147:      return derived().nestedExpression().coeffRef(index);
+        -:  148:    }
+        -:  149:};
+        -:  150:
+        -:  151:/** \returns an expression of the transpose of *this.
+        -:  152:  *
+        -:  153:  * Example: \include MatrixBase_transpose.cpp
+        -:  154:  * Output: \verbinclude MatrixBase_transpose.out
+        -:  155:  *
+        -:  156:  * \warning If you want to replace a matrix by its own transpose, do \b NOT do this:
+        -:  157:  * \code
+        -:  158:  * m = m.transpose(); // bug!!! caused by aliasing effect
+        -:  159:  * \endcode
+        -:  160:  * Instead, use the transposeInPlace() method:
+        -:  161:  * \code
+        -:  162:  * m.transposeInPlace();
+        -:  163:  * \endcode
+        -:  164:  * which gives Eigen good opportunities for optimization, or alternatively you can also do:
+        -:  165:  * \code
+        -:  166:  * m = m.transpose().eval();
+        -:  167:  * \endcode
+        -:  168:  *
+        -:  169:  * \sa transposeInPlace(), adjoint() */
+        -:  170:template<typename Derived>
+        -:  171:inline Transpose<Derived>
+        -:  172:DenseBase<Derived>::transpose()
+        -:  173:{
+        -:  174:  return TransposeReturnType(derived());
+        -:  175:}
+        -:  176:
+        -:  177:/** This is the const version of transpose().
+        -:  178:  *
+        -:  179:  * Make sure you read the warning for transpose() !
+        -:  180:  *
+        -:  181:  * \sa transposeInPlace(), adjoint() */
+        -:  182:template<typename Derived>
+        -:  183:inline typename DenseBase<Derived>::ConstTransposeReturnType
+    #####:  184:DenseBase<Derived>::transpose() const
+        -:  185:{
+    #####:  186:  return ConstTransposeReturnType(derived());
+        -:  187:}
+        -:  188:
+        -:  189:/** \returns an expression of the adjoint (i.e. conjugate transpose) of *this.
+        -:  190:  *
+        -:  191:  * Example: \include MatrixBase_adjoint.cpp
+        -:  192:  * Output: \verbinclude MatrixBase_adjoint.out
+        -:  193:  *
+        -:  194:  * \warning If you want to replace a matrix by its own adjoint, do \b NOT do this:
+        -:  195:  * \code
+        -:  196:  * m = m.adjoint(); // bug!!! caused by aliasing effect
+        -:  197:  * \endcode
+        -:  198:  * Instead, use the adjointInPlace() method:
+        -:  199:  * \code
+        -:  200:  * m.adjointInPlace();
+        -:  201:  * \endcode
+        -:  202:  * which gives Eigen good opportunities for optimization, or alternatively you can also do:
+        -:  203:  * \code
+        -:  204:  * m = m.adjoint().eval();
+        -:  205:  * \endcode
+        -:  206:  *
+        -:  207:  * \sa adjointInPlace(), transpose(), conjugate(), class Transpose, class internal::scalar_conjugate_op */
+        -:  208:template<typename Derived>
+        -:  209:inline const typename MatrixBase<Derived>::AdjointReturnType
+        -:  210:MatrixBase<Derived>::adjoint() const
+        -:  211:{
+        -:  212:  return AdjointReturnType(this->transpose());
+        -:  213:}
+        -:  214:
+        -:  215:/***************************************************************************
+        -:  216:* "in place" transpose implementation
+        -:  217:***************************************************************************/
+        -:  218:
+        -:  219:namespace internal {
+        -:  220:
+        -:  221:template<typename MatrixType,
+        -:  222:  bool IsSquare = (MatrixType::RowsAtCompileTime == MatrixType::ColsAtCompileTime) && MatrixType::RowsAtCompileTime!=Dynamic,
+        -:  223:  bool MatchPacketSize =
+        -:  224:        (int(MatrixType::RowsAtCompileTime) == int(internal::packet_traits<typename MatrixType::Scalar>::size))
+        -:  225:    &&  (internal::evaluator<MatrixType>::Flags&PacketAccessBit) >
+        -:  226:struct inplace_transpose_selector;
+        -:  227:
+        -:  228:template<typename MatrixType>
+        -:  229:struct inplace_transpose_selector<MatrixType,true,false> { // square matrix
+        -:  230:  static void run(MatrixType& m) {
+        -:  231:    m.matrix().template triangularView<StrictlyUpper>().swap(m.matrix().transpose());
+        -:  232:  }
+        -:  233:};
+        -:  234:
+        -:  235:// TODO: vectorized path is currently limited to LargestPacketSize x LargestPacketSize cases only.
+        -:  236:template<typename MatrixType>
+        -:  237:struct inplace_transpose_selector<MatrixType,true,true> { // PacketSize x PacketSize
+        -:  238:  static void run(MatrixType& m) {
+        -:  239:    typedef typename MatrixType::Scalar Scalar;
+        -:  240:    typedef typename internal::packet_traits<typename MatrixType::Scalar>::type Packet;
+        -:  241:    const Index PacketSize = internal::packet_traits<Scalar>::size;
+        -:  242:    const Index Alignment = internal::evaluator<MatrixType>::Alignment;
+        -:  243:    PacketBlock<Packet> A;
+        -:  244:    for (Index i=0; i<PacketSize; ++i)
+        -:  245:      A.packet[i] = m.template packetByOuterInner<Alignment>(i,0);
+        -:  246:    internal::ptranspose(A);
+        -:  247:    for (Index i=0; i<PacketSize; ++i)
+        -:  248:      m.template writePacket<Alignment>(m.rowIndexByOuterInner(i,0), m.colIndexByOuterInner(i,0), A.packet[i]);
+        -:  249:  }
+        -:  250:};
+        -:  251:
+        -:  252:template<typename MatrixType,bool MatchPacketSize>
+        -:  253:struct inplace_transpose_selector<MatrixType,false,MatchPacketSize> { // non square matrix
+        -:  254:  static void run(MatrixType& m) {
+        -:  255:    if (m.rows()==m.cols())
+        -:  256:      m.matrix().template triangularView<StrictlyUpper>().swap(m.matrix().transpose());
+        -:  257:    else
+        -:  258:      m = m.transpose().eval();
+        -:  259:  }
+        -:  260:};
+        -:  261:
+        -:  262:} // end namespace internal
+        -:  263:
+        -:  264:/** This is the "in place" version of transpose(): it replaces \c *this by its own transpose.
+        -:  265:  * Thus, doing
+        -:  266:  * \code
+        -:  267:  * m.transposeInPlace();
+        -:  268:  * \endcode
+        -:  269:  * has the same effect on m as doing
+        -:  270:  * \code
+        -:  271:  * m = m.transpose().eval();
+        -:  272:  * \endcode
+        -:  273:  * and is faster and also safer because in the latter line of code, forgetting the eval() results
+        -:  274:  * in a bug caused by \ref TopicAliasing "aliasing".
+        -:  275:  *
+        -:  276:  * Notice however that this method is only useful if you want to replace a matrix by its own transpose.
+        -:  277:  * If you just need the transpose of a matrix, use transpose().
+        -:  278:  *
+        -:  279:  * \note if the matrix is not square, then \c *this must be a resizable matrix. 
+        -:  280:  * This excludes (non-square) fixed-size matrices, block-expressions and maps.
+        -:  281:  *
+        -:  282:  * \sa transpose(), adjoint(), adjointInPlace() */
+        -:  283:template<typename Derived>
+        -:  284:inline void DenseBase<Derived>::transposeInPlace()
+        -:  285:{
+        -:  286:  eigen_assert((rows() == cols() || (RowsAtCompileTime == Dynamic && ColsAtCompileTime == Dynamic))
+        -:  287:               && "transposeInPlace() called on a non-square non-resizable matrix");
+        -:  288:  internal::inplace_transpose_selector<Derived>::run(derived());
+        -:  289:}
+        -:  290:
+        -:  291:/***************************************************************************
+        -:  292:* "in place" adjoint implementation
+        -:  293:***************************************************************************/
+        -:  294:
+        -:  295:/** This is the "in place" version of adjoint(): it replaces \c *this by its own transpose.
+        -:  296:  * Thus, doing
+        -:  297:  * \code
+        -:  298:  * m.adjointInPlace();
+        -:  299:  * \endcode
+        -:  300:  * has the same effect on m as doing
+        -:  301:  * \code
+        -:  302:  * m = m.adjoint().eval();
+        -:  303:  * \endcode
+        -:  304:  * and is faster and also safer because in the latter line of code, forgetting the eval() results
+        -:  305:  * in a bug caused by aliasing.
+        -:  306:  *
+        -:  307:  * Notice however that this method is only useful if you want to replace a matrix by its own adjoint.
+        -:  308:  * If you just need the adjoint of a matrix, use adjoint().
+        -:  309:  *
+        -:  310:  * \note if the matrix is not square, then \c *this must be a resizable matrix.
+        -:  311:  * This excludes (non-square) fixed-size matrices, block-expressions and maps.
+        -:  312:  *
+        -:  313:  * \sa transpose(), adjoint(), transposeInPlace() */
+        -:  314:template<typename Derived>
+        -:  315:inline void MatrixBase<Derived>::adjointInPlace()
+        -:  316:{
+        -:  317:  derived() = adjoint().eval();
+        -:  318:}
+        -:  319:
+        -:  320:#ifndef EIGEN_NO_DEBUG
+        -:  321:
+        -:  322:// The following is to detect aliasing problems in most common cases.
+        -:  323:
+        -:  324:namespace internal {
+        -:  325:
+        -:  326:template<bool DestIsTransposed, typename OtherDerived>
+        -:  327:struct check_transpose_aliasing_compile_time_selector
+        -:  328:{
+        -:  329:  enum { ret = bool(blas_traits<OtherDerived>::IsTransposed) != DestIsTransposed };
+        -:  330:};
+        -:  331:
+        -:  332:template<bool DestIsTransposed, typename BinOp, typename DerivedA, typename DerivedB>
+        -:  333:struct check_transpose_aliasing_compile_time_selector<DestIsTransposed,CwiseBinaryOp<BinOp,DerivedA,DerivedB> >
+        -:  334:{
+        -:  335:  enum { ret =    bool(blas_traits<DerivedA>::IsTransposed) != DestIsTransposed
+        -:  336:               || bool(blas_traits<DerivedB>::IsTransposed) != DestIsTransposed
+        -:  337:  };
+        -:  338:};
+        -:  339:
+        -:  340:template<typename Scalar, bool DestIsTransposed, typename OtherDerived>
+        -:  341:struct check_transpose_aliasing_run_time_selector
+        -:  342:{
+        -:  343:  static bool run(const Scalar* dest, const OtherDerived& src)
+        -:  344:  {
+        -:  345:    return (bool(blas_traits<OtherDerived>::IsTransposed) != DestIsTransposed) && (dest!=0 && dest==(const Scalar*)extract_data(src));
+        -:  346:  }
+        -:  347:};
+        -:  348:
+        -:  349:template<typename Scalar, bool DestIsTransposed, typename BinOp, typename DerivedA, typename DerivedB>
+        -:  350:struct check_transpose_aliasing_run_time_selector<Scalar,DestIsTransposed,CwiseBinaryOp<BinOp,DerivedA,DerivedB> >
+        -:  351:{
+        -:  352:  static bool run(const Scalar* dest, const CwiseBinaryOp<BinOp,DerivedA,DerivedB>& src)
+        -:  353:  {
+        -:  354:    return ((blas_traits<DerivedA>::IsTransposed != DestIsTransposed) && (dest!=0 && dest==(const Scalar*)extract_data(src.lhs())))
+        -:  355:        || ((blas_traits<DerivedB>::IsTransposed != DestIsTransposed) && (dest!=0 && dest==(const Scalar*)extract_data(src.rhs())));
+        -:  356:  }
+        -:  357:};
+        -:  358:
+        -:  359:// the following selector, checkTransposeAliasing_impl, based on MightHaveTransposeAliasing,
+        -:  360:// is because when the condition controlling the assert is known at compile time, ICC emits a warning.
+        -:  361:// This is actually a good warning: in expressions that don't have any transposing, the condition is
+        -:  362:// known at compile time to be false, and using that, we can avoid generating the code of the assert again
+        -:  363:// and again for all these expressions that don't need it.
+        -:  364:
+        -:  365:template<typename Derived, typename OtherDerived,
+        -:  366:         bool MightHaveTransposeAliasing
+        -:  367:                 = check_transpose_aliasing_compile_time_selector
+        -:  368:                     <blas_traits<Derived>::IsTransposed,OtherDerived>::ret
+        -:  369:        >
+        -:  370:struct checkTransposeAliasing_impl
+        -:  371:{
+        -:  372:    static void run(const Derived& dst, const OtherDerived& other)
+        -:  373:    {
+        -:  374:        eigen_assert((!check_transpose_aliasing_run_time_selector
+        -:  375:                      <typename Derived::Scalar,blas_traits<Derived>::IsTransposed,OtherDerived>
+        -:  376:                      ::run(extract_data(dst), other))
+        -:  377:          && "aliasing detected during transposition, use transposeInPlace() "
+        -:  378:             "or evaluate the rhs into a temporary using .eval()");
+        -:  379:
+        -:  380:    }
+        -:  381:};
+        -:  382:
+        -:  383:template<typename Derived, typename OtherDerived>
+        -:  384:struct checkTransposeAliasing_impl<Derived, OtherDerived, false>
+        -:  385:{
+    #####:  386:    static void run(const Derived&, const OtherDerived&)
+        -:  387:    {
+    #####:  388:    }
+        -:  389:};
+        -:  390:
+        -:  391:template<typename Dst, typename Src>
+    #####:  392:void check_for_aliasing(const Dst &dst, const Src &src)
+        -:  393:{
+    #####:  394:  internal::checkTransposeAliasing_impl<Dst, Src>::run(dst, src);
+    #####:  395:}
+        -:  396:
+        -:  397:} // end namespace internal
+        -:  398:
+        -:  399:#endif // EIGEN_NO_DEBUG
+        -:  400:
+        -:  401:} // end namespace Eigen
+        -:  402:
+        -:  403:#endif // EIGEN_TRANSPOSE_H

@@ -1,0 +1,572 @@
+        -:    0:Source:src/datagrams/kongsberg/KongsbergParser.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:/*
+        -:    2: * @author Guillaume Labbe-Morissette
+        -:    3: */
+        -:    4:
+        -:    5:
+        -:    6:#ifndef KONGSBERG_CPP
+        -:    7:#define KONGSBERG_CPP
+        -:    8:
+        -:    9:
+        -:   10:#include <string>
+        -:   11:#include <cstdio>
+        -:   12:#include <iostream>
+        -:   13:#include <cmath>
+        -:   14:#include <map>
+        -:   15:
+        -:   16:#include "../DatagramParser.hpp"
+        -:   17:#include "../../utils/NmeaUtils.hpp"
+        -:   18:#include "../../utils/TimeUtils.hpp"
+        -:   19:#include "../../utils/Exception.hpp"
+        -:   20:#include "KongsbergTypes.hpp"
+        -:   21:
+        -:   22:/*!
+        -:   23: * \brief Kongsberg parser class extention of Datagram parser class
+        -:   24: */
+        -:   25:class KongsbergParser : public DatagramParser{
+        -:   26:        public:
+        -:   27:
+        -:   28:                /**
+        -:   29:                 * Create an Kongsberg parser
+        -:   30:                 *
+        -:   31:                 * @param processor the datagram processor
+        -:   32:                 */
+        -:   33:	        KongsbergParser(DatagramEventHandler & processor);
+        -:   34:
+        -:   35:                /**Destroy the Kongsberg parser*/
+        -:   36:	        ~KongsbergParser();
+        -:   37:
+        -:   38:	        //interface methods
+        -:   39:                /**
+        -:   40:                 * Read a file and change the Kongsberg parser depending on the information
+        -:   41:                 *
+        -:   42:                 * @param filename name of the file to read
+        -:   43:                 */
+        -:   44:	        void parse(std::string & filename);
+        -:   45:                
+        -:   46:                std::string getName(int tag);
+        -:   47:
+        -:   48:        private:
+        -:   49:
+        -:   50:                /**
+        -:   51:                 * Call the process datagram depending on the type of the Kongsberg Header
+        -:   52:                 * 
+        -:   53:                 * @param hdr the Kongsberg header
+        -:   54:                 * @param datagram the datagram
+        -:   55:                 */
+        -:   56:	        void processDatagram(KongsbergHeader & hdr,unsigned char * datagram);
+        -:   57:
+        -:   58:                /**
+        -:   59:                 * call the process Depth
+        -:   60:                 * 
+        -:   61:                 * @param hdr the Kongsberg header
+        -:   62:                 * @param datagram the datagram
+        -:   63:                 */
+        -:   64:	        void processDepth(KongsbergHeader & hdr,unsigned char * datagram);
+        -:   65:
+        -:   66:                /**
+        -:   67:                 * call the process Water Height
+        -:   68:                 * 
+        -:   69:                 * @param hdr the Kongsberg header
+        -:   70:                 * @param datagram the datagram
+        -:   71:                 */
+        -:   72:	        void processWaterHeight(KongsbergHeader & hdr,unsigned char * datagram);
+        -:   73:                
+        -:   74:                /**
+        -:   75:                 * call the process Attitude
+        -:   76:                 * 
+        -:   77:                 * @param hdr the Kongsberg header
+        -:   78:                 * @param datagram the datagram
+        -:   79:                 */
+        -:   80:	        void processAttitudeDatagram(KongsbergHeader & hdr,unsigned char * datagram);
+        -:   81:                
+        -:   82:                /**
+        -:   83:                 * call the process Position
+        -:   84:                 * 
+        -:   85:                 * @param hdr the Kongsberg header
+        -:   86:                 * @param datagram the datagram
+        -:   87:                 */
+        -:   88:	        void processPositionDatagram(KongsbergHeader & hdr,unsigned char * datagram);
+        -:   89:                
+        -:   90:                /**
+        -:   91:                 * call the process Quality Factor
+        -:   92:                 * 
+        -:   93:                 * @param hdr the Kongsberg header
+        -:   94:                 * @param datagram the datagram
+        -:   95:                 */
+        -:   96:	        void processQualityFactor(KongsbergHeader & hdr,unsigned char * datagram);
+        -:   97:                
+        -:   98:                /**
+        -:   99:                 * call the process Seabed Image Data
+        -:  100:                 * 
+        -:  101:                 * @param hdr the Kongsberg header
+        -:  102:                 * @param datagram the datagram
+        -:  103:                 */
+        -:  104:	        void processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram);
+        -:  105:                
+        -:  106:                /**
+        -:  107:                 * call the process Sound Speed Profile
+        -:  108:                 * 
+        -:  109:                 * @param hdr the Kongsberg header
+        -:  110:                 * @param datagram the datagram
+        -:  111:                 */
+        -:  112:		void processSoundSpeedProfile(KongsbergHeader & hdr,unsigned char * datagram);
+        -:  113:
+        -:  114:
+        -:  115:		/**
+        -:  116:		 * Process range and beam data
+        -:  117:		 *
+        -:  118:                 * @param hdr the Kongsberg header
+        -:  119:                 * @param datagram the datagram
+        -:  120:		 */
+        -:  121:		void processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned char * datagram);
+        -:  122:
+        -:  123:                /**
+        -:  124:                 * Return in microsecond the timestamp
+        -:  125:                 * 
+        -:  126:                 * @param datagramDate the datagram date
+        -:  127:                 * @param datagramTime the datagram time
+        -:  128:                 */
+        -:  129:	        long convertTime(long datagramDate,long datagramTime);
+        -:  130:
+        -:  131:		/**
+        -:  132:		 * Returns a human readable name for a given datagram tag
+        -:  133:		 */
+        -:  134:		/*std::string getName(int tag);*/
+        -:  135:};
+        -:  136:
+        -:  137:/**
+        -:  138: * Create an Kongsberg parser 
+        -:  139: * 
+        -:  140: * @param processor the datagram processor
+        -:  141: */
+    #####:  142:KongsbergParser::KongsbergParser(DatagramEventHandler & processor):DatagramParser(processor){
+        -:  143:
+    #####:  144:}
+        -:  145:
+        -:  146:/**Destroy the Kongsberg parser*/
+    #####:  147:KongsbergParser::~KongsbergParser(){
+        -:  148:
+    #####:  149:}
+        -:  150:
+        -:  151:/**
+        -:  152: * Read a file and change the Kongsberg parser depending on the information
+        -:  153: * 
+        -:  154: * @param filename name of the file to read
+        -:  155: */
+    #####:  156:void KongsbergParser::parse(std::string & filename){
+    #####:  157:	FILE * file = fopen(filename.c_str(),"rb");
+        -:  158:
+    #####:  159:	if(file){
+    #####:  160:		while(!feof(file)){
+        -:  161:			//Lire datagramHeader
+        -:  162:	        	KongsbergHeader hdr;
+    #####:  163:			int elementsRead = fread (&hdr,sizeof(KongsbergHeader),1,file);
+        -:  164:
+    #####:  165:			if(elementsRead == 1){
+        -:  166:				//Verifier la presence du caractere de debut de trame
+    #####:  167:				if(hdr.stx==STX){
+        -:  168:					//Allouer l'espace requis pour le contenu du datagramme
+    #####:  169:			                unsigned char * buffer = (unsigned char*)malloc(hdr.size-sizeof(KongsbergHeader)+sizeof(uint32_t));
+        -:  170:
+    #####:  171:                			elementsRead = fread(buffer,hdr.size-sizeof(KongsbergHeader)+sizeof(uint32_t),1,file);
+        -:  172:
+    #####:  173:					processDatagram(hdr,buffer);
+        -:  174:
+    #####:  175:					free(buffer);
+        -:  176:				}
+        -:  177:				else{
+    #####:  178:					printf("%02x",hdr.size);
+    #####:  179:					throw new Exception("Bad datagram");
+        -:  180:					//TODO: rejct bad datagram, maybe log it
+        -:  181:				}
+        -:  182:            }
+        -:  183:		}
+        -:  184:
+    #####:  185:		fclose(file);
+        -:  186:	}
+        -:  187:	else{
+    #####:  188:		throw new Exception("Couldn't open file " + filename);
+        -:  189:	}
+    #####:  190:}
+        -:  191:
+    #####:  192:std::string KongsbergParser::getName(int tag)
+        -:  193:{
+    #####:  194:    switch(tag)
+        -:  195:    {
+        -:  196:      
+        -:  197:        case 48:
+    #####:  198:            return "PU Id output datagrams";
+        -:  199:        break;
+        -:  200:        
+        -:  201:        case 49:
+    #####:  202:            return "PU Status output";
+        -:  203:        break;
+        -:  204:                        
+        -:  205:        case 51:
+    #####:  206:            return "ExtraParameters 3";
+        -:  207:        break;
+        -:  208:                   
+        -:  209:        case 53:
+    #####:  210:            return "Seabed image datagram";
+        -:  211:        break;
+        -:  212:                
+        -:  213:        case 65:
+    #####:  214:            return "Attitude datagram";
+        -:  215:        break;
+        -:  216:        
+        -:  217:        case 66:
+    #####:  218:            return "PU BIST result output";
+        -:  219:        break;
+        -:  220:        
+        -:  221:        case 67:
+    #####:  222:            return "Clock datagrams";
+        -:  223:        break;
+        -:  224:        
+        -:  225:        case 68:
+    #####:  226:            return "Depth datagram";
+        -:  227:        break;
+        -:  228:                
+        -:  229:        case 69:
+    #####:  230:            return "Single beam echo sounder depth datagram";
+        -:  231:        break;
+        -:  232:                
+        -:  233:        case 70:
+    #####:  234:            return "Raw range and beam angle datagrams";
+        -:  235:        break;
+        -:  236:                 
+        -:  237:        case 71:
+    #####:  238:            return "Surface sound speed datagram";
+        -:  239:        break;
+        -:  240:               
+        -:  241:        case 72:
+    #####:  242:            return "Heading datagrams";
+        -:  243:        break;
+        -:  244:               
+        -:  245:        case 73:
+    #####:  246:            return "Installation parameters";
+        -:  247:        break;
+        -:  248:        
+        -:  249:        case 74:
+    #####:  250:            return "Mechanical transducer tilt datagrams";
+        -:  251:        break;
+        -:  252:                 
+        -:  253:        case 75:
+    #####:  254:            return "Central beams echogram";
+        -:  255:        break;
+        -:  256:        
+        -:  257:        case 78:
+    #####:  258:            return "Raw range and beam angle 78 datagram";
+        -:  259:        break;
+        -:  260:        
+        -:  261:        case 79:
+    #####:  262:            return "Quality factor datagram 79";
+        -:  263:        break;
+        -:  264:
+        -:  265:        case 80:
+    #####:  266:            return "Position datagrams";
+        -:  267:        break;
+        -:  268:
+        -:  269:        case 82:
+    #####:  270:            return "Runtime parameters";
+        -:  271:        break;
+        -:  272:
+        -:  273:        case 84:
+    #####:  274:            return "Tide datagram";
+        -:  275:        break;
+        -:  276:
+        -:  277:        case 85:
+    #####:  278:            return "Sound speed profile datagram";
+        -:  279:        break;
+        -:  280:        
+        -:  281:        case 87:
+    #####:  282:            return "Kongsberg Maritime SSP output datagram";
+        -:  283:        break;
+        -:  284:        
+        -:  285:        case 88:
+    #####:  286:            return "XYZ 88";
+        -:  287:        break;
+        -:  288:        
+        -:  289:        case 89:
+    #####:  290:            return "Seabed image data 89 datagram";
+        -:  291:        break;
+        -:  292:
+        -:  293:        case 102:
+    #####:  294:            return "Raw range and beam angle datagrams";
+        -:  295:        break;
+        -:  296:
+        -:  297:        case 104:
+    #####:  298:            return "Depth (pressure) or height datagram";
+        -:  299:        break;
+        -:  300:
+        -:  301:        case 105:
+    #####:  302:            return "Installation parameters";
+        -:  303:        break;
+        -:  304:        
+        -:  305:        case 107:
+    #####:  306:            return "Water column datagram";
+        -:  307:        break;
+        -:  308:        
+        -:  309:        case 108:
+    #####:  310:            return "Extra detections";
+        -:  311:        break;
+        -:  312:
+        -:  313:        case 110:
+    #####:  314:            return "Network attitude velocity datagram 110";
+        -:  315:        break;
+        -:  316:
+        -:  317:        case 114:
+    #####:  318:            return "Installation parameters or remote information";
+        -:  319:        break;
+        -:  320:
+        -:  321:        default:
+    #####:  322:            return "Invalid tag";
+        -:  323:	break;
+        -:  324:    }
+        -:  325:}
+        -:  326:
+        -:  327:/**
+        -:  328: * Call the process datagram depending on the type of the Kongsberg Header
+        -:  329: * 
+        -:  330: * @param hdr the Kongsberg header
+        -:  331: * @param datagram the datagram
+        -:  332: */
+    #####:  333:void KongsbergParser::processDatagram(KongsbergHeader & hdr,unsigned char * datagram){
+        -:  334:
+        -:  335:/*
+        -:  336:	printf("-------------------------------------\n");
+        -:  337:	printf("Datagram has %d bytes\n",hdr.size);
+        -:  338:        printf("Datagram type: %c\n",hdr.type);
+        -:  339:        printf("EM Model number: %d\n",hdr.modelNumber);
+        -:  340:        printf("Date: %d\n",hdr.date);
+        -:  341:        printf("Seconds since midnight: %d\n",hdr.time);
+        -:  342:        printf("Counter: %d\n",hdr.counter);
+        -:  343:        printf("Serial number: %d\n",hdr.serialNumber);
+        -:  344:*/
+        -:  345:
+    #####:  346:	processor.processDatagramTag(hdr.type);
+        -:  347:
+    #####:  348:	switch(hdr.type){
+        -:  349:		case 'A':
+    #####:  350:        		processAttitudeDatagram(hdr,datagram);
+    #####:  351:        	break;
+        -:  352:
+        -:  353:		case 'D':
+    #####:  354:			processDepth(hdr,datagram);
+    #####:  355:        	break;
+        -:  356:
+        -:  357:	        case 'E':
+        -:  358:        	    //process echosounder data
+        -:  359:        	    //processDepth(hdr,datagram);
+    #####:  360:        	break;
+        -:  361:
+        -:  362:		case 'N':
+    #####:  363:			processRawRangeAndBeam78(hdr,datagram);
+    #####:  364:		break;
+        -:  365:
+        -:  366:        	case 'O':
+        -:  367:        	    //processQualityFactor(hdr,datagram);
+    #####:  368:        	break;
+        -:  369:
+        -:  370:        	case 'P':
+    #####:  371:      		      processPositionDatagram(hdr,datagram);
+    #####:  372:        	break;
+        -:  373:
+        -:  374:		case 'h':
+        -:  375:        	     //processWaterHeight(hdr,datagram);
+    #####:  376:		break;
+        -:  377:
+        -:  378:		case 'U':
+    #####:  379:			processSoundSpeedProfile(hdr,datagram);
+    #####:  380:		break;
+        -:  381:
+        -:  382:		case 'Y':
+        -:  383:        	     //processSeabedImageData(hdr,datagram);
+    #####:  384:		break;
+        -:  385:
+        -:  386:		default:
+        -:  387:			//printf("Unknown type %c\n",hdr.type);
+    #####:  388:		break;
+        -:  389:	}
+    #####:  390:}
+        -:  391:
+        -:  392:/**
+        -:  393: * call the process Depth
+        -:  394: * 
+        -:  395: * @param hdr the Kongsberg header
+        -:  396: * @param datagram the datagram
+        -:  397: */
+    #####:  398:void KongsbergParser::processDepth(KongsbergHeader & hdr,unsigned char * datagram){
+        -:  399:	//printf("TODO: parse depth data\n");
+    #####:  400:}
+        -:  401:
+        -:  402:/**
+        -:  403: * call the process Water Height
+        -:  404: * 
+        -:  405: * @param hdr the Kongsberg header
+        -:  406: * @param datagram the datagram
+        -:  407: */
+    #####:  408:void KongsbergParser::processWaterHeight(KongsbergHeader & hdr,unsigned char * datagram){
+        -:  409:    //printf("TODO: parse height data\n");
+    #####:  410:}
+        -:  411:
+        -:  412:/**
+        -:  413: * call the process Attitude
+        -:  414: * 
+        -:  415: * @param hdr the Kongsberg header
+        -:  416: * @param datagram the datagram
+        -:  417: */
+    #####:  418:void KongsbergParser::processAttitudeDatagram(KongsbergHeader & hdr,unsigned char * datagram){
+    #####:  419:    uint64_t microEpoch = convertTime(hdr.date,hdr.time);
+        -:  420:
+    #####:  421:    uint16_t nEntries = ((uint16_t*)datagram)[0];
+        -:  422:
+    #####:  423:    KongsbergAttitudeEntry * p = (KongsbergAttitudeEntry*) ((unsigned char*)datagram + sizeof(uint16_t));
+        -:  424:
+    #####:  425:    for(unsigned int i = 0;i<nEntries;i++){
+    #####:  426:	double heading = (double)p[i].heading/(double)100;
+    #####:  427:	double pitch   = (double)p[i].pitch/(double)100;
+    #####:  428:	double roll    = (double)p[i].roll/(double)100;
+        -:  429:
+    #####:  430:        processor.processAttitude(
+    #####:  431:		microEpoch + p[i].deltaTime * 1000,
+        -:  432:		heading,
+        -:  433:		(pitch<0)?pitch+360:pitch,
+        -:  434:		(roll<0)?roll+360:roll
+    #####:  435:        );
+        -:  436:    }
+    #####:  437:}
+        -:  438:
+        -:  439:/**
+        -:  440: * call the process Sound speed profile
+        -:  441: * 
+        -:  442: * @param hdr the Kongsberg header
+        -:  443: * @param datagram the datagram
+        -:  444: */
+    #####:  445:void KongsbergParser::processSoundSpeedProfile(KongsbergHeader & hdr,unsigned char * datagram){
+    #####:  446:    SoundVelocityProfile * svp = new SoundVelocityProfile();
+    #####:  447:    uint64_t microEpoch = convertTime(hdr.date,hdr.time);
+        -:  448:
+    #####:  449:    KongsbergSoundSpeedProfile * ssp = (KongsbergSoundSpeedProfile*) datagram;
+        -:  450:
+    #####:  451:    if((ssp->profileDate != 0)&&(ssp->profileTime != 0))
+        -:  452:    {
+    #####:  453:        microEpoch = convertTime(ssp->profileDate,ssp->profileTime);
+        -:  454:    }
+        -:  455:
+    #####:  456:    svp->setTimestamp(microEpoch);
+        -:  457:    
+    #####:  458:    KongsbergSoundSpeedProfileEntry * entry = (KongsbergSoundSpeedProfileEntry*)((unsigned char*)(&ssp->depthResolution)+sizeof(uint16_t));
+        -:  459:    
+    #####:  460:    for(unsigned int i = 0;i< ssp->nbEntries;i++){
+    #####:  461:	double depth = (double)entry[i].depth / ((double)100 / (double)ssp->depthResolution );
+    #####:  462:	double soundSpeed = (double) entry[i].soundSpeed / (double) 10; //speed is in dm/s
+        -:  463:
+    #####:  464:	svp->add(depth,soundSpeed);
+        -:  465:    }
+        -:  466:
+    #####:  467:    processor.processSoundVelocityProfile(svp);
+    #####:  468:}
+        -:  469:
+        -:  470:/**
+        -:  471: * Return in microsecond the timestamp
+        -:  472: * 
+        -:  473: * @param datagramDate the datagram date
+        -:  474: * @param datagramTime the datagram time
+        -:  475: */
+    #####:  476:long KongsbergParser::convertTime(long datagramDate,long datagramTime){
+    #####:  477:    int year = datagramDate / 10000;
+    #####:  478:    int month = (datagramDate - (datagramDate / 10000))/100;
+    #####:  479:    int day = datagramDate - ((datagramDate - (datagramDate / 10000))/100);
+        -:  480:
+        -:  481:    //month is 1-12, day is 1-31, shift to zero offset
+    #####:  482:    return TimeUtils::build_time(year,month-1,day-1,datagramTime);
+        -:  483:}
+        -:  484:
+        -:  485:/**
+        -:  486: * call the process Position
+        -:  487: * 
+        -:  488: * @param hdr the Kongsberg header
+        -:  489: * @param datagram the datagram
+        -:  490: */
+    #####:  491:void KongsbergParser::processPositionDatagram(KongsbergHeader & hdr,unsigned char * datagram){
+    #####:  492:        KongsbergPositionDatagram * p = (KongsbergPositionDatagram*) datagram;
+        -:  493:
+    #####:  494:        uint64_t microEpoch = convertTime(hdr.date,hdr.time);
+        -:  495:
+        -:  496:        //printf("%s",p->inputDatagram);
+        -:  497:
+    #####:  498:        double longitude = (double)p->longitude/(double)20000000;
+    #####:  499:        double latitude  = (double)p->lattitude/(double)20000000;
+        -:  500:
+    #####:  501:        std::string inputDatagram(p->inputDatagram);
+        -:  502:
+    #####:  503:        double height = std::numeric_limits<double>::quiet_NaN();
+        -:  504:
+        -:  505:        //Extract ellipsoidal height from input datagram
+    #####:  506:        if(inputDatagram.find("GGK") != std::string::npos){
+    #####:  507:            height = NmeaUtils::extractHeightFromGGK(inputDatagram);
+        -:  508:
+        -:  509:        }
+    #####:  510:        else if(inputDatagram.find("GGA") != std::string::npos){
+    #####:  511:            height = NmeaUtils::extractHeightFromGGA(inputDatagram);
+        -:  512:        }
+        -:  513:        else{
+        -:  514:            //NO POSITION, whine about this
+    #####:  515:            std::cerr << "No ellipsoidal height found in input datagram: " << inputDatagram << std::endl;
+        -:  516:        }
+        -:  517:
+    #####:  518:        if(!std::isnan(height)){
+    #####:  519:            processor.processPosition(microEpoch,longitude,latitude,height);
+        -:  520:        }
+    #####:  521:}
+        -:  522:
+        -:  523:/**
+        -:  524: * call the process Quality Factor
+        -:  525: * 
+        -:  526: * @param hdr the Kongsberg header
+        -:  527: * @param datagram the datagram
+        -:  528: */
+    #####:  529:void KongsbergParser::processQualityFactor(KongsbergHeader & hdr,unsigned char * datagram){
+        -:  530:        //printf("TODO: parse quality factor data\n");
+    #####:  531:}
+        -:  532:
+        -:  533:/**
+        -:  534: * call the process Seabed Image Data
+        -:  535: * 
+        -:  536: * @param hdr the Kongsberg header
+        -:  537: * @param datagram the datagram
+        -:  538: */
+    #####:  539:void KongsbergParser::processSeabedImageData(KongsbergHeader & hdr,unsigned char * datagram){
+        -:  540:	//printf("TODO: parse Seabed Image Data\n");
+    #####:  541:}
+        -:  542:
+    #####:  543:void KongsbergParser::processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned char * datagram){
+    #####:  544:	KongsbergRangeAndBeam78 * data = (KongsbergRangeAndBeam78*)datagram;
+        -:  545:
+    #####:  546:	uint64_t microEpoch = convertTime(hdr.date,hdr.time);
+        -:  547:
+    #####:  548:	processor.processSwathStart((double)data->surfaceSoundSpeed / (double)10);
+        -:  549:
+    #####:  550:	std::map<int,KongsbergRangeAndBeam78TxEntry*>  txEntries;
+        -:  551:
+    #####:  552:	KongsbergRangeAndBeam78TxEntry* tx = (KongsbergRangeAndBeam78TxEntry*) (((unsigned char *)data)+sizeof(KongsbergRangeAndBeam78));
+        -:  553:
+    #####:  554:	for(unsigned int i=0;i< data->nbTxPackets; i++){
+    #####:  555:		txEntries[tx[i].txSectorNumber] = &tx[i];
+        -:  556:		//printf("Tilt: %0.2f\n",(double)tx[i].tiltAngle/(double)100);
+        -:  557:	}
+        -:  558:
+    #####:  559:	KongsbergRangeAndBeam78RxEntry * rx = (KongsbergRangeAndBeam78RxEntry*)    ((((unsigned char *)data)+sizeof(KongsbergRangeAndBeam78)) + (data->nbTxPackets * sizeof(KongsbergRangeAndBeam78TxEntry)));
+        -:  560:
+    #####:  561:	for(unsigned int i=0;i<data->nbRxPackets;i++){
+        -:  562:		//We'll hack-in the the beam angle as ID...May Satan forgive us
+    #####:  563:		processor.processPing(microEpoch,rx[i].beamAngle,(double)rx[i].beamAngle/(double)100,(double)txEntries[rx[i].txSectorNumber]->tiltAngle/(double)100,rx[i].twoWayTravelTime,rx[i].qualityFactor,rx[i].reflectivity);
+        -:  564:	}
+    #####:  565:}
+        -:  566:
+        -:  567:#endif

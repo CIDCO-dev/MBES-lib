@@ -1,0 +1,286 @@
+        -:    0:Source:/usr/include/c++/6/cstdlib
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// -*- C++ -*- forwarding header.
+        -:    2:
+        -:    3:// Copyright (C) 1997-2016 Free Software Foundation, Inc.
+        -:    4://
+        -:    5:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    6:// software; you can redistribute it and/or modify it under the
+        -:    7:// terms of the GNU General Public License as published by the
+        -:    8:// Free Software Foundation; either version 3, or (at your option)
+        -:    9:// any later version.
+        -:   10:
+        -:   11:// This library is distributed in the hope that it will be useful,
+        -:   12:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   13:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   14:// GNU General Public License for more details.
+        -:   15:
+        -:   16:// Under Section 7 of GPL version 3, you are granted additional
+        -:   17:// permissions described in the GCC Runtime Library Exception, version
+        -:   18:// 3.1, as published by the Free Software Foundation.
+        -:   19:
+        -:   20:// You should have received a copy of the GNU General Public License and
+        -:   21:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   22:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   23:// <http://www.gnu.org/licenses/>.
+        -:   24:
+        -:   25:/** @file include/cstdlib
+        -:   26: *  This is a Standard C++ Library file.  You should @c \#include this file
+        -:   27: *  in your programs, rather than any of the @a *.h implementation files.
+        -:   28: *
+        -:   29: *  This is the C++ version of the Standard C Library header @c stdlib.h,
+        -:   30: *  and its contents are (mostly) the same as that header, but are all
+        -:   31: *  contained in the namespace @c std (except for names which are defined
+        -:   32: *  as macros in C).
+        -:   33: */
+        -:   34:
+        -:   35://
+        -:   36:// ISO C++ 14882: 20.4.6  C library
+        -:   37://
+        -:   38:
+        -:   39:#pragma GCC system_header
+        -:   40:
+        -:   41:#include <bits/c++config.h>
+        -:   42:
+        -:   43:#ifndef _GLIBCXX_CSTDLIB
+        -:   44:#define _GLIBCXX_CSTDLIB 1
+        -:   45:
+        -:   46:#if !_GLIBCXX_HOSTED
+        -:   47:// The C standard does not require a freestanding implementation to
+        -:   48:// provide <stdlib.h>.  However, the C++ standard does still require
+        -:   49:// <cstdlib> -- but only the functionality mentioned in
+        -:   50:// [lib.support.start.term].
+        -:   51:
+        -:   52:#define EXIT_SUCCESS 0
+        -:   53:#define EXIT_FAILURE 1
+        -:   54:
+        -:   55:namespace std
+        -:   56:{
+        -:   57:  extern "C" void abort(void) throw () _GLIBCXX_NORETURN;
+        -:   58:  extern "C" int atexit(void (*)(void)) throw ();
+        -:   59:  extern "C" void exit(int) throw () _GLIBCXX_NORETURN;
+        -:   60:#if __cplusplus >= 201103L
+        -:   61:# ifdef _GLIBCXX_HAVE_AT_QUICK_EXIT
+        -:   62:  extern "C" int at_quick_exit(void (*)(void)) throw ();
+        -:   63:# endif
+        -:   64:# ifdef _GLIBCXX_HAVE_QUICK_EXIT
+        -:   65:  extern "C" void quick_exit(int) throw() _GLIBCXX_NORETURN;
+        -:   66:# endif
+        -:   67:#endif
+        -:   68:} // namespace std
+        -:   69:
+        -:   70:#else
+        -:   71:
+        -:   72:// Need to ensure this finds the C library's <stdlib.h> not a libstdc++
+        -:   73:// wrapper that might already be installed later in the include search path.
+        -:   74:#define _GLIBCXX_INCLUDE_NEXT_C_HEADERS
+        -:   75:#include_next <stdlib.h>
+        -:   76:#undef _GLIBCXX_INCLUDE_NEXT_C_HEADERS
+        -:   77:
+        -:   78:// Get rid of those macros defined in <stdlib.h> in lieu of real functions.
+        -:   79:#undef abort
+        -:   80:#undef abs
+        -:   81:#undef atexit
+        -:   82:#if __cplusplus >= 201103L
+        -:   83:# ifdef _GLIBCXX_HAVE_AT_QUICK_EXIT
+        -:   84:#  undef at_quick_exit
+        -:   85:# endif
+        -:   86:#endif
+        -:   87:#undef atof
+        -:   88:#undef atoi
+        -:   89:#undef atol
+        -:   90:#undef bsearch
+        -:   91:#undef calloc
+        -:   92:#undef div
+        -:   93:#undef exit
+        -:   94:#undef free
+        -:   95:#undef getenv
+        -:   96:#undef labs
+        -:   97:#undef ldiv
+        -:   98:#undef malloc
+        -:   99:#undef mblen
+        -:  100:#undef mbstowcs
+        -:  101:#undef mbtowc
+        -:  102:#undef qsort
+        -:  103:#if __cplusplus >= 201103L
+        -:  104:# ifdef _GLIBCXX_HAVE_QUICK_EXIT
+        -:  105:#  undef quick_exit
+        -:  106:# endif
+        -:  107:#endif
+        -:  108:#undef rand
+        -:  109:#undef realloc
+        -:  110:#undef srand
+        -:  111:#undef strtod
+        -:  112:#undef strtol
+        -:  113:#undef strtoul
+        -:  114:#undef system
+        -:  115:#undef wcstombs
+        -:  116:#undef wctomb
+        -:  117:
+        -:  118:extern "C++"
+        -:  119:{
+        -:  120:namespace std _GLIBCXX_VISIBILITY(default)
+        -:  121:{
+        -:  122:_GLIBCXX_BEGIN_NAMESPACE_VERSION
+        -:  123:
+        -:  124:  using ::div_t;
+        -:  125:  using ::ldiv_t;
+        -:  126:
+        -:  127:  using ::abort;
+        -:  128:  using ::abs;
+        -:  129:  using ::atexit;
+        -:  130:#if __cplusplus >= 201103L
+        -:  131:# ifdef _GLIBCXX_HAVE_AT_QUICK_EXIT
+        -:  132:  using ::at_quick_exit;
+        -:  133:# endif
+        -:  134:#endif
+        -:  135:  using ::atof;
+        -:  136:  using ::atoi;
+        -:  137:  using ::atol;
+        -:  138:  using ::bsearch;
+        -:  139:  using ::calloc;
+        -:  140:  using ::div;
+        -:  141:  using ::exit;
+        -:  142:  using ::free;
+        -:  143:  using ::getenv;
+        -:  144:  using ::labs;
+        -:  145:  using ::ldiv;
+        -:  146:  using ::malloc;
+        -:  147:#ifdef _GLIBCXX_HAVE_MBSTATE_T
+        -:  148:  using ::mblen;
+        -:  149:  using ::mbstowcs;
+        -:  150:  using ::mbtowc;
+        -:  151:#endif // _GLIBCXX_HAVE_MBSTATE_T
+        -:  152:  using ::qsort;
+        -:  153:#if __cplusplus >= 201103L
+        -:  154:# ifdef _GLIBCXX_HAVE_QUICK_EXIT
+        -:  155:  using ::quick_exit;
+        -:  156:# endif
+        -:  157:#endif
+        -:  158:  using ::rand;
+        -:  159:  using ::realloc;
+        -:  160:  using ::srand;
+        -:  161:  using ::strtod;
+        -:  162:  using ::strtol;
+        -:  163:  using ::strtoul;
+        -:  164:  using ::system;
+        -:  165:#ifdef _GLIBCXX_USE_WCHAR_T
+        -:  166:  using ::wcstombs;
+        -:  167:  using ::wctomb;
+        -:  168:#endif // _GLIBCXX_USE_WCHAR_T
+        -:  169:
+        -:  170:#ifndef __CORRECT_ISO_CPP_STDLIB_H_PROTO
+        -:  171:  inline long
+    #####:  172:  abs(long __i) { return __builtin_labs(__i); }
+        -:  173:
+        -:  174:  inline ldiv_t
+        -:  175:  div(long __i, long __j) { return ldiv(__i, __j); }
+        -:  176:#endif
+        -:  177:
+        -:  178:#ifdef _GLIBCXX_USE_LONG_LONG
+        -:  179:  inline long long
+        -:  180:  abs(long long __x) { return __builtin_llabs (__x); }
+        -:  181:#endif
+        -:  182:
+        -:  183:#if defined(__GLIBCXX_TYPE_INT_N_0)
+        -:  184:  inline __GLIBCXX_TYPE_INT_N_0
+        -:  185:  abs(__GLIBCXX_TYPE_INT_N_0 __x) { return __x >= 0 ? __x : -__x; }
+        -:  186:#endif
+        -:  187:#if defined(__GLIBCXX_TYPE_INT_N_1)
+        -:  188:  inline __GLIBCXX_TYPE_INT_N_1
+        -:  189:  abs(__GLIBCXX_TYPE_INT_N_1 __x) { return __x >= 0 ? __x : -__x; }
+        -:  190:#endif
+        -:  191:#if defined(__GLIBCXX_TYPE_INT_N_2)
+        -:  192:  inline __GLIBCXX_TYPE_INT_N_2
+        -:  193:  abs(__GLIBCXX_TYPE_INT_N_2 __x) { return __x >= 0 ? __x : -__x; }
+        -:  194:#endif
+        -:  195:#if defined(__GLIBCXX_TYPE_INT_N_3)
+        -:  196:  inline __GLIBCXX_TYPE_INT_N_3
+        -:  197:  abs(__GLIBCXX_TYPE_INT_N_3 __x) { return __x >= 0 ? __x : -__x; }
+        -:  198:#endif
+        -:  199:
+        -:  200:
+        -:  201:_GLIBCXX_END_NAMESPACE_VERSION
+        -:  202:} // namespace
+        -:  203:
+        -:  204:#if _GLIBCXX_USE_C99_STDLIB
+        -:  205:
+        -:  206:#undef _Exit
+        -:  207:#undef llabs
+        -:  208:#undef lldiv
+        -:  209:#undef atoll
+        -:  210:#undef strtoll
+        -:  211:#undef strtoull
+        -:  212:#undef strtof
+        -:  213:#undef strtold
+        -:  214:
+        -:  215:namespace __gnu_cxx _GLIBCXX_VISIBILITY(default)
+        -:  216:{
+        -:  217:_GLIBCXX_BEGIN_NAMESPACE_VERSION
+        -:  218:
+        -:  219:#if !_GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
+        -:  220:  using ::lldiv_t;
+        -:  221:#endif
+        -:  222:#if _GLIBCXX_USE_C99_CHECK || _GLIBCXX_USE_C99_DYNAMIC
+        -:  223:  extern "C" void (_Exit)(int) throw () _GLIBCXX_NORETURN;
+        -:  224:#endif
+        -:  225:#if !_GLIBCXX_USE_C99_DYNAMIC
+        -:  226:  using ::_Exit;
+        -:  227:#endif
+        -:  228:
+        -:  229:#if !_GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
+        -:  230:  using ::llabs;
+        -:  231:
+        -:  232:  inline lldiv_t
+        -:  233:  div(long long __n, long long __d)
+        -:  234:  { lldiv_t __q; __q.quot = __n / __d; __q.rem = __n % __d; return __q; }
+        -:  235:
+        -:  236:  using ::lldiv;
+        -:  237:#endif
+        -:  238:
+        -:  239:#if _GLIBCXX_USE_C99_LONG_LONG_CHECK || _GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
+        -:  240:  extern "C" long long int (atoll)(const char *) throw ();
+        -:  241:  extern "C" long long int
+        -:  242:    (strtoll)(const char * __restrict, char ** __restrict, int) throw ();
+        -:  243:  extern "C" unsigned long long int
+        -:  244:    (strtoull)(const char * __restrict, char ** __restrict, int) throw ();
+        -:  245:#endif
+        -:  246:#if !_GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
+        -:  247:  using ::atoll;
+        -:  248:  using ::strtoll;
+        -:  249:  using ::strtoull;
+        -:  250:#endif
+        -:  251:  using ::strtof;
+        -:  252:  using ::strtold;
+        -:  253:
+        -:  254:_GLIBCXX_END_NAMESPACE_VERSION
+        -:  255:} // namespace __gnu_cxx
+        -:  256:
+        -:  257:namespace std
+        -:  258:{
+        -:  259:#if !_GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
+        -:  260:  using ::__gnu_cxx::lldiv_t;
+        -:  261:#endif
+        -:  262:  using ::__gnu_cxx::_Exit;
+        -:  263:#if !_GLIBCXX_USE_C99_LONG_LONG_DYNAMIC
+        -:  264:  using ::__gnu_cxx::llabs;
+        -:  265:  using ::__gnu_cxx::div;
+        -:  266:  using ::__gnu_cxx::lldiv;
+        -:  267:#endif
+        -:  268:  using ::__gnu_cxx::atoll;
+        -:  269:  using ::__gnu_cxx::strtof;
+        -:  270:  using ::__gnu_cxx::strtoll;
+        -:  271:  using ::__gnu_cxx::strtoull;
+        -:  272:  using ::__gnu_cxx::strtold;
+        -:  273:} // namespace std
+        -:  274:
+        -:  275:#endif // _GLIBCXX_USE_C99_STDLIB
+        -:  276:
+        -:  277:} // extern "C++"
+        -:  278:
+        -:  279:#endif // !_GLIBCXX_HOSTED
+        -:  280:
+        -:  281:#endif

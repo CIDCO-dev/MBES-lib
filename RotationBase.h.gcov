@@ -1,0 +1,211 @@
+        -:    0:Source:/usr/include/eigen3/Eigen/src/Geometry/RotationBase.h
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// This file is part of Eigen, a lightweight C++ template library
+        -:    2:// for linear algebra.
+        -:    3://
+        -:    4:// Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
+        -:    5://
+        -:    6:// This Source Code Form is subject to the terms of the Mozilla
+        -:    7:// Public License v. 2.0. If a copy of the MPL was not distributed
+        -:    8:// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+        -:    9:
+        -:   10:#ifndef EIGEN_ROTATIONBASE_H
+        -:   11:#define EIGEN_ROTATIONBASE_H
+        -:   12:
+        -:   13:namespace Eigen { 
+        -:   14:
+        -:   15:// forward declaration
+        -:   16:namespace internal {
+        -:   17:template<typename RotationDerived, typename MatrixType, bool IsVector=MatrixType::IsVectorAtCompileTime>
+        -:   18:struct rotation_base_generic_product_selector;
+        -:   19:}
+        -:   20:
+        -:   21:/** \class RotationBase
+        -:   22:  *
+        -:   23:  * \brief Common base class for compact rotation representations
+        -:   24:  *
+        -:   25:  * \tparam Derived is the derived type, i.e., a rotation type
+        -:   26:  * \tparam _Dim the dimension of the space
+        -:   27:  */
+        -:   28:template<typename Derived, int _Dim>
+    #####:   29:class RotationBase
+        -:   30:{
+        -:   31:  public:
+        -:   32:    enum { Dim = _Dim };
+        -:   33:    /** the scalar type of the coefficients */
+        -:   34:    typedef typename internal::traits<Derived>::Scalar Scalar;
+        -:   35:
+        -:   36:    /** corresponding linear transformation matrix type */
+        -:   37:    typedef Matrix<Scalar,Dim,Dim> RotationMatrixType;
+        -:   38:    typedef Matrix<Scalar,Dim,1> VectorType;
+        -:   39:
+        -:   40:  public:
+    #####:   41:    EIGEN_DEVICE_FUNC inline const Derived& derived() const { return *static_cast<const Derived*>(this); }
+    #####:   42:    EIGEN_DEVICE_FUNC inline Derived& derived() { return *static_cast<Derived*>(this); }
+        -:   43:
+        -:   44:    /** \returns an equivalent rotation matrix */
+    #####:   45:    EIGEN_DEVICE_FUNC inline RotationMatrixType toRotationMatrix() const { return derived().toRotationMatrix(); }
+        -:   46:
+        -:   47:    /** \returns an equivalent rotation matrix 
+        -:   48:      * This function is added to be conform with the Transform class' naming scheme.
+        -:   49:      */
+        -:   50:    EIGEN_DEVICE_FUNC inline RotationMatrixType matrix() const { return derived().toRotationMatrix(); }
+        -:   51:
+        -:   52:    /** \returns the inverse rotation */
+        -:   53:    EIGEN_DEVICE_FUNC inline Derived inverse() const { return derived().inverse(); }
+        -:   54:
+        -:   55:    /** \returns the concatenation of the rotation \c *this with a translation \a t */
+        -:   56:    EIGEN_DEVICE_FUNC inline Transform<Scalar,Dim,Isometry> operator*(const Translation<Scalar,Dim>& t) const
+        -:   57:    { return Transform<Scalar,Dim,Isometry>(*this) * t; }
+        -:   58:
+        -:   59:    /** \returns the concatenation of the rotation \c *this with a uniform scaling \a s */
+        -:   60:    EIGEN_DEVICE_FUNC inline RotationMatrixType operator*(const UniformScaling<Scalar>& s) const
+        -:   61:    { return toRotationMatrix() * s.factor(); }
+        -:   62:
+        -:   63:    /** \returns the concatenation of the rotation \c *this with a generic expression \a e
+        -:   64:      * \a e can be:
+        -:   65:      *  - a DimxDim linear transformation matrix
+        -:   66:      *  - a DimxDim diagonal matrix (axis aligned scaling)
+        -:   67:      *  - a vector of size Dim
+        -:   68:      */
+        -:   69:    template<typename OtherDerived>
+        -:   70:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE typename internal::rotation_base_generic_product_selector<Derived,OtherDerived,OtherDerived::IsVectorAtCompileTime>::ReturnType
+        -:   71:    operator*(const EigenBase<OtherDerived>& e) const
+        -:   72:    { return internal::rotation_base_generic_product_selector<Derived,OtherDerived>::run(derived(), e.derived()); }
+        -:   73:
+        -:   74:    /** \returns the concatenation of a linear transformation \a l with the rotation \a r */
+        -:   75:    template<typename OtherDerived> friend
+        -:   76:    EIGEN_DEVICE_FUNC inline RotationMatrixType operator*(const EigenBase<OtherDerived>& l, const Derived& r)
+        -:   77:    { return l.derived() * r.toRotationMatrix(); }
+        -:   78:
+        -:   79:    /** \returns the concatenation of a scaling \a l with the rotation \a r */
+        -:   80:    EIGEN_DEVICE_FUNC friend inline Transform<Scalar,Dim,Affine> operator*(const DiagonalMatrix<Scalar,Dim>& l, const Derived& r)
+        -:   81:    { 
+        -:   82:      Transform<Scalar,Dim,Affine> res(r);
+        -:   83:      res.linear().applyOnTheLeft(l);
+        -:   84:      return res;
+        -:   85:    }
+        -:   86:
+        -:   87:    /** \returns the concatenation of the rotation \c *this with a transformation \a t */
+        -:   88:    template<int Mode, int Options>
+        -:   89:    EIGEN_DEVICE_FUNC inline Transform<Scalar,Dim,Mode> operator*(const Transform<Scalar,Dim,Mode,Options>& t) const
+        -:   90:    { return toRotationMatrix() * t; }
+        -:   91:
+        -:   92:    template<typename OtherVectorType>
+        -:   93:    EIGEN_DEVICE_FUNC inline VectorType _transformVector(const OtherVectorType& v) const
+        -:   94:    { return toRotationMatrix() * v; }
+        -:   95:};
+        -:   96:
+        -:   97:namespace internal {
+        -:   98:
+        -:   99:// implementation of the generic product rotation * matrix
+        -:  100:template<typename RotationDerived, typename MatrixType>
+        -:  101:struct rotation_base_generic_product_selector<RotationDerived,MatrixType,false>
+        -:  102:{
+        -:  103:  enum { Dim = RotationDerived::Dim };
+        -:  104:  typedef Matrix<typename RotationDerived::Scalar,Dim,Dim> ReturnType;
+        -:  105:  EIGEN_DEVICE_FUNC static inline ReturnType run(const RotationDerived& r, const MatrixType& m)
+        -:  106:  { return r.toRotationMatrix() * m; }
+        -:  107:};
+        -:  108:
+        -:  109:template<typename RotationDerived, typename Scalar, int Dim, int MaxDim>
+        -:  110:struct rotation_base_generic_product_selector< RotationDerived, DiagonalMatrix<Scalar,Dim,MaxDim>, false >
+        -:  111:{
+        -:  112:  typedef Transform<Scalar,Dim,Affine> ReturnType;
+        -:  113:  EIGEN_DEVICE_FUNC static inline ReturnType run(const RotationDerived& r, const DiagonalMatrix<Scalar,Dim,MaxDim>& m)
+        -:  114:  {
+        -:  115:    ReturnType res(r);
+        -:  116:    res.linear() *= m;
+        -:  117:    return res;
+        -:  118:  }
+        -:  119:};
+        -:  120:
+        -:  121:template<typename RotationDerived,typename OtherVectorType>
+        -:  122:struct rotation_base_generic_product_selector<RotationDerived,OtherVectorType,true>
+        -:  123:{
+        -:  124:  enum { Dim = RotationDerived::Dim };
+        -:  125:  typedef Matrix<typename RotationDerived::Scalar,Dim,1> ReturnType;
+        -:  126:  EIGEN_DEVICE_FUNC static EIGEN_STRONG_INLINE ReturnType run(const RotationDerived& r, const OtherVectorType& v)
+        -:  127:  {
+        -:  128:    return r._transformVector(v);
+        -:  129:  }
+        -:  130:};
+        -:  131:
+        -:  132:} // end namespace internal
+        -:  133:
+        -:  134:/** \geometry_module
+        -:  135:  *
+        -:  136:  * \brief Constructs a Dim x Dim rotation matrix from the rotation \a r
+        -:  137:  */
+        -:  138:template<typename _Scalar, int _Rows, int _Cols, int _Storage, int _MaxRows, int _MaxCols>
+        -:  139:template<typename OtherDerived>
+        -:  140:EIGEN_DEVICE_FUNC Matrix<_Scalar, _Rows, _Cols, _Storage, _MaxRows, _MaxCols>
+        -:  141:::Matrix(const RotationBase<OtherDerived,ColsAtCompileTime>& r)
+        -:  142:{
+        -:  143:  EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Matrix,int(OtherDerived::Dim),int(OtherDerived::Dim))
+        -:  144:  *this = r.toRotationMatrix();
+        -:  145:}
+        -:  146:
+        -:  147:/** \geometry_module
+        -:  148:  *
+        -:  149:  * \brief Set a Dim x Dim rotation matrix from the rotation \a r
+        -:  150:  */
+        -:  151:template<typename _Scalar, int _Rows, int _Cols, int _Storage, int _MaxRows, int _MaxCols>
+        -:  152:template<typename OtherDerived>
+        -:  153:EIGEN_DEVICE_FUNC Matrix<_Scalar, _Rows, _Cols, _Storage, _MaxRows, _MaxCols>&
+    #####:  154:Matrix<_Scalar, _Rows, _Cols, _Storage, _MaxRows, _MaxCols>
+        -:  155:::operator=(const RotationBase<OtherDerived,ColsAtCompileTime>& r)
+        -:  156:{
+        -:  157:  EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(Matrix,int(OtherDerived::Dim),int(OtherDerived::Dim))
+    #####:  158:  return *this = r.toRotationMatrix();
+        -:  159:}
+        -:  160:
+        -:  161:namespace internal {
+        -:  162:
+        -:  163:/** \internal
+        -:  164:  *
+        -:  165:  * Helper function to return an arbitrary rotation object to a rotation matrix.
+        -:  166:  *
+        -:  167:  * \tparam Scalar the numeric type of the matrix coefficients
+        -:  168:  * \tparam Dim the dimension of the current space
+        -:  169:  *
+        -:  170:  * It returns a Dim x Dim fixed size matrix.
+        -:  171:  *
+        -:  172:  * Default specializations are provided for:
+        -:  173:  *   - any scalar type (2D),
+        -:  174:  *   - any matrix expression,
+        -:  175:  *   - any type based on RotationBase (e.g., Quaternion, AngleAxis, Rotation2D)
+        -:  176:  *
+        -:  177:  * Currently toRotationMatrix is only used by Transform.
+        -:  178:  *
+        -:  179:  * \sa class Transform, class Rotation2D, class Quaternion, class AngleAxis
+        -:  180:  */
+        -:  181:template<typename Scalar, int Dim>
+        -:  182:EIGEN_DEVICE_FUNC static inline Matrix<Scalar,2,2> toRotationMatrix(const Scalar& s)
+        -:  183:{
+        -:  184:  EIGEN_STATIC_ASSERT(Dim==2,YOU_MADE_A_PROGRAMMING_MISTAKE)
+        -:  185:  return Rotation2D<Scalar>(s).toRotationMatrix();
+        -:  186:}
+        -:  187:
+        -:  188:template<typename Scalar, int Dim, typename OtherDerived>
+        -:  189:EIGEN_DEVICE_FUNC static inline Matrix<Scalar,Dim,Dim> toRotationMatrix(const RotationBase<OtherDerived,Dim>& r)
+        -:  190:{
+        -:  191:  return r.toRotationMatrix();
+        -:  192:}
+        -:  193:
+        -:  194:template<typename Scalar, int Dim, typename OtherDerived>
+        -:  195:EIGEN_DEVICE_FUNC static inline const MatrixBase<OtherDerived>& toRotationMatrix(const MatrixBase<OtherDerived>& mat)
+        -:  196:{
+        -:  197:  EIGEN_STATIC_ASSERT(OtherDerived::RowsAtCompileTime==Dim && OtherDerived::ColsAtCompileTime==Dim,
+        -:  198:    YOU_MADE_A_PROGRAMMING_MISTAKE)
+        -:  199:  return mat;
+        -:  200:}
+        -:  201:
+        -:  202:} // end namespace internal
+        -:  203:
+        -:  204:} // end namespace Eigen
+        -:  205:
+        -:  206:#endif // EIGEN_ROTATIONBASE_H

@@ -1,0 +1,691 @@
+        -:    0:Source:src/datagrams/s7k/S7kParser.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:/*
+        -:    2: * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+        -:    3: */
+        -:    4:
+        -:    5:/*
+        -:    6: * File:   S7kParser.hpp
+        -:    7: * Author: glm,jordan
+        -:    8: *
+        -:    9: * Created on November 1, 2018, 4:30 PM
+        -:   10: */
+        -:   11:
+        -:   12:
+        -:   13:#ifndef S7KPARSER_HPP
+        -:   14:#define S7KPARSER_HPP
+        -:   15:
+        -:   16:#include <cstdio>
+        -:   17:#include "../DatagramParser.hpp"
+        -:   18:#include "S7kTypes.hpp"
+        -:   19:#include "../../utils/TimeUtils.hpp"
+        -:   20:#include "../../utils/Constants.hpp"
+        -:   21:#include <list>
+        -:   22:#include "../../svp/SoundVelocityProfile.hpp"
+        -:   23:
+        -:   24:/*!
+        -:   25: * \brief S7k parser class extention of Datagram parser
+        -:   26: */
+        -:   27:class S7kParser : public DatagramParser {
+        -:   28:public:
+        -:   29:
+        -:   30:    /**
+        -:   31:     * Create an S7k parser
+        -:   32:     *
+        -:   33:     * @param processor the datagram processor
+        -:   34:     */
+        -:   35:    S7kParser(DatagramEventHandler & processor);
+        -:   36:
+        -:   37:    /**Destroy the S7k parser*/
+        -:   38:    ~S7kParser();
+        -:   39:
+        -:   40:    /**
+        -:   41:     * Read a file and change the S7k parser depending on the information
+        -:   42:     * 
+        -:   43:     * @param filename name of the file to read
+        -:   44:     */
+        -:   45:    void parse(std::string & filename);
+        -:   46:    
+        -:   47:    std::string getName(int tag);
+        -:   48:
+        -:   49:protected:
+        -:   50:
+        -:   51:    /**
+        -:   52:     * set the S7k data record frame
+        -:   53:     * 
+        -:   54:     * @param drf the new S7k data record frame
+        -:   55:     */
+        -:   56:    void processDataRecordFrame(S7kDataRecordFrame & drf);
+        -:   57:    
+        -:   58:    /**
+        -:   59:     * call the process Attitude
+        -:   60:     * 
+        -:   61:     * @param drf the S7k data record frame
+        -:   62:     * @param data the datagram
+        -:   63:     */
+        -:   64:    void processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+        -:   65:    
+        -:   66:    /**
+        -:   67:     * call the process Position
+        -:   68:     * 
+        -:   69:     * @param drf the S7k data record frame
+        -:   70:     * @param data the datagram
+        -:   71:     */
+        -:   72:    void processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+        -:   73:    
+        -:   74:    /**
+        -:   75:     * call the process Ping
+        -:   76:     * 
+        -:   77:     * @param drf the S7k data record frame
+        -:   78:     * @param data the datagram
+        -:   79:     */
+        -:   80:    void processPingDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+        -:   81:    
+        -:   82:    /**
+        -:   83:     * call the process Sonar setting
+        -:   84:     * 
+        -:   85:     * @param drf the S7k data record frame
+        -:   86:     * @param data datagram
+        -:   87:     */
+        -:   88:    void processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+        -:   89:    
+        -:   90:    /**
+        -:   91:     * call the process Sound Velocity Profile base on the Ctd
+        -:   92:     * 
+        -:   93:     * @param drf the S7k data record frame
+        -:   94:     * @param data the datagram
+        -:   95:     */
+        -:   96:    void processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data);
+        -:   97:
+        -:   98:    /**
+        -:   99:     * Returns a human readable name for a given datagram tag
+        -:  100:     */
+        -:  101:     /*std::string getName(int tag);*/
+        -:  102:
+        -:  103:
+        -:  104:private:
+        -:  105:    
+        -:  106:    /**
+        -:  107:     * Return the Check summary of the S7k data record frame
+        -:  108:     * 
+        -:  109:     * @param drf the S7k data record frame
+        -:  110:     * @param data the datagram
+        -:  111:     */
+        -:  112:    uint32_t computeChecksum(S7kDataRecordFrame * drf, unsigned char * data);
+        -:  113:    
+        -:  114:    /**
+        -:  115:     * Get the S7k data record frame
+        -:  116:     * 
+        -:  117:     * @param drf the S7k data record frame 
+        -:  118:     */
+        -:  119:    uint64_t extractMicroEpoch(S7kDataRecordFrame & drf);
+        -:  120:
+        -:  121:    //TODO Use a map instead
+        -:  122:    /**List of ping settings*/
+        -:  123:    std::list<S7kSonarSettings *> pingSettings;
+        -:  124:};
+        -:  125:
+        -:  126:/**
+        -:  127: * Create an S7k parser
+        -:  128: * 
+        -:  129: * @param processor the datagram processor 
+        -:  130: */
+    #####:  131:S7kParser::S7kParser(DatagramEventHandler & processor) : DatagramParser(processor) {
+        -:  132:
+    #####:  133:}
+        -:  134:
+        -:  135:/**Destroy the S7k parser*/
+    #####:  136:S7kParser::~S7kParser() {
+        -:  137:
+    #####:  138:}
+        -:  139:
+        -:  140:/**
+        -:  141: * Read a file and change the Kongsberg parser depending on the information
+        -:  142: * 
+        -:  143: * @param filename name of the file to read
+        -:  144: */
+    #####:  145:void S7kParser::parse(std::string & filename) {
+    #####:  146:    FILE * file = fopen(filename.c_str(), "rb");
+        -:  147:
+    #####:  148:    if (file) {
+        -:  149:        S7kDataRecordFrame drf;
+        -:  150:
+    #####:  151:        while (!feof(file)) {
+        -:  152:
+        -:  153:            //Read the DRF
+    #####:  154:            int nbItemsRead = fread(&drf, sizeof (S7kDataRecordFrame), 1, file);
+        -:  155:
+        -:  156:            //Check that we read the required amount of data
+    #####:  157:            if (nbItemsRead == 1) {
+        -:  158:
+        -:  159:                //Sanity check on the DRF
+    #####:  160:                if (drf.SyncPattern == SYNC_PATTERN) {
+    #####:  161:                    processDataRecordFrame(drf);
+        -:  162:
+    #####:  163:                    int dataSectionSize = drf.Size - sizeof (S7kDataRecordFrame); // includes checksum
+    #####:  164:                    unsigned char * data = (unsigned char*) malloc(dataSectionSize);
+        -:  165:
+        -:  166:                    //Now read in the data section and the checksum
+    #####:  167:                    nbItemsRead = fread(data, dataSectionSize, 1, file);
+        -:  168:
+        -:  169:                    //We can haz data
+    #####:  170:                    if (nbItemsRead == 1) {
+        -:  171:
+        -:  172:                        //Verify it
+    #####:  173:                        uint32_t checksum = *((uint32_t*) & data[dataSectionSize - sizeof (uint32_t)]);
+    #####:  174:                        uint32_t computedChecksum = computeChecksum(&drf, data);
+        -:  175:
+    #####:  176:                        if (checksum == computedChecksum) {
+    #####:  177:                            processor.processDatagramTag(drf.RecordTypeIdentifier);
+        -:  178:
+        -:  179:			    //Process data according to record type
+    #####:  180:                            if (drf.RecordTypeIdentifier == 1016) {
+        -:  181:                                //Attitude
+    #####:  182:                                processAttitudeDatagram(drf, data);
+        -:  183:                            }
+    #####:  184:			    else if (drf.RecordTypeIdentifier == 1003) {
+        -:  185:                                //Position
+    #####:  186:                                processPositionDatagram(drf, data);
+        -:  187:                            }
+    #####:  188:			    else if(drf.RecordTypeIdentifier == 7027) {
+        -:  189:                                //Ping
+    #####:  190:				processPingDatagram(drf, data);
+        -:  191:                            }
+    #####:  192:			    else if(drf.RecordTypeIdentifier == 7000){
+        -:  193:				//Sonar settings
+    #####:  194:				processSonarSettingsDatagram(drf,data);
+        -:  195:			    }
+    #####:  196:			    else if(drf.RecordTypeIdentifier == 1010){
+        -:  197:				//CTD
+    #####:  198:                                processCtdDatagram(drf,data);
+        -:  199:                            }
+        -:  200:                            //TODO: process other stuff
+        -:  201:
+        -:  202:                        } else {
+    #####:  203:                            printf("Checksum error\n");
+        -:  204:                            //Checksum error...lets ignore the packet for now
+        -:  205:                            //throw new Exception("Checksum error");
+    #####:  206:                            continue;
+        -:  207:                        }
+        -:  208:                    }
+        -:  209:
+    #####:  210:                    free(data);
+        -:  211:                } else {
+    #####:  212:                    throw new Exception("Couldn't find sync pattern");
+        -:  213:                }
+        -:  214:            }//Negative items mean something went wrong
+    #####:  215:            else if (nbItemsRead < 0) {
+    #####:  216:                throw new Exception("Read error");
+        -:  217:            }
+        -:  218:
+        -:  219:            //zero bytes means EOF. Nothing to do
+        -:  220:        }
+        -:  221:    } else {
+    #####:  222:        throw new Exception("File not found");
+        -:  223:    }
+    #####:  224:}
+        -:  225:
+    #####:  226:std::string S7kParser::getName(int tag)
+        -:  227:{
+    #####:  228:    switch(tag)
+        -:  229:    {
+        -:  230:        case 1000:
+    #####:  231:            return "Reference Point";
+        -:  232:        break;
+        -:  233:        
+        -:  234:        case 1001:
+    #####:  235:            return "Sensor Offset Position";
+        -:  236:        break;
+        -:  237:        
+        -:  238:        case 1002:
+    #####:  239:            return "Sensor Offset Position Calibrated";
+        -:  240:        break;
+        -:  241:        
+        -:  242:        case 1003:
+    #####:  243:            return "Position";
+        -:  244:        break;
+        -:  245:        
+        -:  246:        case 1004:
+    #####:  247:            return "Custom Attitude Information";
+        -:  248:        break;
+        -:  249:        
+        -:  250:        case 1005:
+    #####:  251:            return "Tide";
+        -:  252:        break;
+        -:  253:        
+        -:  254:        case 1006:
+    #####:  255:            return "Altitude";
+        -:  256:        break;
+        -:  257:        
+        -:  258:        case 1007:
+    #####:  259:            return "Motion Over Ground";
+        -:  260:        break;
+        -:  261:        
+        -:  262:        case 1008:
+    #####:  263:            return "Depth";
+        -:  264:        break;
+        -:  265:        
+        -:  266:        case 1009:
+    #####:  267:            return "Sound Velocity Profile";
+        -:  268:        break;
+        -:  269:        
+        -:  270:        case 1010:
+    #####:  271:            return "CTD";
+        -:  272:        break;
+        -:  273:        
+        -:  274:        case 1011:
+    #####:  275:            return "Geodesy";
+        -:  276:        break;
+        -:  277:        
+        -:  278:        case 1012:
+    #####:  279:            return "Roll Pitch Heave";
+        -:  280:        break;
+        -:  281:        
+        -:  282:        case 1013:
+    #####:  283:            return "Heading";
+        -:  284:        break;
+        -:  285:        
+        -:  286:        case 1014:
+    #####:  287:            return "Survey Line";
+        -:  288:        break;
+        -:  289:        
+        -:  290:        case 1015:
+    #####:  291:            return "Navigation";
+        -:  292:        break;
+        -:  293:        
+        -:  294:        case 1016:
+    #####:  295:            return "Attitude";
+        -:  296:        break;
+        -:  297:        
+        -:  298:        case 1017:
+    #####:  299:            return "Pan Tilt";
+        -:  300:        break;
+        -:  301:        
+        -:  302:        case 1020:
+    #####:  303:            return "Sonar Installation Identifiers";
+        -:  304:        break;
+        -:  305:        
+        -:  306:        case 2004:
+    #####:  307:            return "Sonar Pipe Environment";
+        -:  308:        break;
+        -:  309:        
+        -:  310:        case 7000:
+    #####:  311:            return "7k Sonar Settings";
+        -:  312:        break;
+        -:  313:        
+        -:  314:        case 7001:
+    #####:  315:            return "7k Configuration";
+        -:  316:        break;
+        -:  317:        
+        -:  318:        case 7002:
+    #####:  319:            return "7k Match Filter";
+        -:  320:        break;
+        -:  321:        
+        -:  322:        case 7003:
+    #####:  323:            return "7k Firmware and Hardware Configuration";
+        -:  324:        break;
+        -:  325:        
+        -:  326:        case 7004:
+    #####:  327:            return "7k Beam Geometry";
+        -:  328:        break;
+        -:  329:        
+        -:  330:        case 7006:
+    #####:  331:            return "7k Bathymetric Data";
+        -:  332:        break;
+        -:  333:        
+        -:  334:        case 7007:
+    #####:  335:            return "7k Side Scan Data";
+        -:  336:        break;
+        -:  337:        
+        -:  338:        case 7008:
+    #####:  339:            return "7k Generic Water Column Data";
+        -:  340:        break;
+        -:  341:        
+        -:  342:        case 7010:
+    #####:  343:            return "TVQ Values";
+        -:  344:        break;
+        -:  345:        
+        -:  346:        case 7011:
+    #####:  347:            return "7k Image Data";
+        -:  348:        break;
+        -:  349:        
+        -:  350:        case 7012:
+    #####:  351:            return "7k Ping Motion Data";
+        -:  352:        break;
+        -:  353:        
+        -:  354:        case 7017:
+    #####:  355:            return "7k Detection Data Setup";
+        -:  356:        break;
+        -:  357:        
+        -:  358:        case 7018:
+    #####:  359:            return "7k Beamformed Data";
+        -:  360:        break;
+        -:  361:        
+        -:  362:        case 7019:
+    #####:  363:            return "Vernier Processing Data";
+        -:  364:        break;
+        -:  365:        
+        -:  366:        case 7021:
+    #####:  367:            return "7k Built-In Test Environment Data";
+        -:  368:        break;
+        -:  369:        
+        -:  370:        case 7022:
+    #####:  371:            return "7kCenter Version";
+        -:  372:        break;
+        -:  373:        
+        -:  374:        case 7023:
+    #####:  375:            return "8k Wet End Version";
+        -:  376:        break;
+        -:  377:        
+        -:  378:        case 7027:
+    #####:  379:            return "7k RAW Detection Data";
+        -:  380:        break;
+        -:  381:        
+        -:  382:        case 7028:
+    #####:  383:            return "7k Snippet Data";
+        -:  384:        break;
+        -:  385:        
+        -:  386:        case 7030:
+    #####:  387:            return "Sonar Installation Parameters";
+        -:  388:        break;
+        -:  389:        
+        -:  390:        case 7031:
+    #####:  391:            return "7k Built-In Test Environment Data (Summary)";
+        -:  392:        break;
+        -:  393:        
+        -:  394:        case 7041:
+    #####:  395:            return "Compressed Beamformed Magnitude Data";
+        -:  396:        break;
+        -:  397:        
+        -:  398:        case 7042:
+    #####:  399:            return "Compressed Watercolumn Data";
+        -:  400:        break;
+        -:  401:        
+        -:  402:        case 7048:
+    #####:  403:            return "7k Calibrated Beam Data";
+        -:  404:        break;
+        -:  405:        
+        -:  406:        case 7050:
+    #####:  407:            return "7k System Events";
+        -:  408:        break;
+        -:  409:        
+        -:  410:        case 7051:
+    #####:  411:            return "7k System Event Message";
+        -:  412:        break;
+        -:  413:        
+        -:  414:        case 7052:
+    #####:  415:            return "RDR Recording Status";
+        -:  416:        break;
+        -:  417:        
+        -:  418:        case 7053:
+    #####:  419:            return "7k Subscriptions";
+        -:  420:        break;
+        -:  421:        
+        -:  422:        case 7055:
+    #####:  423:            return "Calibration Status";
+        -:  424:        break;
+        -:  425:        
+        -:  426:        case 7057:
+    #####:  427:            return "Calibrated Side-Scan Data";
+        -:  428:        break;
+        -:  429:        
+        -:  430:        case 7058:
+    #####:  431:            return "Calibrated Snippet Data";
+        -:  432:        break;
+        -:  433:        
+        -:  434:        case 7059:
+    #####:  435:            return "MB2 specific status";
+        -:  436:        break;
+        -:  437:        
+        -:  438:        case 7200:
+    #####:  439:            return "7k File Header";
+        -:  440:        break;
+        -:  441:                
+        -:  442:        case 7300:
+    #####:  443:            return "7k File Catalog Record";
+        -:  444:        break;
+        -:  445:                
+        -:  446:        case 7400:
+    #####:  447:            return "7k Time Message";
+        -:  448:        break;
+        -:  449:                
+        -:  450:        case 7500:
+    #####:  451:            return "7k Remote Control";
+        -:  452:        break;
+        -:  453:                
+        -:  454:        case 7501:
+    #####:  455:            return "7k Remote Control Acknowledge";
+        -:  456:        break;
+        -:  457:                
+        -:  458:        case 7502:
+    #####:  459:            return "7k Remote Control Not Acknowledge";
+        -:  460:        break;
+        -:  461:                
+        -:  462:        case 7503:
+    #####:  463:            return "Remote Control Sonar Settings";
+        -:  464:        break;
+        -:  465:                
+        -:  466:        case 7504:
+    #####:  467:            return "7P Common System Settings";
+        -:  468:        break;
+        -:  469:                
+        -:  470:        case 7510:
+    #####:  471:            return "SV Filtering";
+        -:  472:        break;
+        -:  473:                
+        -:  474:        case 7511:
+    #####:  475:            return "System Lock Status";
+        -:  476:        break;
+        -:  477:                
+        -:  478:        case 7610:
+    #####:  479:            return "7k Sound Velocity";
+        -:  480:        break;
+        -:  481:                
+        -:  482:        case 7611:
+    #####:  483:            return "7k Absorption Loss";
+        -:  484:        break;
+        -:  485:                
+        -:  486:        case 7612:
+    #####:  487:            return "7k Spreading Loss";
+        -:  488:        break;
+        -:  489:
+        -:  490:        default:
+    #####:  491:            return "Invalid tag";
+        -:  492:	break;
+        -:  493:    }
+        -:  494:}
+        -:  495:
+        -:  496:/**
+        -:  497: * set the S7k data record frame
+        -:  498: * 
+        -:  499: * @param drf the new S7k data record frame
+        -:  500: */
+    #####:  501:void S7kParser::processDataRecordFrame(S7kDataRecordFrame & drf) {
+        -:  502:    //TODO: remove later, leave derived classes decide what to do
+        -:  503:/*    printf("--------------------\n");
+        -:  504:    printf("%d-%03d %02d:%02d:%f\n", drf.Timestamp.Year, drf.Timestamp.Day, drf.Timestamp.Hours, drf.Timestamp.Minutes, drf.Timestamp.Seconds);
+        -:  505:    printf("Type: %d\n", drf.RecordTypeIdentifier);
+        -:  506:    printf("Bytes: %d\n", drf.Size);
+        -:  507:    printf("--------------------\n");
+        -:  508:*/
+    #####:  509:}
+        -:  510:
+        -:  511:/**
+        -:  512: * Return the Check summary of the S7k data record frame
+        -:  513: * 
+        -:  514: * @param drf the S7k data record frame
+        -:  515: * @param data the datagram
+        -:  516: */
+    #####:  517:uint32_t S7kParser::computeChecksum(S7kDataRecordFrame * drf, unsigned char * data) {
+    #####:  518:    uint32_t checksum = 0;
+        -:  519:
+    #####:  520:    unsigned int dataSize = drf->Size - sizeof (S7kDataRecordFrame) - sizeof (uint32_t); //exclude checksum
+        -:  521:
+    #####:  522:    for (unsigned int i = 0; i< sizeof (S7kDataRecordFrame); i++) {
+    #####:  523:        checksum += (unsigned char) ((unsigned char*) drf)[i];
+        -:  524:    }
+        -:  525:
+    #####:  526:    for (unsigned int i = 0; i < dataSize; i++) {
+    #####:  527:        checksum += (unsigned char) data[i];
+        -:  528:    }
+        -:  529:
+    #####:  530:    return checksum;
+        -:  531:}
+        -:  532:
+        -:  533:/**
+        -:  534: * call the process Attitude
+        -:  535: * 
+        -:  536: * @param drf the S7k data record frame
+        -:  537: * @param data the datagram
+        -:  538: */
+    #####:  539:void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
+    #####:  540:    uint64_t microEpoch  = extractMicroEpoch(drf);
+    #####:  541:    uint8_t  nEntries    = ((uint8_t*)data)[0];
+    #####:  542:    S7kAttitudeRD *entry = (S7kAttitudeRD*)(data+1);
+        -:  543:
+    #####:  544:    for(unsigned int i = 0;i<nEntries;i++){
+    #####:  545:	double heading = (double)entry[i].heading*R2D;
+    #####:  546:	double pitch   = (double)entry[i].pitch*R2D;
+    #####:  547:	double roll    = (double)entry[i].roll*R2D;
+        -:  548:
+    #####:  549:        processor.processAttitude(
+    #####:  550:		microEpoch + entry[i].timeDifferenceFromRecordTimeStamp * 1000,
+        -:  551:                heading,
+        -:  552:                (pitch<0)?pitch+360:pitch,
+        -:  553:                (roll<0)?roll+360:roll
+    #####:  554:	);
+        -:  555:    }
+    #####:  556:}
+        -:  557:
+        -:  558:/**
+        -:  559: * call the process Sonar setting
+        -:  560: * 
+        -:  561: * @param drf the S7k data record frame
+        -:  562: * @param data the datagram
+        -:  563: */
+    #####:  564:void S7kParser::processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned char * data){
+    #####:  565:    S7kSonarSettings * settings = (S7kSonarSettings*)data;
+        -:  566:
+    #####:  567:    S7kSonarSettings * settingsCopy = (S7kSonarSettings *)malloc(sizeof(S7kSonarSettings));
+    #####:  568:    memcpy(settingsCopy,settings,sizeof(S7kSonarSettings));
+        -:  569:
+    #####:  570:    pingSettings.push_back(settingsCopy);
+    #####:  571:}
+        -:  572:
+        -:  573:/**
+        -:  574: * call the process Position
+        -:  575: * 
+        -:  576: * @param drf the S7k data record frame
+        -:  577: * @param data the datagram
+        -:  578: */
+    #####:  579:void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
+    #####:  580:    uint64_t microEpoch = extractMicroEpoch(drf);
+    #####:  581:    S7kPosition *position = (S7kPosition*) data;
+        -:  582:
+        -:  583:    // only process WGS84, ignore grid coordinates
+    #####:  584:    if(position->DatumIdentifier == 0 && position->PositioningMethod == 0) {
+    #####:  585:        processor.processPosition(microEpoch, (double)position->LongitudeOrEasting * R2D, (double)position->LatitudeOrNorthing * R2D, (double)position->Height);
+        -:  586:    }
+    #####:  587:}
+        -:  588:
+        -:  589:/**
+        -:  590: * call the process Ping
+        -:  591: * 
+        -:  592: * @param drf the S7k data record frame
+        -:  593: * @param data the datagram
+        -:  594: */
+    #####:  595:void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
+    #####:  596:    uint64_t microEpoch = extractMicroEpoch(drf);
+        -:  597:
+    #####:  598:    S7kRawDetectionDataRTH *swath = (S7kRawDetectionDataRTH*) data;
+        -:  599:
+    #####:  600:    uint32_t nEntries = swath->numberOfDetectionPoints;
+        -:  601:
+    #####:  602:    double tiltAngle = swath->transmissionAngle*R2D;
+    #####:  603:    double samplingRate = swath->samplingRate;
+        -:  604:
+    #####:  605:    S7kSonarSettings * settings = NULL;
+        -:  606:
+    #####:  607:    for(auto i=pingSettings.begin();i!=pingSettings.end();i++){
+    #####:  608:	if((*i)->sequentialNumber==swath->pingNumber){
+    #####:  609:		settings = (*i);
+    #####:  610:                pingSettings.remove((*i));
+    #####:  611:		break;
+        -:  612:	}
+        -:  613:    }
+        -:  614:
+    #####:  615:    if(settings){
+    #####:  616:	double surfaceSoundVelocity = settings->soundVelocity;
+        -:  617:
+    #####:  618:	processor.processSwathStart(surfaceSoundVelocity);
+        -:  619:
+    #####:  620:	for(unsigned int i = 0;i<nEntries;i++) {
+    #####:  621:		S7kRawDetectionDataRD *ping = (S7kRawDetectionDataRD*)(data+sizeof(S7kRawDetectionDataRTH) + i*swath->dataFieldSize);
+    #####:  622:		double twoWayTravelTime = (double)ping->detectionPoint / samplingRate; // see Appendix F p. 190
+    #####:  623:		double intensity = swath->dataFieldSize > 22 ? ping->signalStrength : 0; //see p. 79-80
+    #####:  624:		processor.processPing(microEpoch,(long)ping->beamDescriptor,(double)ping->receptionAngle*R2D,tiltAngle,twoWayTravelTime,ping->quality,intensity);
+        -:  625:        }
+        -:  626:
+    #####:  627:        free(settings);
+        -:  628:    }
+        -:  629:    else{
+    #####:  630:	fprintf(stderr,"No settings for ping #%d\n",swath->pingNumber);
+        -:  631:    }
+    #####:  632:}
+        -:  633:
+        -:  634:/**
+        -:  635: * Get the S7k data record frame
+        -:  636: * 
+        -:  637: * @param drf the S7k data record frame 
+        -:  638: */
+    #####:  639:uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
+    #####:  640:    long microSeconds = drf.Timestamp.Seconds * 1e6;
+        -:  641:
+    #####:  642:    uint64_t res = TimeUtils::build_time(drf.Timestamp.Year, drf.Timestamp.Day, drf.Timestamp.Hours, drf.Timestamp.Minutes, microSeconds);
+        -:  643:
+    #####:  644:    return res;
+        -:  645:}
+        -:  646:
+        -:  647:/**
+        -:  648: * call the process Sound Velocity Profile base on the Ctd
+        -:  649: * 
+        -:  650: * @param drf the S7k data record frame
+        -:  651: * @param data the datagram
+        -:  652: */
+    #####:  653:void S7kParser::processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data){
+    #####:  654:        S7kCtdRTH * ctd = (S7kCtdRTH*) data;
+        -:  655:
+    #####:  656:	SoundVelocityProfile * svp = new SoundVelocityProfile();
+        -:  657:
+    #####:  658:	uint64_t timestamp = extractMicroEpoch(drf);
+        -:  659:
+    #####:  660:	svp->setTimestamp(timestamp);
+        -:  661:        
+    #####:  662:        svp->setLatitude(0);
+    #####:  663:        svp->setLongitude(0);
+        -:  664:
+    #####:  665:	if(
+    #####:  666:		ctd->sampleContentValidity & 0x0C //depth & sound velocity OK
+    #####:  667:		&&
+    #####:  668:		ctd->pressureFlag == 1 //depth
+        -:  669:          ){
+        -:  670:		//Get position if available
+    #####:  671:		if(ctd->positionFlag){
+    #####:  672:			svp->setLongitude(ctd->longitude);
+    #####:  673:			svp->setLatitude(ctd->latitude);
+        -:  674:		}
+        -:  675:
+        -:  676:		//Get SVP samples
+    #####:  677:		S7kCtdRD * rd = (S7kCtdRD *) (((unsigned char *)ctd) + sizeof(S7kCtdRTH));
+    #####:  678:		for(unsigned int i = 0;i < ctd->nbSamples;i++  ){
+    #####:  679:			svp->add(rd[i].pressureDepth,rd[i].soundVelocity);
+        -:  680:		}
+        -:  681:
+    #####:  682:		processor.processSoundVelocityProfile(svp);
+        -:  683:	}
+    #####:  684:}
+        -:  685:
+        -:  686:#endif /* S7KPARSER_HPP */

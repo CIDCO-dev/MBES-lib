@@ -1,0 +1,254 @@
+        -:    0:Source:src/SurveySystem.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:/*
+        -:    2: * Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+        -:    3: */
+        -:    4:
+        -:    5:/*
+        -:    6: * File:   SystemGeometry.h
+        -:    7: * Author: glm,jordan
+        -:    8: *
+        -:    9: * Created on August 20, 2018, 1:07 PM
+        -:   10: */
+        -:   11:
+        -:   12:#ifndef SYSTEMGEOMETRY_H
+        -:   13:#define SYSTEMGEOMETRY_H
+        -:   14:
+        -:   15:#include <Eigen/Dense>
+        -:   16:#include <string>
+        -:   17:#include <iostream>
+        -:   18:#include <fstream>
+        -:   19:#include <sstream>
+        -:   20:#include "utils/Constants.hpp"
+        -:   21:#include "utils/Exception.hpp"
+        -:   22:#include "Attitude.hpp"
+        -:   23:
+        -:   24:/*!
+        -:   25: * \brief Survey system class
+        -:   26: */
+        -:   27:class SurveySystem {
+        -:   28:public:
+        -:   29:    
+        -:   30:    /**Create a Survey system*/
+        -:   31:    SurveySystem();
+        -:   32:    
+        -:   33:    /**Destroy the Survey system*/
+        -:   34:    ~SurveySystem();
+        -:   35:
+        -:   36:    /**Return the MBES model*/
+    #####:   37:    std::string & getMBES_model() {
+    #####:   38:        return MBES_model;
+        -:   39:    }
+        -:   40:
+        -:   41:    /**Return the antenna position*/
+    #####:   42:    Eigen::Vector3d & getAntennaPosition() {
+    #####:   43:        return antennaPosition;
+        -:   44:    }
+        -:   45:
+        -:   46:    /**Return the attitude accuracy*/
+    #####:   47:    Attitude * getAttitudeAccuracy() {
+    #####:   48:        return attitudeAccuracy;
+        -:   49:    }
+        -:   50:
+        -:   51:    /**Return the boresigth patch test*/
+        -:   52:    Attitude * getBoresightPatchTest() {
+        -:   53:        return boresightPatchTest;
+        -:   54:    }
+        -:   55:
+        -:   56:    /**Return the draft*/
+    #####:   57:    double getDraft() {
+    #####:   58:        return draft;
+        -:   59:    }
+        -:   60:
+        -:   61:    /**Return the echo sounder receiver position*/
+    #####:   62:    Eigen::Vector3d & getEchosounderReceivererPosition() {
+    #####:   63:        return echosounderReceivererPosition;
+        -:   64:    }
+        -:   65:
+        -:   66:    /**Return the echo sounder transmitter position*/
+    #####:   67:    Eigen::Vector3d & getEchosounderTransmitterPosition() {
+    #####:   68:        return echosounderTransmitterPosition;
+        -:   69:    }
+        -:   70:
+        -:   71:    /**Return the position accuracy*/
+        -:   72:    Eigen::Vector3d & getPositionAccuracy() {
+        -:   73:        return positionAccuracy;
+        -:   74:    }
+        -:   75:
+        -:   76:    /**
+        -:   77:     * Change the Survey system values by reading a file
+        -:   78:     * Return false if the file is not valid
+        -:   79:     * 
+        -:   80:     * @param filename name of the file who will be read
+        -:   81:     */
+        -:   82:    bool readFile(const std::string & fileName);
+        -:   83:
+        -:   84:private:
+        -:   85:    
+        -:   86:    /**Name of the Survey system MBES model*/
+        -:   87:    std::string MBES_model;
+        -:   88:
+        -:   89:    /**Value of the Survey system draft (meter)*/
+        -:   90:    double draft; // in meters
+        -:   91:
+        -:   92:    // positions in the IMU reference frame in meters
+        -:   93:    
+        -:   94:    /**Vector3d of the Survey system antenna position*/
+        -:   95:    Eigen::Vector3d antennaPosition;
+        -:   96:    
+        -:   97:    /**Vector3d of the Survey system echo sounder transmitter position*/
+        -:   98:    Eigen::Vector3d echosounderTransmitterPosition;
+        -:   99:    
+        -:  100:    /**Vector3d of the Survey system echo sounder receiver position*/
+        -:  101:    Eigen::Vector3d echosounderReceivererPosition;
+        -:  102:
+        -:  103:    // angles in degrees
+        -:  104:    // will be converted internally to radians
+        -:  105:    /**Value of the Survey system boresigth path test (attitude)*/
+        -:  106:    Attitude* boresightPatchTest = NULL;
+        -:  107:
+        -:  108:    // accuracy in 2 sigma
+        -:  109:    /**Value of the Survey system attitude accuracy (attitude)*/
+        -:  110:    Attitude* attitudeAccuracy = NULL;
+        -:  111:    
+        -:  112:    /**Vector3d of the Survey system position accuracy*/
+        -:  113:    Eigen::Vector3d positionAccuracy;
+        -:  114:};
+        -:  115:
+        -:  116:/**Create a Survey system*/
+    #####:  117:SurveySystem::SurveySystem() {
+    #####:  118:}
+        -:  119:
+        -:  120:/**Destroy the Survey system and the boresigth path test and attitude accuracy*/
+    #####:  121:SurveySystem::~SurveySystem() {
+    #####:  122:    if (boresightPatchTest) {
+    #####:  123:        delete boresightPatchTest;
+        -:  124:    }
+        -:  125:
+    #####:  126:    if (attitudeAccuracy) {
+    #####:  127:        delete attitudeAccuracy;
+        -:  128:    }
+    #####:  129:}
+        -:  130:
+        -:  131:/**
+        -:  132: * Change the Survey system values by reading a file
+        -:  133: * Return false if the file is not valid
+        -:  134: * 
+        -:  135: * @param filename name of the file who will be read
+        -:  136: */
+    #####:  137:bool SurveySystem::readFile(const std::string & fileName) {
+        -:  138:
+        -:  139:    // Temporary place holder variables
+    #####:  140:    std::string NameDevice;
+    #####:  141:    double Patch_Roll = 0, Patch_Pitch = 0, Patch_Heading = 0;
+    #####:  142:    double MBES_X = 0, MBES_Y = 0, MBES_Z = 0;
+    #####:  143:    double MBES_RX = 0, MBES_RY = 0, MBES_RZ = 0;
+    #####:  144:    double AntX = 0, AntY = 0, AntZ = 0;
+    #####:  145:    double Draft = 0;
+        -:  146:
+        -:  147:    double PitchRollAcc, HeadingAcc;
+        -:  148:    double PosHorAcc, PosVerAcc;
+        -:  149:
+        -:  150:    //double Eroll = 0, Epitch = 0, Eyaw = 0, Rroll = 0, Rpitch = 0, Ryaw = 0, Mroll = 0, Mpitch = 0, Myaw = 0;
+        -:  151:
+        -:  152:    // Open file
+    #####:  153:    std::string line;
+    #####:  154:    std::ifstream file(fileName);
+        -:  155:
+        -:  156:    /*
+        -:  157:     * This is cancer, no validation of correctness or presence of data
+        -:  158:     * TODO:
+        -:  159:     * Should return false if data is missing or is invalid
+        -:  160:     */
+    #####:  161:    if (!file) {
+    #####:  162:        return false;
+        -:  163:    } else {
+    #####:  164:        for (std::string line; getline(file, line);) {
+        -:  165:            //make a stream for the line itself
+    #####:  166:            std::istringstream in(line);
+        -:  167:
+    #####:  168:            std::string type;
+    #####:  169:            in >> type;
+        -:  170:
+    #####:  171:            if (type == "MultibeamModel") {
+    #####:  172:                in >> NameDevice;
+    #####:  173:            } else if (type == "AntennaPositionOffsetX") {
+    #####:  174:                in >> AntX;
+    #####:  175:            } else if (type == "AntennaPositionOffsetY") {
+    #####:  176:                in >> AntY;
+    #####:  177:            } else if (type == "AntennaPositionOffsetZ") {
+    #####:  178:                in >> AntZ;
+    #####:  179:            } else if (type == "MBETransmitterOffsetX") {
+    #####:  180:                in >> MBES_X;
+    #####:  181:            } else if (type == "MBETransmitterOffsetY") {
+    #####:  182:                in >> MBES_Y;
+    #####:  183:            } else if (type == "MBETransmitterOffsetZ") {
+    #####:  184:                in >> MBES_Z;
+    #####:  185:            } else if (type == "MBEDraft") {
+    #####:  186:                in >> Draft;
+    #####:  187:            } else if (type == "MBEReceiverOffsetX") {
+    #####:  188:                in >> MBES_RX;
+    #####:  189:            } else if (type == "MBEReceiverOffsetY") {
+    #####:  190:                in >> MBES_RY;
+    #####:  191:            } else if (type == "MBEReceiverOffsetZ") {
+    #####:  192:                in >> MBES_RZ;
+    #####:  193:            } else if (type == "PositionAccuracy") {
+    #####:  194:                in >> PosHorAcc;
+    #####:  195:                PosVerAcc = PosHorAcc * 1.5;
+    #####:  196:            } else if (type == "PitchRollAccuracy") {
+    #####:  197:                in >> PitchRollAcc;
+    #####:  198:            } else if (type == "HeadingAccuracy") {
+    #####:  199:                in >> HeadingAcc;
+    #####:  200:            } else if (type == "RollAlignment") {
+    #####:  201:                in >> Patch_Roll;
+    #####:  202:            } else if (type == "PitchAlignment") {
+    #####:  203:                in >> Patch_Pitch;
+    #####:  204:            } else if (type == "HeadingAlignment") {
+    #####:  205:                in >> Patch_Heading;
+        -:  206:            }/* else if (type == "MBEOffsetR") {
+        -:  207:                in >> Eroll;
+        -:  208:            } else if (type == "MBEOffsetP") {
+        -:  209:                in >> Epitch;
+        -:  210:            } else if (type == "MBEOffsetH") {
+        -:  211:                in >> Eyaw;
+        -:  212:            } else if (type == "MBEOffset2R") {
+        -:  213:                in >> Rroll;
+        -:  214:            } else if (type == "MBEOffset2P") {
+        -:  215:                in >> Rpitch;
+        -:  216:            } else if (type == "MBEOffset2H") {
+        -:  217:                in >> Ryaw;
+        -:  218:            } else if (type == "MotionSensorR") {
+        -:  219:                in >> Mroll;
+        -:  220:            } else if (type == "MotionSensorP") {
+        -:  221:                in >> Mpitch;
+        -:  222:            } else if (type == "MotionSensorH") {
+        -:  223:                in >> Myaw;
+        -:  224:            }*/
+        -:  225:        }
+        -:  226:
+    #####:  227:        file.close();
+        -:  228:
+    #####:  229:        MBES_model = NameDevice;
+        -:  230:
+    #####:  231:        draft = Draft;
+        -:  232:
+    #####:  233:        antennaPosition << AntX, AntY, -AntZ;
+    #####:  234:        echosounderTransmitterPosition << MBES_X, MBES_Y, -MBES_Z;
+    #####:  235:        echosounderReceivererPosition << MBES_RX, MBES_RY, -MBES_RZ;
+        -:  236:
+    #####:  237:        boresightPatchTest = new Attitude(0,Patch_Roll, Patch_Pitch, Patch_Heading);
+        -:  238:
+    #####:  239:        attitudeAccuracy = new Attitude(0,PitchRollAcc, PitchRollAcc, HeadingAcc);
+        -:  240:
+    #####:  241:        positionAccuracy << PosHorAcc, PosHorAcc, PosVerAcc;
+        -:  242:
+    #####:  243:	return true;
+        -:  244:    }
+        -:  245:}
+        -:  246:
+        -:  247:
+        -:  248:
+        -:  249:#endif /* SYSTEMGEOMETRY_H */

@@ -1,0 +1,1101 @@
+        -:    0:Source:/usr/include/c++/6/bits/deque.tcc
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// Deque implementation (out of line) -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 2001-2016 Free Software Foundation, Inc.
+        -:    4://
+        -:    5:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    6:// software; you can redistribute it and/or modify it under the
+        -:    7:// terms of the GNU General Public License as published by the
+        -:    8:// Free Software Foundation; either version 3, or (at your option)
+        -:    9:// any later version.
+        -:   10:
+        -:   11:// This library is distributed in the hope that it will be useful,
+        -:   12:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   13:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   14:// GNU General Public License for more details.
+        -:   15:
+        -:   16:// Under Section 7 of GPL version 3, you are granted additional
+        -:   17:// permissions described in the GCC Runtime Library Exception, version
+        -:   18:// 3.1, as published by the Free Software Foundation.
+        -:   19:
+        -:   20:// You should have received a copy of the GNU General Public License and
+        -:   21:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   22:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   23:// <http://www.gnu.org/licenses/>.
+        -:   24:
+        -:   25:/*
+        -:   26: *
+        -:   27: * Copyright (c) 1994
+        -:   28: * Hewlett-Packard Company
+        -:   29: *
+        -:   30: * Permission to use, copy, modify, distribute and sell this software
+        -:   31: * and its documentation for any purpose is hereby granted without fee,
+        -:   32: * provided that the above copyright notice appear in all copies and
+        -:   33: * that both that copyright notice and this permission notice appear
+        -:   34: * in supporting documentation.  Hewlett-Packard Company makes no
+        -:   35: * representations about the suitability of this software for any
+        -:   36: * purpose.  It is provided "as is" without express or implied warranty.
+        -:   37: *
+        -:   38: *
+        -:   39: * Copyright (c) 1997
+        -:   40: * Silicon Graphics Computer Systems, Inc.
+        -:   41: *
+        -:   42: * Permission to use, copy, modify, distribute and sell this software
+        -:   43: * and its documentation for any purpose is hereby granted without fee,
+        -:   44: * provided that the above copyright notice appear in all copies and
+        -:   45: * that both that copyright notice and this permission notice appear
+        -:   46: * in supporting documentation.  Silicon Graphics makes no
+        -:   47: * representations about the suitability of this software for any
+        -:   48: * purpose.  It is provided "as is" without express or implied warranty.
+        -:   49: */
+        -:   50:
+        -:   51:/** @file bits/deque.tcc
+        -:   52: *  This is an internal header file, included by other library headers.
+        -:   53: *  Do not attempt to use it directly. @headername{deque}
+        -:   54: */
+        -:   55:
+        -:   56:#ifndef _DEQUE_TCC
+        -:   57:#define _DEQUE_TCC 1
+        -:   58:
+        -:   59:namespace std _GLIBCXX_VISIBILITY(default)
+        -:   60:{
+        -:   61:_GLIBCXX_BEGIN_NAMESPACE_CONTAINER
+        -:   62:
+        -:   63:#if __cplusplus >= 201103L
+        -:   64:  template <typename _Tp, typename _Alloc>
+        -:   65:    void
+        -:   66:    deque<_Tp, _Alloc>::
+        -:   67:    _M_default_initialize()
+        -:   68:    {
+        -:   69:      _Map_pointer __cur;
+        -:   70:      __try
+        -:   71:        {
+        -:   72:          for (__cur = this->_M_impl._M_start._M_node;
+        -:   73:	       __cur < this->_M_impl._M_finish._M_node;
+        -:   74:	       ++__cur)
+        -:   75:            std::__uninitialized_default_a(*__cur, *__cur + _S_buffer_size(),
+        -:   76:					   _M_get_Tp_allocator());
+        -:   77:          std::__uninitialized_default_a(this->_M_impl._M_finish._M_first,
+        -:   78:					 this->_M_impl._M_finish._M_cur,
+        -:   79:					 _M_get_Tp_allocator());
+        -:   80:        }
+        -:   81:      __catch(...)
+        -:   82:        {
+        -:   83:          std::_Destroy(this->_M_impl._M_start, iterator(*__cur, __cur),
+        -:   84:			_M_get_Tp_allocator());
+        -:   85:          __throw_exception_again;
+        -:   86:        }
+        -:   87:    }
+        -:   88:#endif
+        -:   89:
+        -:   90:  template <typename _Tp, typename _Alloc>
+        -:   91:    deque<_Tp, _Alloc>&
+        -:   92:    deque<_Tp, _Alloc>::
+        -:   93:    operator=(const deque& __x)
+        -:   94:    {
+        -:   95:      if (&__x != this)
+        -:   96:	{
+        -:   97:#if __cplusplus >= 201103L
+        -:   98:	  if (_Alloc_traits::_S_propagate_on_copy_assign())
+        -:   99:	    {
+        -:  100:	      if (!_Alloc_traits::_S_always_equal()
+        -:  101:	          && _M_get_Tp_allocator() != __x._M_get_Tp_allocator())
+        -:  102:	        {
+        -:  103:		  // Replacement allocator cannot free existing storage,
+        -:  104:		  // so deallocate everything and take copy of __x's data.
+        -:  105:		  _M_replace_map(__x, __x.get_allocator());
+        -:  106:		  std::__alloc_on_copy(_M_get_Tp_allocator(),
+        -:  107:				       __x._M_get_Tp_allocator());
+        -:  108:		  return *this;
+        -:  109:		}
+        -:  110:	      std::__alloc_on_copy(_M_get_Tp_allocator(),
+        -:  111:				   __x._M_get_Tp_allocator());
+        -:  112:	    }
+        -:  113:#endif
+        -:  114:	  const size_type __len = size();
+        -:  115:	  if (__len >= __x.size())
+        -:  116:	    _M_erase_at_end(std::copy(__x.begin(), __x.end(),
+        -:  117:				      this->_M_impl._M_start));
+        -:  118:	  else
+        -:  119:	    {
+        -:  120:	      const_iterator __mid = __x.begin() + difference_type(__len);
+        -:  121:	      std::copy(__x.begin(), __mid, this->_M_impl._M_start);
+        -:  122:	      insert(this->_M_impl._M_finish, __mid, __x.end());
+        -:  123:	    }
+        -:  124:	}
+        -:  125:      return *this;
+        -:  126:    }
+        -:  127:
+        -:  128:#if __cplusplus >= 201103L
+        -:  129:  template<typename _Tp, typename _Alloc>
+        -:  130:    template<typename... _Args>
+        -:  131:      void
+        -:  132:      deque<_Tp, _Alloc>::
+        -:  133:      emplace_front(_Args&&... __args)
+        -:  134:      {
+        -:  135:	if (this->_M_impl._M_start._M_cur != this->_M_impl._M_start._M_first)
+        -:  136:	  {
+        -:  137:	    _Alloc_traits::construct(this->_M_impl,
+        -:  138:	                             this->_M_impl._M_start._M_cur - 1,
+        -:  139:			             std::forward<_Args>(__args)...);
+        -:  140:	    --this->_M_impl._M_start._M_cur;
+        -:  141:	  }
+        -:  142:	else
+        -:  143:	  _M_push_front_aux(std::forward<_Args>(__args)...);
+        -:  144:      }
+        -:  145:
+        -:  146:  template<typename _Tp, typename _Alloc>
+        -:  147:    template<typename... _Args>
+        -:  148:      void
+    #####:  149:      deque<_Tp, _Alloc>::
+        -:  150:      emplace_back(_Args&&... __args)
+        -:  151:      {
+    #####:  152:	if (this->_M_impl._M_finish._M_cur
+    #####:  153:	    != this->_M_impl._M_finish._M_last - 1)
+        -:  154:	  {
+    #####:  155:	    _Alloc_traits::construct(this->_M_impl,
+        -:  156:	                             this->_M_impl._M_finish._M_cur,
+        -:  157:			             std::forward<_Args>(__args)...);
+    #####:  158:	    ++this->_M_impl._M_finish._M_cur;
+        -:  159:	  }
+        -:  160:	else
+    #####:  161:	  _M_push_back_aux(std::forward<_Args>(__args)...);
+    #####:  162:      }
+        -:  163:#endif
+        -:  164:
+        -:  165:#if __cplusplus >= 201103L
+        -:  166:  template<typename _Tp, typename _Alloc>
+        -:  167:    template<typename... _Args>
+        -:  168:      typename deque<_Tp, _Alloc>::iterator
+        -:  169:      deque<_Tp, _Alloc>::
+        -:  170:      emplace(const_iterator __position, _Args&&... __args)
+        -:  171:      {
+        -:  172:	if (__position._M_cur == this->_M_impl._M_start._M_cur)
+        -:  173:	  {
+        -:  174:	    emplace_front(std::forward<_Args>(__args)...);
+        -:  175:	    return this->_M_impl._M_start;
+        -:  176:	  }
+        -:  177:	else if (__position._M_cur == this->_M_impl._M_finish._M_cur)
+        -:  178:	  {
+        -:  179:	    emplace_back(std::forward<_Args>(__args)...);
+        -:  180:	    iterator __tmp = this->_M_impl._M_finish;
+        -:  181:	    --__tmp;
+        -:  182:	    return __tmp;
+        -:  183:	  }
+        -:  184:	else
+        -:  185:	  return _M_insert_aux(__position._M_const_cast(),
+        -:  186:			       std::forward<_Args>(__args)...);
+        -:  187:      }
+        -:  188:#endif
+        -:  189:
+        -:  190:  template <typename _Tp, typename _Alloc>
+        -:  191:    typename deque<_Tp, _Alloc>::iterator
+        -:  192:    deque<_Tp, _Alloc>::
+        -:  193:#if __cplusplus >= 201103L
+        -:  194:    insert(const_iterator __position, const value_type& __x)
+        -:  195:#else
+        -:  196:    insert(iterator __position, const value_type& __x)
+        -:  197:#endif
+        -:  198:    {
+        -:  199:      if (__position._M_cur == this->_M_impl._M_start._M_cur)
+        -:  200:	{
+        -:  201:	  push_front(__x);
+        -:  202:	  return this->_M_impl._M_start;
+        -:  203:	}
+        -:  204:      else if (__position._M_cur == this->_M_impl._M_finish._M_cur)
+        -:  205:	{
+        -:  206:	  push_back(__x);
+        -:  207:	  iterator __tmp = this->_M_impl._M_finish;
+        -:  208:	  --__tmp;
+        -:  209:	  return __tmp;
+        -:  210:	}
+        -:  211:      else
+        -:  212:	return _M_insert_aux(__position._M_const_cast(), __x);
+        -:  213:   }
+        -:  214:
+        -:  215:  template <typename _Tp, typename _Alloc>
+        -:  216:    typename deque<_Tp, _Alloc>::iterator
+        -:  217:    deque<_Tp, _Alloc>::
+        -:  218:    _M_erase(iterator __position)
+        -:  219:    {
+        -:  220:      iterator __next = __position;
+        -:  221:      ++__next;
+        -:  222:      const difference_type __index = __position - begin();
+        -:  223:      if (static_cast<size_type>(__index) < (size() >> 1))
+        -:  224:	{
+        -:  225:	  if (__position != begin())
+        -:  226:	    _GLIBCXX_MOVE_BACKWARD3(begin(), __position, __next);
+        -:  227:	  pop_front();
+        -:  228:	}
+        -:  229:      else
+        -:  230:	{
+        -:  231:	  if (__next != end())
+        -:  232:	    _GLIBCXX_MOVE3(__next, end(), __position);
+        -:  233:	  pop_back();
+        -:  234:	}
+        -:  235:      return begin() + __index;
+        -:  236:    }
+        -:  237:
+        -:  238:  template <typename _Tp, typename _Alloc>
+        -:  239:    typename deque<_Tp, _Alloc>::iterator
+        -:  240:    deque<_Tp, _Alloc>::
+        -:  241:    _M_erase(iterator __first, iterator __last)
+        -:  242:    {
+        -:  243:      if (__first == __last)
+        -:  244:	return __first;
+        -:  245:      else if (__first == begin() && __last == end())
+        -:  246:	{
+        -:  247:	  clear();
+        -:  248:	  return end();
+        -:  249:	}
+        -:  250:      else
+        -:  251:	{
+        -:  252:	  const difference_type __n = __last - __first;
+        -:  253:	  const difference_type __elems_before = __first - begin();
+        -:  254:	  if (static_cast<size_type>(__elems_before) <= (size() - __n) / 2)
+        -:  255:	    {
+        -:  256:	      if (__first != begin())
+        -:  257:		_GLIBCXX_MOVE_BACKWARD3(begin(), __first, __last);
+        -:  258:	      _M_erase_at_begin(begin() + __n);
+        -:  259:	    }
+        -:  260:	  else
+        -:  261:	    {
+        -:  262:	      if (__last != end())
+        -:  263:		_GLIBCXX_MOVE3(__last, end(), __first);
+        -:  264:	      _M_erase_at_end(end() - __n);
+        -:  265:	    }
+        -:  266:	  return begin() + __elems_before;
+        -:  267:	}
+        -:  268:    }
+        -:  269:
+        -:  270:  template <typename _Tp, class _Alloc>
+        -:  271:    template <typename _InputIterator>
+        -:  272:      void
+        -:  273:      deque<_Tp, _Alloc>::
+        -:  274:      _M_assign_aux(_InputIterator __first, _InputIterator __last,
+        -:  275:		    std::input_iterator_tag)
+        -:  276:      {
+        -:  277:        iterator __cur = begin();
+        -:  278:        for (; __first != __last && __cur != end(); ++__cur, ++__first)
+        -:  279:          *__cur = *__first;
+        -:  280:        if (__first == __last)
+        -:  281:          _M_erase_at_end(__cur);
+        -:  282:        else
+        -:  283:          insert(end(), __first, __last);
+        -:  284:      }
+        -:  285:
+        -:  286:  template <typename _Tp, typename _Alloc>
+        -:  287:    void
+        -:  288:    deque<_Tp, _Alloc>::
+        -:  289:    _M_fill_insert(iterator __pos, size_type __n, const value_type& __x)
+        -:  290:    {
+        -:  291:      if (__pos._M_cur == this->_M_impl._M_start._M_cur)
+        -:  292:	{
+        -:  293:	  iterator __new_start = _M_reserve_elements_at_front(__n);
+        -:  294:	  __try
+        -:  295:	    {
+        -:  296:	      std::__uninitialized_fill_a(__new_start, this->_M_impl._M_start,
+        -:  297:					  __x, _M_get_Tp_allocator());
+        -:  298:	      this->_M_impl._M_start = __new_start;
+        -:  299:	    }
+        -:  300:	  __catch(...)
+        -:  301:	    {
+        -:  302:	      _M_destroy_nodes(__new_start._M_node,
+        -:  303:			       this->_M_impl._M_start._M_node);
+        -:  304:	      __throw_exception_again;
+        -:  305:	    }
+        -:  306:	}
+        -:  307:      else if (__pos._M_cur == this->_M_impl._M_finish._M_cur)
+        -:  308:	{
+        -:  309:	  iterator __new_finish = _M_reserve_elements_at_back(__n);
+        -:  310:	  __try
+        -:  311:	    {
+        -:  312:	      std::__uninitialized_fill_a(this->_M_impl._M_finish,
+        -:  313:					  __new_finish, __x,
+        -:  314:					  _M_get_Tp_allocator());
+        -:  315:	      this->_M_impl._M_finish = __new_finish;
+        -:  316:	    }
+        -:  317:	  __catch(...)
+        -:  318:	    {
+        -:  319:	      _M_destroy_nodes(this->_M_impl._M_finish._M_node + 1,
+        -:  320:			       __new_finish._M_node + 1);
+        -:  321:	      __throw_exception_again;
+        -:  322:	    }
+        -:  323:	}
+        -:  324:      else
+        -:  325:        _M_insert_aux(__pos, __n, __x);
+        -:  326:    }
+        -:  327:
+        -:  328:#if __cplusplus >= 201103L
+        -:  329:  template <typename _Tp, typename _Alloc>
+        -:  330:    void
+        -:  331:    deque<_Tp, _Alloc>::
+        -:  332:    _M_default_append(size_type __n)
+        -:  333:    {
+        -:  334:      if (__n)
+        -:  335:	{
+        -:  336:	  iterator __new_finish = _M_reserve_elements_at_back(__n);
+        -:  337:	  __try
+        -:  338:	    {
+        -:  339:	      std::__uninitialized_default_a(this->_M_impl._M_finish,
+        -:  340:					     __new_finish,
+        -:  341:					     _M_get_Tp_allocator());
+        -:  342:	      this->_M_impl._M_finish = __new_finish;
+        -:  343:	    }
+        -:  344:	  __catch(...)
+        -:  345:	    {
+        -:  346:	      _M_destroy_nodes(this->_M_impl._M_finish._M_node + 1,
+        -:  347:			       __new_finish._M_node + 1);
+        -:  348:	      __throw_exception_again;
+        -:  349:	    }
+        -:  350:	}
+        -:  351:    }
+        -:  352:
+        -:  353:  template <typename _Tp, typename _Alloc>
+        -:  354:    bool
+        -:  355:    deque<_Tp, _Alloc>::
+        -:  356:    _M_shrink_to_fit()
+        -:  357:    {
+        -:  358:      const difference_type __front_capacity
+        -:  359:	= (this->_M_impl._M_start._M_cur - this->_M_impl._M_start._M_first);
+        -:  360:      if (__front_capacity == 0)
+        -:  361:	return false;
+        -:  362:
+        -:  363:      const difference_type __back_capacity
+        -:  364:	= (this->_M_impl._M_finish._M_last - this->_M_impl._M_finish._M_cur);
+        -:  365:      if (__front_capacity + __back_capacity < _S_buffer_size())
+        -:  366:	return false;
+        -:  367:
+        -:  368:      return std::__shrink_to_fit_aux<deque>::_S_do_it(*this);
+        -:  369:    }
+        -:  370:#endif
+        -:  371:
+        -:  372:  template <typename _Tp, typename _Alloc>
+        -:  373:    void
+        -:  374:    deque<_Tp, _Alloc>::
+        -:  375:    _M_fill_initialize(const value_type& __value)
+        -:  376:    {
+        -:  377:      _Map_pointer __cur;
+        -:  378:      __try
+        -:  379:        {
+        -:  380:          for (__cur = this->_M_impl._M_start._M_node;
+        -:  381:	       __cur < this->_M_impl._M_finish._M_node;
+        -:  382:	       ++__cur)
+        -:  383:            std::__uninitialized_fill_a(*__cur, *__cur + _S_buffer_size(),
+        -:  384:					__value, _M_get_Tp_allocator());
+        -:  385:          std::__uninitialized_fill_a(this->_M_impl._M_finish._M_first,
+        -:  386:				      this->_M_impl._M_finish._M_cur,
+        -:  387:				      __value, _M_get_Tp_allocator());
+        -:  388:        }
+        -:  389:      __catch(...)
+        -:  390:        {
+        -:  391:          std::_Destroy(this->_M_impl._M_start, iterator(*__cur, __cur),
+        -:  392:			_M_get_Tp_allocator());
+        -:  393:          __throw_exception_again;
+        -:  394:        }
+        -:  395:    }
+        -:  396:
+        -:  397:  template <typename _Tp, typename _Alloc>
+        -:  398:    template <typename _InputIterator>
+        -:  399:      void
+        -:  400:      deque<_Tp, _Alloc>::
+        -:  401:      _M_range_initialize(_InputIterator __first, _InputIterator __last,
+        -:  402:                          std::input_iterator_tag)
+        -:  403:      {
+        -:  404:        this->_M_initialize_map(0);
+        -:  405:        __try
+        -:  406:          {
+        -:  407:            for (; __first != __last; ++__first)
+        -:  408:#if __cplusplus >= 201103L
+        -:  409:	      emplace_back(*__first);
+        -:  410:#else
+        -:  411:              push_back(*__first);
+        -:  412:#endif
+        -:  413:          }
+        -:  414:        __catch(...)
+        -:  415:          {
+        -:  416:            clear();
+        -:  417:            __throw_exception_again;
+        -:  418:          }
+        -:  419:      }
+        -:  420:
+        -:  421:  template <typename _Tp, typename _Alloc>
+        -:  422:    template <typename _ForwardIterator>
+        -:  423:      void
+        -:  424:      deque<_Tp, _Alloc>::
+        -:  425:      _M_range_initialize(_ForwardIterator __first, _ForwardIterator __last,
+        -:  426:                          std::forward_iterator_tag)
+        -:  427:      {
+        -:  428:        const size_type __n = std::distance(__first, __last);
+        -:  429:        this->_M_initialize_map(__n);
+        -:  430:
+        -:  431:        _Map_pointer __cur_node;
+        -:  432:        __try
+        -:  433:          {
+        -:  434:            for (__cur_node = this->_M_impl._M_start._M_node;
+        -:  435:                 __cur_node < this->_M_impl._M_finish._M_node;
+        -:  436:                 ++__cur_node)
+        -:  437:	      {
+        -:  438:		_ForwardIterator __mid = __first;
+        -:  439:		std::advance(__mid, _S_buffer_size());
+        -:  440:		std::__uninitialized_copy_a(__first, __mid, *__cur_node,
+        -:  441:					    _M_get_Tp_allocator());
+        -:  442:		__first = __mid;
+        -:  443:	      }
+        -:  444:            std::__uninitialized_copy_a(__first, __last,
+        -:  445:					this->_M_impl._M_finish._M_first,
+        -:  446:					_M_get_Tp_allocator());
+        -:  447:          }
+        -:  448:        __catch(...)
+        -:  449:          {
+        -:  450:            std::_Destroy(this->_M_impl._M_start,
+        -:  451:			  iterator(*__cur_node, __cur_node),
+        -:  452:			  _M_get_Tp_allocator());
+        -:  453:            __throw_exception_again;
+        -:  454:          }
+        -:  455:      }
+        -:  456:
+        -:  457:  // Called only if _M_impl._M_finish._M_cur == _M_impl._M_finish._M_last - 1.
+        -:  458:  template<typename _Tp, typename _Alloc>
+        -:  459:#if __cplusplus >= 201103L
+        -:  460:    template<typename... _Args>
+        -:  461:      void
+    #####:  462:      deque<_Tp, _Alloc>::
+        -:  463:      _M_push_back_aux(_Args&&... __args)
+        -:  464:#else
+        -:  465:      void
+        -:  466:      deque<_Tp, _Alloc>::
+        -:  467:      _M_push_back_aux(const value_type& __t)
+        -:  468:#endif
+        -:  469:      {
+    #####:  470:	_M_reserve_map_at_back();
+    #####:  471:	*(this->_M_impl._M_finish._M_node + 1) = this->_M_allocate_node();
+        -:  472:	__try
+        -:  473:	  {
+        -:  474:#if __cplusplus >= 201103L
+    #####:  475:	    _Alloc_traits::construct(this->_M_impl,
+        -:  476:	                             this->_M_impl._M_finish._M_cur,
+        -:  477:			             std::forward<_Args>(__args)...);
+        -:  478:#else
+        -:  479:	    this->_M_impl.construct(this->_M_impl._M_finish._M_cur, __t);
+        -:  480:#endif
+    #####:  481:	    this->_M_impl._M_finish._M_set_node(this->_M_impl._M_finish._M_node
+        -:  482:						+ 1);
+    #####:  483:	    this->_M_impl._M_finish._M_cur = this->_M_impl._M_finish._M_first;
+        -:  484:	  }
+    =====:  485:	__catch(...)
+        -:  486:	  {
+    =====:  487:	    _M_deallocate_node(*(this->_M_impl._M_finish._M_node + 1));
+    =====:  488:	    __throw_exception_again;
+        -:  489:	  }
+    #####:  490:      }
+        -:  491:
+        -:  492:  // Called only if _M_impl._M_start._M_cur == _M_impl._M_start._M_first.
+        -:  493:  template<typename _Tp, typename _Alloc>
+        -:  494:#if __cplusplus >= 201103L
+        -:  495:    template<typename... _Args>
+        -:  496:      void
+        -:  497:      deque<_Tp, _Alloc>::
+        -:  498:      _M_push_front_aux(_Args&&... __args)
+        -:  499:#else
+        -:  500:      void
+        -:  501:      deque<_Tp, _Alloc>::
+        -:  502:      _M_push_front_aux(const value_type& __t)
+        -:  503:#endif
+        -:  504:      {
+        -:  505:	_M_reserve_map_at_front();
+        -:  506:	*(this->_M_impl._M_start._M_node - 1) = this->_M_allocate_node();
+        -:  507:	__try
+        -:  508:	  {
+        -:  509:	    this->_M_impl._M_start._M_set_node(this->_M_impl._M_start._M_node
+        -:  510:					       - 1);
+        -:  511:	    this->_M_impl._M_start._M_cur = this->_M_impl._M_start._M_last - 1;
+        -:  512:#if __cplusplus >= 201103L
+        -:  513:	    _Alloc_traits::construct(this->_M_impl,
+        -:  514:	                             this->_M_impl._M_start._M_cur,
+        -:  515:			             std::forward<_Args>(__args)...);
+        -:  516:#else
+        -:  517:	    this->_M_impl.construct(this->_M_impl._M_start._M_cur, __t);
+        -:  518:#endif
+        -:  519:	  }
+        -:  520:	__catch(...)
+        -:  521:	  {
+        -:  522:	    ++this->_M_impl._M_start;
+        -:  523:	    _M_deallocate_node(*(this->_M_impl._M_start._M_node - 1));
+        -:  524:	    __throw_exception_again;
+        -:  525:	  }
+        -:  526:      }
+        -:  527:
+        -:  528:  // Called only if _M_impl._M_finish._M_cur == _M_impl._M_finish._M_first.
+        -:  529:  template <typename _Tp, typename _Alloc>
+    #####:  530:    void deque<_Tp, _Alloc>::
+        -:  531:    _M_pop_back_aux()
+        -:  532:    {
+    #####:  533:      _M_deallocate_node(this->_M_impl._M_finish._M_first);
+    #####:  534:      this->_M_impl._M_finish._M_set_node(this->_M_impl._M_finish._M_node - 1);
+    #####:  535:      this->_M_impl._M_finish._M_cur = this->_M_impl._M_finish._M_last - 1;
+    #####:  536:      _Alloc_traits::destroy(_M_get_Tp_allocator(),
+        -:  537:			     this->_M_impl._M_finish._M_cur);
+    #####:  538:    }
+        -:  539:
+        -:  540:  // Called only if _M_impl._M_start._M_cur == _M_impl._M_start._M_last - 1.
+        -:  541:  // Note that if the deque has at least one element (a precondition for this
+        -:  542:  // member function), and if
+        -:  543:  //   _M_impl._M_start._M_cur == _M_impl._M_start._M_last,
+        -:  544:  // then the deque must have at least two nodes.
+        -:  545:  template <typename _Tp, typename _Alloc>
+        -:  546:    void deque<_Tp, _Alloc>::
+        -:  547:    _M_pop_front_aux()
+        -:  548:    {
+        -:  549:      _Alloc_traits::destroy(_M_get_Tp_allocator(),
+        -:  550:			     this->_M_impl._M_start._M_cur);
+        -:  551:      _M_deallocate_node(this->_M_impl._M_start._M_first);
+        -:  552:      this->_M_impl._M_start._M_set_node(this->_M_impl._M_start._M_node + 1);
+        -:  553:      this->_M_impl._M_start._M_cur = this->_M_impl._M_start._M_first;
+        -:  554:    }
+        -:  555:
+        -:  556:  template <typename _Tp, typename _Alloc>
+        -:  557:    template <typename _InputIterator>
+        -:  558:      void
+        -:  559:      deque<_Tp, _Alloc>::
+        -:  560:      _M_range_insert_aux(iterator __pos,
+        -:  561:                          _InputIterator __first, _InputIterator __last,
+        -:  562:                          std::input_iterator_tag)
+        -:  563:      { std::copy(__first, __last, std::inserter(*this, __pos)); }
+        -:  564:
+        -:  565:  template <typename _Tp, typename _Alloc>
+        -:  566:    template <typename _ForwardIterator>
+        -:  567:      void
+        -:  568:      deque<_Tp, _Alloc>::
+        -:  569:      _M_range_insert_aux(iterator __pos,
+        -:  570:                          _ForwardIterator __first, _ForwardIterator __last,
+        -:  571:                          std::forward_iterator_tag)
+        -:  572:      {
+        -:  573:        const size_type __n = std::distance(__first, __last);
+        -:  574:        if (__pos._M_cur == this->_M_impl._M_start._M_cur)
+        -:  575:	  {
+        -:  576:	    iterator __new_start = _M_reserve_elements_at_front(__n);
+        -:  577:	    __try
+        -:  578:	      {
+        -:  579:		std::__uninitialized_copy_a(__first, __last, __new_start,
+        -:  580:					    _M_get_Tp_allocator());
+        -:  581:		this->_M_impl._M_start = __new_start;
+        -:  582:	      }
+        -:  583:	    __catch(...)
+        -:  584:	      {
+        -:  585:		_M_destroy_nodes(__new_start._M_node,
+        -:  586:				 this->_M_impl._M_start._M_node);
+        -:  587:		__throw_exception_again;
+        -:  588:	      }
+        -:  589:	  }
+        -:  590:        else if (__pos._M_cur == this->_M_impl._M_finish._M_cur)
+        -:  591:	  {
+        -:  592:	    iterator __new_finish = _M_reserve_elements_at_back(__n);
+        -:  593:	    __try
+        -:  594:	      {
+        -:  595:		std::__uninitialized_copy_a(__first, __last,
+        -:  596:					    this->_M_impl._M_finish,
+        -:  597:					    _M_get_Tp_allocator());
+        -:  598:		this->_M_impl._M_finish = __new_finish;
+        -:  599:	      }
+        -:  600:	    __catch(...)
+        -:  601:	      {
+        -:  602:		_M_destroy_nodes(this->_M_impl._M_finish._M_node + 1,
+        -:  603:				 __new_finish._M_node + 1);
+        -:  604:		__throw_exception_again;
+        -:  605:	      }
+        -:  606:	  }
+        -:  607:        else
+        -:  608:          _M_insert_aux(__pos, __first, __last, __n);
+        -:  609:      }
+        -:  610:
+        -:  611:  template<typename _Tp, typename _Alloc>
+        -:  612:#if __cplusplus >= 201103L
+        -:  613:    template<typename... _Args>
+        -:  614:      typename deque<_Tp, _Alloc>::iterator
+        -:  615:      deque<_Tp, _Alloc>::
+        -:  616:      _M_insert_aux(iterator __pos, _Args&&... __args)
+        -:  617:      {
+        -:  618:	value_type __x_copy(std::forward<_Args>(__args)...); // XXX copy
+        -:  619:#else
+        -:  620:    typename deque<_Tp, _Alloc>::iterator
+        -:  621:      deque<_Tp, _Alloc>::
+        -:  622:      _M_insert_aux(iterator __pos, const value_type& __x)
+        -:  623:      {
+        -:  624:	value_type __x_copy = __x; // XXX copy
+        -:  625:#endif
+        -:  626:	difference_type __index = __pos - this->_M_impl._M_start;
+        -:  627:	if (static_cast<size_type>(__index) < size() / 2)
+        -:  628:	  {
+        -:  629:	    push_front(_GLIBCXX_MOVE(front()));
+        -:  630:	    iterator __front1 = this->_M_impl._M_start;
+        -:  631:	    ++__front1;
+        -:  632:	    iterator __front2 = __front1;
+        -:  633:	    ++__front2;
+        -:  634:	    __pos = this->_M_impl._M_start + __index;
+        -:  635:	    iterator __pos1 = __pos;
+        -:  636:	    ++__pos1;
+        -:  637:	    _GLIBCXX_MOVE3(__front2, __pos1, __front1);
+        -:  638:	  }
+        -:  639:	else
+        -:  640:	  {
+        -:  641:	    push_back(_GLIBCXX_MOVE(back()));
+        -:  642:	    iterator __back1 = this->_M_impl._M_finish;
+        -:  643:	    --__back1;
+        -:  644:	    iterator __back2 = __back1;
+        -:  645:	    --__back2;
+        -:  646:	    __pos = this->_M_impl._M_start + __index;
+        -:  647:	    _GLIBCXX_MOVE_BACKWARD3(__pos, __back2, __back1);
+        -:  648:	  }
+        -:  649:	*__pos = _GLIBCXX_MOVE(__x_copy);
+        -:  650:	return __pos;
+        -:  651:      }
+        -:  652:
+        -:  653:  template <typename _Tp, typename _Alloc>
+        -:  654:    void
+        -:  655:    deque<_Tp, _Alloc>::
+        -:  656:    _M_insert_aux(iterator __pos, size_type __n, const value_type& __x)
+        -:  657:    {
+        -:  658:      const difference_type __elems_before = __pos - this->_M_impl._M_start;
+        -:  659:      const size_type __length = this->size();
+        -:  660:      value_type __x_copy = __x;
+        -:  661:      if (__elems_before < difference_type(__length / 2))
+        -:  662:	{
+        -:  663:	  iterator __new_start = _M_reserve_elements_at_front(__n);
+        -:  664:	  iterator __old_start = this->_M_impl._M_start;
+        -:  665:	  __pos = this->_M_impl._M_start + __elems_before;
+        -:  666:	  __try
+        -:  667:	    {
+        -:  668:	      if (__elems_before >= difference_type(__n))
+        -:  669:		{
+        -:  670:		  iterator __start_n = (this->_M_impl._M_start
+        -:  671:					+ difference_type(__n));
+        -:  672:		  std::__uninitialized_move_a(this->_M_impl._M_start,
+        -:  673:					      __start_n, __new_start,
+        -:  674:					      _M_get_Tp_allocator());
+        -:  675:		  this->_M_impl._M_start = __new_start;
+        -:  676:		  _GLIBCXX_MOVE3(__start_n, __pos, __old_start);
+        -:  677:		  std::fill(__pos - difference_type(__n), __pos, __x_copy);
+        -:  678:		}
+        -:  679:	      else
+        -:  680:		{
+        -:  681:		  std::__uninitialized_move_fill(this->_M_impl._M_start,
+        -:  682:						 __pos, __new_start,
+        -:  683:						 this->_M_impl._M_start,
+        -:  684:						 __x_copy,
+        -:  685:						 _M_get_Tp_allocator());
+        -:  686:		  this->_M_impl._M_start = __new_start;
+        -:  687:		  std::fill(__old_start, __pos, __x_copy);
+        -:  688:		}
+        -:  689:	    }
+        -:  690:	  __catch(...)
+        -:  691:	    {
+        -:  692:	      _M_destroy_nodes(__new_start._M_node,
+        -:  693:			       this->_M_impl._M_start._M_node);
+        -:  694:	      __throw_exception_again;
+        -:  695:	    }
+        -:  696:	}
+        -:  697:      else
+        -:  698:	{
+        -:  699:	  iterator __new_finish = _M_reserve_elements_at_back(__n);
+        -:  700:	  iterator __old_finish = this->_M_impl._M_finish;
+        -:  701:	  const difference_type __elems_after =
+        -:  702:	    difference_type(__length) - __elems_before;
+        -:  703:	  __pos = this->_M_impl._M_finish - __elems_after;
+        -:  704:	  __try
+        -:  705:	    {
+        -:  706:	      if (__elems_after > difference_type(__n))
+        -:  707:		{
+        -:  708:		  iterator __finish_n = (this->_M_impl._M_finish
+        -:  709:					 - difference_type(__n));
+        -:  710:		  std::__uninitialized_move_a(__finish_n,
+        -:  711:					      this->_M_impl._M_finish,
+        -:  712:					      this->_M_impl._M_finish,
+        -:  713:					      _M_get_Tp_allocator());
+        -:  714:		  this->_M_impl._M_finish = __new_finish;
+        -:  715:		  _GLIBCXX_MOVE_BACKWARD3(__pos, __finish_n, __old_finish);
+        -:  716:		  std::fill(__pos, __pos + difference_type(__n), __x_copy);
+        -:  717:		}
+        -:  718:	      else
+        -:  719:		{
+        -:  720:		  std::__uninitialized_fill_move(this->_M_impl._M_finish,
+        -:  721:						 __pos + difference_type(__n),
+        -:  722:						 __x_copy, __pos,
+        -:  723:						 this->_M_impl._M_finish,
+        -:  724:						 _M_get_Tp_allocator());
+        -:  725:		  this->_M_impl._M_finish = __new_finish;
+        -:  726:		  std::fill(__pos, __old_finish, __x_copy);
+        -:  727:		}
+        -:  728:	    }
+        -:  729:	  __catch(...)
+        -:  730:	    {
+        -:  731:	      _M_destroy_nodes(this->_M_impl._M_finish._M_node + 1,
+        -:  732:			       __new_finish._M_node + 1);
+        -:  733:	      __throw_exception_again;
+        -:  734:	    }
+        -:  735:	}
+        -:  736:    }
+        -:  737:
+        -:  738:  template <typename _Tp, typename _Alloc>
+        -:  739:    template <typename _ForwardIterator>
+        -:  740:      void
+        -:  741:      deque<_Tp, _Alloc>::
+        -:  742:      _M_insert_aux(iterator __pos,
+        -:  743:                    _ForwardIterator __first, _ForwardIterator __last,
+        -:  744:                    size_type __n)
+        -:  745:      {
+        -:  746:        const difference_type __elemsbefore = __pos - this->_M_impl._M_start;
+        -:  747:        const size_type __length = size();
+        -:  748:        if (static_cast<size_type>(__elemsbefore) < __length / 2)
+        -:  749:	  {
+        -:  750:	    iterator __new_start = _M_reserve_elements_at_front(__n);
+        -:  751:	    iterator __old_start = this->_M_impl._M_start;
+        -:  752:	    __pos = this->_M_impl._M_start + __elemsbefore;
+        -:  753:	    __try
+        -:  754:	      {
+        -:  755:		if (__elemsbefore >= difference_type(__n))
+        -:  756:		  {
+        -:  757:		    iterator __start_n = (this->_M_impl._M_start
+        -:  758:					  + difference_type(__n));
+        -:  759:		    std::__uninitialized_move_a(this->_M_impl._M_start,
+        -:  760:						__start_n, __new_start,
+        -:  761:						_M_get_Tp_allocator());
+        -:  762:		    this->_M_impl._M_start = __new_start;
+        -:  763:		    _GLIBCXX_MOVE3(__start_n, __pos, __old_start);
+        -:  764:		    std::copy(__first, __last, __pos - difference_type(__n));
+        -:  765:		  }
+        -:  766:		else
+        -:  767:		  {
+        -:  768:		    _ForwardIterator __mid = __first;
+        -:  769:		    std::advance(__mid, difference_type(__n) - __elemsbefore);
+        -:  770:		    std::__uninitialized_move_copy(this->_M_impl._M_start,
+        -:  771:						   __pos, __first, __mid,
+        -:  772:						   __new_start,
+        -:  773:						   _M_get_Tp_allocator());
+        -:  774:		    this->_M_impl._M_start = __new_start;
+        -:  775:		    std::copy(__mid, __last, __old_start);
+        -:  776:		  }
+        -:  777:	      }
+        -:  778:	    __catch(...)
+        -:  779:	      {
+        -:  780:		_M_destroy_nodes(__new_start._M_node,
+        -:  781:				 this->_M_impl._M_start._M_node);
+        -:  782:		__throw_exception_again;
+        -:  783:	      }
+        -:  784:	  }
+        -:  785:        else
+        -:  786:        {
+        -:  787:          iterator __new_finish = _M_reserve_elements_at_back(__n);
+        -:  788:          iterator __old_finish = this->_M_impl._M_finish;
+        -:  789:          const difference_type __elemsafter =
+        -:  790:            difference_type(__length) - __elemsbefore;
+        -:  791:          __pos = this->_M_impl._M_finish - __elemsafter;
+        -:  792:          __try
+        -:  793:            {
+        -:  794:              if (__elemsafter > difference_type(__n))
+        -:  795:		{
+        -:  796:		  iterator __finish_n = (this->_M_impl._M_finish
+        -:  797:					 - difference_type(__n));
+        -:  798:		  std::__uninitialized_move_a(__finish_n,
+        -:  799:					      this->_M_impl._M_finish,
+        -:  800:					      this->_M_impl._M_finish,
+        -:  801:					      _M_get_Tp_allocator());
+        -:  802:		  this->_M_impl._M_finish = __new_finish;
+        -:  803:		  _GLIBCXX_MOVE_BACKWARD3(__pos, __finish_n, __old_finish);
+        -:  804:		  std::copy(__first, __last, __pos);
+        -:  805:		}
+        -:  806:              else
+        -:  807:		{
+        -:  808:		  _ForwardIterator __mid = __first;
+        -:  809:		  std::advance(__mid, __elemsafter);
+        -:  810:		  std::__uninitialized_copy_move(__mid, __last, __pos,
+        -:  811:						 this->_M_impl._M_finish,
+        -:  812:						 this->_M_impl._M_finish,
+        -:  813:						 _M_get_Tp_allocator());
+        -:  814:		  this->_M_impl._M_finish = __new_finish;
+        -:  815:		  std::copy(__first, __mid, __pos);
+        -:  816:		}
+        -:  817:            }
+        -:  818:          __catch(...)
+        -:  819:            {
+        -:  820:              _M_destroy_nodes(this->_M_impl._M_finish._M_node + 1,
+        -:  821:			       __new_finish._M_node + 1);
+        -:  822:              __throw_exception_again;
+        -:  823:            }
+        -:  824:        }
+        -:  825:      }
+        -:  826:
+        -:  827:   template<typename _Tp, typename _Alloc>
+        -:  828:     void
+        -:  829:     deque<_Tp, _Alloc>::
+        -:  830:     _M_destroy_data_aux(iterator __first, iterator __last)
+        -:  831:     {
+        -:  832:       for (_Map_pointer __node = __first._M_node + 1;
+        -:  833:	    __node < __last._M_node; ++__node)
+        -:  834:	 std::_Destroy(*__node, *__node + _S_buffer_size(),
+        -:  835:		       _M_get_Tp_allocator());
+        -:  836:
+        -:  837:       if (__first._M_node != __last._M_node)
+        -:  838:	 {
+        -:  839:	   std::_Destroy(__first._M_cur, __first._M_last,
+        -:  840:			 _M_get_Tp_allocator());
+        -:  841:	   std::_Destroy(__last._M_first, __last._M_cur,
+        -:  842:			 _M_get_Tp_allocator());
+        -:  843:	 }
+        -:  844:       else
+        -:  845:	 std::_Destroy(__first._M_cur, __last._M_cur,
+        -:  846:		       _M_get_Tp_allocator());
+        -:  847:     }
+        -:  848:
+        -:  849:  template <typename _Tp, typename _Alloc>
+        -:  850:    void
+        -:  851:    deque<_Tp, _Alloc>::
+        -:  852:    _M_new_elements_at_front(size_type __new_elems)
+        -:  853:    {
+        -:  854:      if (this->max_size() - this->size() < __new_elems)
+        -:  855:	__throw_length_error(__N("deque::_M_new_elements_at_front"));
+        -:  856:
+        -:  857:      const size_type __new_nodes = ((__new_elems + _S_buffer_size() - 1)
+        -:  858:				     / _S_buffer_size());
+        -:  859:      _M_reserve_map_at_front(__new_nodes);
+        -:  860:      size_type __i;
+        -:  861:      __try
+        -:  862:        {
+        -:  863:          for (__i = 1; __i <= __new_nodes; ++__i)
+        -:  864:            *(this->_M_impl._M_start._M_node - __i) = this->_M_allocate_node();
+        -:  865:        }
+        -:  866:      __catch(...)
+        -:  867:        {
+        -:  868:          for (size_type __j = 1; __j < __i; ++__j)
+        -:  869:            _M_deallocate_node(*(this->_M_impl._M_start._M_node - __j));
+        -:  870:          __throw_exception_again;
+        -:  871:        }
+        -:  872:    }
+        -:  873:
+        -:  874:  template <typename _Tp, typename _Alloc>
+        -:  875:    void
+        -:  876:    deque<_Tp, _Alloc>::
+        -:  877:    _M_new_elements_at_back(size_type __new_elems)
+        -:  878:    {
+        -:  879:      if (this->max_size() - this->size() < __new_elems)
+        -:  880:	__throw_length_error(__N("deque::_M_new_elements_at_back"));
+        -:  881:
+        -:  882:      const size_type __new_nodes = ((__new_elems + _S_buffer_size() - 1)
+        -:  883:				     / _S_buffer_size());
+        -:  884:      _M_reserve_map_at_back(__new_nodes);
+        -:  885:      size_type __i;
+        -:  886:      __try
+        -:  887:        {
+        -:  888:          for (__i = 1; __i <= __new_nodes; ++__i)
+        -:  889:            *(this->_M_impl._M_finish._M_node + __i) = this->_M_allocate_node();
+        -:  890:        }
+        -:  891:      __catch(...)
+        -:  892:        {
+        -:  893:          for (size_type __j = 1; __j < __i; ++__j)
+        -:  894:            _M_deallocate_node(*(this->_M_impl._M_finish._M_node + __j));
+        -:  895:          __throw_exception_again;
+        -:  896:        }
+        -:  897:    }
+        -:  898:
+        -:  899:  template <typename _Tp, typename _Alloc>
+        -:  900:    void
+    #####:  901:    deque<_Tp, _Alloc>::
+        -:  902:    _M_reallocate_map(size_type __nodes_to_add, bool __add_at_front)
+        -:  903:    {
+        -:  904:      const size_type __old_num_nodes
+    #####:  905:	= this->_M_impl._M_finish._M_node - this->_M_impl._M_start._M_node + 1;
+    #####:  906:      const size_type __new_num_nodes = __old_num_nodes + __nodes_to_add;
+        -:  907:
+        -:  908:      _Map_pointer __new_nstart;
+    #####:  909:      if (this->_M_impl._M_map_size > 2 * __new_num_nodes)
+        -:  910:	{
+    #####:  911:	  __new_nstart = this->_M_impl._M_map + (this->_M_impl._M_map_size
+    #####:  912:					 - __new_num_nodes) / 2
+    #####:  913:	                 + (__add_at_front ? __nodes_to_add : 0);
+    #####:  914:	  if (__new_nstart < this->_M_impl._M_start._M_node)
+    #####:  915:	    std::copy(this->_M_impl._M_start._M_node,
+    #####:  916:		      this->_M_impl._M_finish._M_node + 1,
+        -:  917:		      __new_nstart);
+        -:  918:	  else
+    #####:  919:	    std::copy_backward(this->_M_impl._M_start._M_node,
+    #####:  920:			       this->_M_impl._M_finish._M_node + 1,
+    #####:  921:			       __new_nstart + __old_num_nodes);
+        -:  922:	}
+        -:  923:      else
+        -:  924:	{
+    #####:  925:	  size_type __new_map_size = this->_M_impl._M_map_size
+    #####:  926:	                             + std::max(this->_M_impl._M_map_size,
+    #####:  927:						__nodes_to_add) + 2;
+        -:  928:
+    #####:  929:	  _Map_pointer __new_map = this->_M_allocate_map(__new_map_size);
+    #####:  930:	  __new_nstart = __new_map + (__new_map_size - __new_num_nodes) / 2
+    #####:  931:	                 + (__add_at_front ? __nodes_to_add : 0);
+    #####:  932:	  std::copy(this->_M_impl._M_start._M_node,
+    #####:  933:		    this->_M_impl._M_finish._M_node + 1,
+        -:  934:		    __new_nstart);
+    #####:  935:	  _M_deallocate_map(this->_M_impl._M_map, this->_M_impl._M_map_size);
+        -:  936:
+    #####:  937:	  this->_M_impl._M_map = __new_map;
+    #####:  938:	  this->_M_impl._M_map_size = __new_map_size;
+        -:  939:	}
+        -:  940:
+    #####:  941:      this->_M_impl._M_start._M_set_node(__new_nstart);
+    #####:  942:      this->_M_impl._M_finish._M_set_node(__new_nstart + __old_num_nodes - 1);
+    #####:  943:    }
+        -:  944:
+        -:  945:  // Overload for deque::iterators, exploiting the "segmented-iterator
+        -:  946:  // optimization".
+        -:  947:  template<typename _Tp>
+        -:  948:    void
+        -:  949:    fill(const _Deque_iterator<_Tp, _Tp&, _Tp*>& __first,
+        -:  950:	 const _Deque_iterator<_Tp, _Tp&, _Tp*>& __last, const _Tp& __value)
+        -:  951:    {
+        -:  952:      typedef typename _Deque_iterator<_Tp, _Tp&, _Tp*>::_Self _Self;
+        -:  953:
+        -:  954:      for (typename _Self::_Map_pointer __node = __first._M_node + 1;
+        -:  955:           __node < __last._M_node; ++__node)
+        -:  956:	std::fill(*__node, *__node + _Self::_S_buffer_size(), __value);
+        -:  957:
+        -:  958:      if (__first._M_node != __last._M_node)
+        -:  959:	{
+        -:  960:	  std::fill(__first._M_cur, __first._M_last, __value);
+        -:  961:	  std::fill(__last._M_first, __last._M_cur, __value);
+        -:  962:	}
+        -:  963:      else
+        -:  964:	std::fill(__first._M_cur, __last._M_cur, __value);
+        -:  965:    }
+        -:  966:
+        -:  967:  template<typename _Tp>
+        -:  968:    _Deque_iterator<_Tp, _Tp&, _Tp*>
+        -:  969:    copy(_Deque_iterator<_Tp, const _Tp&, const _Tp*> __first,
+        -:  970:	 _Deque_iterator<_Tp, const _Tp&, const _Tp*> __last,
+        -:  971:	 _Deque_iterator<_Tp, _Tp&, _Tp*> __result)
+        -:  972:    {
+        -:  973:      typedef typename _Deque_iterator<_Tp, _Tp&, _Tp*>::_Self _Self;
+        -:  974:      typedef typename _Self::difference_type difference_type;
+        -:  975:
+        -:  976:      difference_type __len = __last - __first;
+        -:  977:      while (__len > 0)
+        -:  978:	{
+        -:  979:	  const difference_type __clen
+        -:  980:	    = std::min(__len, std::min(__first._M_last - __first._M_cur,
+        -:  981:				       __result._M_last - __result._M_cur));
+        -:  982:	  std::copy(__first._M_cur, __first._M_cur + __clen, __result._M_cur);
+        -:  983:	  __first += __clen;
+        -:  984:	  __result += __clen;
+        -:  985:	  __len -= __clen;
+        -:  986:	}
+        -:  987:      return __result;
+        -:  988:    }
+        -:  989:
+        -:  990:  template<typename _Tp>
+        -:  991:    _Deque_iterator<_Tp, _Tp&, _Tp*>
+        -:  992:    copy_backward(_Deque_iterator<_Tp, const _Tp&, const _Tp*> __first,
+        -:  993:		  _Deque_iterator<_Tp, const _Tp&, const _Tp*> __last,
+        -:  994:		  _Deque_iterator<_Tp, _Tp&, _Tp*> __result)
+        -:  995:    {
+        -:  996:      typedef typename _Deque_iterator<_Tp, _Tp&, _Tp*>::_Self _Self;
+        -:  997:      typedef typename _Self::difference_type difference_type;
+        -:  998:
+        -:  999:      difference_type __len = __last - __first;
+        -: 1000:      while (__len > 0)
+        -: 1001:	{
+        -: 1002:	  difference_type __llen = __last._M_cur - __last._M_first;
+        -: 1003:	  _Tp* __lend = __last._M_cur;
+        -: 1004:
+        -: 1005:	  difference_type __rlen = __result._M_cur - __result._M_first;
+        -: 1006:	  _Tp* __rend = __result._M_cur;
+        -: 1007:
+        -: 1008:	  if (!__llen)
+        -: 1009:	    {
+        -: 1010:	      __llen = _Self::_S_buffer_size();
+        -: 1011:	      __lend = *(__last._M_node - 1) + __llen;
+        -: 1012:	    }
+        -: 1013:	  if (!__rlen)
+        -: 1014:	    {
+        -: 1015:	      __rlen = _Self::_S_buffer_size();
+        -: 1016:	      __rend = *(__result._M_node - 1) + __rlen;
+        -: 1017:	    }
+        -: 1018:
+        -: 1019:	  const difference_type __clen = std::min(__len,
+        -: 1020:						  std::min(__llen, __rlen));
+        -: 1021:	  std::copy_backward(__lend - __clen, __lend, __rend);
+        -: 1022:	  __last -= __clen;
+        -: 1023:	  __result -= __clen;
+        -: 1024:	  __len -= __clen;
+        -: 1025:	}
+        -: 1026:      return __result;
+        -: 1027:    }
+        -: 1028:
+        -: 1029:#if __cplusplus >= 201103L
+        -: 1030:  template<typename _Tp>
+        -: 1031:    _Deque_iterator<_Tp, _Tp&, _Tp*>
+        -: 1032:    move(_Deque_iterator<_Tp, const _Tp&, const _Tp*> __first,
+        -: 1033:	 _Deque_iterator<_Tp, const _Tp&, const _Tp*> __last,
+        -: 1034:	 _Deque_iterator<_Tp, _Tp&, _Tp*> __result)
+        -: 1035:    {
+        -: 1036:      typedef typename _Deque_iterator<_Tp, _Tp&, _Tp*>::_Self _Self;
+        -: 1037:      typedef typename _Self::difference_type difference_type;
+        -: 1038:
+        -: 1039:      difference_type __len = __last - __first;
+        -: 1040:      while (__len > 0)
+        -: 1041:	{
+        -: 1042:	  const difference_type __clen
+        -: 1043:	    = std::min(__len, std::min(__first._M_last - __first._M_cur,
+        -: 1044:				       __result._M_last - __result._M_cur));
+        -: 1045:	  std::move(__first._M_cur, __first._M_cur + __clen, __result._M_cur);
+        -: 1046:	  __first += __clen;
+        -: 1047:	  __result += __clen;
+        -: 1048:	  __len -= __clen;
+        -: 1049:	}
+        -: 1050:      return __result;
+        -: 1051:    }
+        -: 1052:
+        -: 1053:  template<typename _Tp>
+        -: 1054:    _Deque_iterator<_Tp, _Tp&, _Tp*>
+        -: 1055:    move_backward(_Deque_iterator<_Tp, const _Tp&, const _Tp*> __first,
+        -: 1056:		  _Deque_iterator<_Tp, const _Tp&, const _Tp*> __last,
+        -: 1057:		  _Deque_iterator<_Tp, _Tp&, _Tp*> __result)
+        -: 1058:    {
+        -: 1059:      typedef typename _Deque_iterator<_Tp, _Tp&, _Tp*>::_Self _Self;
+        -: 1060:      typedef typename _Self::difference_type difference_type;
+        -: 1061:
+        -: 1062:      difference_type __len = __last - __first;
+        -: 1063:      while (__len > 0)
+        -: 1064:	{
+        -: 1065:	  difference_type __llen = __last._M_cur - __last._M_first;
+        -: 1066:	  _Tp* __lend = __last._M_cur;
+        -: 1067:
+        -: 1068:	  difference_type __rlen = __result._M_cur - __result._M_first;
+        -: 1069:	  _Tp* __rend = __result._M_cur;
+        -: 1070:
+        -: 1071:	  if (!__llen)
+        -: 1072:	    {
+        -: 1073:	      __llen = _Self::_S_buffer_size();
+        -: 1074:	      __lend = *(__last._M_node - 1) + __llen;
+        -: 1075:	    }
+        -: 1076:	  if (!__rlen)
+        -: 1077:	    {
+        -: 1078:	      __rlen = _Self::_S_buffer_size();
+        -: 1079:	      __rend = *(__result._M_node - 1) + __rlen;
+        -: 1080:	    }
+        -: 1081:
+        -: 1082:	  const difference_type __clen = std::min(__len,
+        -: 1083:						  std::min(__llen, __rlen));
+        -: 1084:	  std::move_backward(__lend - __clen, __lend, __rend);
+        -: 1085:	  __last -= __clen;
+        -: 1086:	  __result -= __clen;
+        -: 1087:	  __len -= __clen;
+        -: 1088:	}
+        -: 1089:      return __result;
+        -: 1090:    }
+        -: 1091:#endif
+        -: 1092:
+        -: 1093:_GLIBCXX_END_NAMESPACE_CONTAINER
+        -: 1094:} // namespace std
+        -: 1095:
+        -: 1096:#endif

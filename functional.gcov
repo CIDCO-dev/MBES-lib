@@ -1,0 +1,2244 @@
+        -:    0:Source:/usr/include/c++/6/functional
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// <functional> -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 2001-2016 Free Software Foundation, Inc.
+        -:    4://
+        -:    5:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    6:// software; you can redistribute it and/or modify it under the
+        -:    7:// terms of the GNU General Public License as published by the
+        -:    8:// Free Software Foundation; either version 3, or (at your option)
+        -:    9:// any later version.
+        -:   10:
+        -:   11:// This library is distributed in the hope that it will be useful,
+        -:   12:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   13:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   14:// GNU General Public License for more details.
+        -:   15:
+        -:   16:// Under Section 7 of GPL version 3, you are granted additional
+        -:   17:// permissions described in the GCC Runtime Library Exception, version
+        -:   18:// 3.1, as published by the Free Software Foundation.
+        -:   19:
+        -:   20:// You should have received a copy of the GNU General Public License and
+        -:   21:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   22:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   23:// <http://www.gnu.org/licenses/>.
+        -:   24:
+        -:   25:/*
+        -:   26: * Copyright (c) 1997
+        -:   27: * Silicon Graphics Computer Systems, Inc.
+        -:   28: *
+        -:   29: * Permission to use, copy, modify, distribute and sell this software
+        -:   30: * and its documentation for any purpose is hereby granted without fee,
+        -:   31: * provided that the above copyright notice appear in all copies and
+        -:   32: * that both that copyright notice and this permission notice appear
+        -:   33: * in supporting documentation.  Silicon Graphics makes no
+        -:   34: * representations about the suitability of this software for any
+        -:   35: * purpose.  It is provided "as is" without express or implied warranty.
+        -:   36: *
+        -:   37: */
+        -:   38:
+        -:   39:/** @file include/functional
+        -:   40: *  This is a Standard C++ Library header.
+        -:   41: */
+        -:   42:
+        -:   43:#ifndef _GLIBCXX_FUNCTIONAL
+        -:   44:#define _GLIBCXX_FUNCTIONAL 1
+        -:   45:
+        -:   46:#pragma GCC system_header
+        -:   47:
+        -:   48:#include <bits/c++config.h>
+        -:   49:#include <bits/stl_function.h>
+        -:   50:
+        -:   51:#if __cplusplus >= 201103L
+        -:   52:
+        -:   53:#include <typeinfo>
+        -:   54:#include <new>
+        -:   55:#include <tuple>
+        -:   56:#include <type_traits>
+        -:   57:#include <bits/functexcept.h>
+        -:   58:#include <bits/functional_hash.h>
+        -:   59:
+        -:   60:namespace std _GLIBCXX_VISIBILITY(default)
+        -:   61:{
+        -:   62:_GLIBCXX_BEGIN_NAMESPACE_VERSION
+        -:   63:
+        -:   64:  template<typename _MemberPointer>
+        -:   65:    class _Mem_fn;
+        -:   66:  template<typename _Tp, typename _Class>
+        -:   67:    _Mem_fn<_Tp _Class::*>
+        -:   68:    mem_fn(_Tp _Class::*) noexcept;
+        -:   69:
+        -:   70:  /// If we have found a result_type, extract it.
+        -:   71:  template<typename _Functor, typename = __void_t<>>
+        -:   72:    struct _Maybe_get_result_type
+        -:   73:    { };
+        -:   74:
+        -:   75:  template<typename _Functor>
+        -:   76:    struct _Maybe_get_result_type<_Functor,
+        -:   77:				  __void_t<typename _Functor::result_type>>
+        -:   78:    { typedef typename _Functor::result_type result_type; };
+        -:   79:
+        -:   80:  /**
+        -:   81:   *  Base class for any function object that has a weak result type, as
+        -:   82:   *  defined in 20.8.2 [func.require] of C++11.
+        -:   83:  */
+        -:   84:  template<typename _Functor>
+        -:   85:    struct _Weak_result_type_impl
+        -:   86:    : _Maybe_get_result_type<_Functor>
+        -:   87:    { };
+        -:   88:
+        -:   89:  /// Retrieve the result type for a function type.
+        -:   90:  template<typename _Res, typename... _ArgTypes>
+        -:   91:    struct _Weak_result_type_impl<_Res(_ArgTypes...)>
+        -:   92:    { typedef _Res result_type; };
+        -:   93:
+        -:   94:  template<typename _Res, typename... _ArgTypes>
+        -:   95:    struct _Weak_result_type_impl<_Res(_ArgTypes......)>
+        -:   96:    { typedef _Res result_type; };
+        -:   97:
+        -:   98:  template<typename _Res, typename... _ArgTypes>
+        -:   99:    struct _Weak_result_type_impl<_Res(_ArgTypes...) const>
+        -:  100:    { typedef _Res result_type; };
+        -:  101:
+        -:  102:  template<typename _Res, typename... _ArgTypes>
+        -:  103:    struct _Weak_result_type_impl<_Res(_ArgTypes......) const>
+        -:  104:    { typedef _Res result_type; };
+        -:  105:
+        -:  106:  template<typename _Res, typename... _ArgTypes>
+        -:  107:    struct _Weak_result_type_impl<_Res(_ArgTypes...) volatile>
+        -:  108:    { typedef _Res result_type; };
+        -:  109:
+        -:  110:  template<typename _Res, typename... _ArgTypes>
+        -:  111:    struct _Weak_result_type_impl<_Res(_ArgTypes......) volatile>
+        -:  112:    { typedef _Res result_type; };
+        -:  113:
+        -:  114:  template<typename _Res, typename... _ArgTypes>
+        -:  115:    struct _Weak_result_type_impl<_Res(_ArgTypes...) const volatile>
+        -:  116:    { typedef _Res result_type; };
+        -:  117:
+        -:  118:  template<typename _Res, typename... _ArgTypes>
+        -:  119:    struct _Weak_result_type_impl<_Res(_ArgTypes......) const volatile>
+        -:  120:    { typedef _Res result_type; };
+        -:  121:
+        -:  122:  /// Retrieve the result type for a function reference.
+        -:  123:  template<typename _Res, typename... _ArgTypes>
+        -:  124:    struct _Weak_result_type_impl<_Res(&)(_ArgTypes...)>
+        -:  125:    { typedef _Res result_type; };
+        -:  126:
+        -:  127:  template<typename _Res, typename... _ArgTypes>
+        -:  128:    struct _Weak_result_type_impl<_Res(&)(_ArgTypes......)>
+        -:  129:    { typedef _Res result_type; };
+        -:  130:
+        -:  131:  /// Retrieve the result type for a function pointer.
+        -:  132:  template<typename _Res, typename... _ArgTypes>
+        -:  133:    struct _Weak_result_type_impl<_Res(*)(_ArgTypes...)>
+        -:  134:    { typedef _Res result_type; };
+        -:  135:
+        -:  136:  template<typename _Res, typename... _ArgTypes>
+        -:  137:    struct _Weak_result_type_impl<_Res(*)(_ArgTypes......)>
+        -:  138:    { typedef _Res result_type; };
+        -:  139:
+        -:  140:  /// Retrieve result type for a member function pointer.
+        -:  141:  template<typename _Res, typename _Class, typename... _ArgTypes>
+        -:  142:    struct _Weak_result_type_impl<_Res (_Class::*)(_ArgTypes...)>
+        -:  143:    { typedef _Res result_type; };
+        -:  144:
+        -:  145:  template<typename _Res, typename _Class, typename... _ArgTypes>
+        -:  146:    struct _Weak_result_type_impl<_Res (_Class::*)(_ArgTypes......)>
+        -:  147:    { typedef _Res result_type; };
+        -:  148:
+        -:  149:  /// Retrieve result type for a const member function pointer.
+        -:  150:  template<typename _Res, typename _Class, typename... _ArgTypes>
+        -:  151:    struct _Weak_result_type_impl<_Res (_Class::*)(_ArgTypes...) const>
+        -:  152:    { typedef _Res result_type; };
+        -:  153:
+        -:  154:  template<typename _Res, typename _Class, typename... _ArgTypes>
+        -:  155:    struct _Weak_result_type_impl<_Res (_Class::*)(_ArgTypes......) const>
+        -:  156:    { typedef _Res result_type; };
+        -:  157:
+        -:  158:  /// Retrieve result type for a volatile member function pointer.
+        -:  159:  template<typename _Res, typename _Class, typename... _ArgTypes>
+        -:  160:    struct _Weak_result_type_impl<_Res (_Class::*)(_ArgTypes...) volatile>
+        -:  161:    { typedef _Res result_type; };
+        -:  162:
+        -:  163:  template<typename _Res, typename _Class, typename... _ArgTypes>
+        -:  164:    struct _Weak_result_type_impl<_Res (_Class::*)(_ArgTypes......) volatile>
+        -:  165:    { typedef _Res result_type; };
+        -:  166:
+        -:  167:  /// Retrieve result type for a const volatile member function pointer.
+        -:  168:  template<typename _Res, typename _Class, typename... _ArgTypes>
+        -:  169:    struct _Weak_result_type_impl<_Res (_Class::*)(_ArgTypes...)
+        -:  170:				  const volatile>
+        -:  171:    { typedef _Res result_type; };
+        -:  172:
+        -:  173:  template<typename _Res, typename _Class, typename... _ArgTypes>
+        -:  174:    struct _Weak_result_type_impl<_Res (_Class::*)(_ArgTypes......)
+        -:  175:				  const volatile>
+        -:  176:    { typedef _Res result_type; };
+        -:  177:
+        -:  178:  /**
+        -:  179:   *  Strip top-level cv-qualifiers from the function object and let
+        -:  180:   *  _Weak_result_type_impl perform the real work.
+        -:  181:  */
+        -:  182:  template<typename _Functor>
+        -:  183:    struct _Weak_result_type
+        -:  184:    : _Weak_result_type_impl<typename remove_cv<_Functor>::type>
+        -:  185:    { };
+        -:  186:
+        -:  187:  template<typename _Tp, typename _Up = typename decay<_Tp>::type>
+        -:  188:    struct __inv_unwrap
+        -:  189:    {
+        -:  190:      using type = _Tp;
+        -:  191:    };
+        -:  192:
+        -:  193:  template<typename _Tp, typename _Up>
+        -:  194:    struct __inv_unwrap<_Tp, reference_wrapper<_Up>>
+        -:  195:    {
+        -:  196:      using type = _Up&;
+        -:  197:    };
+        -:  198:
+        -:  199:  // Used by __invoke_impl instead of std::forward<_Tp> so that a
+        -:  200:  // reference_wrapper is converted to an lvalue-reference.
+        -:  201:  template<typename _Tp, typename _Up = typename __inv_unwrap<_Tp>::type>
+        -:  202:    inline _Up&&
+        -:  203:    __invfwd(typename remove_reference<_Tp>::type& __t) noexcept
+        -:  204:    { return static_cast<_Up&&>(__t); }
+        -:  205:
+        -:  206:  template<typename _Res, typename _Fn, typename... _Args>
+        -:  207:    inline _Res
+        -:  208:    __invoke_impl(__invoke_other, _Fn&& __f, _Args&&... __args)
+        -:  209:    noexcept(noexcept(std::forward<_Fn>(__f)(std::forward<_Args>(__args)...)))
+        -:  210:    { return std::forward<_Fn>(__f)(std::forward<_Args>(__args)...); }
+        -:  211:
+        -:  212:  template<typename _Res, typename _MemFun, typename _Tp, typename... _Args>
+        -:  213:    inline _Res
+        -:  214:    __invoke_impl(__invoke_memfun_ref, _MemFun&& __f, _Tp&& __t,
+        -:  215:		  _Args&&... __args)
+        -:  216:    noexcept(noexcept(
+        -:  217:	  (__invfwd<_Tp>(__t).*__f)(std::forward<_Args>(__args)...)))
+        -:  218:    { return (__invfwd<_Tp>(__t).*__f)(std::forward<_Args>(__args)...); }
+        -:  219:
+        -:  220:  template<typename _Res, typename _MemFun, typename _Tp, typename... _Args>
+        -:  221:    inline _Res
+        -:  222:    __invoke_impl(__invoke_memfun_deref, _MemFun&& __f, _Tp&& __t,
+        -:  223:		  _Args&&... __args)
+        -:  224:    noexcept(noexcept(
+        -:  225:	  ((*std::forward<_Tp>(__t)).*__f)(std::forward<_Args>(__args)...)))
+        -:  226:    {
+        -:  227:      return ((*std::forward<_Tp>(__t)).*__f)(std::forward<_Args>(__args)...);
+        -:  228:    }
+        -:  229:
+        -:  230:  template<typename _Res, typename _MemPtr, typename _Tp>
+        -:  231:    inline _Res
+        -:  232:    __invoke_impl(__invoke_memobj_ref, _MemPtr&& __f, _Tp&& __t)
+        -:  233:    noexcept(noexcept(__invfwd<_Tp>(__t).*__f))
+        -:  234:    { return __invfwd<_Tp>(__t).*__f; }
+        -:  235:
+        -:  236:  template<typename _Res, typename _MemPtr, typename _Tp>
+        -:  237:    inline _Res
+        -:  238:    __invoke_impl(__invoke_memobj_deref, _MemPtr&& __f, _Tp&& __t)
+        -:  239:    noexcept(noexcept((*std::forward<_Tp>(__t)).*__f))
+        -:  240:    { return (*std::forward<_Tp>(__t)).*__f; }
+        -:  241:
+        -:  242:  /// Invoke a callable object.
+        -:  243:  template<typename _Callable, typename... _Args>
+        -:  244:    inline typename result_of<_Callable&&(_Args&&...)>::type
+        -:  245:    __invoke(_Callable&& __fn, _Args&&... __args)
+        -:  246:    {
+        -:  247:      using __result_of = result_of<_Callable&&(_Args&&...)>;
+        -:  248:      using __type = typename __result_of::type;
+        -:  249:      using __tag = typename __result_of::__invoke_type;
+        -:  250:      return std::__invoke_impl<__type>(__tag{}, std::forward<_Callable>(__fn),
+        -:  251:					std::forward<_Args>(__args)...);
+        -:  252:    }
+        -:  253:
+        -:  254:#if __cplusplus > 201402L
+        -:  255:# define __cpp_lib_invoke 201411
+        -:  256:
+        -:  257:  /// Invoke a callable object.
+        -:  258:  template<typename _Callable, typename... _Args>
+        -:  259:    inline result_of_t<_Callable&&(_Args&&...)>
+        -:  260:    invoke(_Callable&& __fn, _Args&&... __args)
+        -:  261:    {
+        -:  262:      return std::__invoke(std::forward<_Callable>(__fn),
+        -:  263:			   std::forward<_Args>(__args)...);
+        -:  264:    }
+        -:  265:#endif
+        -:  266:
+        -:  267:  /**
+        -:  268:   *  Knowing which of unary_function and binary_function _Tp derives
+        -:  269:   *  from, derives from the same and ensures that reference_wrapper
+        -:  270:   *  will have a weak result type. See cases below.
+        -:  271:   */
+        -:  272:  template<bool _Unary, bool _Binary, typename _Tp>
+        -:  273:    struct _Reference_wrapper_base_impl;
+        -:  274:
+        -:  275:  // None of the nested argument types.
+        -:  276:  template<typename _Tp>
+        -:  277:    struct _Reference_wrapper_base_impl<false, false, _Tp>
+        -:  278:    : _Weak_result_type<_Tp>
+        -:  279:    { };
+        -:  280:
+        -:  281:  // Nested argument_type only.
+        -:  282:  template<typename _Tp>
+        -:  283:    struct _Reference_wrapper_base_impl<true, false, _Tp>
+        -:  284:    : _Weak_result_type<_Tp>
+        -:  285:    {
+        -:  286:      typedef typename _Tp::argument_type argument_type;
+        -:  287:    };
+        -:  288:
+        -:  289:  // Nested first_argument_type and second_argument_type only.
+        -:  290:  template<typename _Tp>
+        -:  291:    struct _Reference_wrapper_base_impl<false, true, _Tp>
+        -:  292:    : _Weak_result_type<_Tp>
+        -:  293:    {
+        -:  294:      typedef typename _Tp::first_argument_type first_argument_type;
+        -:  295:      typedef typename _Tp::second_argument_type second_argument_type;
+        -:  296:    };
+        -:  297:
+        -:  298:  // All the nested argument types.
+        -:  299:   template<typename _Tp>
+        -:  300:    struct _Reference_wrapper_base_impl<true, true, _Tp>
+        -:  301:    : _Weak_result_type<_Tp>
+        -:  302:    {
+        -:  303:      typedef typename _Tp::argument_type argument_type;
+        -:  304:      typedef typename _Tp::first_argument_type first_argument_type;
+        -:  305:      typedef typename _Tp::second_argument_type second_argument_type;
+        -:  306:    };
+        -:  307:
+        -:  308:  _GLIBCXX_HAS_NESTED_TYPE(argument_type)
+        -:  309:  _GLIBCXX_HAS_NESTED_TYPE(first_argument_type)
+        -:  310:  _GLIBCXX_HAS_NESTED_TYPE(second_argument_type)
+        -:  311:
+        -:  312:  /**
+        -:  313:   *  Derives from unary_function or binary_function when it
+        -:  314:   *  can. Specializations handle all of the easy cases. The primary
+        -:  315:   *  template determines what to do with a class type, which may
+        -:  316:   *  derive from both unary_function and binary_function.
+        -:  317:  */
+        -:  318:  template<typename _Tp>
+        -:  319:    struct _Reference_wrapper_base
+        -:  320:    : _Reference_wrapper_base_impl<
+        -:  321:      __has_argument_type<_Tp>::value,
+        -:  322:      __has_first_argument_type<_Tp>::value
+        -:  323:      && __has_second_argument_type<_Tp>::value,
+        -:  324:      _Tp>
+        -:  325:    { };
+        -:  326:
+        -:  327:  // - a function type (unary)
+        -:  328:  template<typename _Res, typename _T1>
+        -:  329:    struct _Reference_wrapper_base<_Res(_T1)>
+        -:  330:    : unary_function<_T1, _Res>
+        -:  331:    { };
+        -:  332:
+        -:  333:  template<typename _Res, typename _T1>
+        -:  334:    struct _Reference_wrapper_base<_Res(_T1) const>
+        -:  335:    : unary_function<_T1, _Res>
+        -:  336:    { };
+        -:  337:
+        -:  338:  template<typename _Res, typename _T1>
+        -:  339:    struct _Reference_wrapper_base<_Res(_T1) volatile>
+        -:  340:    : unary_function<_T1, _Res>
+        -:  341:    { };
+        -:  342:
+        -:  343:  template<typename _Res, typename _T1>
+        -:  344:    struct _Reference_wrapper_base<_Res(_T1) const volatile>
+        -:  345:    : unary_function<_T1, _Res>
+        -:  346:    { };
+        -:  347:
+        -:  348:  // - a function type (binary)
+        -:  349:  template<typename _Res, typename _T1, typename _T2>
+        -:  350:    struct _Reference_wrapper_base<_Res(_T1, _T2)>
+        -:  351:    : binary_function<_T1, _T2, _Res>
+        -:  352:    { };
+        -:  353:
+        -:  354:  template<typename _Res, typename _T1, typename _T2>
+        -:  355:    struct _Reference_wrapper_base<_Res(_T1, _T2) const>
+        -:  356:    : binary_function<_T1, _T2, _Res>
+        -:  357:    { };
+        -:  358:
+        -:  359:  template<typename _Res, typename _T1, typename _T2>
+        -:  360:    struct _Reference_wrapper_base<_Res(_T1, _T2) volatile>
+        -:  361:    : binary_function<_T1, _T2, _Res>
+        -:  362:    { };
+        -:  363:
+        -:  364:  template<typename _Res, typename _T1, typename _T2>
+        -:  365:    struct _Reference_wrapper_base<_Res(_T1, _T2) const volatile>
+        -:  366:    : binary_function<_T1, _T2, _Res>
+        -:  367:    { };
+        -:  368:
+        -:  369:  // - a function pointer type (unary)
+        -:  370:  template<typename _Res, typename _T1>
+        -:  371:    struct _Reference_wrapper_base<_Res(*)(_T1)>
+        -:  372:    : unary_function<_T1, _Res>
+        -:  373:    { };
+        -:  374:
+        -:  375:  // - a function pointer type (binary)
+        -:  376:  template<typename _Res, typename _T1, typename _T2>
+        -:  377:    struct _Reference_wrapper_base<_Res(*)(_T1, _T2)>
+        -:  378:    : binary_function<_T1, _T2, _Res>
+        -:  379:    { };
+        -:  380:
+        -:  381:  // - a pointer to member function type (unary, no qualifiers)
+        -:  382:  template<typename _Res, typename _T1>
+        -:  383:    struct _Reference_wrapper_base<_Res (_T1::*)()>
+        -:  384:    : unary_function<_T1*, _Res>
+        -:  385:    { };
+        -:  386:
+        -:  387:  // - a pointer to member function type (binary, no qualifiers)
+        -:  388:  template<typename _Res, typename _T1, typename _T2>
+        -:  389:    struct _Reference_wrapper_base<_Res (_T1::*)(_T2)>
+        -:  390:    : binary_function<_T1*, _T2, _Res>
+        -:  391:    { };
+        -:  392:
+        -:  393:  // - a pointer to member function type (unary, const)
+        -:  394:  template<typename _Res, typename _T1>
+        -:  395:    struct _Reference_wrapper_base<_Res (_T1::*)() const>
+        -:  396:    : unary_function<const _T1*, _Res>
+        -:  397:    { };
+        -:  398:
+        -:  399:  // - a pointer to member function type (binary, const)
+        -:  400:  template<typename _Res, typename _T1, typename _T2>
+        -:  401:    struct _Reference_wrapper_base<_Res (_T1::*)(_T2) const>
+        -:  402:    : binary_function<const _T1*, _T2, _Res>
+        -:  403:    { };
+        -:  404:
+        -:  405:  // - a pointer to member function type (unary, volatile)
+        -:  406:  template<typename _Res, typename _T1>
+        -:  407:    struct _Reference_wrapper_base<_Res (_T1::*)() volatile>
+        -:  408:    : unary_function<volatile _T1*, _Res>
+        -:  409:    { };
+        -:  410:
+        -:  411:  // - a pointer to member function type (binary, volatile)
+        -:  412:  template<typename _Res, typename _T1, typename _T2>
+        -:  413:    struct _Reference_wrapper_base<_Res (_T1::*)(_T2) volatile>
+        -:  414:    : binary_function<volatile _T1*, _T2, _Res>
+        -:  415:    { };
+        -:  416:
+        -:  417:  // - a pointer to member function type (unary, const volatile)
+        -:  418:  template<typename _Res, typename _T1>
+        -:  419:    struct _Reference_wrapper_base<_Res (_T1::*)() const volatile>
+        -:  420:    : unary_function<const volatile _T1*, _Res>
+        -:  421:    { };
+        -:  422:
+        -:  423:  // - a pointer to member function type (binary, const volatile)
+        -:  424:  template<typename _Res, typename _T1, typename _T2>
+        -:  425:    struct _Reference_wrapper_base<_Res (_T1::*)(_T2) const volatile>
+        -:  426:    : binary_function<const volatile _T1*, _T2, _Res>
+        -:  427:    { };
+        -:  428:
+        -:  429:  /**
+        -:  430:   *  @brief Primary class template for reference_wrapper.
+        -:  431:   *  @ingroup functors
+        -:  432:   *  @{
+        -:  433:   */
+        -:  434:  template<typename _Tp>
+        -:  435:    class reference_wrapper
+        -:  436:    : public _Reference_wrapper_base<typename remove_cv<_Tp>::type>
+        -:  437:    {
+        -:  438:      _Tp* _M_data;
+        -:  439:
+        -:  440:    public:
+        -:  441:      typedef _Tp type;
+        -:  442:
+        -:  443:      reference_wrapper(_Tp& __indata) noexcept
+        -:  444:      : _M_data(std::__addressof(__indata))
+        -:  445:      { }
+        -:  446:
+        -:  447:      reference_wrapper(_Tp&&) = delete;
+        -:  448:
+        -:  449:      reference_wrapper(const reference_wrapper&) = default;
+        -:  450:
+        -:  451:      reference_wrapper&
+        -:  452:      operator=(const reference_wrapper&) = default;
+        -:  453:
+        -:  454:      operator _Tp&() const noexcept
+        -:  455:      { return this->get(); }
+        -:  456:
+        -:  457:      _Tp&
+        -:  458:      get() const noexcept
+        -:  459:      { return *_M_data; }
+        -:  460:
+        -:  461:      template<typename... _Args>
+        -:  462:	typename result_of<_Tp&(_Args&&...)>::type
+        -:  463:	operator()(_Args&&... __args) const
+        -:  464:	{
+        -:  465:	  return std::__invoke(get(), std::forward<_Args>(__args)...);
+        -:  466:	}
+        -:  467:    };
+        -:  468:
+        -:  469:
+        -:  470:  /// Denotes a reference should be taken to a variable.
+        -:  471:  template<typename _Tp>
+        -:  472:    inline reference_wrapper<_Tp>
+        -:  473:    ref(_Tp& __t) noexcept
+        -:  474:    { return reference_wrapper<_Tp>(__t); }
+        -:  475:
+        -:  476:  /// Denotes a const reference should be taken to a variable.
+        -:  477:  template<typename _Tp>
+        -:  478:    inline reference_wrapper<const _Tp>
+        -:  479:    cref(const _Tp& __t) noexcept
+        -:  480:    { return reference_wrapper<const _Tp>(__t); }
+        -:  481:
+        -:  482:  template<typename _Tp>
+        -:  483:    void ref(const _Tp&&) = delete;
+        -:  484:
+        -:  485:  template<typename _Tp>
+        -:  486:    void cref(const _Tp&&) = delete;
+        -:  487:
+        -:  488:  /// Partial specialization.
+        -:  489:  template<typename _Tp>
+        -:  490:    inline reference_wrapper<_Tp>
+        -:  491:    ref(reference_wrapper<_Tp> __t) noexcept
+        -:  492:    { return ref(__t.get()); }
+        -:  493:
+        -:  494:  /// Partial specialization.
+        -:  495:  template<typename _Tp>
+        -:  496:    inline reference_wrapper<const _Tp>
+        -:  497:    cref(reference_wrapper<_Tp> __t) noexcept
+        -:  498:    { return cref(__t.get()); }
+        -:  499:
+        -:  500:  // @} group functors
+        -:  501:
+        -:  502:  template<typename... _Types>
+        -:  503:    struct _Pack : integral_constant<size_t, sizeof...(_Types)>
+        -:  504:    { };
+        -:  505:
+        -:  506:  template<typename _From, typename _To, bool = _From::value == _To::value>
+        -:  507:    struct _AllConvertible : false_type
+        -:  508:    { };
+        -:  509:
+        -:  510:  template<typename... _From, typename... _To>
+        -:  511:    struct _AllConvertible<_Pack<_From...>, _Pack<_To...>, true>
+        -:  512:    : __and_<is_convertible<_From, _To>...>
+        -:  513:    { };
+        -:  514:
+        -:  515:  template<typename _Tp1, typename _Tp2>
+        -:  516:    using _NotSame = __not_<is_same<typename std::decay<_Tp1>::type,
+        -:  517:				    typename std::decay<_Tp2>::type>>;
+        -:  518:
+        -:  519:  /**
+        -:  520:   * Derives from @c unary_function or @c binary_function, or perhaps
+        -:  521:   * nothing, depending on the number of arguments provided. The
+        -:  522:   * primary template is the basis case, which derives nothing.
+        -:  523:   */
+        -:  524:  template<typename _Res, typename... _ArgTypes>
+        -:  525:    struct _Maybe_unary_or_binary_function { };
+        -:  526:
+        -:  527:  /// Derives from @c unary_function, as appropriate.
+        -:  528:  template<typename _Res, typename _T1>
+    #####:  529:    struct _Maybe_unary_or_binary_function<_Res, _T1>
+        -:  530:    : std::unary_function<_T1, _Res> { };
+        -:  531:
+        -:  532:  /// Derives from @c binary_function, as appropriate.
+        -:  533:  template<typename _Res, typename _T1, typename _T2>
+        -:  534:    struct _Maybe_unary_or_binary_function<_Res, _T1, _T2>
+        -:  535:    : std::binary_function<_T1, _T2, _Res> { };
+        -:  536:
+        -:  537:  template<typename _Signature>
+        -:  538:    struct _Mem_fn_traits;
+        -:  539:
+        -:  540:  template<typename _Res, typename _Class, typename... _ArgTypes>
+        -:  541:    struct _Mem_fn_traits_base
+        -:  542:    {
+        -:  543:      using __result_type = _Res;
+        -:  544:      using __maybe_type
+        -:  545:	= _Maybe_unary_or_binary_function<_Res, _Class*, _ArgTypes...>;
+        -:  546:      using __arity = integral_constant<size_t, sizeof...(_ArgTypes)>;
+        -:  547:    };
+        -:  548:
+        -:  549:#define _GLIBCXX_MEM_FN_TRAITS2(_CV, _REF, _LVAL, _RVAL)		\
+        -:  550:  template<typename _Res, typename _Class, typename... _ArgTypes>	\
+        -:  551:    struct _Mem_fn_traits<_Res (_Class::*)(_ArgTypes...) _CV _REF>	\
+        -:  552:    : _Mem_fn_traits_base<_Res, _CV _Class, _ArgTypes...>		\
+        -:  553:    {									\
+        -:  554:      using __vararg = false_type;					\
+        -:  555:    };									\
+        -:  556:  template<typename _Res, typename _Class, typename... _ArgTypes>	\
+        -:  557:    struct _Mem_fn_traits<_Res (_Class::*)(_ArgTypes... ...) _CV _REF>	\
+        -:  558:    : _Mem_fn_traits_base<_Res, _CV _Class, _ArgTypes...>		\
+        -:  559:    {									\
+        -:  560:      using __vararg = true_type;					\
+        -:  561:    };
+        -:  562:
+        -:  563:#define _GLIBCXX_MEM_FN_TRAITS(_REF, _LVAL, _RVAL)		\
+        -:  564:  _GLIBCXX_MEM_FN_TRAITS2(		, _REF, _LVAL, _RVAL)	\
+        -:  565:  _GLIBCXX_MEM_FN_TRAITS2(const		, _REF, _LVAL, _RVAL)	\
+        -:  566:  _GLIBCXX_MEM_FN_TRAITS2(volatile	, _REF, _LVAL, _RVAL)	\
+        -:  567:  _GLIBCXX_MEM_FN_TRAITS2(const volatile, _REF, _LVAL, _RVAL)
+        -:  568:
+        -:  569:_GLIBCXX_MEM_FN_TRAITS( , true_type, true_type)
+        -:  570:_GLIBCXX_MEM_FN_TRAITS(&, true_type, false_type)
+        -:  571:_GLIBCXX_MEM_FN_TRAITS(&&, false_type, true_type)
+        -:  572:
+        -:  573:#undef _GLIBCXX_MEM_FN_TRAITS
+        -:  574:#undef _GLIBCXX_MEM_FN_TRAITS2
+        -:  575:
+        -:  576:  template<typename _MemFunPtr,
+        -:  577:	   bool __is_mem_fn = is_member_function_pointer<_MemFunPtr>::value>
+        -:  578:    class _Mem_fn_base
+        -:  579:    : public _Mem_fn_traits<_MemFunPtr>::__maybe_type
+        -:  580:    {
+        -:  581:      using _Traits = _Mem_fn_traits<_MemFunPtr>;
+        -:  582:
+        -:  583:      using _Arity = typename _Traits::__arity;
+        -:  584:      using _Varargs = typename _Traits::__vararg;
+        -:  585:
+        -:  586:      template<typename _Func, typename... _BoundArgs>
+        -:  587:	friend struct _Bind_check_arity;
+        -:  588:
+        -:  589:      _MemFunPtr _M_pmf;
+        -:  590:
+        -:  591:    public:
+        -:  592:
+        -:  593:      using result_type = typename _Traits::__result_type;
+        -:  594:
+        -:  595:      explicit constexpr
+        -:  596:      _Mem_fn_base(_MemFunPtr __pmf) noexcept : _M_pmf(__pmf) { }
+        -:  597:
+        -:  598:      template<typename... _Args>
+        -:  599:	auto
+        -:  600:	operator()(_Args&&... __args) const
+        -:  601:	noexcept(noexcept(
+        -:  602:	      std::__invoke(_M_pmf, std::forward<_Args>(__args)...)))
+        -:  603:	-> decltype(std::__invoke(_M_pmf, std::forward<_Args>(__args)...))
+        -:  604:	{ return std::__invoke(_M_pmf, std::forward<_Args>(__args)...); }
+        -:  605:    };
+        -:  606:
+        -:  607:  // Partial specialization for member object pointers.
+        -:  608:  template<typename _MemObjPtr>
+        -:  609:    class _Mem_fn_base<_MemObjPtr, false>
+        -:  610:    {
+        -:  611:      using _Arity = integral_constant<size_t, 0>;
+        -:  612:      using _Varargs = false_type;
+        -:  613:
+        -:  614:      template<typename _Func, typename... _BoundArgs>
+        -:  615:	friend struct _Bind_check_arity;
+        -:  616:
+        -:  617:      _MemObjPtr _M_pm;
+        -:  618:
+        -:  619:    public:
+        -:  620:      explicit constexpr
+        -:  621:      _Mem_fn_base(_MemObjPtr __pm) noexcept : _M_pm(__pm) { }
+        -:  622:
+        -:  623:      template<typename _Tp>
+        -:  624:	auto
+        -:  625:	operator()(_Tp&& __obj) const
+        -:  626:	noexcept(noexcept(std::__invoke(_M_pm, std::forward<_Tp>(__obj))))
+        -:  627:	-> decltype(std::__invoke(_M_pm, std::forward<_Tp>(__obj)))
+        -:  628:	{ return std::__invoke(_M_pm, std::forward<_Tp>(__obj)); }
+        -:  629:    };
+        -:  630:
+        -:  631:  template<typename _Res, typename _Class>
+        -:  632:    struct _Mem_fn<_Res _Class::*>
+        -:  633:    : _Mem_fn_base<_Res _Class::*>
+        -:  634:    {
+        -:  635:      using _Mem_fn_base<_Res _Class::*>::_Mem_fn_base;
+        -:  636:    };
+        -:  637:
+        -:  638:  // _GLIBCXX_RESOLVE_LIB_DEFECTS
+        -:  639:  // 2048.  Unnecessary mem_fn overloads
+        -:  640:  /**
+        -:  641:   *  @brief Returns a function object that forwards to the member
+        -:  642:   *  pointer @a pm.
+        -:  643:   *  @ingroup functors
+        -:  644:   */
+        -:  645:  template<typename _Tp, typename _Class>
+        -:  646:    inline _Mem_fn<_Tp _Class::*>
+        -:  647:    mem_fn(_Tp _Class::* __pm) noexcept
+        -:  648:    {
+        -:  649:      return _Mem_fn<_Tp _Class::*>(__pm);
+        -:  650:    }
+        -:  651:
+        -:  652:  /**
+        -:  653:   *  @brief Determines if the given type _Tp is a function object that
+        -:  654:   *  should be treated as a subexpression when evaluating calls to
+        -:  655:   *  function objects returned by bind().
+        -:  656:   *
+        -:  657:   *  C++11 [func.bind.isbind].
+        -:  658:   *  @ingroup binders
+        -:  659:   */
+        -:  660:  template<typename _Tp>
+        -:  661:    struct is_bind_expression
+        -:  662:    : public false_type { };
+        -:  663:
+        -:  664:  /**
+        -:  665:   *  @brief Determines if the given type _Tp is a placeholder in a
+        -:  666:   *  bind() expression and, if so, which placeholder it is.
+        -:  667:   *
+        -:  668:   *  C++11 [func.bind.isplace].
+        -:  669:   *  @ingroup binders
+        -:  670:   */
+        -:  671:  template<typename _Tp>
+        -:  672:    struct is_placeholder
+        -:  673:    : public integral_constant<int, 0>
+        -:  674:    { };
+        -:  675:
+        -:  676:  /** @brief The type of placeholder objects defined by libstdc++.
+        -:  677:   *  @ingroup binders
+        -:  678:   */
+        -:  679:  template<int _Num> struct _Placeholder { };
+        -:  680:
+        -:  681:  _GLIBCXX_END_NAMESPACE_VERSION
+        -:  682:
+        -:  683:  /** @namespace std::placeholders
+        -:  684:   *  @brief ISO C++11 entities sub-namespace for functional.
+        -:  685:   *  @ingroup binders
+        -:  686:   */
+        -:  687:  namespace placeholders
+        -:  688:  {
+        -:  689:  _GLIBCXX_BEGIN_NAMESPACE_VERSION
+        -:  690:  /* Define a large number of placeholders. There is no way to
+        -:  691:   * simplify this with variadic templates, because we're introducing
+        -:  692:   * unique names for each.
+        -:  693:   */
+        -:  694:    extern const _Placeholder<1> _1;
+        -:  695:    extern const _Placeholder<2> _2;
+        -:  696:    extern const _Placeholder<3> _3;
+        -:  697:    extern const _Placeholder<4> _4;
+        -:  698:    extern const _Placeholder<5> _5;
+        -:  699:    extern const _Placeholder<6> _6;
+        -:  700:    extern const _Placeholder<7> _7;
+        -:  701:    extern const _Placeholder<8> _8;
+        -:  702:    extern const _Placeholder<9> _9;
+        -:  703:    extern const _Placeholder<10> _10;
+        -:  704:    extern const _Placeholder<11> _11;
+        -:  705:    extern const _Placeholder<12> _12;
+        -:  706:    extern const _Placeholder<13> _13;
+        -:  707:    extern const _Placeholder<14> _14;
+        -:  708:    extern const _Placeholder<15> _15;
+        -:  709:    extern const _Placeholder<16> _16;
+        -:  710:    extern const _Placeholder<17> _17;
+        -:  711:    extern const _Placeholder<18> _18;
+        -:  712:    extern const _Placeholder<19> _19;
+        -:  713:    extern const _Placeholder<20> _20;
+        -:  714:    extern const _Placeholder<21> _21;
+        -:  715:    extern const _Placeholder<22> _22;
+        -:  716:    extern const _Placeholder<23> _23;
+        -:  717:    extern const _Placeholder<24> _24;
+        -:  718:    extern const _Placeholder<25> _25;
+        -:  719:    extern const _Placeholder<26> _26;
+        -:  720:    extern const _Placeholder<27> _27;
+        -:  721:    extern const _Placeholder<28> _28;
+        -:  722:    extern const _Placeholder<29> _29;
+        -:  723:  _GLIBCXX_END_NAMESPACE_VERSION
+        -:  724:  }
+        -:  725:
+        -:  726:  _GLIBCXX_BEGIN_NAMESPACE_VERSION
+        -:  727:
+        -:  728:  /**
+        -:  729:   *  Partial specialization of is_placeholder that provides the placeholder
+        -:  730:   *  number for the placeholder objects defined by libstdc++.
+        -:  731:   *  @ingroup binders
+        -:  732:   */
+        -:  733:  template<int _Num>
+        -:  734:    struct is_placeholder<_Placeholder<_Num> >
+        -:  735:    : public integral_constant<int, _Num>
+        -:  736:    { };
+        -:  737:
+        -:  738:  template<int _Num>
+        -:  739:    struct is_placeholder<const _Placeholder<_Num> >
+        -:  740:    : public integral_constant<int, _Num>
+        -:  741:    { };
+        -:  742:
+        -:  743:
+        -:  744:  // Like tuple_element_t but SFINAE-friendly.
+        -:  745: template<std::size_t __i, typename _Tuple>
+        -:  746:   using _Safe_tuple_element_t
+        -:  747:     = typename enable_if<(__i < tuple_size<_Tuple>::value),
+        -:  748:			  tuple_element<__i, _Tuple>>::type::type;
+        -:  749:
+        -:  750:  /**
+        -:  751:   *  Maps an argument to bind() into an actual argument to the bound
+        -:  752:   *  function object [func.bind.bind]/10. Only the first parameter should
+        -:  753:   *  be specified: the rest are used to determine among the various
+        -:  754:   *  implementations. Note that, although this class is a function
+        -:  755:   *  object, it isn't entirely normal because it takes only two
+        -:  756:   *  parameters regardless of the number of parameters passed to the
+        -:  757:   *  bind expression. The first parameter is the bound argument and
+        -:  758:   *  the second parameter is a tuple containing references to the
+        -:  759:   *  rest of the arguments.
+        -:  760:   */
+        -:  761:  template<typename _Arg,
+        -:  762:	   bool _IsBindExp = is_bind_expression<_Arg>::value,
+        -:  763:	   bool _IsPlaceholder = (is_placeholder<_Arg>::value > 0)>
+        -:  764:    class _Mu;
+        -:  765:
+        -:  766:  /**
+        -:  767:   *  If the argument is reference_wrapper<_Tp>, returns the
+        -:  768:   *  underlying reference.
+        -:  769:   *  C++11 [func.bind.bind] p10 bullet 1.
+        -:  770:   */
+        -:  771:  template<typename _Tp>
+        -:  772:    class _Mu<reference_wrapper<_Tp>, false, false>
+        -:  773:    {
+        -:  774:    public:
+        -:  775:      /* Note: This won't actually work for const volatile
+        -:  776:       * reference_wrappers, because reference_wrapper::get() is const
+        -:  777:       * but not volatile-qualified. This might be a defect in the TR.
+        -:  778:       */
+        -:  779:      template<typename _CVRef, typename _Tuple>
+        -:  780:	_Tp&
+        -:  781:	operator()(_CVRef& __arg, _Tuple&) const volatile
+        -:  782:	{ return __arg.get(); }
+        -:  783:    };
+        -:  784:
+        -:  785:  /**
+        -:  786:   *  If the argument is a bind expression, we invoke the underlying
+        -:  787:   *  function object with the same cv-qualifiers as we are given and
+        -:  788:   *  pass along all of our arguments (unwrapped).
+        -:  789:   *  C++11 [func.bind.bind] p10 bullet 2.
+        -:  790:   */
+        -:  791:  template<typename _Arg>
+        -:  792:    class _Mu<_Arg, true, false>
+        -:  793:    {
+        -:  794:    public:
+        -:  795:      template<typename _CVArg, typename... _Args>
+        -:  796:	auto
+        -:  797:	operator()(_CVArg& __arg,
+        -:  798:		   tuple<_Args...>& __tuple) const volatile
+        -:  799:	-> decltype(__arg(declval<_Args>()...))
+        -:  800:	{
+        -:  801:	  // Construct an index tuple and forward to __call
+        -:  802:	  typedef typename _Build_index_tuple<sizeof...(_Args)>::__type
+        -:  803:	    _Indexes;
+        -:  804:	  return this->__call(__arg, __tuple, _Indexes());
+        -:  805:	}
+        -:  806:
+        -:  807:    private:
+        -:  808:      // Invokes the underlying function object __arg by unpacking all
+        -:  809:      // of the arguments in the tuple.
+        -:  810:      template<typename _CVArg, typename... _Args, std::size_t... _Indexes>
+        -:  811:	auto
+        -:  812:	__call(_CVArg& __arg, tuple<_Args...>& __tuple,
+        -:  813:	       const _Index_tuple<_Indexes...>&) const volatile
+        -:  814:	-> decltype(__arg(declval<_Args>()...))
+        -:  815:	{
+        -:  816:	  return __arg(std::forward<_Args>(std::get<_Indexes>(__tuple))...);
+        -:  817:	}
+        -:  818:    };
+        -:  819:
+        -:  820:  /**
+        -:  821:   *  If the argument is a placeholder for the Nth argument, returns
+        -:  822:   *  a reference to the Nth argument to the bind function object.
+        -:  823:   *  C++11 [func.bind.bind] p10 bullet 3.
+        -:  824:   */
+        -:  825:  template<typename _Arg>
+        -:  826:    class _Mu<_Arg, false, true>
+        -:  827:    {
+        -:  828:    public:
+        -:  829:      template<typename _Tuple>
+        -:  830:	_Safe_tuple_element_t<(is_placeholder<_Arg>::value - 1), _Tuple>&&
+        -:  831:	operator()(const volatile _Arg&, _Tuple& __tuple) const volatile
+        -:  832:	{
+        -:  833:	  using __type
+        -:  834:	    = __tuple_element_t<(is_placeholder<_Arg>::value - 1), _Tuple>;
+        -:  835:	  return std::forward<__type>(
+        -:  836:	      ::std::get<(is_placeholder<_Arg>::value - 1)>(__tuple));
+        -:  837:	}
+        -:  838:    };
+        -:  839:
+        -:  840:  /**
+        -:  841:   *  If the argument is just a value, returns a reference to that
+        -:  842:   *  value. The cv-qualifiers on the reference are determined by the caller.
+        -:  843:   *  C++11 [func.bind.bind] p10 bullet 4.
+        -:  844:   */
+        -:  845:  template<typename _Arg>
+        -:  846:    class _Mu<_Arg, false, false>
+        -:  847:    {
+        -:  848:    public:
+        -:  849:      template<typename _CVArg, typename _Tuple>
+        -:  850:	_CVArg&&
+        -:  851:	operator()(_CVArg&& __arg, _Tuple&) const volatile
+        -:  852:	{ return std::forward<_CVArg>(__arg); }
+        -:  853:    };
+        -:  854:
+        -:  855:  /**
+        -:  856:   *  Maps member pointers into instances of _Mem_fn but leaves all
+        -:  857:   *  other function objects untouched. Used by std::bind(). The
+        -:  858:   *  primary template handles the non-member-pointer case.
+        -:  859:   */
+        -:  860:  template<typename _Tp>
+        -:  861:    struct _Maybe_wrap_member_pointer
+        -:  862:    {
+        -:  863:      typedef _Tp type;
+        -:  864:
+        -:  865:      static constexpr const _Tp&
+        -:  866:      __do_wrap(const _Tp& __x)
+        -:  867:      { return __x; }
+        -:  868:
+        -:  869:      static constexpr _Tp&&
+        -:  870:      __do_wrap(_Tp&& __x)
+        -:  871:      { return static_cast<_Tp&&>(__x); }
+        -:  872:    };
+        -:  873:
+        -:  874:  /**
+        -:  875:   *  Maps member pointers into instances of _Mem_fn but leaves all
+        -:  876:   *  other function objects untouched. Used by std::bind(). This
+        -:  877:   *  partial specialization handles the member pointer case.
+        -:  878:   */
+        -:  879:  template<typename _Tp, typename _Class>
+        -:  880:    struct _Maybe_wrap_member_pointer<_Tp _Class::*>
+        -:  881:    {
+        -:  882:      typedef _Mem_fn<_Tp _Class::*> type;
+        -:  883:
+        -:  884:      static constexpr type
+        -:  885:      __do_wrap(_Tp _Class::* __pm)
+        -:  886:      { return type(__pm); }
+        -:  887:    };
+        -:  888:
+        -:  889:  // Specialization needed to prevent "forming reference to void" errors when
+        -:  890:  // bind<void>() is called, because argument deduction instantiates
+        -:  891:  // _Maybe_wrap_member_pointer<void> outside the immediate context where
+        -:  892:  // SFINAE applies.
+        -:  893:  template<>
+        -:  894:    struct _Maybe_wrap_member_pointer<void>
+        -:  895:    {
+        -:  896:      typedef void type;
+        -:  897:    };
+        -:  898:
+        -:  899:  // std::get<I> for volatile-qualified tuples
+        -:  900:  template<std::size_t _Ind, typename... _Tp>
+        -:  901:    inline auto
+        -:  902:    __volget(volatile tuple<_Tp...>& __tuple)
+        -:  903:    -> __tuple_element_t<_Ind, tuple<_Tp...>> volatile&
+        -:  904:    { return std::get<_Ind>(const_cast<tuple<_Tp...>&>(__tuple)); }
+        -:  905:
+        -:  906:  // std::get<I> for const-volatile-qualified tuples
+        -:  907:  template<std::size_t _Ind, typename... _Tp>
+        -:  908:    inline auto
+        -:  909:    __volget(const volatile tuple<_Tp...>& __tuple)
+        -:  910:    -> __tuple_element_t<_Ind, tuple<_Tp...>> const volatile&
+        -:  911:    { return std::get<_Ind>(const_cast<const tuple<_Tp...>&>(__tuple)); }
+        -:  912:
+        -:  913:  /// Type of the function object returned from bind().
+        -:  914:  template<typename _Signature>
+        -:  915:    struct _Bind;
+        -:  916:
+        -:  917:   template<typename _Functor, typename... _Bound_args>
+        -:  918:    class _Bind<_Functor(_Bound_args...)>
+        -:  919:    : public _Weak_result_type<_Functor>
+        -:  920:    {
+        -:  921:      typedef _Bind __self_type;
+        -:  922:      typedef typename _Build_index_tuple<sizeof...(_Bound_args)>::__type
+        -:  923:	_Bound_indexes;
+        -:  924:
+        -:  925:      _Functor _M_f;
+        -:  926:      tuple<_Bound_args...> _M_bound_args;
+        -:  927:
+        -:  928:      // Call unqualified
+        -:  929:      template<typename _Result, typename... _Args, std::size_t... _Indexes>
+        -:  930:	_Result
+        -:  931:	__call(tuple<_Args...>&& __args, _Index_tuple<_Indexes...>)
+        -:  932:	{
+        -:  933:	  return _M_f(_Mu<_Bound_args>()
+        -:  934:		      (std::get<_Indexes>(_M_bound_args), __args)...);
+        -:  935:	}
+        -:  936:
+        -:  937:      // Call as const
+        -:  938:      template<typename _Result, typename... _Args, std::size_t... _Indexes>
+        -:  939:	_Result
+        -:  940:	__call_c(tuple<_Args...>&& __args, _Index_tuple<_Indexes...>) const
+        -:  941:	{
+        -:  942:	  return _M_f(_Mu<_Bound_args>()
+        -:  943:		      (std::get<_Indexes>(_M_bound_args), __args)...);
+        -:  944:	}
+        -:  945:
+        -:  946:      // Call as volatile
+        -:  947:      template<typename _Result, typename... _Args, std::size_t... _Indexes>
+        -:  948:	_Result
+        -:  949:	__call_v(tuple<_Args...>&& __args,
+        -:  950:		 _Index_tuple<_Indexes...>) volatile
+        -:  951:	{
+        -:  952:	  return _M_f(_Mu<_Bound_args>()
+        -:  953:		      (__volget<_Indexes>(_M_bound_args), __args)...);
+        -:  954:	}
+        -:  955:
+        -:  956:      // Call as const volatile
+        -:  957:      template<typename _Result, typename... _Args, std::size_t... _Indexes>
+        -:  958:	_Result
+        -:  959:	__call_c_v(tuple<_Args...>&& __args,
+        -:  960:		   _Index_tuple<_Indexes...>) const volatile
+        -:  961:	{
+        -:  962:	  return _M_f(_Mu<_Bound_args>()
+        -:  963:		      (__volget<_Indexes>(_M_bound_args), __args)...);
+        -:  964:	}
+        -:  965:
+        -:  966:     public:
+        -:  967:      template<typename... _Args>
+        -:  968:	explicit _Bind(const _Functor& __f, _Args&&... __args)
+        -:  969:	: _M_f(__f), _M_bound_args(std::forward<_Args>(__args)...)
+        -:  970:	{ }
+        -:  971:
+        -:  972:      template<typename... _Args>
+        -:  973:	explicit _Bind(_Functor&& __f, _Args&&... __args)
+        -:  974:	: _M_f(std::move(__f)), _M_bound_args(std::forward<_Args>(__args)...)
+        -:  975:	{ }
+        -:  976:
+        -:  977:      _Bind(const _Bind&) = default;
+        -:  978:
+        -:  979:      _Bind(_Bind&& __b)
+        -:  980:      : _M_f(std::move(__b._M_f)), _M_bound_args(std::move(__b._M_bound_args))
+        -:  981:      { }
+        -:  982:
+        -:  983:      // Call unqualified
+        -:  984:      template<typename... _Args, typename _Result
+        -:  985:	= decltype( std::declval<_Functor&>()(
+        -:  986:	      _Mu<_Bound_args>()( std::declval<_Bound_args&>(),
+        -:  987:				  std::declval<tuple<_Args...>&>() )... ) )>
+        -:  988:	_Result
+        -:  989:	operator()(_Args&&... __args)
+        -:  990:	{
+        -:  991:	  return this->__call<_Result>(
+        -:  992:	      std::forward_as_tuple(std::forward<_Args>(__args)...),
+        -:  993:	      _Bound_indexes());
+        -:  994:	}
+        -:  995:
+        -:  996:      // Call as const
+        -:  997:      template<typename... _Args, typename _Result
+        -:  998:	= decltype( std::declval<typename enable_if<(sizeof...(_Args) >= 0),
+        -:  999:		       typename add_const<_Functor>::type&>::type>()(
+        -: 1000:	      _Mu<_Bound_args>()( std::declval<const _Bound_args&>(),
+        -: 1001:				  std::declval<tuple<_Args...>&>() )... ) )>
+        -: 1002:	_Result
+        -: 1003:	operator()(_Args&&... __args) const
+        -: 1004:	{
+        -: 1005:	  return this->__call_c<_Result>(
+        -: 1006:	      std::forward_as_tuple(std::forward<_Args>(__args)...),
+        -: 1007:	      _Bound_indexes());
+        -: 1008:	}
+        -: 1009:
+        -: 1010:      // Call as volatile
+        -: 1011:      template<typename... _Args, typename _Result
+        -: 1012:	= decltype( std::declval<typename enable_if<(sizeof...(_Args) >= 0),
+        -: 1013:                       typename add_volatile<_Functor>::type&>::type>()(
+        -: 1014:	      _Mu<_Bound_args>()( std::declval<volatile _Bound_args&>(),
+        -: 1015:				  std::declval<tuple<_Args...>&>() )... ) )>
+        -: 1016:	_Result
+        -: 1017:	operator()(_Args&&... __args) volatile
+        -: 1018:	{
+        -: 1019:	  return this->__call_v<_Result>(
+        -: 1020:	      std::forward_as_tuple(std::forward<_Args>(__args)...),
+        -: 1021:	      _Bound_indexes());
+        -: 1022:	}
+        -: 1023:
+        -: 1024:      // Call as const volatile
+        -: 1025:      template<typename... _Args, typename _Result
+        -: 1026:	= decltype( std::declval<typename enable_if<(sizeof...(_Args) >= 0),
+        -: 1027:                       typename add_cv<_Functor>::type&>::type>()(
+        -: 1028:	      _Mu<_Bound_args>()( std::declval<const volatile _Bound_args&>(),
+        -: 1029:				  std::declval<tuple<_Args...>&>() )... ) )>
+        -: 1030:	_Result
+        -: 1031:	operator()(_Args&&... __args) const volatile
+        -: 1032:	{
+        -: 1033:	  return this->__call_c_v<_Result>(
+        -: 1034:	      std::forward_as_tuple(std::forward<_Args>(__args)...),
+        -: 1035:	      _Bound_indexes());
+        -: 1036:	}
+        -: 1037:    };
+        -: 1038:
+        -: 1039:  /// Type of the function object returned from bind<R>().
+        -: 1040:  template<typename _Result, typename _Signature>
+        -: 1041:    struct _Bind_result;
+        -: 1042:
+        -: 1043:  template<typename _Result, typename _Functor, typename... _Bound_args>
+        -: 1044:    class _Bind_result<_Result, _Functor(_Bound_args...)>
+        -: 1045:    {
+        -: 1046:      typedef _Bind_result __self_type;
+        -: 1047:      typedef typename _Build_index_tuple<sizeof...(_Bound_args)>::__type
+        -: 1048:	_Bound_indexes;
+        -: 1049:
+        -: 1050:      _Functor _M_f;
+        -: 1051:      tuple<_Bound_args...> _M_bound_args;
+        -: 1052:
+        -: 1053:      // sfinae types
+        -: 1054:      template<typename _Res>
+        -: 1055:	struct __enable_if_void : enable_if<is_void<_Res>::value, int> { };
+        -: 1056:      template<typename _Res>
+        -: 1057:	struct __disable_if_void : enable_if<!is_void<_Res>::value, int> { };
+        -: 1058:
+        -: 1059:      // Call unqualified
+        -: 1060:      template<typename _Res, typename... _Args, std::size_t... _Indexes>
+        -: 1061:	_Result
+        -: 1062:	__call(tuple<_Args...>&& __args, _Index_tuple<_Indexes...>,
+        -: 1063:	    typename __disable_if_void<_Res>::type = 0)
+        -: 1064:	{
+        -: 1065:	  return _M_f(_Mu<_Bound_args>()
+        -: 1066:		      (std::get<_Indexes>(_M_bound_args), __args)...);
+        -: 1067:	}
+        -: 1068:
+        -: 1069:      // Call unqualified, return void
+        -: 1070:      template<typename _Res, typename... _Args, std::size_t... _Indexes>
+        -: 1071:	void
+        -: 1072:	__call(tuple<_Args...>&& __args, _Index_tuple<_Indexes...>,
+        -: 1073:	    typename __enable_if_void<_Res>::type = 0)
+        -: 1074:	{
+        -: 1075:	  _M_f(_Mu<_Bound_args>()
+        -: 1076:	       (std::get<_Indexes>(_M_bound_args), __args)...);
+        -: 1077:	}
+        -: 1078:
+        -: 1079:      // Call as const
+        -: 1080:      template<typename _Res, typename... _Args, std::size_t... _Indexes>
+        -: 1081:	_Result
+        -: 1082:	__call(tuple<_Args...>&& __args, _Index_tuple<_Indexes...>,
+        -: 1083:	    typename __disable_if_void<_Res>::type = 0) const
+        -: 1084:	{
+        -: 1085:	  return _M_f(_Mu<_Bound_args>()
+        -: 1086:		      (std::get<_Indexes>(_M_bound_args), __args)...);
+        -: 1087:	}
+        -: 1088:
+        -: 1089:      // Call as const, return void
+        -: 1090:      template<typename _Res, typename... _Args, std::size_t... _Indexes>
+        -: 1091:	void
+        -: 1092:	__call(tuple<_Args...>&& __args, _Index_tuple<_Indexes...>,
+        -: 1093:	    typename __enable_if_void<_Res>::type = 0) const
+        -: 1094:	{
+        -: 1095:	  _M_f(_Mu<_Bound_args>()
+        -: 1096:	       (std::get<_Indexes>(_M_bound_args),  __args)...);
+        -: 1097:	}
+        -: 1098:
+        -: 1099:      // Call as volatile
+        -: 1100:      template<typename _Res, typename... _Args, std::size_t... _Indexes>
+        -: 1101:	_Result
+        -: 1102:	__call(tuple<_Args...>&& __args, _Index_tuple<_Indexes...>,
+        -: 1103:	    typename __disable_if_void<_Res>::type = 0) volatile
+        -: 1104:	{
+        -: 1105:	  return _M_f(_Mu<_Bound_args>()
+        -: 1106:		      (__volget<_Indexes>(_M_bound_args), __args)...);
+        -: 1107:	}
+        -: 1108:
+        -: 1109:      // Call as volatile, return void
+        -: 1110:      template<typename _Res, typename... _Args, std::size_t... _Indexes>
+        -: 1111:	void
+        -: 1112:	__call(tuple<_Args...>&& __args, _Index_tuple<_Indexes...>,
+        -: 1113:	    typename __enable_if_void<_Res>::type = 0) volatile
+        -: 1114:	{
+        -: 1115:	  _M_f(_Mu<_Bound_args>()
+        -: 1116:	       (__volget<_Indexes>(_M_bound_args), __args)...);
+        -: 1117:	}
+        -: 1118:
+        -: 1119:      // Call as const volatile
+        -: 1120:      template<typename _Res, typename... _Args, std::size_t... _Indexes>
+        -: 1121:	_Result
+        -: 1122:	__call(tuple<_Args...>&& __args, _Index_tuple<_Indexes...>,
+        -: 1123:	    typename __disable_if_void<_Res>::type = 0) const volatile
+        -: 1124:	{
+        -: 1125:	  return _M_f(_Mu<_Bound_args>()
+        -: 1126:		      (__volget<_Indexes>(_M_bound_args), __args)...);
+        -: 1127:	}
+        -: 1128:
+        -: 1129:      // Call as const volatile, return void
+        -: 1130:      template<typename _Res, typename... _Args, std::size_t... _Indexes>
+        -: 1131:	void
+        -: 1132:	__call(tuple<_Args...>&& __args,
+        -: 1133:	       _Index_tuple<_Indexes...>,
+        -: 1134:	    typename __enable_if_void<_Res>::type = 0) const volatile
+        -: 1135:	{
+        -: 1136:	  _M_f(_Mu<_Bound_args>()
+        -: 1137:	       (__volget<_Indexes>(_M_bound_args), __args)...);
+        -: 1138:	}
+        -: 1139:
+        -: 1140:    public:
+        -: 1141:      typedef _Result result_type;
+        -: 1142:
+        -: 1143:      template<typename... _Args>
+        -: 1144:	explicit _Bind_result(const _Functor& __f, _Args&&... __args)
+        -: 1145:	: _M_f(__f), _M_bound_args(std::forward<_Args>(__args)...)
+        -: 1146:	{ }
+        -: 1147:
+        -: 1148:      template<typename... _Args>
+        -: 1149:	explicit _Bind_result(_Functor&& __f, _Args&&... __args)
+        -: 1150:	: _M_f(std::move(__f)), _M_bound_args(std::forward<_Args>(__args)...)
+        -: 1151:	{ }
+        -: 1152:
+        -: 1153:      _Bind_result(const _Bind_result&) = default;
+        -: 1154:
+        -: 1155:      _Bind_result(_Bind_result&& __b)
+        -: 1156:      : _M_f(std::move(__b._M_f)), _M_bound_args(std::move(__b._M_bound_args))
+        -: 1157:      { }
+        -: 1158:
+        -: 1159:      // Call unqualified
+        -: 1160:      template<typename... _Args>
+        -: 1161:	result_type
+        -: 1162:	operator()(_Args&&... __args)
+        -: 1163:	{
+        -: 1164:	  return this->__call<_Result>(
+        -: 1165:	      std::forward_as_tuple(std::forward<_Args>(__args)...),
+        -: 1166:	      _Bound_indexes());
+        -: 1167:	}
+        -: 1168:
+        -: 1169:      // Call as const
+        -: 1170:      template<typename... _Args>
+        -: 1171:	result_type
+        -: 1172:	operator()(_Args&&... __args) const
+        -: 1173:	{
+        -: 1174:	  return this->__call<_Result>(
+        -: 1175:	      std::forward_as_tuple(std::forward<_Args>(__args)...),
+        -: 1176:	      _Bound_indexes());
+        -: 1177:	}
+        -: 1178:
+        -: 1179:      // Call as volatile
+        -: 1180:      template<typename... _Args>
+        -: 1181:	result_type
+        -: 1182:	operator()(_Args&&... __args) volatile
+        -: 1183:	{
+        -: 1184:	  return this->__call<_Result>(
+        -: 1185:	      std::forward_as_tuple(std::forward<_Args>(__args)...),
+        -: 1186:	      _Bound_indexes());
+        -: 1187:	}
+        -: 1188:
+        -: 1189:      // Call as const volatile
+        -: 1190:      template<typename... _Args>
+        -: 1191:	result_type
+        -: 1192:	operator()(_Args&&... __args) const volatile
+        -: 1193:	{
+        -: 1194:	  return this->__call<_Result>(
+        -: 1195:	      std::forward_as_tuple(std::forward<_Args>(__args)...),
+        -: 1196:	      _Bound_indexes());
+        -: 1197:	}
+        -: 1198:    };
+        -: 1199:
+        -: 1200:  /**
+        -: 1201:   *  @brief Class template _Bind is always a bind expression.
+        -: 1202:   *  @ingroup binders
+        -: 1203:   */
+        -: 1204:  template<typename _Signature>
+        -: 1205:    struct is_bind_expression<_Bind<_Signature> >
+        -: 1206:    : public true_type { };
+        -: 1207:
+        -: 1208:  /**
+        -: 1209:   *  @brief Class template _Bind is always a bind expression.
+        -: 1210:   *  @ingroup binders
+        -: 1211:   */
+        -: 1212:  template<typename _Signature>
+        -: 1213:    struct is_bind_expression<const _Bind<_Signature> >
+        -: 1214:    : public true_type { };
+        -: 1215:
+        -: 1216:  /**
+        -: 1217:   *  @brief Class template _Bind is always a bind expression.
+        -: 1218:   *  @ingroup binders
+        -: 1219:   */
+        -: 1220:  template<typename _Signature>
+        -: 1221:    struct is_bind_expression<volatile _Bind<_Signature> >
+        -: 1222:    : public true_type { };
+        -: 1223:
+        -: 1224:  /**
+        -: 1225:   *  @brief Class template _Bind is always a bind expression.
+        -: 1226:   *  @ingroup binders
+        -: 1227:   */
+        -: 1228:  template<typename _Signature>
+        -: 1229:    struct is_bind_expression<const volatile _Bind<_Signature>>
+        -: 1230:    : public true_type { };
+        -: 1231:
+        -: 1232:  /**
+        -: 1233:   *  @brief Class template _Bind_result is always a bind expression.
+        -: 1234:   *  @ingroup binders
+        -: 1235:   */
+        -: 1236:  template<typename _Result, typename _Signature>
+        -: 1237:    struct is_bind_expression<_Bind_result<_Result, _Signature>>
+        -: 1238:    : public true_type { };
+        -: 1239:
+        -: 1240:  /**
+        -: 1241:   *  @brief Class template _Bind_result is always a bind expression.
+        -: 1242:   *  @ingroup binders
+        -: 1243:   */
+        -: 1244:  template<typename _Result, typename _Signature>
+        -: 1245:    struct is_bind_expression<const _Bind_result<_Result, _Signature>>
+        -: 1246:    : public true_type { };
+        -: 1247:
+        -: 1248:  /**
+        -: 1249:   *  @brief Class template _Bind_result is always a bind expression.
+        -: 1250:   *  @ingroup binders
+        -: 1251:   */
+        -: 1252:  template<typename _Result, typename _Signature>
+        -: 1253:    struct is_bind_expression<volatile _Bind_result<_Result, _Signature>>
+        -: 1254:    : public true_type { };
+        -: 1255:
+        -: 1256:  /**
+        -: 1257:   *  @brief Class template _Bind_result is always a bind expression.
+        -: 1258:   *  @ingroup binders
+        -: 1259:   */
+        -: 1260:  template<typename _Result, typename _Signature>
+        -: 1261:    struct is_bind_expression<const volatile _Bind_result<_Result, _Signature>>
+        -: 1262:    : public true_type { };
+        -: 1263:
+        -: 1264:  template<typename _Func, typename... _BoundArgs>
+        -: 1265:    struct _Bind_check_arity { };
+        -: 1266:
+        -: 1267:  template<typename _Ret, typename... _Args, typename... _BoundArgs>
+        -: 1268:    struct _Bind_check_arity<_Ret (*)(_Args...), _BoundArgs...>
+        -: 1269:    {
+        -: 1270:      static_assert(sizeof...(_BoundArgs) == sizeof...(_Args),
+        -: 1271:                   "Wrong number of arguments for function");
+        -: 1272:    };
+        -: 1273:
+        -: 1274:  template<typename _Ret, typename... _Args, typename... _BoundArgs>
+        -: 1275:    struct _Bind_check_arity<_Ret (*)(_Args......), _BoundArgs...>
+        -: 1276:    {
+        -: 1277:      static_assert(sizeof...(_BoundArgs) >= sizeof...(_Args),
+        -: 1278:                   "Wrong number of arguments for function");
+        -: 1279:    };
+        -: 1280:
+        -: 1281:  template<typename _Tp, typename _Class, typename... _BoundArgs>
+        -: 1282:    struct _Bind_check_arity<_Tp _Class::*, _BoundArgs...>
+        -: 1283:    {
+        -: 1284:      using _Arity = typename _Mem_fn<_Tp _Class::*>::_Arity;
+        -: 1285:      using _Varargs = typename _Mem_fn<_Tp _Class::*>::_Varargs;
+        -: 1286:      static_assert(_Varargs::value
+        -: 1287:		    ? sizeof...(_BoundArgs) >= _Arity::value + 1
+        -: 1288:		    : sizeof...(_BoundArgs) == _Arity::value + 1,
+        -: 1289:		    "Wrong number of arguments for pointer-to-member");
+        -: 1290:    };
+        -: 1291:
+        -: 1292:  // Trait type used to remove std::bind() from overload set via SFINAE
+        -: 1293:  // when first argument has integer type, so that std::bind() will
+        -: 1294:  // not be a better match than ::bind() from the BSD Sockets API.
+        -: 1295:  template<typename _Tp, typename _Tp2 = typename decay<_Tp>::type>
+        -: 1296:    using __is_socketlike = __or_<is_integral<_Tp2>, is_enum<_Tp2>>;
+        -: 1297:
+        -: 1298:  template<bool _SocketLike, typename _Func, typename... _BoundArgs>
+        -: 1299:    struct _Bind_helper
+        -: 1300:    : _Bind_check_arity<typename decay<_Func>::type, _BoundArgs...>
+        -: 1301:    {
+        -: 1302:      typedef _Maybe_wrap_member_pointer<typename decay<_Func>::type>
+        -: 1303:	__maybe_type;
+        -: 1304:      typedef typename __maybe_type::type __func_type;
+        -: 1305:      typedef _Bind<__func_type(typename decay<_BoundArgs>::type...)> type;
+        -: 1306:    };
+        -: 1307:
+        -: 1308:  // Partial specialization for is_socketlike == true, does not define
+        -: 1309:  // nested type so std::bind() will not participate in overload resolution
+        -: 1310:  // when the first argument might be a socket file descriptor.
+        -: 1311:  template<typename _Func, typename... _BoundArgs>
+        -: 1312:    struct _Bind_helper<true, _Func, _BoundArgs...>
+        -: 1313:    { };
+        -: 1314:
+        -: 1315:  /**
+        -: 1316:   *  @brief Function template for std::bind.
+        -: 1317:   *  @ingroup binders
+        -: 1318:   */
+        -: 1319:  template<typename _Func, typename... _BoundArgs>
+        -: 1320:    inline typename
+        -: 1321:    _Bind_helper<__is_socketlike<_Func>::value, _Func, _BoundArgs...>::type
+        -: 1322:    bind(_Func&& __f, _BoundArgs&&... __args)
+        -: 1323:    {
+        -: 1324:      typedef _Bind_helper<false, _Func, _BoundArgs...> __helper_type;
+        -: 1325:      typedef typename __helper_type::__maybe_type __maybe_type;
+        -: 1326:      typedef typename __helper_type::type __result_type;
+        -: 1327:      return __result_type(__maybe_type::__do_wrap(std::forward<_Func>(__f)),
+        -: 1328:			   std::forward<_BoundArgs>(__args)...);
+        -: 1329:    }
+        -: 1330:
+        -: 1331:  template<typename _Result, typename _Func, typename... _BoundArgs>
+        -: 1332:    struct _Bindres_helper
+        -: 1333:    : _Bind_check_arity<typename decay<_Func>::type, _BoundArgs...>
+        -: 1334:    {
+        -: 1335:      typedef _Maybe_wrap_member_pointer<typename decay<_Func>::type>
+        -: 1336:	__maybe_type;
+        -: 1337:      typedef typename __maybe_type::type __functor_type;
+        -: 1338:      typedef _Bind_result<_Result,
+        -: 1339:			   __functor_type(typename decay<_BoundArgs>::type...)>
+        -: 1340:	type;
+        -: 1341:    };
+        -: 1342:
+        -: 1343:  /**
+        -: 1344:   *  @brief Function template for std::bind<R>.
+        -: 1345:   *  @ingroup binders
+        -: 1346:   */
+        -: 1347:  template<typename _Result, typename _Func, typename... _BoundArgs>
+        -: 1348:    inline
+        -: 1349:    typename _Bindres_helper<_Result, _Func, _BoundArgs...>::type
+        -: 1350:    bind(_Func&& __f, _BoundArgs&&... __args)
+        -: 1351:    {
+        -: 1352:      typedef _Bindres_helper<_Result, _Func, _BoundArgs...> __helper_type;
+        -: 1353:      typedef typename __helper_type::__maybe_type __maybe_type;
+        -: 1354:      typedef typename __helper_type::type __result_type;
+        -: 1355:      return __result_type(__maybe_type::__do_wrap(std::forward<_Func>(__f)),
+        -: 1356:			   std::forward<_BoundArgs>(__args)...);
+        -: 1357:    }
+        -: 1358:
+        -: 1359:  template<typename _Signature>
+        -: 1360:    struct _Bind_simple;
+        -: 1361:
+        -: 1362:  template<typename _Callable, typename... _Args>
+        -: 1363:    struct _Bind_simple<_Callable(_Args...)>
+        -: 1364:    {
+        -: 1365:      typedef typename result_of<_Callable(_Args...)>::type result_type;
+        -: 1366:
+        -: 1367:      template<typename _Tp, typename... _Up>
+        -: 1368:        explicit
+        -: 1369:        _Bind_simple(_Tp&& __f, _Up&&... __args)
+        -: 1370:        : _M_bound(std::forward<_Tp>(__f), std::forward<_Up>(__args)...)
+        -: 1371:        { }
+        -: 1372:
+        -: 1373:      _Bind_simple(const _Bind_simple&) = default;
+        -: 1374:      _Bind_simple(_Bind_simple&&) = default;
+        -: 1375:
+        -: 1376:      result_type
+        -: 1377:      operator()()
+        -: 1378:      {
+        -: 1379:        typedef typename _Build_index_tuple<sizeof...(_Args)>::__type _Indices;
+        -: 1380:        return _M_invoke(_Indices());
+        -: 1381:      }
+        -: 1382:
+        -: 1383:    private:
+        -: 1384:      template<std::size_t... _Indices>
+        -: 1385:        typename result_of<_Callable(_Args...)>::type
+        -: 1386:        _M_invoke(_Index_tuple<_Indices...>)
+        -: 1387:        {
+        -: 1388:	  // std::bind always forwards bound arguments as lvalues,
+        -: 1389:	  // but this type can call functions which only accept rvalues.
+        -: 1390:          return std::forward<_Callable>(std::get<0>(_M_bound))(
+        -: 1391:              std::forward<_Args>(std::get<_Indices+1>(_M_bound))...);
+        -: 1392:        }
+        -: 1393:
+        -: 1394:      std::tuple<_Callable, _Args...> _M_bound;
+        -: 1395:    };
+        -: 1396:
+        -: 1397:  template<typename _Func, typename... _BoundArgs>
+        -: 1398:    struct _Bind_simple_helper
+        -: 1399:    : _Bind_check_arity<typename decay<_Func>::type, _BoundArgs...>
+        -: 1400:    {
+        -: 1401:      typedef _Maybe_wrap_member_pointer<typename decay<_Func>::type>
+        -: 1402:        __maybe_type;
+        -: 1403:      typedef typename __maybe_type::type __func_type;
+        -: 1404:      typedef _Bind_simple<__func_type(typename decay<_BoundArgs>::type...)>
+        -: 1405:       	__type;
+        -: 1406:    };
+        -: 1407:
+        -: 1408:  // Simplified version of std::bind for internal use, without support for
+        -: 1409:  // unbound arguments, placeholders or nested bind expressions.
+        -: 1410:  template<typename _Callable, typename... _Args>
+        -: 1411:    typename _Bind_simple_helper<_Callable, _Args...>::__type
+        -: 1412:    __bind_simple(_Callable&& __callable, _Args&&... __args)
+        -: 1413:    {
+        -: 1414:      typedef _Bind_simple_helper<_Callable, _Args...> __helper_type;
+        -: 1415:      typedef typename __helper_type::__maybe_type __maybe_type;
+        -: 1416:      typedef typename __helper_type::__type __result_type;
+        -: 1417:      return __result_type(
+        -: 1418:          __maybe_type::__do_wrap( std::forward<_Callable>(__callable)),
+        -: 1419:          std::forward<_Args>(__args)...);
+        -: 1420:    }
+        -: 1421:
+        -: 1422:  /**
+        -: 1423:   *  @brief Exception class thrown when class template function's
+        -: 1424:   *  operator() is called with an empty target.
+        -: 1425:   *  @ingroup exceptions
+        -: 1426:   */
+        -: 1427:  class bad_function_call : public std::exception
+        -: 1428:  {
+        -: 1429:  public:
+        -: 1430:    virtual ~bad_function_call() noexcept;
+        -: 1431:
+        -: 1432:    const char* what() const noexcept;
+        -: 1433:  };
+        -: 1434:
+        -: 1435:  /**
+        -: 1436:   *  Trait identifying "location-invariant" types, meaning that the
+        -: 1437:   *  address of the object (or any of its members) will not escape.
+        -: 1438:   *  Trivially copyable types are location-invariant and users can
+        -: 1439:   *  specialize this trait for other types.
+        -: 1440:   */
+        -: 1441:  template<typename _Tp>
+        -: 1442:    struct __is_location_invariant
+        -: 1443:    : is_trivially_copyable<_Tp>::type
+        -: 1444:    { };
+        -: 1445:
+        -: 1446:  class _Undefined_class;
+        -: 1447:
+        -: 1448:  union _Nocopy_types
+        -: 1449:  {
+        -: 1450:    void*       _M_object;
+        -: 1451:    const void* _M_const_object;
+        -: 1452:    void (*_M_function_pointer)();
+        -: 1453:    void (_Undefined_class::*_M_member_pointer)();
+        -: 1454:  };
+        -: 1455:
+        -: 1456:  union [[gnu::may_alias]] _Any_data
+        -: 1457:  {
+    #####: 1458:    void*       _M_access()       { return &_M_pod_data[0]; }
+    #####: 1459:    const void* _M_access() const { return &_M_pod_data[0]; }
+        -: 1460:
+        -: 1461:    template<typename _Tp>
+        -: 1462:      _Tp&
+    #####: 1463:      _M_access()
+    #####: 1464:      { return *static_cast<_Tp*>(_M_access()); }
+        -: 1465:
+        -: 1466:    template<typename _Tp>
+        -: 1467:      const _Tp&
+    #####: 1468:      _M_access() const
+    #####: 1469:      { return *static_cast<const _Tp*>(_M_access()); }
+        -: 1470:
+        -: 1471:    _Nocopy_types _M_unused;
+        -: 1472:    char _M_pod_data[sizeof(_Nocopy_types)];
+        -: 1473:  };
+        -: 1474:
+        -: 1475:  enum _Manager_operation
+        -: 1476:  {
+        -: 1477:    __get_type_info,
+        -: 1478:    __get_functor_ptr,
+        -: 1479:    __clone_functor,
+        -: 1480:    __destroy_functor
+        -: 1481:  };
+        -: 1482:
+        -: 1483:  // Simple type wrapper that helps avoid annoying const problems
+        -: 1484:  // when casting between void pointers and pointers-to-pointers.
+        -: 1485:  template<typename _Tp>
+        -: 1486:    struct _Simple_type_wrapper
+        -: 1487:    {
+        -: 1488:      _Simple_type_wrapper(_Tp __value) : __value(__value) { }
+        -: 1489:
+        -: 1490:      _Tp __value;
+        -: 1491:    };
+        -: 1492:
+        -: 1493:  template<typename _Tp>
+        -: 1494:    struct __is_location_invariant<_Simple_type_wrapper<_Tp> >
+        -: 1495:    : __is_location_invariant<_Tp>
+        -: 1496:    { };
+        -: 1497:
+        -: 1498:  // Converts a reference to a function object into a callable
+        -: 1499:  // function object.
+        -: 1500:  template<typename _Functor>
+        -: 1501:    inline _Functor&
+        -: 1502:    __callable_functor(_Functor& __f)
+        -: 1503:    { return __f; }
+        -: 1504:
+        -: 1505:  template<typename _Member, typename _Class>
+        -: 1506:    inline _Mem_fn<_Member _Class::*>
+        -: 1507:    __callable_functor(_Member _Class::* &__p)
+        -: 1508:    { return std::mem_fn(__p); }
+        -: 1509:
+        -: 1510:  template<typename _Member, typename _Class>
+        -: 1511:    inline _Mem_fn<_Member _Class::*>
+        -: 1512:    __callable_functor(_Member _Class::* const &__p)
+        -: 1513:    { return std::mem_fn(__p); }
+        -: 1514:
+        -: 1515:  template<typename _Member, typename _Class>
+        -: 1516:    inline _Mem_fn<_Member _Class::*>
+        -: 1517:    __callable_functor(_Member _Class::* volatile &__p)
+        -: 1518:    { return std::mem_fn(__p); }
+        -: 1519:
+        -: 1520:  template<typename _Member, typename _Class>
+        -: 1521:    inline _Mem_fn<_Member _Class::*>
+        -: 1522:    __callable_functor(_Member _Class::* const volatile &__p)
+        -: 1523:    { return std::mem_fn(__p); }
+        -: 1524:
+        -: 1525:  template<typename _Signature>
+        -: 1526:    class function;
+        -: 1527:
+        -: 1528:  /// Base class of all polymorphic function object wrappers.
+        -: 1529:  class _Function_base
+        -: 1530:  {
+        -: 1531:  public:
+        -: 1532:    static const std::size_t _M_max_size = sizeof(_Nocopy_types);
+        -: 1533:    static const std::size_t _M_max_align = __alignof__(_Nocopy_types);
+        -: 1534:
+        -: 1535:    template<typename _Functor>
+        -: 1536:      class _Base_manager
+        -: 1537:      {
+        -: 1538:      protected:
+        -: 1539:	static const bool __stored_locally =
+        -: 1540:	(__is_location_invariant<_Functor>::value
+        -: 1541:	 && sizeof(_Functor) <= _M_max_size
+        -: 1542:	 && __alignof__(_Functor) <= _M_max_align
+        -: 1543:	 && (_M_max_align % __alignof__(_Functor) == 0));
+        -: 1544:
+        -: 1545:	typedef integral_constant<bool, __stored_locally> _Local_storage;
+        -: 1546:
+        -: 1547:	// Retrieve a pointer to the function object
+        -: 1548:	static _Functor*
+    #####: 1549:	_M_get_pointer(const _Any_data& __source)
+        -: 1550:	{
+        -: 1551:	  const _Functor* __ptr =
+    #####: 1552:	    __stored_locally? std::__addressof(__source._M_access<_Functor>())
+    #####: 1553:	    /* have stored a pointer */ : __source._M_access<_Functor*>();
+    #####: 1554:	  return const_cast<_Functor*>(__ptr);
+        -: 1555:	}
+        -: 1556:
+        -: 1557:	// Clone a location-invariant function object that fits within
+        -: 1558:	// an _Any_data structure.
+        -: 1559:	static void
+    #####: 1560:	_M_clone(_Any_data& __dest, const _Any_data& __source, true_type)
+        -: 1561:	{
+    #####: 1562:	  ::new (__dest._M_access()) _Functor(__source._M_access<_Functor>());
+    #####: 1563:	}
+        -: 1564:
+        -: 1565:	// Clone a function object that is not location-invariant or
+        -: 1566:	// that cannot fit into an _Any_data structure.
+        -: 1567:	static void
+    #####: 1568:	_M_clone(_Any_data& __dest, const _Any_data& __source, false_type)
+        -: 1569:	{
+    #####: 1570:	  __dest._M_access<_Functor*>() =
+    #####: 1571:	    new _Functor(*__source._M_access<_Functor*>());
+    #####: 1572:	}
+        -: 1573:
+        -: 1574:	// Destroying a location-invariant object may still require
+        -: 1575:	// destruction.
+        -: 1576:	static void
+    #####: 1577:	_M_destroy(_Any_data& __victim, true_type)
+        -: 1578:	{
+    #####: 1579:	  __victim._M_access<_Functor>().~_Functor();
+    #####: 1580:	}
+        -: 1581:
+        -: 1582:	// Destroying an object located on the heap.
+        -: 1583:	static void
+    #####: 1584:	_M_destroy(_Any_data& __victim, false_type)
+        -: 1585:	{
+    #####: 1586:	  delete __victim._M_access<_Functor*>();
+    #####: 1587:	}
+        -: 1588:
+        -: 1589:      public:
+        -: 1590:	static bool
+    #####: 1591:	_M_manager(_Any_data& __dest, const _Any_data& __source,
+        -: 1592:		   _Manager_operation __op)
+        -: 1593:	{
+    #####: 1594:	  switch (__op)
+        -: 1595:	    {
+        -: 1596:#if __cpp_rtti
+        -: 1597:	    case __get_type_info:
+    #####: 1598:	      __dest._M_access<const type_info*>() = &typeid(_Functor);
+    #####: 1599:	      break;
+        -: 1600:#endif
+        -: 1601:	    case __get_functor_ptr:
+    #####: 1602:	      __dest._M_access<_Functor*>() = _M_get_pointer(__source);
+    #####: 1603:	      break;
+        -: 1604:
+        -: 1605:	    case __clone_functor:
+    #####: 1606:	      _M_clone(__dest, __source, _Local_storage());
+    #####: 1607:	      break;
+        -: 1608:
+        -: 1609:	    case __destroy_functor:
+    #####: 1610:	      _M_destroy(__dest, _Local_storage());
+    #####: 1611:	      break;
+        -: 1612:	    }
+    #####: 1613:	  return false;
+        -: 1614:	}
+        -: 1615:
+        -: 1616:	static void
+    #####: 1617:	_M_init_functor(_Any_data& __functor, _Functor&& __f)
+    #####: 1618:	{ _M_init_functor(__functor, std::move(__f), _Local_storage()); }
+        -: 1619:
+        -: 1620:	template<typename _Signature>
+        -: 1621:	  static bool
+        -: 1622:	  _M_not_empty_function(const function<_Signature>& __f)
+        -: 1623:	  { return static_cast<bool>(__f); }
+        -: 1624:
+        -: 1625:	template<typename _Tp>
+        -: 1626:	  static bool
+        -: 1627:	  _M_not_empty_function(_Tp* __fp)
+        -: 1628:	  { return __fp != nullptr; }
+        -: 1629:
+        -: 1630:	template<typename _Class, typename _Tp>
+        -: 1631:	  static bool
+        -: 1632:	  _M_not_empty_function(_Tp _Class::* __mp)
+        -: 1633:	  { return __mp != nullptr; }
+        -: 1634:
+        -: 1635:	template<typename _Tp>
+        -: 1636:	  static bool
+    #####: 1637:	  _M_not_empty_function(const _Tp&)
+    #####: 1638:	  { return true; }
+        -: 1639:
+        -: 1640:      private:
+        -: 1641:	static void
+    #####: 1642:	_M_init_functor(_Any_data& __functor, _Functor&& __f, true_type)
+    #####: 1643:	{ ::new (__functor._M_access()) _Functor(std::move(__f)); }
+        -: 1644:
+        -: 1645:	static void
+    #####: 1646:	_M_init_functor(_Any_data& __functor, _Functor&& __f, false_type)
+    #####: 1647:	{ __functor._M_access<_Functor*>() = new _Functor(std::move(__f)); }
+        -: 1648:      };
+        -: 1649:
+        -: 1650:    template<typename _Functor>
+        -: 1651:      class _Ref_manager : public _Base_manager<_Functor*>
+        -: 1652:      {
+        -: 1653:	typedef _Function_base::_Base_manager<_Functor*> _Base;
+        -: 1654:
+        -: 1655:      public:
+        -: 1656:	static bool
+        -: 1657:	_M_manager(_Any_data& __dest, const _Any_data& __source,
+        -: 1658:		   _Manager_operation __op)
+        -: 1659:	{
+        -: 1660:	  switch (__op)
+        -: 1661:	    {
+        -: 1662:#if __cpp_rtti
+        -: 1663:	    case __get_type_info:
+        -: 1664:	      __dest._M_access<const type_info*>() = &typeid(_Functor);
+        -: 1665:	      break;
+        -: 1666:#endif
+        -: 1667:	    case __get_functor_ptr:
+        -: 1668:	      __dest._M_access<_Functor*>() = *_Base::_M_get_pointer(__source);
+        -: 1669:	      return is_const<_Functor>::value;
+        -: 1670:	      break;
+        -: 1671:
+        -: 1672:	    default:
+        -: 1673:	      _Base::_M_manager(__dest, __source, __op);
+        -: 1674:	    }
+        -: 1675:	  return false;
+        -: 1676:	}
+        -: 1677:
+        -: 1678:	static void
+        -: 1679:	_M_init_functor(_Any_data& __functor, reference_wrapper<_Functor> __f)
+        -: 1680:	{
+        -: 1681:	  _Base::_M_init_functor(__functor, std::__addressof(__f.get()));
+        -: 1682:	}
+        -: 1683:      };
+        -: 1684:
+    #####: 1685:    _Function_base() : _M_manager(nullptr) { }
+        -: 1686:
+    #####: 1687:    ~_Function_base()
+    #####: 1688:    {
+    #####: 1689:      if (_M_manager)
+    #####: 1690:	_M_manager(_M_functor, _M_functor, __destroy_functor);
+    #####: 1691:    }
+        -: 1692:
+        -: 1693:
+    #####: 1694:    bool _M_empty() const { return !_M_manager; }
+        -: 1695:
+        -: 1696:    typedef bool (*_Manager_type)(_Any_data&, const _Any_data&,
+        -: 1697:				  _Manager_operation);
+        -: 1698:
+        -: 1699:    _Any_data     _M_functor;
+        -: 1700:    _Manager_type _M_manager;
+        -: 1701:  };
+        -: 1702:
+        -: 1703:  template<typename _Signature, typename _Functor>
+        -: 1704:    class _Function_handler;
+        -: 1705:
+        -: 1706:  template<typename _Res, typename _Functor, typename... _ArgTypes>
+        -: 1707:    class _Function_handler<_Res(_ArgTypes...), _Functor>
+        -: 1708:    : public _Function_base::_Base_manager<_Functor>
+        -: 1709:    {
+        -: 1710:      typedef _Function_base::_Base_manager<_Functor> _Base;
+        -: 1711:
+        -: 1712:    public:
+        -: 1713:      static _Res
+    #####: 1714:      _M_invoke(const _Any_data& __functor, _ArgTypes&&... __args)
+        -: 1715:      {
+    #####: 1716:	return (*_Base::_M_get_pointer(__functor))(
+    #####: 1717:	    std::forward<_ArgTypes>(__args)...);
+        -: 1718:      }
+        -: 1719:    };
+        -: 1720:
+        -: 1721:  template<typename _Functor, typename... _ArgTypes>
+        -: 1722:    class _Function_handler<void(_ArgTypes...), _Functor>
+        -: 1723:    : public _Function_base::_Base_manager<_Functor>
+        -: 1724:    {
+        -: 1725:      typedef _Function_base::_Base_manager<_Functor> _Base;
+        -: 1726:
+        -: 1727:     public:
+        -: 1728:      static void
+        -: 1729:      _M_invoke(const _Any_data& __functor, _ArgTypes&&... __args)
+        -: 1730:      {
+        -: 1731:	(*_Base::_M_get_pointer(__functor))(
+        -: 1732:	    std::forward<_ArgTypes>(__args)...);
+        -: 1733:      }
+        -: 1734:    };
+        -: 1735:
+        -: 1736:  template<typename _Res, typename _Functor, typename... _ArgTypes>
+        -: 1737:    class _Function_handler<_Res(_ArgTypes...), reference_wrapper<_Functor> >
+        -: 1738:    : public _Function_base::_Ref_manager<_Functor>
+        -: 1739:    {
+        -: 1740:      typedef _Function_base::_Ref_manager<_Functor> _Base;
+        -: 1741:
+        -: 1742:     public:
+        -: 1743:      static _Res
+        -: 1744:      _M_invoke(const _Any_data& __functor, _ArgTypes&&... __args)
+        -: 1745:      {
+        -: 1746:	return std::__callable_functor(**_Base::_M_get_pointer(__functor))(
+        -: 1747:	      std::forward<_ArgTypes>(__args)...);
+        -: 1748:      }
+        -: 1749:    };
+        -: 1750:
+        -: 1751:  template<typename _Functor, typename... _ArgTypes>
+        -: 1752:    class _Function_handler<void(_ArgTypes...), reference_wrapper<_Functor> >
+        -: 1753:    : public _Function_base::_Ref_manager<_Functor>
+        -: 1754:    {
+        -: 1755:      typedef _Function_base::_Ref_manager<_Functor> _Base;
+        -: 1756:
+        -: 1757:     public:
+        -: 1758:      static void
+        -: 1759:      _M_invoke(const _Any_data& __functor, _ArgTypes&&... __args)
+        -: 1760:      {
+        -: 1761:	std::__callable_functor(**_Base::_M_get_pointer(__functor))(
+        -: 1762:	    std::forward<_ArgTypes>(__args)...);
+        -: 1763:      }
+        -: 1764:    };
+        -: 1765:
+        -: 1766:  template<typename _Class, typename _Member, typename _Res,
+        -: 1767:	   typename... _ArgTypes>
+        -: 1768:    class _Function_handler<_Res(_ArgTypes...), _Member _Class::*>
+        -: 1769:    : public _Function_handler<void(_ArgTypes...), _Member _Class::*>
+        -: 1770:    {
+        -: 1771:      typedef _Function_handler<void(_ArgTypes...), _Member _Class::*>
+        -: 1772:	_Base;
+        -: 1773:
+        -: 1774:     public:
+        -: 1775:      static _Res
+        -: 1776:      _M_invoke(const _Any_data& __functor, _ArgTypes&&... __args)
+        -: 1777:      {
+        -: 1778:	return std::mem_fn(_Base::_M_get_pointer(__functor)->__value)(
+        -: 1779:	    std::forward<_ArgTypes>(__args)...);
+        -: 1780:      }
+        -: 1781:    };
+        -: 1782:
+        -: 1783:  template<typename _Class, typename _Member, typename... _ArgTypes>
+        -: 1784:    class _Function_handler<void(_ArgTypes...), _Member _Class::*>
+        -: 1785:    : public _Function_base::_Base_manager<
+        -: 1786:		 _Simple_type_wrapper< _Member _Class::* > >
+        -: 1787:    {
+        -: 1788:      typedef _Member _Class::* _Functor;
+        -: 1789:      typedef _Simple_type_wrapper<_Functor> _Wrapper;
+        -: 1790:      typedef _Function_base::_Base_manager<_Wrapper> _Base;
+        -: 1791:
+        -: 1792:    public:
+        -: 1793:      static bool
+        -: 1794:      _M_manager(_Any_data& __dest, const _Any_data& __source,
+        -: 1795:		 _Manager_operation __op)
+        -: 1796:      {
+        -: 1797:	switch (__op)
+        -: 1798:	  {
+        -: 1799:#if __cpp_rtti
+        -: 1800:	  case __get_type_info:
+        -: 1801:	    __dest._M_access<const type_info*>() = &typeid(_Functor);
+        -: 1802:	    break;
+        -: 1803:#endif
+        -: 1804:	  case __get_functor_ptr:
+        -: 1805:	    __dest._M_access<_Functor*>() =
+        -: 1806:	      &_Base::_M_get_pointer(__source)->__value;
+        -: 1807:	    break;
+        -: 1808:
+        -: 1809:	  default:
+        -: 1810:	    _Base::_M_manager(__dest, __source, __op);
+        -: 1811:	  }
+        -: 1812:	return false;
+        -: 1813:      }
+        -: 1814:
+        -: 1815:      static void
+        -: 1816:      _M_invoke(const _Any_data& __functor, _ArgTypes&&... __args)
+        -: 1817:      {
+        -: 1818:	std::mem_fn(_Base::_M_get_pointer(__functor)->__value)(
+        -: 1819:	    std::forward<_ArgTypes>(__args)...);
+        -: 1820:      }
+        -: 1821:    };
+        -: 1822:
+        -: 1823:  template<typename _From, typename _To>
+        -: 1824:    using __check_func_return_type
+        -: 1825:      = __or_<is_void<_To>, is_same<_From, _To>, is_convertible<_From, _To>>;
+        -: 1826:
+        -: 1827:  /**
+        -: 1828:   *  @brief Primary class template for std::function.
+        -: 1829:   *  @ingroup functors
+        -: 1830:   *
+        -: 1831:   *  Polymorphic function wrapper.
+        -: 1832:   */
+        -: 1833:  template<typename _Res, typename... _ArgTypes>
+    #####: 1834:    class function<_Res(_ArgTypes...)>
+        -: 1835:    : public _Maybe_unary_or_binary_function<_Res, _ArgTypes...>,
+        -: 1836:      private _Function_base
+        -: 1837:    {
+        -: 1838:      typedef _Res _Signature_type(_ArgTypes...);
+        -: 1839:
+        -: 1840:      template<typename _Func,
+        -: 1841:	       typename _Res2 = typename result_of<_Func&(_ArgTypes...)>::type>
+        -: 1842:	struct _Callable : __check_func_return_type<_Res2, _Res> { };
+        -: 1843:
+        -: 1844:      // Used so the return type convertibility checks aren't done when
+        -: 1845:      // performing overload resolution for copy construction/assignment.
+        -: 1846:      template<typename _Tp>
+        -: 1847:	struct _Callable<function, _Tp> : false_type { };
+        -: 1848:
+        -: 1849:      template<typename _Cond, typename _Tp>
+        -: 1850:	using _Requires = typename enable_if<_Cond::value, _Tp>::type;
+        -: 1851:
+        -: 1852:    public:
+        -: 1853:      typedef _Res result_type;
+        -: 1854:
+        -: 1855:      // [3.7.2.1] construct/copy/destroy
+        -: 1856:
+        -: 1857:      /**
+        -: 1858:       *  @brief Default construct creates an empty function call wrapper.
+        -: 1859:       *  @post @c !(bool)*this
+        -: 1860:       */
+    #####: 1861:      function() noexcept
+    #####: 1862:      : _Function_base() { }
+        -: 1863:
+        -: 1864:      /**
+        -: 1865:       *  @brief Creates an empty function call wrapper.
+        -: 1866:       *  @post @c !(bool)*this
+        -: 1867:       */
+        -: 1868:      function(nullptr_t) noexcept
+        -: 1869:      : _Function_base() { }
+        -: 1870:
+        -: 1871:      /**
+        -: 1872:       *  @brief %Function copy constructor.
+        -: 1873:       *  @param __x A %function object with identical call signature.
+        -: 1874:       *  @post @c bool(*this) == bool(__x)
+        -: 1875:       *
+        -: 1876:       *  The newly-created %function contains a copy of the target of @a
+        -: 1877:       *  __x (if it has one).
+        -: 1878:       */
+        -: 1879:      function(const function& __x);
+        -: 1880:
+        -: 1881:      /**
+        -: 1882:       *  @brief %Function move constructor.
+        -: 1883:       *  @param __x A %function object rvalue with identical call signature.
+        -: 1884:       *
+        -: 1885:       *  The newly-created %function contains the target of @a __x
+        -: 1886:       *  (if it has one).
+        -: 1887:       */
+    #####: 1888:      function(function&& __x) : _Function_base()
+        -: 1889:      {
+    #####: 1890:	__x.swap(*this);
+    #####: 1891:      }
+        -: 1892:
+        -: 1893:      // TODO: needs allocator_arg_t
+        -: 1894:
+        -: 1895:      /**
+        -: 1896:       *  @brief Builds a %function that targets a copy of the incoming
+        -: 1897:       *  function object.
+        -: 1898:       *  @param __f A %function object that is callable with parameters of
+        -: 1899:       *  type @c T1, @c T2, ..., @c TN and returns a value convertible
+        -: 1900:       *  to @c Res.
+        -: 1901:       *
+        -: 1902:       *  The newly-created %function object will target a copy of 
+        -: 1903:       *  @a __f. If @a __f is @c reference_wrapper<F>, then this function
+        -: 1904:       *  object will contain a reference to the function object @c
+        -: 1905:       *  __f.get(). If @a __f is a NULL function pointer or NULL
+        -: 1906:       *  pointer-to-member, the newly-created object will be empty.
+        -: 1907:       *
+        -: 1908:       *  If @a __f is a non-NULL function pointer or an object of type @c
+        -: 1909:       *  reference_wrapper<F>, this function will not throw.
+        -: 1910:       */
+        -: 1911:      template<typename _Functor,
+        -: 1912:	       typename = _Requires<__not_<is_same<_Functor, function>>, void>,
+        -: 1913:	       typename = _Requires<_Callable<_Functor>, void>>
+        -: 1914:	function(_Functor);
+        -: 1915:
+        -: 1916:      /**
+        -: 1917:       *  @brief %Function assignment operator.
+        -: 1918:       *  @param __x A %function with identical call signature.
+        -: 1919:       *  @post @c (bool)*this == (bool)x
+        -: 1920:       *  @returns @c *this
+        -: 1921:       *
+        -: 1922:       *  The target of @a __x is copied to @c *this. If @a __x has no
+        -: 1923:       *  target, then @c *this will be empty.
+        -: 1924:       *
+        -: 1925:       *  If @a __x targets a function pointer or a reference to a function
+        -: 1926:       *  object, then this operation will not throw an %exception.
+        -: 1927:       */
+        -: 1928:      function&
+        -: 1929:      operator=(const function& __x)
+        -: 1930:      {
+        -: 1931:	function(__x).swap(*this);
+        -: 1932:	return *this;
+        -: 1933:      }
+        -: 1934:
+        -: 1935:      /**
+        -: 1936:       *  @brief %Function move-assignment operator.
+        -: 1937:       *  @param __x A %function rvalue with identical call signature.
+        -: 1938:       *  @returns @c *this
+        -: 1939:       *
+        -: 1940:       *  The target of @a __x is moved to @c *this. If @a __x has no
+        -: 1941:       *  target, then @c *this will be empty.
+        -: 1942:       *
+        -: 1943:       *  If @a __x targets a function pointer or a reference to a function
+        -: 1944:       *  object, then this operation will not throw an %exception.
+        -: 1945:       */
+        -: 1946:      function&
+    #####: 1947:      operator=(function&& __x)
+        -: 1948:      {
+    #####: 1949:	function(std::move(__x)).swap(*this);
+    #####: 1950:	return *this;
+        -: 1951:      }
+        -: 1952:
+        -: 1953:      /**
+        -: 1954:       *  @brief %Function assignment to zero.
+        -: 1955:       *  @post @c !(bool)*this
+        -: 1956:       *  @returns @c *this
+        -: 1957:       *
+        -: 1958:       *  The target of @c *this is deallocated, leaving it empty.
+        -: 1959:       */
+        -: 1960:      function&
+        -: 1961:      operator=(nullptr_t) noexcept
+        -: 1962:      {
+        -: 1963:	if (_M_manager)
+        -: 1964:	  {
+        -: 1965:	    _M_manager(_M_functor, _M_functor, __destroy_functor);
+        -: 1966:	    _M_manager = nullptr;
+        -: 1967:	    _M_invoker = nullptr;
+        -: 1968:	  }
+        -: 1969:	return *this;
+        -: 1970:      }
+        -: 1971:
+        -: 1972:      /**
+        -: 1973:       *  @brief %Function assignment to a new target.
+        -: 1974:       *  @param __f A %function object that is callable with parameters of
+        -: 1975:       *  type @c T1, @c T2, ..., @c TN and returns a value convertible
+        -: 1976:       *  to @c Res.
+        -: 1977:       *  @return @c *this
+        -: 1978:       *
+        -: 1979:       *  This  %function object wrapper will target a copy of @a
+        -: 1980:       *  __f. If @a __f is @c reference_wrapper<F>, then this function
+        -: 1981:       *  object will contain a reference to the function object @c
+        -: 1982:       *  __f.get(). If @a __f is a NULL function pointer or NULL
+        -: 1983:       *  pointer-to-member, @c this object will be empty.
+        -: 1984:       *
+        -: 1985:       *  If @a __f is a non-NULL function pointer or an object of type @c
+        -: 1986:       *  reference_wrapper<F>, this function will not throw.
+        -: 1987:       */
+        -: 1988:      template<typename _Functor>
+        -: 1989:	_Requires<_Callable<typename decay<_Functor>::type>, function&>
+        -: 1990:	operator=(_Functor&& __f)
+        -: 1991:	{
+        -: 1992:	  function(std::forward<_Functor>(__f)).swap(*this);
+        -: 1993:	  return *this;
+        -: 1994:	}
+        -: 1995:
+        -: 1996:      /// @overload
+        -: 1997:      template<typename _Functor>
+        -: 1998:	function&
+        -: 1999:	operator=(reference_wrapper<_Functor> __f) noexcept
+        -: 2000:	{
+        -: 2001:	  function(__f).swap(*this);
+        -: 2002:	  return *this;
+        -: 2003:	}
+        -: 2004:
+        -: 2005:      // [3.7.2.2] function modifiers
+        -: 2006:
+        -: 2007:      /**
+        -: 2008:       *  @brief Swap the targets of two %function objects.
+        -: 2009:       *  @param __x A %function with identical call signature.
+        -: 2010:       *
+        -: 2011:       *  Swap the targets of @c this function object and @a __f. This
+        -: 2012:       *  function will not throw an %exception.
+        -: 2013:       */
+    #####: 2014:      void swap(function& __x) noexcept
+        -: 2015:      {
+    #####: 2016:	std::swap(_M_functor, __x._M_functor);
+    #####: 2017:	std::swap(_M_manager, __x._M_manager);
+    #####: 2018:	std::swap(_M_invoker, __x._M_invoker);
+    #####: 2019:      }
+        -: 2020:
+        -: 2021:      // TODO: needs allocator_arg_t
+        -: 2022:      /*
+        -: 2023:      template<typename _Functor, typename _Alloc>
+        -: 2024:	void
+        -: 2025:	assign(_Functor&& __f, const _Alloc& __a)
+        -: 2026:	{
+        -: 2027:	  function(allocator_arg, __a,
+        -: 2028:		   std::forward<_Functor>(__f)).swap(*this);
+        -: 2029:	}
+        -: 2030:      */
+        -: 2031:
+        -: 2032:      // [3.7.2.3] function capacity
+        -: 2033:
+        -: 2034:      /**
+        -: 2035:       *  @brief Determine if the %function wrapper has a target.
+        -: 2036:       *
+        -: 2037:       *  @return @c true when this %function object contains a target,
+        -: 2038:       *  or @c false when it is empty.
+        -: 2039:       *
+        -: 2040:       *  This function will not throw an %exception.
+        -: 2041:       */
+    #####: 2042:      explicit operator bool() const noexcept
+    #####: 2043:      { return !_M_empty(); }
+        -: 2044:
+        -: 2045:      // [3.7.2.4] function invocation
+        -: 2046:
+        -: 2047:      /**
+        -: 2048:       *  @brief Invokes the function targeted by @c *this.
+        -: 2049:       *  @returns the result of the target.
+        -: 2050:       *  @throws bad_function_call when @c !(bool)*this
+        -: 2051:       *
+        -: 2052:       *  The function call operator invokes the target function object
+        -: 2053:       *  stored by @c this.
+        -: 2054:       */
+        -: 2055:      _Res operator()(_ArgTypes... __args) const;
+        -: 2056:
+        -: 2057:#if __cpp_rtti
+        -: 2058:      // [3.7.2.5] function target access
+        -: 2059:      /**
+        -: 2060:       *  @brief Determine the type of the target of this function object
+        -: 2061:       *  wrapper.
+        -: 2062:       *
+        -: 2063:       *  @returns the type identifier of the target function object, or
+        -: 2064:       *  @c typeid(void) if @c !(bool)*this.
+        -: 2065:       *
+        -: 2066:       *  This function will not throw an %exception.
+        -: 2067:       */
+        -: 2068:      const type_info& target_type() const noexcept;
+        -: 2069:
+        -: 2070:      /**
+        -: 2071:       *  @brief Access the stored target function object.
+        -: 2072:       *
+        -: 2073:       *  @return Returns a pointer to the stored target function object,
+        -: 2074:       *  if @c typeid(Functor).equals(target_type()); otherwise, a NULL
+        -: 2075:       *  pointer.
+        -: 2076:       *
+        -: 2077:       * This function will not throw an %exception.
+        -: 2078:       */
+        -: 2079:      template<typename _Functor>       _Functor* target() noexcept;
+        -: 2080:
+        -: 2081:      /// @overload
+        -: 2082:      template<typename _Functor> const _Functor* target() const noexcept;
+        -: 2083:#endif
+        -: 2084:
+        -: 2085:    private:
+        -: 2086:      using _Invoker_type = _Res (*)(const _Any_data&, _ArgTypes&&...);
+        -: 2087:      _Invoker_type _M_invoker;
+        -: 2088:  };
+        -: 2089:
+        -: 2090:  // Out-of-line member definitions.
+        -: 2091:  template<typename _Res, typename... _ArgTypes>
+    #####: 2092:    function<_Res(_ArgTypes...)>::
+        -: 2093:    function(const function& __x)
+    #####: 2094:    : _Function_base()
+        -: 2095:    {
+    #####: 2096:      if (static_cast<bool>(__x))
+        -: 2097:	{
+    #####: 2098:	  __x._M_manager(_M_functor, __x._M_functor, __clone_functor);
+    #####: 2099:	  _M_invoker = __x._M_invoker;
+    #####: 2100:	  _M_manager = __x._M_manager;
+        -: 2101:	}
+    #####: 2102:    }
+        -: 2103:
+        -: 2104:  template<typename _Res, typename... _ArgTypes>
+        -: 2105:    template<typename _Functor, typename, typename>
+    #####: 2106:      function<_Res(_ArgTypes...)>::
+        -: 2107:      function(_Functor __f)
+    #####: 2108:      : _Function_base()
+        -: 2109:      {
+        -: 2110:	typedef _Function_handler<_Signature_type, _Functor> _My_handler;
+        -: 2111:
+    #####: 2112:	if (_My_handler::_M_not_empty_function(__f))
+        -: 2113:	  {
+    #####: 2114:	    _My_handler::_M_init_functor(_M_functor, std::move(__f));
+    #####: 2115:	    _M_invoker = &_My_handler::_M_invoke;
+    #####: 2116:	    _M_manager = &_My_handler::_M_manager;
+        -: 2117:	  }
+    #####: 2118:      }
+        -: 2119:
+        -: 2120:  template<typename _Res, typename... _ArgTypes>
+        -: 2121:    _Res
+    #####: 2122:    function<_Res(_ArgTypes...)>::
+        -: 2123:    operator()(_ArgTypes... __args) const
+        -: 2124:    {
+    #####: 2125:      if (_M_empty())
+    #####: 2126:	__throw_bad_function_call();
+    #####: 2127:      return _M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...);
+        -: 2128:    }
+        -: 2129:
+        -: 2130:#if __cpp_rtti
+        -: 2131:  template<typename _Res, typename... _ArgTypes>
+        -: 2132:    const type_info&
+        -: 2133:    function<_Res(_ArgTypes...)>::
+        -: 2134:    target_type() const noexcept
+        -: 2135:    {
+        -: 2136:      if (_M_manager)
+        -: 2137:	{
+        -: 2138:	  _Any_data __typeinfo_result;
+        -: 2139:	  _M_manager(__typeinfo_result, _M_functor, __get_type_info);
+        -: 2140:	  return *__typeinfo_result._M_access<const type_info*>();
+        -: 2141:	}
+        -: 2142:      else
+        -: 2143:	return typeid(void);
+        -: 2144:    }
+        -: 2145:
+        -: 2146:  template<typename _Res, typename... _ArgTypes>
+        -: 2147:    template<typename _Functor>
+        -: 2148:      _Functor*
+        -: 2149:      function<_Res(_ArgTypes...)>::
+        -: 2150:      target() noexcept
+        -: 2151:      {
+        -: 2152:	if (typeid(_Functor) == target_type() && _M_manager)
+        -: 2153:	  {
+        -: 2154:	    _Any_data __ptr;
+        -: 2155:	    if (_M_manager(__ptr, _M_functor, __get_functor_ptr)
+        -: 2156:		&& !is_const<_Functor>::value)
+        -: 2157:	      return 0;
+        -: 2158:	    else
+        -: 2159:	      return __ptr._M_access<_Functor*>();
+        -: 2160:	  }
+        -: 2161:	else
+        -: 2162:	  return 0;
+        -: 2163:      }
+        -: 2164:
+        -: 2165:  template<typename _Res, typename... _ArgTypes>
+        -: 2166:    template<typename _Functor>
+        -: 2167:      const _Functor*
+        -: 2168:      function<_Res(_ArgTypes...)>::
+        -: 2169:      target() const noexcept
+        -: 2170:      {
+        -: 2171:	if (typeid(_Functor) == target_type() && _M_manager)
+        -: 2172:	  {
+        -: 2173:	    _Any_data __ptr;
+        -: 2174:	    _M_manager(__ptr, _M_functor, __get_functor_ptr);
+        -: 2175:	    return __ptr._M_access<const _Functor*>();
+        -: 2176:	  }
+        -: 2177:	else
+        -: 2178:	  return 0;
+        -: 2179:      }
+        -: 2180:#endif
+        -: 2181:
+        -: 2182:  // [20.7.15.2.6] null pointer comparisons
+        -: 2183:
+        -: 2184:  /**
+        -: 2185:   *  @brief Compares a polymorphic function object wrapper against 0
+        -: 2186:   *  (the NULL pointer).
+        -: 2187:   *  @returns @c true if the wrapper has no target, @c false otherwise
+        -: 2188:   *
+        -: 2189:   *  This function will not throw an %exception.
+        -: 2190:   */
+        -: 2191:  template<typename _Res, typename... _Args>
+        -: 2192:    inline bool
+        -: 2193:    operator==(const function<_Res(_Args...)>& __f, nullptr_t) noexcept
+        -: 2194:    { return !static_cast<bool>(__f); }
+        -: 2195:
+        -: 2196:  /// @overload
+        -: 2197:  template<typename _Res, typename... _Args>
+        -: 2198:    inline bool
+        -: 2199:    operator==(nullptr_t, const function<_Res(_Args...)>& __f) noexcept
+        -: 2200:    { return !static_cast<bool>(__f); }
+        -: 2201:
+        -: 2202:  /**
+        -: 2203:   *  @brief Compares a polymorphic function object wrapper against 0
+        -: 2204:   *  (the NULL pointer).
+        -: 2205:   *  @returns @c false if the wrapper has no target, @c true otherwise
+        -: 2206:   *
+        -: 2207:   *  This function will not throw an %exception.
+        -: 2208:   */
+        -: 2209:  template<typename _Res, typename... _Args>
+        -: 2210:    inline bool
+        -: 2211:    operator!=(const function<_Res(_Args...)>& __f, nullptr_t) noexcept
+        -: 2212:    { return static_cast<bool>(__f); }
+        -: 2213:
+        -: 2214:  /// @overload
+        -: 2215:  template<typename _Res, typename... _Args>
+        -: 2216:    inline bool
+        -: 2217:    operator!=(nullptr_t, const function<_Res(_Args...)>& __f) noexcept
+        -: 2218:    { return static_cast<bool>(__f); }
+        -: 2219:
+        -: 2220:  // [20.7.15.2.7] specialized algorithms
+        -: 2221:
+        -: 2222:  /**
+        -: 2223:   *  @brief Swap the targets of two polymorphic function object wrappers.
+        -: 2224:   *
+        -: 2225:   *  This function will not throw an %exception.
+        -: 2226:   */
+        -: 2227:  // _GLIBCXX_RESOLVE_LIB_DEFECTS
+        -: 2228:  // 2062. Effect contradictions w/o no-throw guarantee of std::function swaps
+        -: 2229:  template<typename _Res, typename... _Args>
+        -: 2230:    inline void
+        -: 2231:    swap(function<_Res(_Args...)>& __x, function<_Res(_Args...)>& __y) noexcept
+        -: 2232:    { __x.swap(__y); }
+        -: 2233:
+        -: 2234:_GLIBCXX_END_NAMESPACE_VERSION
+        -: 2235:} // namespace std
+        -: 2236:
+        -: 2237:#endif // C++11
+        -: 2238:
+        -: 2239:#endif // _GLIBCXX_FUNCTIONAL

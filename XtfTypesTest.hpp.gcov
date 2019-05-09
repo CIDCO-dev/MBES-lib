@@ -1,0 +1,35 @@
+        -:    0:Source:test/XtfTypesTest.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:#ifndef TEST_XCF_HPP
+        -:    2:#define TEST_XCF_HPP
+        -:    3:
+        -:    4:#include "catch.hpp"
+        -:    5:#include "../src/datagrams/xtf/XtfTypes.hpp"
+        -:    6:
+    #####:    7:TEST_CASE( "Les structs XTF ont la bonne dimensions", "[xtfTypes]" ) {
+    #####:    8:    REQUIRE( sizeof(XtfFileHeader) == 1024 );
+    #####:    9:    REQUIRE( sizeof(XtfChanInfo) == 128 );
+    #####:   10:    REQUIRE( sizeof(XtfAttitudeData)+sizeof(XtfPacketHeader) == 64 );
+    #####:   11:    REQUIRE( sizeof(XtfNotesHeader) == 256-sizeof(XtfPacketHeader) );
+    #####:   12:    REQUIRE( sizeof(XtfRawSerialHeader) == 30 );
+    #####:   13:    REQUIRE( sizeof(XtfPingHeader) == 256-sizeof(XtfPacketHeader));
+    #####:   14:    REQUIRE( sizeof(XtfPingChanHeader) == 64);
+    #####:   15:    REQUIRE( sizeof(XtfHighSpeedSensor) == 64);
+    #####:   16:    REQUIRE( sizeof(XtfBeamXYZA) == 31);
+    #####:   17:    REQUIRE( sizeof(SNP0) == 74);
+    #####:   18:    REQUIRE( sizeof(SNP1) == 24);
+    #####:   19:    REQUIRE( sizeof(XtfPosRawNavigation)+sizeof(XtfPacketHeader) == 64);
+    #####:   20:    REQUIRE( sizeof(XtfQpsSingleBeam) == 54);
+    #####:   21:    REQUIRE( sizeof(XtfQpsMultiTxEntry) == 48);
+    #####:   22:    REQUIRE( sizeof(XtfQpsMbEntry) == 64 );
+    #####:   23:    REQUIRE( sizeof(XtfRawCustomHeader) == 64);
+    #####:   24:    REQUIRE( sizeof(XtfHeaderNavigation_type42) == 64 );
+    #####:   25:    REQUIRE( sizeof(XtfHeaderNavigation_type84) == 64 );
+    #####:   26:    REQUIRE( sizeof(XtfHeaderGyro) == 64);
+        -:   27:
+    #####:   28:}
+        -:   29:
+        -:   30:#endif

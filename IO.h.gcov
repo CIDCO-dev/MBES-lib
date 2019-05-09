@@ -1,0 +1,244 @@
+        -:    0:Source:/usr/include/eigen3/Eigen/src/Core/IO.h
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// This file is part of Eigen, a lightweight C++ template library
+        -:    2:// for linear algebra.
+        -:    3://
+        -:    4:// Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
+        -:    5:// Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
+        -:    6://
+        -:    7:// This Source Code Form is subject to the terms of the Mozilla
+        -:    8:// Public License v. 2.0. If a copy of the MPL was not distributed
+        -:    9:// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+        -:   10:
+        -:   11:#ifndef EIGEN_IO_H
+        -:   12:#define EIGEN_IO_H
+        -:   13:
+        -:   14:namespace Eigen { 
+        -:   15:
+        -:   16:enum { DontAlignCols = 1 };
+        -:   17:enum { StreamPrecision = -1,
+        -:   18:       FullPrecision = -2 };
+        -:   19:
+        -:   20:namespace internal {
+        -:   21:template<typename Derived>
+        -:   22:std::ostream & print_matrix(std::ostream & s, const Derived& _m, const IOFormat& fmt);
+        -:   23:}
+        -:   24:
+        -:   25:/** \class IOFormat
+        -:   26:  * \ingroup Core_Module
+        -:   27:  *
+        -:   28:  * \brief Stores a set of parameters controlling the way matrices are printed
+        -:   29:  *
+        -:   30:  * List of available parameters:
+        -:   31:  *  - \b precision number of digits for floating point values, or one of the special constants \c StreamPrecision and \c FullPrecision.
+        -:   32:  *                 The default is the special value \c StreamPrecision which means to use the
+        -:   33:  *                 stream's own precision setting, as set for instance using \c cout.precision(3). The other special value
+        -:   34:  *                 \c FullPrecision means that the number of digits will be computed to match the full precision of each floating-point
+        -:   35:  *                 type.
+        -:   36:  *  - \b flags an OR-ed combination of flags, the default value is 0, the only currently available flag is \c DontAlignCols which
+        -:   37:  *             allows to disable the alignment of columns, resulting in faster code.
+        -:   38:  *  - \b coeffSeparator string printed between two coefficients of the same row
+        -:   39:  *  - \b rowSeparator string printed between two rows
+        -:   40:  *  - \b rowPrefix string printed at the beginning of each row
+        -:   41:  *  - \b rowSuffix string printed at the end of each row
+        -:   42:  *  - \b matPrefix string printed at the beginning of the matrix
+        -:   43:  *  - \b matSuffix string printed at the end of the matrix
+        -:   44:  *
+        -:   45:  * Example: \include IOFormat.cpp
+        -:   46:  * Output: \verbinclude IOFormat.out
+        -:   47:  *
+        -:   48:  * \sa DenseBase::format(), class WithFormat
+        -:   49:  */
+    #####:   50:struct IOFormat
+        -:   51:{
+        -:   52:  /** Default constructor, see class IOFormat for the meaning of the parameters */
+    #####:   53:  IOFormat(int _precision = StreamPrecision, int _flags = 0,
+        -:   54:    const std::string& _coeffSeparator = " ",
+        -:   55:    const std::string& _rowSeparator = "\n", const std::string& _rowPrefix="", const std::string& _rowSuffix="",
+        -:   56:    const std::string& _matPrefix="", const std::string& _matSuffix="")
+    #####:   57:  : matPrefix(_matPrefix), matSuffix(_matSuffix), rowPrefix(_rowPrefix), rowSuffix(_rowSuffix), rowSeparator(_rowSeparator),
+    #####:   58:    rowSpacer(""), coeffSeparator(_coeffSeparator), precision(_precision), flags(_flags)
+        -:   59:  {
+        -:   60:    // TODO check if rowPrefix, rowSuffix or rowSeparator contains a newline
+        -:   61:    // don't add rowSpacer if columns are not to be aligned
+    #####:   62:    if((flags & DontAlignCols))
+    #####:   63:      return;
+    #####:   64:    int i = int(matSuffix.length())-1;
+    #####:   65:    while (i>=0 && matSuffix[i]!='\n')
+        -:   66:    {
+    #####:   67:      rowSpacer += ' ';
+    #####:   68:      i--;
+        -:   69:    }
+        -:   70:  }
+        -:   71:  std::string matPrefix, matSuffix;
+        -:   72:  std::string rowPrefix, rowSuffix, rowSeparator, rowSpacer;
+        -:   73:  std::string coeffSeparator;
+        -:   74:  int precision;
+        -:   75:  int flags;
+        -:   76:};
+        -:   77:
+        -:   78:/** \class WithFormat
+        -:   79:  * \ingroup Core_Module
+        -:   80:  *
+        -:   81:  * \brief Pseudo expression providing matrix output with given format
+        -:   82:  *
+        -:   83:  * \tparam ExpressionType the type of the object on which IO stream operations are performed
+        -:   84:  *
+        -:   85:  * This class represents an expression with stream operators controlled by a given IOFormat.
+        -:   86:  * It is the return type of DenseBase::format()
+        -:   87:  * and most of the time this is the only way it is used.
+        -:   88:  *
+        -:   89:  * See class IOFormat for some examples.
+        -:   90:  *
+        -:   91:  * \sa DenseBase::format(), class IOFormat
+        -:   92:  */
+        -:   93:template<typename ExpressionType>
+        -:   94:class WithFormat
+        -:   95:{
+        -:   96:  public:
+        -:   97:
+        -:   98:    WithFormat(const ExpressionType& matrix, const IOFormat& format)
+        -:   99:      : m_matrix(matrix), m_format(format)
+        -:  100:    {}
+        -:  101:
+        -:  102:    friend std::ostream & operator << (std::ostream & s, const WithFormat& wf)
+        -:  103:    {
+        -:  104:      return internal::print_matrix(s, wf.m_matrix.eval(), wf.m_format);
+        -:  105:    }
+        -:  106:
+        -:  107:  protected:
+        -:  108:    typename ExpressionType::Nested m_matrix;
+        -:  109:    IOFormat m_format;
+        -:  110:};
+        -:  111:
+        -:  112:/** \returns a WithFormat proxy object allowing to print a matrix the with given
+        -:  113:  * format \a fmt.
+        -:  114:  *
+        -:  115:  * See class IOFormat for some examples.
+        -:  116:  *
+        -:  117:  * \sa class IOFormat, class WithFormat
+        -:  118:  */
+        -:  119:template<typename Derived>
+        -:  120:inline const WithFormat<Derived>
+        -:  121:DenseBase<Derived>::format(const IOFormat& fmt) const
+        -:  122:{
+        -:  123:  return WithFormat<Derived>(derived(), fmt);
+        -:  124:}
+        -:  125:
+        -:  126:namespace internal {
+        -:  127:
+        -:  128:// NOTE: This helper is kept for backward compatibility with previous code specializing
+        -:  129://       this internal::significant_decimals_impl structure. In the future we should directly
+        -:  130://       call digits10() which has been introduced in July 2016 in 3.3.
+        -:  131:template<typename Scalar>
+        -:  132:struct significant_decimals_impl
+        -:  133:{
+    #####:  134:  static inline int run()
+        -:  135:  {
+    #####:  136:    return NumTraits<Scalar>::digits10();
+        -:  137:  }
+        -:  138:};
+        -:  139:
+        -:  140:/** \internal
+        -:  141:  * print the matrix \a _m to the output stream \a s using the output format \a fmt */
+        -:  142:template<typename Derived>
+    #####:  143:std::ostream & print_matrix(std::ostream & s, const Derived& _m, const IOFormat& fmt)
+        -:  144:{
+    #####:  145:  if(_m.size() == 0)
+        -:  146:  {
+    #####:  147:    s << fmt.matPrefix << fmt.matSuffix;
+    #####:  148:    return s;
+        -:  149:  }
+        -:  150:  
+    #####:  151:  typename Derived::Nested m = _m;
+        -:  152:  typedef typename Derived::Scalar Scalar;
+        -:  153:
+    #####:  154:  Index width = 0;
+        -:  155:
+        -:  156:  std::streamsize explicit_precision;
+    #####:  157:  if(fmt.precision == StreamPrecision)
+        -:  158:  {
+    #####:  159:    explicit_precision = 0;
+        -:  160:  }
+    #####:  161:  else if(fmt.precision == FullPrecision)
+        -:  162:  {
+        -:  163:    if (NumTraits<Scalar>::IsInteger)
+        -:  164:    {
+        -:  165:      explicit_precision = 0;
+        -:  166:    }
+        -:  167:    else
+        -:  168:    {
+    #####:  169:      explicit_precision = significant_decimals_impl<Scalar>::run();
+        -:  170:    }
+        -:  171:  }
+        -:  172:  else
+        -:  173:  {
+    #####:  174:    explicit_precision = fmt.precision;
+        -:  175:  }
+        -:  176:
+    #####:  177:  std::streamsize old_precision = 0;
+    #####:  178:  if(explicit_precision) old_precision = s.precision(explicit_precision);
+        -:  179:
+    #####:  180:  bool align_cols = !(fmt.flags & DontAlignCols);
+    #####:  181:  if(align_cols)
+        -:  182:  {
+        -:  183:    // compute the largest width
+    #####:  184:    for(Index j = 0; j < m.cols(); ++j)
+    #####:  185:      for(Index i = 0; i < m.rows(); ++i)
+        -:  186:      {
+    #####:  187:        std::stringstream sstr;
+    #####:  188:        sstr.copyfmt(s);
+    #####:  189:        sstr << m.coeff(i,j);
+    #####:  190:        width = std::max<Index>(width, Index(sstr.str().length()));
+        -:  191:      }
+        -:  192:  }
+    #####:  193:  s << fmt.matPrefix;
+    #####:  194:  for(Index i = 0; i < m.rows(); ++i)
+        -:  195:  {
+    #####:  196:    if (i)
+    #####:  197:      s << fmt.rowSpacer;
+    #####:  198:    s << fmt.rowPrefix;
+    #####:  199:    if(width) s.width(width);
+    #####:  200:    s << m.coeff(i, 0);
+    #####:  201:    for(Index j = 1; j < m.cols(); ++j)
+        -:  202:    {
+    #####:  203:      s << fmt.coeffSeparator;
+    #####:  204:      if (width) s.width(width);
+    #####:  205:      s << m.coeff(i, j);
+        -:  206:    }
+    #####:  207:    s << fmt.rowSuffix;
+    #####:  208:    if( i < m.rows() - 1)
+    #####:  209:      s << fmt.rowSeparator;
+        -:  210:  }
+    #####:  211:  s << fmt.matSuffix;
+    #####:  212:  if(explicit_precision) s.precision(old_precision);
+    #####:  213:  return s;
+        -:  214:}
+        -:  215:
+        -:  216:} // end namespace internal
+        -:  217:
+        -:  218:/** \relates DenseBase
+        -:  219:  *
+        -:  220:  * Outputs the matrix, to the given stream.
+        -:  221:  *
+        -:  222:  * If you wish to print the matrix with a format different than the default, use DenseBase::format().
+        -:  223:  *
+        -:  224:  * It is also possible to change the default format by defining EIGEN_DEFAULT_IO_FORMAT before including Eigen headers.
+        -:  225:  * If not defined, this will automatically be defined to Eigen::IOFormat(), that is the Eigen::IOFormat with default parameters.
+        -:  226:  *
+        -:  227:  * \sa DenseBase::format()
+        -:  228:  */
+        -:  229:template<typename Derived>
+    #####:  230:std::ostream & operator <<
+        -:  231:(std::ostream & s,
+        -:  232: const DenseBase<Derived> & m)
+        -:  233:{
+    #####:  234:  return internal::print_matrix(s, m.eval(), EIGEN_DEFAULT_IO_FORMAT);
+        -:  235:}
+        -:  236:
+        -:  237:} // end namespace Eigen
+        -:  238:
+        -:  239:#endif // EIGEN_IO_H

@@ -1,0 +1,892 @@
+        -:    0:Source:/usr/include/c++/6/bits/vector.tcc
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// Vector implementation (out of line) -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 2001-2016 Free Software Foundation, Inc.
+        -:    4://
+        -:    5:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    6:// software; you can redistribute it and/or modify it under the
+        -:    7:// terms of the GNU General Public License as published by the
+        -:    8:// Free Software Foundation; either version 3, or (at your option)
+        -:    9:// any later version.
+        -:   10:
+        -:   11:// This library is distributed in the hope that it will be useful,
+        -:   12:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   13:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   14:// GNU General Public License for more details.
+        -:   15:
+        -:   16:// Under Section 7 of GPL version 3, you are granted additional
+        -:   17:// permissions described in the GCC Runtime Library Exception, version
+        -:   18:// 3.1, as published by the Free Software Foundation.
+        -:   19:
+        -:   20:// You should have received a copy of the GNU General Public License and
+        -:   21:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   22:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   23:// <http://www.gnu.org/licenses/>.
+        -:   24:
+        -:   25:/*
+        -:   26: *
+        -:   27: * Copyright (c) 1994
+        -:   28: * Hewlett-Packard Company
+        -:   29: *
+        -:   30: * Permission to use, copy, modify, distribute and sell this software
+        -:   31: * and its documentation for any purpose is hereby granted without fee,
+        -:   32: * provided that the above copyright notice appear in all copies and
+        -:   33: * that both that copyright notice and this permission notice appear
+        -:   34: * in supporting documentation.  Hewlett-Packard Company makes no
+        -:   35: * representations about the suitability of this software for any
+        -:   36: * purpose.  It is provided "as is" without express or implied warranty.
+        -:   37: *
+        -:   38: *
+        -:   39: * Copyright (c) 1996
+        -:   40: * Silicon Graphics Computer Systems, Inc.
+        -:   41: *
+        -:   42: * Permission to use, copy, modify, distribute and sell this software
+        -:   43: * and its documentation for any purpose is hereby granted without fee,
+        -:   44: * provided that the above copyright notice appear in all copies and
+        -:   45: * that both that copyright notice and this permission notice appear
+        -:   46: * in supporting documentation.  Silicon Graphics makes no
+        -:   47: * representations about the suitability of this  software for any
+        -:   48: * purpose.  It is provided "as is" without express or implied warranty.
+        -:   49: */
+        -:   50:
+        -:   51:/** @file bits/vector.tcc
+        -:   52: *  This is an internal header file, included by other library headers.
+        -:   53: *  Do not attempt to use it directly. @headername{vector}
+        -:   54: */
+        -:   55:
+        -:   56:#ifndef _VECTOR_TCC
+        -:   57:#define _VECTOR_TCC 1
+        -:   58:
+        -:   59:namespace std _GLIBCXX_VISIBILITY(default)
+        -:   60:{
+        -:   61:_GLIBCXX_BEGIN_NAMESPACE_CONTAINER
+        -:   62:
+        -:   63:  template<typename _Tp, typename _Alloc>
+        -:   64:    void
+    #####:   65:    vector<_Tp, _Alloc>::
+        -:   66:    reserve(size_type __n)
+        -:   67:    {
+    #####:   68:      if (__n > this->max_size())
+    #####:   69:	__throw_length_error(__N("vector::reserve"));
+    #####:   70:      if (this->capacity() < __n)
+        -:   71:	{
+    #####:   72:	  const size_type __old_size = size();
+        -:   73:	  pointer __tmp = _M_allocate_and_copy(__n,
+        -:   74:	    _GLIBCXX_MAKE_MOVE_IF_NOEXCEPT_ITERATOR(this->_M_impl._M_start),
+    #####:   75:	    _GLIBCXX_MAKE_MOVE_IF_NOEXCEPT_ITERATOR(this->_M_impl._M_finish));
+    #####:   76:	  std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,
+    #####:   77:			_M_get_Tp_allocator());
+    #####:   78:	  _M_deallocate(this->_M_impl._M_start,
+    #####:   79:			this->_M_impl._M_end_of_storage
+    #####:   80:			- this->_M_impl._M_start);
+    #####:   81:	  this->_M_impl._M_start = __tmp;
+    #####:   82:	  this->_M_impl._M_finish = __tmp + __old_size;
+    #####:   83:	  this->_M_impl._M_end_of_storage = this->_M_impl._M_start + __n;
+        -:   84:	}
+    #####:   85:    }
+        -:   86:
+        -:   87:#if __cplusplus >= 201103L
+        -:   88:  template<typename _Tp, typename _Alloc>
+        -:   89:    template<typename... _Args>
+        -:   90:      void
+    #####:   91:      vector<_Tp, _Alloc>::
+        -:   92:      emplace_back(_Args&&... __args)
+        -:   93:      {
+    #####:   94:	if (this->_M_impl._M_finish != this->_M_impl._M_end_of_storage)
+        -:   95:	  {
+    #####:   96:	    _Alloc_traits::construct(this->_M_impl, this->_M_impl._M_finish,
+        -:   97:				     std::forward<_Args>(__args)...);
+    #####:   98:	    ++this->_M_impl._M_finish;
+        -:   99:	  }
+        -:  100:	else
+    #####:  101:	  _M_emplace_back_aux(std::forward<_Args>(__args)...);
+    #####:  102:      }
+        -:  103:#endif
+        -:  104:
+        -:  105:  template<typename _Tp, typename _Alloc>
+        -:  106:    typename vector<_Tp, _Alloc>::iterator
+        -:  107:    vector<_Tp, _Alloc>::
+        -:  108:#if __cplusplus >= 201103L
+        -:  109:    insert(const_iterator __position, const value_type& __x)
+        -:  110:#else
+        -:  111:    insert(iterator __position, const value_type& __x)
+        -:  112:#endif
+        -:  113:    {
+        -:  114:      const size_type __n = __position - begin();
+        -:  115:      if (this->_M_impl._M_finish != this->_M_impl._M_end_of_storage
+        -:  116:	  && __position == end())
+        -:  117:	{
+        -:  118:	  _Alloc_traits::construct(this->_M_impl, this->_M_impl._M_finish, __x);
+        -:  119:	  ++this->_M_impl._M_finish;
+        -:  120:	}
+        -:  121:      else
+        -:  122:	{
+        -:  123:#if __cplusplus >= 201103L
+        -:  124:	  const auto __pos = begin() + (__position - cbegin());
+        -:  125:	  if (this->_M_impl._M_finish != this->_M_impl._M_end_of_storage)
+        -:  126:	    {
+        -:  127:	      _Tp __x_copy = __x;
+        -:  128:	      _M_insert_aux(__pos, std::move(__x_copy));
+        -:  129:	    }
+        -:  130:	  else
+        -:  131:	    _M_insert_aux(__pos, __x);
+        -:  132:#else
+        -:  133:	    _M_insert_aux(__position, __x);
+        -:  134:#endif
+        -:  135:	}
+        -:  136:      return iterator(this->_M_impl._M_start + __n);
+        -:  137:    }
+        -:  138:
+        -:  139:  template<typename _Tp, typename _Alloc>
+        -:  140:    typename vector<_Tp, _Alloc>::iterator
+    #####:  141:    vector<_Tp, _Alloc>::
+        -:  142:    _M_erase(iterator __position)
+        -:  143:    {
+    #####:  144:      if (__position + 1 != end())
+    #####:  145:	_GLIBCXX_MOVE3(__position + 1, end(), __position);
+    #####:  146:      --this->_M_impl._M_finish;
+    #####:  147:      _Alloc_traits::destroy(this->_M_impl, this->_M_impl._M_finish);
+    #####:  148:      return __position;
+        -:  149:    }
+        -:  150:
+        -:  151:  template<typename _Tp, typename _Alloc>
+        -:  152:    typename vector<_Tp, _Alloc>::iterator
+    #####:  153:    vector<_Tp, _Alloc>::
+        -:  154:    _M_erase(iterator __first, iterator __last)
+        -:  155:    {
+    #####:  156:      if (__first != __last)
+        -:  157:	{
+    #####:  158:	  if (__last != end())
+    #####:  159:	    _GLIBCXX_MOVE3(__last, end(), __first);
+    #####:  160:	  _M_erase_at_end(__first.base() + (end() - __last));
+        -:  161:	}
+    #####:  162:      return __first;
+        -:  163:    }
+        -:  164:
+        -:  165:  template<typename _Tp, typename _Alloc>
+        -:  166:    vector<_Tp, _Alloc>&
+    #####:  167:    vector<_Tp, _Alloc>::
+        -:  168:    operator=(const vector<_Tp, _Alloc>& __x)
+        -:  169:    {
+    #####:  170:      if (&__x != this)
+        -:  171:	{
+        -:  172:#if __cplusplus >= 201103L
+    #####:  173:	  if (_Alloc_traits::_S_propagate_on_copy_assign())
+        -:  174:	    {
+    #####:  175:	      if (!_Alloc_traits::_S_always_equal()
+    #####:  176:	          && _M_get_Tp_allocator() != __x._M_get_Tp_allocator())
+        -:  177:	        {
+        -:  178:		  // replacement allocator cannot free existing storage
+    #####:  179:		  this->clear();
+    #####:  180:		  _M_deallocate(this->_M_impl._M_start,
+    #####:  181:				this->_M_impl._M_end_of_storage
+    #####:  182:				- this->_M_impl._M_start);
+    #####:  183:		  this->_M_impl._M_start = nullptr;
+    #####:  184:		  this->_M_impl._M_finish = nullptr;
+    #####:  185:		  this->_M_impl._M_end_of_storage = nullptr;
+        -:  186:		}
+    #####:  187:	      std::__alloc_on_copy(_M_get_Tp_allocator(),
+        -:  188:				   __x._M_get_Tp_allocator());
+        -:  189:	    }
+        -:  190:#endif
+    #####:  191:	  const size_type __xlen = __x.size();
+    #####:  192:	  if (__xlen > capacity())
+        -:  193:	    {
+        -:  194:	      pointer __tmp = _M_allocate_and_copy(__xlen, __x.begin(),
+    #####:  195:						   __x.end());
+    #####:  196:	      std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,
+    #####:  197:			    _M_get_Tp_allocator());
+    #####:  198:	      _M_deallocate(this->_M_impl._M_start,
+    #####:  199:			    this->_M_impl._M_end_of_storage
+    #####:  200:			    - this->_M_impl._M_start);
+    #####:  201:	      this->_M_impl._M_start = __tmp;
+    #####:  202:	      this->_M_impl._M_end_of_storage = this->_M_impl._M_start + __xlen;
+        -:  203:	    }
+    #####:  204:	  else if (size() >= __xlen)
+        -:  205:	    {
+    #####:  206:	      std::_Destroy(std::copy(__x.begin(), __x.end(), begin()),
+    #####:  207:			    end(), _M_get_Tp_allocator());
+        -:  208:	    }
+        -:  209:	  else
+        -:  210:	    {
+    #####:  211:	      std::copy(__x._M_impl._M_start, __x._M_impl._M_start + size(),
+        -:  212:			this->_M_impl._M_start);
+    #####:  213:	      std::__uninitialized_copy_a(__x._M_impl._M_start + size(),
+    #####:  214:					  __x._M_impl._M_finish,
+        -:  215:					  this->_M_impl._M_finish,
+    #####:  216:					  _M_get_Tp_allocator());
+        -:  217:	    }
+    #####:  218:	  this->_M_impl._M_finish = this->_M_impl._M_start + __xlen;
+        -:  219:	}
+    #####:  220:      return *this;
+        -:  221:    }
+        -:  222:
+        -:  223:  template<typename _Tp, typename _Alloc>
+        -:  224:    void
+        -:  225:    vector<_Tp, _Alloc>::
+        -:  226:    _M_fill_assign(size_t __n, const value_type& __val)
+        -:  227:    {
+        -:  228:      if (__n > capacity())
+        -:  229:	{
+        -:  230:	  vector __tmp(__n, __val, _M_get_Tp_allocator());
+        -:  231:	  __tmp._M_impl._M_swap_data(this->_M_impl);
+        -:  232:	}
+        -:  233:      else if (__n > size())
+        -:  234:	{
+        -:  235:	  std::fill(begin(), end(), __val);
+        -:  236:	  this->_M_impl._M_finish =
+        -:  237:	    std::__uninitialized_fill_n_a(this->_M_impl._M_finish,
+        -:  238:					  __n - size(), __val,
+        -:  239:					  _M_get_Tp_allocator());
+        -:  240:	}
+        -:  241:      else
+        -:  242:        _M_erase_at_end(std::fill_n(this->_M_impl._M_start, __n, __val));
+        -:  243:    }
+        -:  244:
+        -:  245:  template<typename _Tp, typename _Alloc>
+        -:  246:    template<typename _InputIterator>
+        -:  247:      void
+        -:  248:      vector<_Tp, _Alloc>::
+        -:  249:      _M_assign_aux(_InputIterator __first, _InputIterator __last,
+        -:  250:		    std::input_iterator_tag)
+        -:  251:      {
+        -:  252:	pointer __cur(this->_M_impl._M_start);
+        -:  253:	for (; __first != __last && __cur != this->_M_impl._M_finish;
+        -:  254:	     ++__cur, ++__first)
+        -:  255:	  *__cur = *__first;
+        -:  256:	if (__first == __last)
+        -:  257:	  _M_erase_at_end(__cur);
+        -:  258:	else
+        -:  259:	  insert(end(), __first, __last);
+        -:  260:      }
+        -:  261:
+        -:  262:  template<typename _Tp, typename _Alloc>
+        -:  263:    template<typename _ForwardIterator>
+        -:  264:      void
+        -:  265:      vector<_Tp, _Alloc>::
+        -:  266:      _M_assign_aux(_ForwardIterator __first, _ForwardIterator __last,
+        -:  267:		    std::forward_iterator_tag)
+        -:  268:      {
+        -:  269:	const size_type __len = std::distance(__first, __last);
+        -:  270:
+        -:  271:	if (__len > capacity())
+        -:  272:	  {
+        -:  273:	    pointer __tmp(_M_allocate_and_copy(__len, __first, __last));
+        -:  274:	    std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,
+        -:  275:			  _M_get_Tp_allocator());
+        -:  276:	    _M_deallocate(this->_M_impl._M_start,
+        -:  277:			  this->_M_impl._M_end_of_storage
+        -:  278:			  - this->_M_impl._M_start);
+        -:  279:	    this->_M_impl._M_start = __tmp;
+        -:  280:	    this->_M_impl._M_finish = this->_M_impl._M_start + __len;
+        -:  281:	    this->_M_impl._M_end_of_storage = this->_M_impl._M_finish;
+        -:  282:	  }
+        -:  283:	else if (size() >= __len)
+        -:  284:	  _M_erase_at_end(std::copy(__first, __last, this->_M_impl._M_start));
+        -:  285:	else
+        -:  286:	  {
+        -:  287:	    _ForwardIterator __mid = __first;
+        -:  288:	    std::advance(__mid, size());
+        -:  289:	    std::copy(__first, __mid, this->_M_impl._M_start);
+        -:  290:	    this->_M_impl._M_finish =
+        -:  291:	      std::__uninitialized_copy_a(__mid, __last,
+        -:  292:					  this->_M_impl._M_finish,
+        -:  293:					  _M_get_Tp_allocator());
+        -:  294:	  }
+        -:  295:      }
+        -:  296:
+        -:  297:#if __cplusplus >= 201103L
+        -:  298:  template<typename _Tp, typename _Alloc>
+        -:  299:    template<typename... _Args>
+        -:  300:      typename vector<_Tp, _Alloc>::iterator
+        -:  301:      vector<_Tp, _Alloc>::
+        -:  302:      emplace(const_iterator __position, _Args&&... __args)
+        -:  303:      {
+        -:  304:	const size_type __n = __position - begin();
+        -:  305:	if (this->_M_impl._M_finish != this->_M_impl._M_end_of_storage
+        -:  306:	    && __position == end())
+        -:  307:	  {
+        -:  308:	    _Alloc_traits::construct(this->_M_impl, this->_M_impl._M_finish,
+        -:  309:				     std::forward<_Args>(__args)...);
+        -:  310:	    ++this->_M_impl._M_finish;
+        -:  311:	  }
+        -:  312:	else
+        -:  313:	  _M_insert_aux(begin() + (__position - cbegin()),
+        -:  314:			std::forward<_Args>(__args)...);
+        -:  315:	return iterator(this->_M_impl._M_start + __n);
+        -:  316:      }
+        -:  317:
+        -:  318:  template<typename _Tp, typename _Alloc>
+        -:  319:    template<typename... _Args>
+        -:  320:      void
+        -:  321:      vector<_Tp, _Alloc>::
+        -:  322:      _M_insert_aux(iterator __position, _Args&&... __args)
+        -:  323:#else
+        -:  324:  template<typename _Tp, typename _Alloc>
+        -:  325:    void
+        -:  326:    vector<_Tp, _Alloc>::
+        -:  327:    _M_insert_aux(iterator __position, const _Tp& __x)
+        -:  328:#endif
+        -:  329:    {
+        -:  330:      if (this->_M_impl._M_finish != this->_M_impl._M_end_of_storage)
+        -:  331:	{
+        -:  332:	  _Alloc_traits::construct(this->_M_impl, this->_M_impl._M_finish,
+        -:  333:			           _GLIBCXX_MOVE(*(this->_M_impl._M_finish
+        -:  334:				                   - 1)));
+        -:  335:	  ++this->_M_impl._M_finish;
+        -:  336:#if __cplusplus < 201103L
+        -:  337:	  _Tp __x_copy = __x;
+        -:  338:#endif
+        -:  339:	  _GLIBCXX_MOVE_BACKWARD3(__position.base(),
+        -:  340:				  this->_M_impl._M_finish - 2,
+        -:  341:				  this->_M_impl._M_finish - 1);
+        -:  342:#if __cplusplus < 201103L
+        -:  343:	  *__position = __x_copy;
+        -:  344:#else
+        -:  345:	  *__position = _Tp(std::forward<_Args>(__args)...);
+        -:  346:#endif
+        -:  347:	}
+        -:  348:      else
+        -:  349:	{
+        -:  350:	  const size_type __len =
+        -:  351:	    _M_check_len(size_type(1), "vector::_M_insert_aux");
+        -:  352:	  const size_type __elems_before = __position - begin();
+        -:  353:	  pointer __new_start(this->_M_allocate(__len));
+        -:  354:	  pointer __new_finish(__new_start);
+        -:  355:	  __try
+        -:  356:	    {
+        -:  357:	      // The order of the three operations is dictated by the C++0x
+        -:  358:	      // case, where the moves could alter a new element belonging
+        -:  359:	      // to the existing vector.  This is an issue only for callers
+        -:  360:	      // taking the element by const lvalue ref (see 23.1/13).
+        -:  361:	      _Alloc_traits::construct(this->_M_impl,
+        -:  362:		                       __new_start + __elems_before,
+        -:  363:#if __cplusplus >= 201103L
+        -:  364:				       std::forward<_Args>(__args)...);
+        -:  365:#else
+        -:  366:	                               __x);
+        -:  367:#endif
+        -:  368:	      __new_finish = pointer();
+        -:  369:
+        -:  370:	      __new_finish
+        -:  371:		= std::__uninitialized_move_if_noexcept_a
+        -:  372:		(this->_M_impl._M_start, __position.base(),
+        -:  373:		 __new_start, _M_get_Tp_allocator());
+        -:  374:
+        -:  375:	      ++__new_finish;
+        -:  376:
+        -:  377:	      __new_finish
+        -:  378:		= std::__uninitialized_move_if_noexcept_a
+        -:  379:		(__position.base(), this->_M_impl._M_finish,
+        -:  380:		 __new_finish, _M_get_Tp_allocator());
+        -:  381:	    }
+        -:  382:          __catch(...)
+        -:  383:	    {
+        -:  384:	      if (!__new_finish)
+        -:  385:		_Alloc_traits::destroy(this->_M_impl,
+        -:  386:		                       __new_start + __elems_before);
+        -:  387:	      else
+        -:  388:		std::_Destroy(__new_start, __new_finish, _M_get_Tp_allocator());
+        -:  389:	      _M_deallocate(__new_start, __len);
+        -:  390:	      __throw_exception_again;
+        -:  391:	    }
+        -:  392:	  std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,
+        -:  393:			_M_get_Tp_allocator());
+        -:  394:	  _M_deallocate(this->_M_impl._M_start,
+        -:  395:			this->_M_impl._M_end_of_storage
+        -:  396:			- this->_M_impl._M_start);
+        -:  397:	  this->_M_impl._M_start = __new_start;
+        -:  398:	  this->_M_impl._M_finish = __new_finish;
+        -:  399:	  this->_M_impl._M_end_of_storage = __new_start + __len;
+        -:  400:	}
+        -:  401:    }
+        -:  402:
+        -:  403:#if __cplusplus >= 201103L
+        -:  404:  template<typename _Tp, typename _Alloc>
+        -:  405:    template<typename... _Args>
+        -:  406:      void
+    #####:  407:      vector<_Tp, _Alloc>::
+        -:  408:      _M_emplace_back_aux(_Args&&... __args)
+        -:  409:      {
+        -:  410:	const size_type __len =
+    #####:  411:	  _M_check_len(size_type(1), "vector::_M_emplace_back_aux");
+    #####:  412:	pointer __new_start(this->_M_allocate(__len));
+    #####:  413:	pointer __new_finish(__new_start);
+        -:  414:	__try
+        -:  415:	  {
+    #####:  416:	    _Alloc_traits::construct(this->_M_impl, __new_start + size(),
+        -:  417:				     std::forward<_Args>(__args)...);
+    #####:  418:	    __new_finish = pointer();
+        -:  419:
+    #####:  420:	    __new_finish
+        -:  421:	      = std::__uninitialized_move_if_noexcept_a
+    #####:  422:	      (this->_M_impl._M_start, this->_M_impl._M_finish,
+    #####:  423:	       __new_start, _M_get_Tp_allocator());
+        -:  424:
+    #####:  425:	    ++__new_finish;
+        -:  426:	  }
+    =====:  427:	__catch(...)
+        -:  428:	  {
+    =====:  429:	    if (!__new_finish)
+    =====:  430:	      _Alloc_traits::destroy(this->_M_impl, __new_start + size());
+        -:  431:	    else
+    =====:  432:	      std::_Destroy(__new_start, __new_finish, _M_get_Tp_allocator());
+    =====:  433:	    _M_deallocate(__new_start, __len);
+    =====:  434:	    __throw_exception_again;
+        -:  435:	  }
+    #####:  436:	std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,
+    #####:  437:		      _M_get_Tp_allocator());
+    #####:  438:	_M_deallocate(this->_M_impl._M_start,
+    #####:  439:		      this->_M_impl._M_end_of_storage
+    #####:  440:		      - this->_M_impl._M_start);
+    #####:  441:	this->_M_impl._M_start = __new_start;
+    #####:  442:	this->_M_impl._M_finish = __new_finish;
+    #####:  443:	this->_M_impl._M_end_of_storage = __new_start + __len;
+    #####:  444:      }
+        -:  445:#endif
+        -:  446:
+        -:  447:  template<typename _Tp, typename _Alloc>
+        -:  448:    void
+        -:  449:    vector<_Tp, _Alloc>::
+        -:  450:    _M_fill_insert(iterator __position, size_type __n, const value_type& __x)
+        -:  451:    {
+        -:  452:      if (__n != 0)
+        -:  453:	{
+        -:  454:	  if (size_type(this->_M_impl._M_end_of_storage
+        -:  455:			- this->_M_impl._M_finish) >= __n)
+        -:  456:	    {
+        -:  457:	      value_type __x_copy = __x;
+        -:  458:	      const size_type __elems_after = end() - __position;
+        -:  459:	      pointer __old_finish(this->_M_impl._M_finish);
+        -:  460:	      if (__elems_after > __n)
+        -:  461:		{
+        -:  462:		  std::__uninitialized_move_a(this->_M_impl._M_finish - __n,
+        -:  463:					      this->_M_impl._M_finish,
+        -:  464:					      this->_M_impl._M_finish,
+        -:  465:					      _M_get_Tp_allocator());
+        -:  466:		  this->_M_impl._M_finish += __n;
+        -:  467:		  _GLIBCXX_MOVE_BACKWARD3(__position.base(),
+        -:  468:					  __old_finish - __n, __old_finish);
+        -:  469:		  std::fill(__position.base(), __position.base() + __n,
+        -:  470:			    __x_copy);
+        -:  471:		}
+        -:  472:	      else
+        -:  473:		{
+        -:  474:		  this->_M_impl._M_finish =
+        -:  475:		    std::__uninitialized_fill_n_a(this->_M_impl._M_finish,
+        -:  476:						  __n - __elems_after,
+        -:  477:						  __x_copy,
+        -:  478:						  _M_get_Tp_allocator());
+        -:  479:		  std::__uninitialized_move_a(__position.base(), __old_finish,
+        -:  480:					      this->_M_impl._M_finish,
+        -:  481:					      _M_get_Tp_allocator());
+        -:  482:		  this->_M_impl._M_finish += __elems_after;
+        -:  483:		  std::fill(__position.base(), __old_finish, __x_copy);
+        -:  484:		}
+        -:  485:	    }
+        -:  486:	  else
+        -:  487:	    {
+        -:  488:	      const size_type __len =
+        -:  489:		_M_check_len(__n, "vector::_M_fill_insert");
+        -:  490:	      const size_type __elems_before = __position - begin();
+        -:  491:	      pointer __new_start(this->_M_allocate(__len));
+        -:  492:	      pointer __new_finish(__new_start);
+        -:  493:	      __try
+        -:  494:		{
+        -:  495:		  // See _M_insert_aux above.
+        -:  496:		  std::__uninitialized_fill_n_a(__new_start + __elems_before,
+        -:  497:						__n, __x,
+        -:  498:						_M_get_Tp_allocator());
+        -:  499:		  __new_finish = pointer();
+        -:  500:
+        -:  501:		  __new_finish
+        -:  502:		    = std::__uninitialized_move_if_noexcept_a
+        -:  503:		    (this->_M_impl._M_start, __position.base(),
+        -:  504:		     __new_start, _M_get_Tp_allocator());
+        -:  505:
+        -:  506:		  __new_finish += __n;
+        -:  507:
+        -:  508:		  __new_finish
+        -:  509:		    = std::__uninitialized_move_if_noexcept_a
+        -:  510:		    (__position.base(), this->_M_impl._M_finish,
+        -:  511:		     __new_finish, _M_get_Tp_allocator());
+        -:  512:		}
+        -:  513:	      __catch(...)
+        -:  514:		{
+        -:  515:		  if (!__new_finish)
+        -:  516:		    std::_Destroy(__new_start + __elems_before,
+        -:  517:				  __new_start + __elems_before + __n,
+        -:  518:				  _M_get_Tp_allocator());
+        -:  519:		  else
+        -:  520:		    std::_Destroy(__new_start, __new_finish,
+        -:  521:				  _M_get_Tp_allocator());
+        -:  522:		  _M_deallocate(__new_start, __len);
+        -:  523:		  __throw_exception_again;
+        -:  524:		}
+        -:  525:	      std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,
+        -:  526:			    _M_get_Tp_allocator());
+        -:  527:	      _M_deallocate(this->_M_impl._M_start,
+        -:  528:			    this->_M_impl._M_end_of_storage
+        -:  529:			    - this->_M_impl._M_start);
+        -:  530:	      this->_M_impl._M_start = __new_start;
+        -:  531:	      this->_M_impl._M_finish = __new_finish;
+        -:  532:	      this->_M_impl._M_end_of_storage = __new_start + __len;
+        -:  533:	    }
+        -:  534:	}
+        -:  535:    }
+        -:  536:
+        -:  537:#if __cplusplus >= 201103L
+        -:  538:  template<typename _Tp, typename _Alloc>
+        -:  539:    void
+    #####:  540:    vector<_Tp, _Alloc>::
+        -:  541:    _M_default_append(size_type __n)
+        -:  542:    {
+    #####:  543:      if (__n != 0)
+        -:  544:	{
+    #####:  545:	  if (size_type(this->_M_impl._M_end_of_storage
+    #####:  546:			- this->_M_impl._M_finish) >= __n)
+        -:  547:	    {
+    #####:  548:	      this->_M_impl._M_finish =
+    #####:  549:		std::__uninitialized_default_n_a(this->_M_impl._M_finish,
+    #####:  550:						 __n, _M_get_Tp_allocator());
+        -:  551:	    }
+        -:  552:	  else
+        -:  553:	    {
+        -:  554:	      const size_type __len =
+    #####:  555:		_M_check_len(__n, "vector::_M_default_append");
+    #####:  556:	      const size_type __old_size = this->size();
+    #####:  557:	      pointer __new_start(this->_M_allocate(__len));
+    #####:  558:	      pointer __new_finish(__new_start);
+        -:  559:	      __try
+        -:  560:		{
+    #####:  561:		  __new_finish
+        -:  562:		    = std::__uninitialized_move_if_noexcept_a
+    #####:  563:		    (this->_M_impl._M_start, this->_M_impl._M_finish,
+    #####:  564:		     __new_start, _M_get_Tp_allocator());
+    #####:  565:		  __new_finish =
+        -:  566:		    std::__uninitialized_default_n_a(__new_finish, __n,
+    #####:  567:						     _M_get_Tp_allocator());
+        -:  568:		}
+    =====:  569:	      __catch(...)
+        -:  570:		{
+    =====:  571:		  std::_Destroy(__new_start, __new_finish,
+    =====:  572:				_M_get_Tp_allocator());
+    =====:  573:		  _M_deallocate(__new_start, __len);
+    =====:  574:		  __throw_exception_again;
+        -:  575:		}
+    #####:  576:	      std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,
+    #####:  577:			    _M_get_Tp_allocator());
+    #####:  578:	      _M_deallocate(this->_M_impl._M_start,
+    #####:  579:			    this->_M_impl._M_end_of_storage
+    #####:  580:			    - this->_M_impl._M_start);
+    #####:  581:	      this->_M_impl._M_start = __new_start;
+    #####:  582:	      this->_M_impl._M_finish = __new_finish;
+    #####:  583:	      this->_M_impl._M_end_of_storage = __new_start + __len;
+        -:  584:	    }
+        -:  585:	}
+    #####:  586:    }
+        -:  587:
+        -:  588:  template<typename _Tp, typename _Alloc>
+        -:  589:    bool
+        -:  590:    vector<_Tp, _Alloc>::
+        -:  591:    _M_shrink_to_fit()
+        -:  592:    {
+        -:  593:      if (capacity() == size())
+        -:  594:	return false;
+        -:  595:      return std::__shrink_to_fit_aux<vector>::_S_do_it(*this);
+        -:  596:    }
+        -:  597:#endif
+        -:  598:
+        -:  599:  template<typename _Tp, typename _Alloc>
+        -:  600:    template<typename _InputIterator>
+        -:  601:      void
+        -:  602:      vector<_Tp, _Alloc>::
+        -:  603:      _M_range_insert(iterator __pos, _InputIterator __first,
+        -:  604:		      _InputIterator __last, std::input_iterator_tag)
+        -:  605:      {
+        -:  606:	for (; __first != __last; ++__first)
+        -:  607:	  {
+        -:  608:	    __pos = insert(__pos, *__first);
+        -:  609:	    ++__pos;
+        -:  610:	  }
+        -:  611:      }
+        -:  612:
+        -:  613:  template<typename _Tp, typename _Alloc>
+        -:  614:    template<typename _ForwardIterator>
+        -:  615:      void
+    #####:  616:      vector<_Tp, _Alloc>::
+        -:  617:      _M_range_insert(iterator __position, _ForwardIterator __first,
+        -:  618:		      _ForwardIterator __last, std::forward_iterator_tag)
+        -:  619:      {
+    #####:  620:	if (__first != __last)
+        -:  621:	  {
+    #####:  622:	    const size_type __n = std::distance(__first, __last);
+    #####:  623:	    if (size_type(this->_M_impl._M_end_of_storage
+    #####:  624:			  - this->_M_impl._M_finish) >= __n)
+        -:  625:	      {
+    #####:  626:		const size_type __elems_after = end() - __position;
+    #####:  627:		pointer __old_finish(this->_M_impl._M_finish);
+    #####:  628:		if (__elems_after > __n)
+        -:  629:		  {
+    #####:  630:		    std::__uninitialized_move_a(this->_M_impl._M_finish - __n,
+        -:  631:						this->_M_impl._M_finish,
+        -:  632:						this->_M_impl._M_finish,
+    #####:  633:						_M_get_Tp_allocator());
+    #####:  634:		    this->_M_impl._M_finish += __n;
+    #####:  635:		    _GLIBCXX_MOVE_BACKWARD3(__position.base(),
+        -:  636:					    __old_finish - __n, __old_finish);
+    #####:  637:		    std::copy(__first, __last, __position);
+        -:  638:		  }
+        -:  639:		else
+        -:  640:		  {
+    #####:  641:		    _ForwardIterator __mid = __first;
+    #####:  642:		    std::advance(__mid, __elems_after);
+    #####:  643:		    std::__uninitialized_copy_a(__mid, __last,
+        -:  644:						this->_M_impl._M_finish,
+    #####:  645:						_M_get_Tp_allocator());
+    #####:  646:		    this->_M_impl._M_finish += __n - __elems_after;
+    #####:  647:		    std::__uninitialized_move_a(__position.base(),
+        -:  648:						__old_finish,
+        -:  649:						this->_M_impl._M_finish,
+    #####:  650:						_M_get_Tp_allocator());
+    #####:  651:		    this->_M_impl._M_finish += __elems_after;
+    #####:  652:		    std::copy(__first, __mid, __position);
+        -:  653:		  }
+        -:  654:	      }
+        -:  655:	    else
+        -:  656:	      {
+        -:  657:		const size_type __len =
+    #####:  658:		  _M_check_len(__n, "vector::_M_range_insert");
+    #####:  659:		pointer __new_start(this->_M_allocate(__len));
+    #####:  660:		pointer __new_finish(__new_start);
+        -:  661:		__try
+        -:  662:		  {
+    #####:  663:		    __new_finish
+        -:  664:		      = std::__uninitialized_move_if_noexcept_a
+    #####:  665:		      (this->_M_impl._M_start, __position.base(),
+    #####:  666:		       __new_start, _M_get_Tp_allocator());
+    #####:  667:		    __new_finish
+        -:  668:		      = std::__uninitialized_copy_a(__first, __last,
+        -:  669:						    __new_finish,
+    #####:  670:						    _M_get_Tp_allocator());
+    #####:  671:		    __new_finish
+        -:  672:		      = std::__uninitialized_move_if_noexcept_a
+    #####:  673:		      (__position.base(), this->_M_impl._M_finish,
+    #####:  674:		       __new_finish, _M_get_Tp_allocator());
+        -:  675:		  }
+    =====:  676:		__catch(...)
+        -:  677:		  {
+    =====:  678:		    std::_Destroy(__new_start, __new_finish,
+    =====:  679:				  _M_get_Tp_allocator());
+    =====:  680:		    _M_deallocate(__new_start, __len);
+    =====:  681:		    __throw_exception_again;
+        -:  682:		  }
+    #####:  683:		std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,
+    #####:  684:			      _M_get_Tp_allocator());
+    #####:  685:		_M_deallocate(this->_M_impl._M_start,
+    #####:  686:			      this->_M_impl._M_end_of_storage
+    #####:  687:			      - this->_M_impl._M_start);
+    #####:  688:		this->_M_impl._M_start = __new_start;
+    #####:  689:		this->_M_impl._M_finish = __new_finish;
+    #####:  690:		this->_M_impl._M_end_of_storage = __new_start + __len;
+        -:  691:	      }
+        -:  692:	  }
+    #####:  693:      }
+        -:  694:
+        -:  695:
+        -:  696:  // vector<bool>
+        -:  697:  template<typename _Alloc>
+        -:  698:    void
+        -:  699:    vector<bool, _Alloc>::
+        -:  700:    _M_reallocate(size_type __n)
+        -:  701:    {
+        -:  702:      _Bit_pointer __q = this->_M_allocate(__n);
+        -:  703:      iterator __start(std::__addressof(*__q), 0);
+        -:  704:      this->_M_impl._M_finish = _M_copy_aligned(begin(), end(), __start);
+        -:  705:      this->_M_deallocate();
+        -:  706:      this->_M_impl._M_start = __start;
+        -:  707:      this->_M_impl._M_end_of_storage = __q + _S_nword(__n);
+        -:  708:    }
+        -:  709:
+        -:  710:  template<typename _Alloc>
+        -:  711:    void
+        -:  712:    vector<bool, _Alloc>::
+        -:  713:    _M_fill_insert(iterator __position, size_type __n, bool __x)
+        -:  714:    {
+        -:  715:      if (__n == 0)
+        -:  716:	return;
+        -:  717:      if (capacity() - size() >= __n)
+        -:  718:	{
+        -:  719:	  std::copy_backward(__position, end(),
+        -:  720:			     this->_M_impl._M_finish + difference_type(__n));
+        -:  721:	  std::fill(__position, __position + difference_type(__n), __x);
+        -:  722:	  this->_M_impl._M_finish += difference_type(__n);
+        -:  723:	}
+        -:  724:      else
+        -:  725:	{
+        -:  726:	  const size_type __len = 
+        -:  727:	    _M_check_len(__n, "vector<bool>::_M_fill_insert");
+        -:  728:	  _Bit_pointer __q = this->_M_allocate(__len);
+        -:  729:	  iterator __start(std::__addressof(*__q), 0);
+        -:  730:	  iterator __i = _M_copy_aligned(begin(), __position, __start);
+        -:  731:	  std::fill(__i, __i + difference_type(__n), __x);
+        -:  732:	  this->_M_impl._M_finish = std::copy(__position, end(),
+        -:  733:					      __i + difference_type(__n));
+        -:  734:	  this->_M_deallocate();
+        -:  735:	  this->_M_impl._M_end_of_storage = __q + _S_nword(__len);
+        -:  736:	  this->_M_impl._M_start = __start;
+        -:  737:	}
+        -:  738:    }
+        -:  739:
+        -:  740:  template<typename _Alloc>
+        -:  741:    template<typename _ForwardIterator>
+        -:  742:      void
+        -:  743:      vector<bool, _Alloc>::
+        -:  744:      _M_insert_range(iterator __position, _ForwardIterator __first, 
+        -:  745:		      _ForwardIterator __last, std::forward_iterator_tag)
+        -:  746:      {
+        -:  747:	if (__first != __last)
+        -:  748:	  {
+        -:  749:	    size_type __n = std::distance(__first, __last);
+        -:  750:	    if (capacity() - size() >= __n)
+        -:  751:	      {
+        -:  752:		std::copy_backward(__position, end(),
+        -:  753:				   this->_M_impl._M_finish
+        -:  754:				   + difference_type(__n));
+        -:  755:		std::copy(__first, __last, __position);
+        -:  756:		this->_M_impl._M_finish += difference_type(__n);
+        -:  757:	      }
+        -:  758:	    else
+        -:  759:	      {
+        -:  760:		const size_type __len =
+        -:  761:		  _M_check_len(__n, "vector<bool>::_M_insert_range");
+        -:  762:		_Bit_pointer __q = this->_M_allocate(__len);
+        -:  763:		iterator __start(std::__addressof(*__q), 0);
+        -:  764:		iterator __i = _M_copy_aligned(begin(), __position, __start);
+        -:  765:		__i = std::copy(__first, __last, __i);
+        -:  766:		this->_M_impl._M_finish = std::copy(__position, end(), __i);
+        -:  767:		this->_M_deallocate();
+        -:  768:		this->_M_impl._M_end_of_storage = __q + _S_nword(__len);
+        -:  769:		this->_M_impl._M_start = __start;
+        -:  770:	      }
+        -:  771:	  }
+        -:  772:      }
+        -:  773:
+        -:  774:  template<typename _Alloc>
+        -:  775:    void
+        -:  776:    vector<bool, _Alloc>::
+        -:  777:    _M_insert_aux(iterator __position, bool __x)
+        -:  778:    {
+        -:  779:      if (this->_M_impl._M_finish._M_p != this->_M_impl._M_end_addr())
+        -:  780:	{
+        -:  781:	  std::copy_backward(__position, this->_M_impl._M_finish, 
+        -:  782:			     this->_M_impl._M_finish + 1);
+        -:  783:	  *__position = __x;
+        -:  784:	  ++this->_M_impl._M_finish;
+        -:  785:	}
+        -:  786:      else
+        -:  787:	{
+        -:  788:	  const size_type __len =
+        -:  789:	    _M_check_len(size_type(1), "vector<bool>::_M_insert_aux");
+        -:  790:	  _Bit_pointer __q = this->_M_allocate(__len);
+        -:  791:	  iterator __start(std::__addressof(*__q), 0);
+        -:  792:	  iterator __i = _M_copy_aligned(begin(), __position, __start);
+        -:  793:	  *__i++ = __x;
+        -:  794:	  this->_M_impl._M_finish = std::copy(__position, end(), __i);
+        -:  795:	  this->_M_deallocate();
+        -:  796:	  this->_M_impl._M_end_of_storage = __q + _S_nword(__len);
+        -:  797:	  this->_M_impl._M_start = __start;
+        -:  798:	}
+        -:  799:    }
+        -:  800:
+        -:  801:  template<typename _Alloc>
+        -:  802:    typename vector<bool, _Alloc>::iterator
+        -:  803:    vector<bool, _Alloc>::
+        -:  804:    _M_erase(iterator __position)
+        -:  805:    {
+        -:  806:      if (__position + 1 != end())
+        -:  807:        std::copy(__position + 1, end(), __position);
+        -:  808:      --this->_M_impl._M_finish;
+        -:  809:      return __position;
+        -:  810:    }
+        -:  811:
+        -:  812:  template<typename _Alloc>
+        -:  813:    typename vector<bool, _Alloc>::iterator
+        -:  814:    vector<bool, _Alloc>::
+        -:  815:    _M_erase(iterator __first, iterator __last)
+        -:  816:    {
+        -:  817:      if (__first != __last)
+        -:  818:	_M_erase_at_end(std::copy(__last, end(), __first));
+        -:  819:      return __first;
+        -:  820:    }
+        -:  821:
+        -:  822:#if __cplusplus >= 201103L
+        -:  823:  template<typename _Alloc>
+        -:  824:    bool
+        -:  825:    vector<bool, _Alloc>::
+        -:  826:    _M_shrink_to_fit()
+        -:  827:    {
+        -:  828:      if (capacity() - size() < int(_S_word_bit))
+        -:  829:	return false;
+        -:  830:      __try
+        -:  831:	{
+        -:  832:	  _M_reallocate(size());
+        -:  833:	  return true;
+        -:  834:	}
+        -:  835:      __catch(...)
+        -:  836:	{ return false; }
+        -:  837:    }
+        -:  838:#endif
+        -:  839:
+        -:  840:_GLIBCXX_END_NAMESPACE_CONTAINER
+        -:  841:} // namespace std
+        -:  842:
+        -:  843:#if __cplusplus >= 201103L
+        -:  844:
+        -:  845:namespace std _GLIBCXX_VISIBILITY(default)
+        -:  846:{
+        -:  847:_GLIBCXX_BEGIN_NAMESPACE_VERSION
+        -:  848:
+        -:  849:  template<typename _Alloc>
+        -:  850:    size_t
+        -:  851:    hash<_GLIBCXX_STD_C::vector<bool, _Alloc>>::
+        -:  852:    operator()(const _GLIBCXX_STD_C::vector<bool, _Alloc>& __b) const noexcept
+        -:  853:    {
+        -:  854:      size_t __hash = 0;
+        -:  855:      using _GLIBCXX_STD_C::_S_word_bit;
+        -:  856:      using _GLIBCXX_STD_C::_Bit_type;
+        -:  857:
+        -:  858:      const size_t __words = __b.size() / _S_word_bit;
+        -:  859:      if (__words)
+        -:  860:	{
+        -:  861:	  const size_t __clength = __words * sizeof(_Bit_type);
+        -:  862:	  __hash = std::_Hash_impl::hash(__b._M_impl._M_start._M_p, __clength);
+        -:  863:	}
+        -:  864:
+        -:  865:      const size_t __extrabits = __b.size() % _S_word_bit;
+        -:  866:      if (__extrabits)
+        -:  867:	{
+        -:  868:	  _Bit_type __hiword = *__b._M_impl._M_finish._M_p;
+        -:  869:	  __hiword &= ~((~static_cast<_Bit_type>(0)) << __extrabits);
+        -:  870:
+        -:  871:	  const size_t __clength
+        -:  872:	    = (__extrabits + __CHAR_BIT__ - 1) / __CHAR_BIT__;
+        -:  873:	  if (__words)
+        -:  874:	    __hash = std::_Hash_impl::hash(&__hiword, __clength, __hash);
+        -:  875:	  else
+        -:  876:	    __hash = std::_Hash_impl::hash(&__hiword, __clength);
+        -:  877:	}
+        -:  878:
+        -:  879:      return __hash;
+        -:  880:    }
+        -:  881:
+        -:  882:_GLIBCXX_END_NAMESPACE_VERSION
+        -:  883:} // namespace std
+        -:  884:
+        -:  885:#endif // C++11
+        -:  886:
+        -:  887:#endif /* _VECTOR_TCC */

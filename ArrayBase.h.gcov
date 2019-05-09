@@ -1,0 +1,231 @@
+        -:    0:Source:/usr/include/eigen3/Eigen/src/Core/ArrayBase.h
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// This file is part of Eigen, a lightweight C++ template library
+        -:    2:// for linear algebra.
+        -:    3://
+        -:    4:// Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
+        -:    5://
+        -:    6:// This Source Code Form is subject to the terms of the Mozilla
+        -:    7:// Public License v. 2.0. If a copy of the MPL was not distributed
+        -:    8:// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+        -:    9:
+        -:   10:#ifndef EIGEN_ARRAYBASE_H
+        -:   11:#define EIGEN_ARRAYBASE_H
+        -:   12:
+        -:   13:namespace Eigen { 
+        -:   14:
+        -:   15:template<typename ExpressionType> class MatrixWrapper;
+        -:   16:
+        -:   17:/** \class ArrayBase
+        -:   18:  * \ingroup Core_Module
+        -:   19:  *
+        -:   20:  * \brief Base class for all 1D and 2D array, and related expressions
+        -:   21:  *
+        -:   22:  * An array is similar to a dense vector or matrix. While matrices are mathematical
+        -:   23:  * objects with well defined linear algebra operators, an array is just a collection
+        -:   24:  * of scalar values arranged in a one or two dimensionnal fashion. As the main consequence,
+        -:   25:  * all operations applied to an array are performed coefficient wise. Furthermore,
+        -:   26:  * arrays support scalar math functions of the c++ standard library (e.g., std::sin(x)), and convenient
+        -:   27:  * constructors allowing to easily write generic code working for both scalar values
+        -:   28:  * and arrays.
+        -:   29:  *
+        -:   30:  * This class is the base that is inherited by all array expression types.
+        -:   31:  *
+        -:   32:  * \tparam Derived is the derived type, e.g., an array or an expression type.
+        -:   33:  *
+        -:   34:  * This class can be extended with the help of the plugin mechanism described on the page
+        -:   35:  * \ref TopicCustomizing_Plugins by defining the preprocessor symbol \c EIGEN_ARRAYBASE_PLUGIN.
+        -:   36:  *
+        -:   37:  * \sa class MatrixBase, \ref TopicClassHierarchy
+        -:   38:  */
+        -:   39:template<typename Derived> class ArrayBase
+        -:   40:  : public DenseBase<Derived>
+        -:   41:{
+        -:   42:  public:
+        -:   43:#ifndef EIGEN_PARSED_BY_DOXYGEN
+        -:   44:    /** The base class for a given storage type. */
+        -:   45:    typedef ArrayBase StorageBaseType;
+        -:   46:
+        -:   47:    typedef ArrayBase Eigen_BaseClassForSpecializationOfGlobalMathFuncImpl;
+        -:   48:
+        -:   49:    typedef typename internal::traits<Derived>::StorageKind StorageKind;
+        -:   50:    typedef typename internal::traits<Derived>::Scalar Scalar;
+        -:   51:    typedef typename internal::packet_traits<Scalar>::type PacketScalar;
+        -:   52:    typedef typename NumTraits<Scalar>::Real RealScalar;
+        -:   53:
+        -:   54:    typedef DenseBase<Derived> Base;
+        -:   55:    using Base::RowsAtCompileTime;
+        -:   56:    using Base::ColsAtCompileTime;
+        -:   57:    using Base::SizeAtCompileTime;
+        -:   58:    using Base::MaxRowsAtCompileTime;
+        -:   59:    using Base::MaxColsAtCompileTime;
+        -:   60:    using Base::MaxSizeAtCompileTime;
+        -:   61:    using Base::IsVectorAtCompileTime;
+        -:   62:    using Base::Flags;
+        -:   63:    
+        -:   64:    using Base::derived;
+        -:   65:    using Base::const_cast_derived;
+        -:   66:    using Base::rows;
+        -:   67:    using Base::cols;
+        -:   68:    using Base::size;
+        -:   69:    using Base::coeff;
+        -:   70:    using Base::coeffRef;
+        -:   71:    using Base::lazyAssign;
+        -:   72:    using Base::operator=;
+        -:   73:    using Base::operator+=;
+        -:   74:    using Base::operator-=;
+        -:   75:    using Base::operator*=;
+        -:   76:    using Base::operator/=;
+        -:   77:
+        -:   78:    typedef typename Base::CoeffReturnType CoeffReturnType;
+        -:   79:
+        -:   80:#endif // not EIGEN_PARSED_BY_DOXYGEN
+        -:   81:
+        -:   82:#ifndef EIGEN_PARSED_BY_DOXYGEN
+        -:   83:    typedef typename Base::PlainObject PlainObject;
+        -:   84:
+        -:   85:    /** \internal Represents a matrix with all coefficients equal to one another*/
+        -:   86:    typedef CwiseNullaryOp<internal::scalar_constant_op<Scalar>,PlainObject> ConstantReturnType;
+        -:   87:#endif // not EIGEN_PARSED_BY_DOXYGEN
+        -:   88:
+        -:   89:#define EIGEN_CURRENT_STORAGE_BASE_CLASS Eigen::ArrayBase
+        -:   90:#define EIGEN_DOC_UNARY_ADDONS(X,Y)
+        -:   91:#   include "../plugins/CommonCwiseUnaryOps.h"
+        -:   92:#   include "../plugins/MatrixCwiseUnaryOps.h"
+        -:   93:#   include "../plugins/ArrayCwiseUnaryOps.h"
+        -:   94:#   include "../plugins/CommonCwiseBinaryOps.h"
+        -:   95:#   include "../plugins/MatrixCwiseBinaryOps.h"
+        -:   96:#   include "../plugins/ArrayCwiseBinaryOps.h"
+        -:   97:#   ifdef EIGEN_ARRAYBASE_PLUGIN
+        -:   98:#     include EIGEN_ARRAYBASE_PLUGIN
+        -:   99:#   endif
+        -:  100:#undef EIGEN_CURRENT_STORAGE_BASE_CLASS
+        -:  101:#undef EIGEN_DOC_UNARY_ADDONS
+        -:  102:
+        -:  103:    /** Special case of the template operator=, in order to prevent the compiler
+        -:  104:      * from generating a default operator= (issue hit with g++ 4.1)
+        -:  105:      */
+        -:  106:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+        -:  107:    Derived& operator=(const ArrayBase& other)
+        -:  108:    {
+        -:  109:      internal::call_assignment(derived(), other.derived());
+        -:  110:      return derived();
+        -:  111:    }
+        -:  112:    
+        -:  113:    /** Set all the entries to \a value.
+        -:  114:      * \sa DenseBase::setConstant(), DenseBase::fill() */
+        -:  115:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+        -:  116:    Derived& operator=(const Scalar &value)
+        -:  117:    { Base::setConstant(value); return derived(); }
+        -:  118:
+        -:  119:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+        -:  120:    Derived& operator+=(const Scalar& scalar);
+        -:  121:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+        -:  122:    Derived& operator-=(const Scalar& scalar);
+        -:  123:
+        -:  124:    template<typename OtherDerived>
+        -:  125:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+        -:  126:    Derived& operator+=(const ArrayBase<OtherDerived>& other);
+        -:  127:    template<typename OtherDerived>
+        -:  128:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+        -:  129:    Derived& operator-=(const ArrayBase<OtherDerived>& other);
+        -:  130:
+        -:  131:    template<typename OtherDerived>
+        -:  132:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+        -:  133:    Derived& operator*=(const ArrayBase<OtherDerived>& other);
+        -:  134:
+        -:  135:    template<typename OtherDerived>
+        -:  136:    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
+        -:  137:    Derived& operator/=(const ArrayBase<OtherDerived>& other);
+        -:  138:
+        -:  139:  public:
+        -:  140:    EIGEN_DEVICE_FUNC
+        -:  141:    ArrayBase<Derived>& array() { return *this; }
+        -:  142:    EIGEN_DEVICE_FUNC
+        -:  143:    const ArrayBase<Derived>& array() const { return *this; }
+        -:  144:
+        -:  145:    /** \returns an \link Eigen::MatrixBase Matrix \endlink expression of this array
+        -:  146:      * \sa MatrixBase::array() */
+        -:  147:    EIGEN_DEVICE_FUNC
+        -:  148:    MatrixWrapper<Derived> matrix() { return MatrixWrapper<Derived>(derived()); }
+        -:  149:    EIGEN_DEVICE_FUNC
+        -:  150:    const MatrixWrapper<const Derived> matrix() const { return MatrixWrapper<const Derived>(derived()); }
+        -:  151:
+        -:  152://     template<typename Dest>
+        -:  153://     inline void evalTo(Dest& dst) const { dst = matrix(); }
+        -:  154:
+        -:  155:  protected:
+        -:  156:    EIGEN_DEVICE_FUNC
+    #####:  157:    ArrayBase() : Base() {}
+        -:  158:
+        -:  159:  private:
+        -:  160:    explicit ArrayBase(Index);
+        -:  161:    ArrayBase(Index,Index);
+        -:  162:    template<typename OtherDerived> explicit ArrayBase(const ArrayBase<OtherDerived>&);
+        -:  163:  protected:
+        -:  164:    // mixing arrays and matrices is not legal
+        -:  165:    template<typename OtherDerived> Derived& operator+=(const MatrixBase<OtherDerived>& )
+        -:  166:    {EIGEN_STATIC_ASSERT(std::ptrdiff_t(sizeof(typename OtherDerived::Scalar))==-1,YOU_CANNOT_MIX_ARRAYS_AND_MATRICES); return *this;}
+        -:  167:    // mixing arrays and matrices is not legal
+        -:  168:    template<typename OtherDerived> Derived& operator-=(const MatrixBase<OtherDerived>& )
+        -:  169:    {EIGEN_STATIC_ASSERT(std::ptrdiff_t(sizeof(typename OtherDerived::Scalar))==-1,YOU_CANNOT_MIX_ARRAYS_AND_MATRICES); return *this;}
+        -:  170:};
+        -:  171:
+        -:  172:/** replaces \c *this by \c *this - \a other.
+        -:  173:  *
+        -:  174:  * \returns a reference to \c *this
+        -:  175:  */
+        -:  176:template<typename Derived>
+        -:  177:template<typename OtherDerived>
+        -:  178:EIGEN_STRONG_INLINE Derived &
+        -:  179:ArrayBase<Derived>::operator-=(const ArrayBase<OtherDerived> &other)
+        -:  180:{
+        -:  181:  call_assignment(derived(), other.derived(), internal::sub_assign_op<Scalar,typename OtherDerived::Scalar>());
+        -:  182:  return derived();
+        -:  183:}
+        -:  184:
+        -:  185:/** replaces \c *this by \c *this + \a other.
+        -:  186:  *
+        -:  187:  * \returns a reference to \c *this
+        -:  188:  */
+        -:  189:template<typename Derived>
+        -:  190:template<typename OtherDerived>
+        -:  191:EIGEN_STRONG_INLINE Derived &
+        -:  192:ArrayBase<Derived>::operator+=(const ArrayBase<OtherDerived>& other)
+        -:  193:{
+        -:  194:  call_assignment(derived(), other.derived(), internal::add_assign_op<Scalar,typename OtherDerived::Scalar>());
+        -:  195:  return derived();
+        -:  196:}
+        -:  197:
+        -:  198:/** replaces \c *this by \c *this * \a other coefficient wise.
+        -:  199:  *
+        -:  200:  * \returns a reference to \c *this
+        -:  201:  */
+        -:  202:template<typename Derived>
+        -:  203:template<typename OtherDerived>
+        -:  204:EIGEN_STRONG_INLINE Derived &
+        -:  205:ArrayBase<Derived>::operator*=(const ArrayBase<OtherDerived>& other)
+        -:  206:{
+        -:  207:  call_assignment(derived(), other.derived(), internal::mul_assign_op<Scalar,typename OtherDerived::Scalar>());
+        -:  208:  return derived();
+        -:  209:}
+        -:  210:
+        -:  211:/** replaces \c *this by \c *this / \a other coefficient wise.
+        -:  212:  *
+        -:  213:  * \returns a reference to \c *this
+        -:  214:  */
+        -:  215:template<typename Derived>
+        -:  216:template<typename OtherDerived>
+        -:  217:EIGEN_STRONG_INLINE Derived &
+        -:  218:ArrayBase<Derived>::operator/=(const ArrayBase<OtherDerived>& other)
+        -:  219:{
+        -:  220:  call_assignment(derived(), other.derived(), internal::div_assign_op<Scalar,typename OtherDerived::Scalar>());
+        -:  221:  return derived();
+        -:  222:}
+        -:  223:
+        -:  224:} // end namespace Eigen
+        -:  225:
+        -:  226:#endif // EIGEN_ARRAYBASE_H

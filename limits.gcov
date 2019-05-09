@@ -1,0 +1,1831 @@
+        -:    0:Source:/usr/include/c++/6/limits
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:// The template and inlines for the numeric_limits classes. -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 1999-2016 Free Software Foundation, Inc.
+        -:    4://
+        -:    5:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    6:// software; you can redistribute it and/or modify it under the
+        -:    7:// terms of the GNU General Public License as published by the
+        -:    8:// Free Software Foundation; either version 3, or (at your option)
+        -:    9:// any later version.
+        -:   10:
+        -:   11:// This library is distributed in the hope that it will be useful,
+        -:   12:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   13:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   14:// GNU General Public License for more details.
+        -:   15:
+        -:   16:// Under Section 7 of GPL version 3, you are granted additional
+        -:   17:// permissions described in the GCC Runtime Library Exception, version
+        -:   18:// 3.1, as published by the Free Software Foundation.
+        -:   19:
+        -:   20:// You should have received a copy of the GNU General Public License and
+        -:   21:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   22:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   23:// <http://www.gnu.org/licenses/>.
+        -:   24:
+        -:   25:/** @file include/limits
+        -:   26: *  This is a Standard C++ Library header.
+        -:   27: */
+        -:   28:
+        -:   29:// Note: this is not a conforming implementation.
+        -:   30:// Written by Gabriel Dos Reis <gdr@codesourcery.com>
+        -:   31:
+        -:   32://
+        -:   33:// ISO 14882:1998
+        -:   34:// 18.2.1
+        -:   35://
+        -:   36:
+        -:   37:#ifndef _GLIBCXX_NUMERIC_LIMITS
+        -:   38:#define _GLIBCXX_NUMERIC_LIMITS 1
+        -:   39:
+        -:   40:#pragma GCC system_header
+        -:   41:
+        -:   42:#include <bits/c++config.h>
+        -:   43:
+        -:   44://
+        -:   45:// The numeric_limits<> traits document implementation-defined aspects
+        -:   46:// of fundamental arithmetic data types (integers and floating points).
+        -:   47:// From Standard C++ point of view, there are 14 such types:
+        -:   48://   * integers
+        -:   49://         bool							(1)
+        -:   50://         char, signed char, unsigned char, wchar_t            (4)
+        -:   51://         short, unsigned short				(2)
+        -:   52://         int, unsigned					(2)
+        -:   53://         long, unsigned long					(2)
+        -:   54://
+        -:   55://   * floating points
+        -:   56://         float						(1)
+        -:   57://         double						(1)
+        -:   58://         long double						(1)
+        -:   59://
+        -:   60:// GNU C++ understands (where supported by the host C-library)
+        -:   61://   * integer
+        -:   62://         long long, unsigned long long			(2)
+        -:   63://
+        -:   64:// which brings us to 16 fundamental arithmetic data types in GNU C++.
+        -:   65://
+        -:   66://
+        -:   67:// Since a numeric_limits<> is a bit tricky to get right, we rely on
+        -:   68:// an interface composed of macros which should be defined in config/os
+        -:   69:// or config/cpu when they differ from the generic (read arbitrary)
+        -:   70:// definitions given here.
+        -:   71://
+        -:   72:
+        -:   73:// These values can be overridden in the target configuration file.
+        -:   74:// The default values are appropriate for many 32-bit targets.
+        -:   75:
+        -:   76:// GCC only intrinsically supports modulo integral types.  The only remaining
+        -:   77:// integral exceptional values is division by zero.  Only targets that do not
+        -:   78:// signal division by zero in some "hard to ignore" way should use false.
+        -:   79:#ifndef __glibcxx_integral_traps
+        -:   80:# define __glibcxx_integral_traps true
+        -:   81:#endif
+        -:   82:
+        -:   83:// float
+        -:   84://
+        -:   85:
+        -:   86:// Default values.  Should be overridden in configuration files if necessary.
+        -:   87:
+        -:   88:#ifndef __glibcxx_float_has_denorm_loss
+        -:   89:#  define __glibcxx_float_has_denorm_loss false
+        -:   90:#endif
+        -:   91:#ifndef __glibcxx_float_traps
+        -:   92:#  define __glibcxx_float_traps false
+        -:   93:#endif
+        -:   94:#ifndef __glibcxx_float_tinyness_before
+        -:   95:#  define __glibcxx_float_tinyness_before false
+        -:   96:#endif
+        -:   97:
+        -:   98:// double
+        -:   99:
+        -:  100:// Default values.  Should be overridden in configuration files if necessary.
+        -:  101:
+        -:  102:#ifndef __glibcxx_double_has_denorm_loss
+        -:  103:#  define __glibcxx_double_has_denorm_loss false
+        -:  104:#endif
+        -:  105:#ifndef __glibcxx_double_traps
+        -:  106:#  define __glibcxx_double_traps false
+        -:  107:#endif
+        -:  108:#ifndef __glibcxx_double_tinyness_before
+        -:  109:#  define __glibcxx_double_tinyness_before false
+        -:  110:#endif
+        -:  111:
+        -:  112:// long double
+        -:  113:
+        -:  114:// Default values.  Should be overridden in configuration files if necessary.
+        -:  115:
+        -:  116:#ifndef __glibcxx_long_double_has_denorm_loss
+        -:  117:#  define __glibcxx_long_double_has_denorm_loss false
+        -:  118:#endif
+        -:  119:#ifndef __glibcxx_long_double_traps
+        -:  120:#  define __glibcxx_long_double_traps false
+        -:  121:#endif
+        -:  122:#ifndef __glibcxx_long_double_tinyness_before
+        -:  123:#  define __glibcxx_long_double_tinyness_before false
+        -:  124:#endif
+        -:  125:
+        -:  126:// You should not need to define any macros below this point.
+        -:  127:
+        -:  128:#define __glibcxx_signed_b(T,B)	((T)(-1) < 0)
+        -:  129:
+        -:  130:#define __glibcxx_min_b(T,B)					\
+        -:  131:  (__glibcxx_signed_b (T,B) ? -__glibcxx_max_b (T,B) - 1 : (T)0)
+        -:  132:
+        -:  133:#define __glibcxx_max_b(T,B)						\
+        -:  134:  (__glibcxx_signed_b (T,B) ?						\
+        -:  135:   (((((T)1 << (__glibcxx_digits_b (T,B) - 1)) - 1) << 1) + 1) : ~(T)0)
+        -:  136:
+        -:  137:#define __glibcxx_digits_b(T,B)				\
+        -:  138:  (B - __glibcxx_signed_b (T,B))
+        -:  139:
+        -:  140:// The fraction 643/2136 approximates log10(2) to 7 significant digits.
+        -:  141:#define __glibcxx_digits10_b(T,B)		\
+        -:  142:  (__glibcxx_digits_b (T,B) * 643L / 2136)
+        -:  143:
+        -:  144:#define __glibcxx_signed(T) \
+        -:  145:  __glibcxx_signed_b (T, sizeof(T) * __CHAR_BIT__)
+        -:  146:#define __glibcxx_min(T) \
+        -:  147:  __glibcxx_min_b (T, sizeof(T) * __CHAR_BIT__)
+        -:  148:#define __glibcxx_max(T) \
+        -:  149:  __glibcxx_max_b (T, sizeof(T) * __CHAR_BIT__)
+        -:  150:#define __glibcxx_digits(T) \
+        -:  151:  __glibcxx_digits_b (T, sizeof(T) * __CHAR_BIT__)
+        -:  152:#define __glibcxx_digits10(T) \
+        -:  153:  __glibcxx_digits10_b (T, sizeof(T) * __CHAR_BIT__)
+        -:  154:
+        -:  155:#define __glibcxx_max_digits10(T) \
+        -:  156:  (2 + (T) * 643L / 2136)
+        -:  157:
+        -:  158:namespace std _GLIBCXX_VISIBILITY(default)
+        -:  159:{
+        -:  160:_GLIBCXX_BEGIN_NAMESPACE_VERSION
+        -:  161:
+        -:  162:  /**
+        -:  163:   *  @brief Describes the rounding style for floating-point types.
+        -:  164:   *
+        -:  165:   *  This is used in the std::numeric_limits class.
+        -:  166:  */
+        -:  167:  enum float_round_style
+        -:  168:  {
+        -:  169:    round_indeterminate       = -1,    /// Intermediate.
+        -:  170:    round_toward_zero         = 0,     /// To zero.
+        -:  171:    round_to_nearest          = 1,     /// To the nearest representable value.
+        -:  172:    round_toward_infinity     = 2,     /// To infinity.
+        -:  173:    round_toward_neg_infinity = 3      /// To negative infinity.
+        -:  174:  };
+        -:  175:
+        -:  176:  /**
+        -:  177:   *  @brief Describes the denormalization for floating-point types.
+        -:  178:   *
+        -:  179:   *  These values represent the presence or absence of a variable number
+        -:  180:   *  of exponent bits.  This type is used in the std::numeric_limits class.
+        -:  181:  */
+        -:  182:  enum float_denorm_style
+        -:  183:  {
+        -:  184:    /// Indeterminate at compile time whether denormalized values are allowed.
+        -:  185:    denorm_indeterminate = -1,
+        -:  186:    /// The type does not allow denormalized values.
+        -:  187:    denorm_absent        = 0,
+        -:  188:    /// The type allows denormalized values.
+        -:  189:    denorm_present       = 1
+        -:  190:  };
+        -:  191:
+        -:  192:  /**
+        -:  193:   *  @brief Part of std::numeric_limits.
+        -:  194:   *
+        -:  195:   *  The @c static @c const members are usable as integral constant
+        -:  196:   *  expressions.
+        -:  197:   *
+        -:  198:   *  @note This is a separate class for purposes of efficiency; you
+        -:  199:   *        should only access these members as part of an instantiation
+        -:  200:   *        of the std::numeric_limits class.
+        -:  201:  */
+        -:  202:  struct __numeric_limits_base
+        -:  203:  {
+        -:  204:    /** This will be true for all fundamental types (which have
+        -:  205:	specializations), and false for everything else.  */
+        -:  206:    static _GLIBCXX_USE_CONSTEXPR bool is_specialized = false;
+        -:  207:
+        -:  208:    /** The number of @c radix digits that be represented without change:  for
+        -:  209:	integer types, the number of non-sign bits in the mantissa; for
+        -:  210:	floating types, the number of @c radix digits in the mantissa.  */
+        -:  211:    static _GLIBCXX_USE_CONSTEXPR int digits = 0;
+        -:  212:
+        -:  213:    /** The number of base 10 digits that can be represented without change. */
+        -:  214:    static _GLIBCXX_USE_CONSTEXPR int digits10 = 0;
+        -:  215:
+        -:  216:#if __cplusplus >= 201103L
+        -:  217:    /** The number of base 10 digits required to ensure that values which
+        -:  218:	differ are always differentiated.  */
+        -:  219:    static constexpr int max_digits10 = 0;
+        -:  220:#endif
+        -:  221:
+        -:  222:    /** True if the type is signed.  */
+        -:  223:    static _GLIBCXX_USE_CONSTEXPR bool is_signed = false;
+        -:  224:
+        -:  225:    /** True if the type is integer.  */
+        -:  226:    static _GLIBCXX_USE_CONSTEXPR bool is_integer = false;
+        -:  227:
+        -:  228:    /** True if the type uses an exact representation. All integer types are
+        -:  229:	exact, but not all exact types are integer.  For example, rational and
+        -:  230:	fixed-exponent representations are exact but not integer. */
+        -:  231:    static _GLIBCXX_USE_CONSTEXPR bool is_exact = false;
+        -:  232:
+        -:  233:    /** For integer types, specifies the base of the representation.  For
+        -:  234:	floating types, specifies the base of the exponent representation.  */
+        -:  235:    static _GLIBCXX_USE_CONSTEXPR int radix = 0;
+        -:  236:
+        -:  237:    /** The minimum negative integer such that @c radix raised to the power of
+        -:  238:	(one less than that integer) is a normalized floating point number.  */
+        -:  239:    static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -:  240:
+        -:  241:    /** The minimum negative integer such that 10 raised to that power is in
+        -:  242:	the range of normalized floating point numbers.  */
+        -:  243:    static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -:  244:
+        -:  245:    /** The maximum positive integer such that @c radix raised to the power of
+        -:  246:	(one less than that integer) is a representable finite floating point
+        -:  247:	number.  */
+        -:  248:    static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -:  249:
+        -:  250:    /** The maximum positive integer such that 10 raised to that power is in
+        -:  251:	the range of representable finite floating point numbers.  */
+        -:  252:    static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -:  253:
+        -:  254:    /** True if the type has a representation for positive infinity.  */
+        -:  255:    static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -:  256:
+        -:  257:    /** True if the type has a representation for a quiet (non-signaling)
+        -:  258:	Not a Number.  */
+        -:  259:    static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -:  260:
+        -:  261:    /** True if the type has a representation for a signaling
+        -:  262:	Not a Number.  */
+        -:  263:    static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -:  264:
+        -:  265:    /** See std::float_denorm_style for more information.  */
+        -:  266:    static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm = denorm_absent;
+        -:  267:
+        -:  268:    /** True if loss of accuracy is detected as a denormalization loss,
+        -:  269:	rather than as an inexact result. */
+        -:  270:    static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -:  271:
+        -:  272:    /** True if-and-only-if the type adheres to the IEC 559 standard, also
+        -:  273:	known as IEEE 754.  (Only makes sense for floating point types.)  */
+        -:  274:    static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -:  275:
+        -:  276:    /** True if the set of values representable by the type is
+        -:  277:	finite.  All built-in types are bounded, this member would be
+        -:  278:	false for arbitrary precision types. */
+        -:  279:    static _GLIBCXX_USE_CONSTEXPR bool is_bounded = false;
+        -:  280:
+        -:  281:    /** True if the type is @e modulo. A type is modulo if, for any
+        -:  282:	operation involving +, -, or * on values of that type whose
+        -:  283:	result would fall outside the range [min(),max()], the value
+        -:  284:	returned differs from the true value by an integer multiple of
+        -:  285:	max() - min() + 1. On most machines, this is false for floating
+        -:  286:	types, true for unsigned integers, and true for signed integers.
+        -:  287:	See PR22200 about signed integers.  */
+        -:  288:    static _GLIBCXX_USE_CONSTEXPR bool is_modulo = false;
+        -:  289:
+        -:  290:    /** True if trapping is implemented for this type.  */
+        -:  291:    static _GLIBCXX_USE_CONSTEXPR bool traps = false;
+        -:  292:
+        -:  293:    /** True if tininess is detected before rounding.  (see IEC 559)  */
+        -:  294:    static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -:  295:
+        -:  296:    /** See std::float_round_style for more information.  This is only
+        -:  297:	meaningful for floating types; integer types will all be
+        -:  298:	round_toward_zero.  */
+        -:  299:    static _GLIBCXX_USE_CONSTEXPR float_round_style round_style = 
+        -:  300:						    round_toward_zero;
+        -:  301:  };
+        -:  302:
+        -:  303:  /**
+        -:  304:   *  @brief Properties of fundamental types.
+        -:  305:   *
+        -:  306:   *  This class allows a program to obtain information about the
+        -:  307:   *  representation of a fundamental type on a given platform.  For
+        -:  308:   *  non-fundamental types, the functions will return 0 and the data
+        -:  309:   *  members will all be @c false.
+        -:  310:   *
+        -:  311:   *  _GLIBCXX_RESOLVE_LIB_DEFECTS:  DRs 201 and 184 (hi Gaby!) are
+        -:  312:   *  noted, but not incorporated in this documented (yet).
+        -:  313:  */
+        -:  314:  template<typename _Tp>
+        -:  315:    struct numeric_limits : public __numeric_limits_base
+        -:  316:    {
+        -:  317:      /** The minimum finite value, or for floating types with
+        -:  318:	  denormalization, the minimum positive normalized value.  */
+        -:  319:      static _GLIBCXX_CONSTEXPR _Tp
+        -:  320:      min() _GLIBCXX_USE_NOEXCEPT { return _Tp(); }
+        -:  321:
+        -:  322:      /** The maximum finite value.  */
+        -:  323:      static _GLIBCXX_CONSTEXPR _Tp
+        -:  324:      max() _GLIBCXX_USE_NOEXCEPT { return _Tp(); }
+        -:  325:
+        -:  326:#if __cplusplus >= 201103L
+        -:  327:      /** A finite value x such that there is no other finite value y
+        -:  328:       *  where y < x.  */
+        -:  329:      static constexpr _Tp
+        -:  330:      lowest() noexcept { return _Tp(); }
+        -:  331:#endif
+        -:  332:
+        -:  333:      /** The @e machine @e epsilon:  the difference between 1 and the least
+        -:  334:	  value greater than 1 that is representable.  */
+        -:  335:      static _GLIBCXX_CONSTEXPR _Tp
+        -:  336:      epsilon() _GLIBCXX_USE_NOEXCEPT { return _Tp(); }
+        -:  337:
+        -:  338:      /** The maximum rounding error measurement (see LIA-1).  */
+        -:  339:      static _GLIBCXX_CONSTEXPR _Tp
+        -:  340:      round_error() _GLIBCXX_USE_NOEXCEPT { return _Tp(); }
+        -:  341:
+        -:  342:      /** The representation of positive infinity, if @c has_infinity.  */
+        -:  343:      static _GLIBCXX_CONSTEXPR _Tp
+        -:  344:      infinity() _GLIBCXX_USE_NOEXCEPT { return _Tp(); }
+        -:  345:
+        -:  346:      /** The representation of a quiet Not a Number,
+        -:  347:	  if @c has_quiet_NaN. */
+        -:  348:      static _GLIBCXX_CONSTEXPR _Tp
+        -:  349:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return _Tp(); }
+        -:  350:
+        -:  351:      /** The representation of a signaling Not a Number, if
+        -:  352:	  @c has_signaling_NaN. */
+        -:  353:      static _GLIBCXX_CONSTEXPR _Tp
+        -:  354:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT { return _Tp(); }
+        -:  355:
+        -:  356:      /** The minimum positive denormalized value.  For types where
+        -:  357:	  @c has_denorm is false, this is the minimum positive normalized
+        -:  358:	  value.  */
+        -:  359:      static _GLIBCXX_CONSTEXPR _Tp
+        -:  360:      denorm_min() _GLIBCXX_USE_NOEXCEPT { return _Tp(); }
+        -:  361:    };
+        -:  362:
+        -:  363:#if __cplusplus >= 201103L
+        -:  364:  template<typename _Tp>
+        -:  365:    struct numeric_limits<const _Tp>
+        -:  366:    : public numeric_limits<_Tp> { };
+        -:  367:
+        -:  368:  template<typename _Tp>
+        -:  369:    struct numeric_limits<volatile _Tp>
+        -:  370:    : public numeric_limits<_Tp> { };
+        -:  371:
+        -:  372:  template<typename _Tp>
+        -:  373:    struct numeric_limits<const volatile _Tp>
+        -:  374:    : public numeric_limits<_Tp> { };
+        -:  375:#endif
+        -:  376:
+        -:  377:  // Now there follow 16 explicit specializations.  Yes, 16.  Make sure
+        -:  378:  // you get the count right. (18 in c++0x mode)
+        -:  379:
+        -:  380:  /// numeric_limits<bool> specialization.
+        -:  381:  template<>
+        -:  382:    struct numeric_limits<bool>
+        -:  383:    {
+        -:  384:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -:  385:
+        -:  386:      static _GLIBCXX_CONSTEXPR bool 
+        -:  387:      min() _GLIBCXX_USE_NOEXCEPT { return false; }
+        -:  388:
+        -:  389:      static _GLIBCXX_CONSTEXPR bool 
+        -:  390:      max() _GLIBCXX_USE_NOEXCEPT { return true; }
+        -:  391:
+        -:  392:#if __cplusplus >= 201103L
+        -:  393:      static constexpr bool
+        -:  394:      lowest() noexcept { return min(); }
+        -:  395:#endif
+        -:  396:      static _GLIBCXX_USE_CONSTEXPR int digits = 1;
+        -:  397:      static _GLIBCXX_USE_CONSTEXPR int digits10 = 0;
+        -:  398:#if __cplusplus >= 201103L
+        -:  399:      static constexpr int max_digits10 = 0;
+        -:  400:#endif
+        -:  401:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = false;
+        -:  402:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -:  403:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -:  404:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -:  405:
+        -:  406:      static _GLIBCXX_CONSTEXPR bool 
+        -:  407:      epsilon() _GLIBCXX_USE_NOEXCEPT { return false; }
+        -:  408:
+        -:  409:      static _GLIBCXX_CONSTEXPR bool 
+        -:  410:      round_error() _GLIBCXX_USE_NOEXCEPT { return false; }
+        -:  411:
+        -:  412:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -:  413:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -:  414:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -:  415:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -:  416:
+        -:  417:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -:  418:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -:  419:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -:  420:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -:  421:       = denorm_absent;
+        -:  422:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -:  423:
+        -:  424:      static _GLIBCXX_CONSTEXPR bool 
+        -:  425:      infinity() _GLIBCXX_USE_NOEXCEPT { return false; }
+        -:  426:
+        -:  427:      static _GLIBCXX_CONSTEXPR bool 
+        -:  428:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return false; }
+        -:  429:
+        -:  430:      static _GLIBCXX_CONSTEXPR bool 
+        -:  431:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT { return false; }
+        -:  432:
+        -:  433:      static _GLIBCXX_CONSTEXPR bool 
+        -:  434:      denorm_min() _GLIBCXX_USE_NOEXCEPT { return false; }
+        -:  435:
+        -:  436:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -:  437:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -:  438:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = false;
+        -:  439:
+        -:  440:      // It is not clear what it means for a boolean type to trap.
+        -:  441:      // This is a DR on the LWG issue list.  Here, I use integer
+        -:  442:      // promotion semantics.
+        -:  443:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -:  444:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -:  445:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -:  446:       = round_toward_zero;
+        -:  447:    };
+        -:  448:
+        -:  449:  /// numeric_limits<char> specialization.
+        -:  450:  template<>
+        -:  451:    struct numeric_limits<char>
+        -:  452:    {
+        -:  453:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -:  454:
+        -:  455:      static _GLIBCXX_CONSTEXPR char 
+        -:  456:      min() _GLIBCXX_USE_NOEXCEPT { return __glibcxx_min(char); }
+        -:  457:
+        -:  458:      static _GLIBCXX_CONSTEXPR char 
+        -:  459:      max() _GLIBCXX_USE_NOEXCEPT { return __glibcxx_max(char); }
+        -:  460:
+        -:  461:#if __cplusplus >= 201103L
+        -:  462:      static constexpr char 
+        -:  463:      lowest() noexcept { return min(); }
+        -:  464:#endif
+        -:  465:
+        -:  466:      static _GLIBCXX_USE_CONSTEXPR int digits = __glibcxx_digits (char);
+        -:  467:      static _GLIBCXX_USE_CONSTEXPR int digits10 = __glibcxx_digits10 (char);
+        -:  468:#if __cplusplus >= 201103L
+        -:  469:      static constexpr int max_digits10 = 0;
+        -:  470:#endif
+        -:  471:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = __glibcxx_signed (char);
+        -:  472:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -:  473:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -:  474:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -:  475:
+        -:  476:      static _GLIBCXX_CONSTEXPR char 
+        -:  477:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  478:
+        -:  479:      static _GLIBCXX_CONSTEXPR char 
+        -:  480:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  481:
+        -:  482:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -:  483:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -:  484:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -:  485:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -:  486:
+        -:  487:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -:  488:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -:  489:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -:  490:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -:  491:       = denorm_absent;
+        -:  492:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -:  493:
+        -:  494:      static _GLIBCXX_CONSTEXPR 
+        -:  495:      char infinity() _GLIBCXX_USE_NOEXCEPT { return char(); }
+        -:  496:
+        -:  497:      static _GLIBCXX_CONSTEXPR char 
+        -:  498:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return char(); }
+        -:  499:
+        -:  500:      static _GLIBCXX_CONSTEXPR char 
+        -:  501:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT { return char(); }
+        -:  502:
+        -:  503:      static _GLIBCXX_CONSTEXPR char 
+        -:  504:      denorm_min() _GLIBCXX_USE_NOEXCEPT { return static_cast<char>(0); }
+        -:  505:
+        -:  506:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -:  507:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -:  508:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = !is_signed;
+        -:  509:
+        -:  510:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -:  511:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -:  512:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -:  513:       = round_toward_zero;
+        -:  514:    };
+        -:  515:
+        -:  516:  /// numeric_limits<signed char> specialization.
+        -:  517:  template<>
+        -:  518:    struct numeric_limits<signed char>
+        -:  519:    {
+        -:  520:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -:  521:
+        -:  522:      static _GLIBCXX_CONSTEXPR signed char 
+        -:  523:      min() _GLIBCXX_USE_NOEXCEPT { return -__SCHAR_MAX__ - 1; }
+        -:  524:
+        -:  525:      static _GLIBCXX_CONSTEXPR signed char 
+        -:  526:      max() _GLIBCXX_USE_NOEXCEPT { return __SCHAR_MAX__; }
+        -:  527:
+        -:  528:#if __cplusplus >= 201103L
+        -:  529:      static constexpr signed char 
+        -:  530:      lowest() noexcept { return min(); }
+        -:  531:#endif
+        -:  532:
+        -:  533:      static _GLIBCXX_USE_CONSTEXPR int digits = __glibcxx_digits (signed char);
+        -:  534:      static _GLIBCXX_USE_CONSTEXPR int digits10 
+        -:  535:       = __glibcxx_digits10 (signed char);
+        -:  536:#if __cplusplus >= 201103L
+        -:  537:      static constexpr int max_digits10 = 0;
+        -:  538:#endif
+        -:  539:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = true;
+        -:  540:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -:  541:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -:  542:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -:  543:
+        -:  544:      static _GLIBCXX_CONSTEXPR signed char 
+        -:  545:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  546:
+        -:  547:      static _GLIBCXX_CONSTEXPR signed char 
+        -:  548:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  549:
+        -:  550:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -:  551:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -:  552:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -:  553:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -:  554:
+        -:  555:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -:  556:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -:  557:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -:  558:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -:  559:       = denorm_absent;
+        -:  560:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -:  561:
+        -:  562:      static _GLIBCXX_CONSTEXPR signed char 
+        -:  563:      infinity() _GLIBCXX_USE_NOEXCEPT { return static_cast<signed char>(0); }
+        -:  564:
+        -:  565:      static _GLIBCXX_CONSTEXPR signed char 
+        -:  566:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return static_cast<signed char>(0); }
+        -:  567:
+        -:  568:      static _GLIBCXX_CONSTEXPR signed char 
+        -:  569:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT
+        -:  570:      { return static_cast<signed char>(0); }
+        -:  571:
+        -:  572:      static _GLIBCXX_CONSTEXPR signed char 
+        -:  573:      denorm_min() _GLIBCXX_USE_NOEXCEPT
+        -:  574:      { return static_cast<signed char>(0); }
+        -:  575:
+        -:  576:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -:  577:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -:  578:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = false;
+        -:  579:
+        -:  580:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -:  581:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -:  582:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -:  583:       = round_toward_zero;
+        -:  584:    };
+        -:  585:
+        -:  586:  /// numeric_limits<unsigned char> specialization.
+        -:  587:  template<>
+        -:  588:    struct numeric_limits<unsigned char>
+        -:  589:    {
+        -:  590:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -:  591:
+        -:  592:      static _GLIBCXX_CONSTEXPR unsigned char 
+        -:  593:      min() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  594:
+        -:  595:      static _GLIBCXX_CONSTEXPR unsigned char 
+        -:  596:      max() _GLIBCXX_USE_NOEXCEPT { return __SCHAR_MAX__ * 2U + 1; }
+        -:  597:
+        -:  598:#if __cplusplus >= 201103L
+        -:  599:      static constexpr unsigned char 
+        -:  600:      lowest() noexcept { return min(); }
+        -:  601:#endif
+        -:  602:
+        -:  603:      static _GLIBCXX_USE_CONSTEXPR int digits 
+        -:  604:       = __glibcxx_digits (unsigned char);
+        -:  605:      static _GLIBCXX_USE_CONSTEXPR int digits10 
+        -:  606:       = __glibcxx_digits10 (unsigned char);
+        -:  607:#if __cplusplus >= 201103L
+        -:  608:      static constexpr int max_digits10 = 0;
+        -:  609:#endif
+        -:  610:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = false;
+        -:  611:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -:  612:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -:  613:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -:  614:
+        -:  615:      static _GLIBCXX_CONSTEXPR unsigned char 
+        -:  616:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  617:
+        -:  618:      static _GLIBCXX_CONSTEXPR unsigned char 
+        -:  619:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  620:
+        -:  621:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -:  622:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -:  623:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -:  624:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -:  625:
+        -:  626:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -:  627:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -:  628:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -:  629:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -:  630:       = denorm_absent;
+        -:  631:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -:  632:
+        -:  633:      static _GLIBCXX_CONSTEXPR unsigned char 
+        -:  634:      infinity() _GLIBCXX_USE_NOEXCEPT
+        -:  635:      { return static_cast<unsigned char>(0); }
+        -:  636:
+        -:  637:      static _GLIBCXX_CONSTEXPR unsigned char 
+        -:  638:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT
+        -:  639:      { return static_cast<unsigned char>(0); }
+        -:  640:
+        -:  641:      static _GLIBCXX_CONSTEXPR unsigned char 
+        -:  642:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT
+        -:  643:      { return static_cast<unsigned char>(0); }
+        -:  644:
+        -:  645:      static _GLIBCXX_CONSTEXPR unsigned char 
+        -:  646:      denorm_min() _GLIBCXX_USE_NOEXCEPT
+        -:  647:      { return static_cast<unsigned char>(0); }
+        -:  648:
+        -:  649:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -:  650:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -:  651:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = true;
+        -:  652:
+        -:  653:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -:  654:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -:  655:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -:  656:       = round_toward_zero;
+        -:  657:    };
+        -:  658:
+        -:  659:  /// numeric_limits<wchar_t> specialization.
+        -:  660:  template<>
+        -:  661:    struct numeric_limits<wchar_t>
+        -:  662:    {
+        -:  663:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -:  664:
+        -:  665:      static _GLIBCXX_CONSTEXPR wchar_t 
+        -:  666:      min() _GLIBCXX_USE_NOEXCEPT { return __glibcxx_min (wchar_t); }
+        -:  667:
+        -:  668:      static _GLIBCXX_CONSTEXPR wchar_t 
+        -:  669:      max() _GLIBCXX_USE_NOEXCEPT { return __glibcxx_max (wchar_t); }
+        -:  670:
+        -:  671:#if __cplusplus >= 201103L
+        -:  672:      static constexpr wchar_t
+        -:  673:      lowest() noexcept { return min(); }
+        -:  674:#endif
+        -:  675:
+        -:  676:      static _GLIBCXX_USE_CONSTEXPR int digits = __glibcxx_digits (wchar_t);
+        -:  677:      static _GLIBCXX_USE_CONSTEXPR int digits10 
+        -:  678:       = __glibcxx_digits10 (wchar_t);
+        -:  679:#if __cplusplus >= 201103L
+        -:  680:      static constexpr int max_digits10 = 0;
+        -:  681:#endif
+        -:  682:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = __glibcxx_signed (wchar_t);
+        -:  683:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -:  684:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -:  685:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -:  686:
+        -:  687:      static _GLIBCXX_CONSTEXPR wchar_t 
+        -:  688:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  689:
+        -:  690:      static _GLIBCXX_CONSTEXPR wchar_t 
+        -:  691:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  692:
+        -:  693:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -:  694:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -:  695:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -:  696:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -:  697:
+        -:  698:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -:  699:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -:  700:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -:  701:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -:  702:       = denorm_absent;
+        -:  703:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -:  704:
+        -:  705:      static _GLIBCXX_CONSTEXPR wchar_t 
+        -:  706:      infinity() _GLIBCXX_USE_NOEXCEPT { return wchar_t(); }
+        -:  707:
+        -:  708:      static _GLIBCXX_CONSTEXPR wchar_t 
+        -:  709:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return wchar_t(); }
+        -:  710:
+        -:  711:      static _GLIBCXX_CONSTEXPR wchar_t 
+        -:  712:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT { return wchar_t(); }
+        -:  713:
+        -:  714:      static _GLIBCXX_CONSTEXPR wchar_t 
+        -:  715:      denorm_min() _GLIBCXX_USE_NOEXCEPT { return wchar_t(); }
+        -:  716:
+        -:  717:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -:  718:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -:  719:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = !is_signed;
+        -:  720:
+        -:  721:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -:  722:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -:  723:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -:  724:       = round_toward_zero;
+        -:  725:    };
+        -:  726:
+        -:  727:#if __cplusplus >= 201103L
+        -:  728:  /// numeric_limits<char16_t> specialization.
+        -:  729:  template<>
+        -:  730:    struct numeric_limits<char16_t>
+        -:  731:    {
+        -:  732:      static constexpr bool is_specialized = true;
+        -:  733:
+        -:  734:      static constexpr char16_t 
+        -:  735:      min() noexcept { return __glibcxx_min (char16_t); }
+        -:  736:
+        -:  737:      static constexpr char16_t 
+        -:  738:      max() noexcept { return __glibcxx_max (char16_t); }
+        -:  739:
+        -:  740:      static constexpr char16_t 
+        -:  741:      lowest() noexcept { return min(); }
+        -:  742:
+        -:  743:      static constexpr int digits = __glibcxx_digits (char16_t);
+        -:  744:      static constexpr int digits10 = __glibcxx_digits10 (char16_t);
+        -:  745:      static constexpr int max_digits10 = 0;
+        -:  746:      static constexpr bool is_signed = __glibcxx_signed (char16_t);
+        -:  747:      static constexpr bool is_integer = true;
+        -:  748:      static constexpr bool is_exact = true;
+        -:  749:      static constexpr int radix = 2;
+        -:  750:
+        -:  751:      static constexpr char16_t 
+        -:  752:      epsilon() noexcept { return 0; }
+        -:  753:
+        -:  754:      static constexpr char16_t 
+        -:  755:      round_error() noexcept { return 0; }
+        -:  756:
+        -:  757:      static constexpr int min_exponent = 0;
+        -:  758:      static constexpr int min_exponent10 = 0;
+        -:  759:      static constexpr int max_exponent = 0;
+        -:  760:      static constexpr int max_exponent10 = 0;
+        -:  761:
+        -:  762:      static constexpr bool has_infinity = false;
+        -:  763:      static constexpr bool has_quiet_NaN = false;
+        -:  764:      static constexpr bool has_signaling_NaN = false;
+        -:  765:      static constexpr float_denorm_style has_denorm = denorm_absent;
+        -:  766:      static constexpr bool has_denorm_loss = false;
+        -:  767:
+        -:  768:      static constexpr char16_t 
+        -:  769:      infinity() noexcept { return char16_t(); }
+        -:  770:
+        -:  771:      static constexpr char16_t 
+        -:  772:      quiet_NaN() noexcept { return char16_t(); }
+        -:  773:
+        -:  774:      static constexpr char16_t 
+        -:  775:      signaling_NaN() noexcept { return char16_t(); }
+        -:  776:
+        -:  777:      static constexpr char16_t 
+        -:  778:      denorm_min() noexcept { return char16_t(); }
+        -:  779:
+        -:  780:      static constexpr bool is_iec559 = false;
+        -:  781:      static constexpr bool is_bounded = true;
+        -:  782:      static constexpr bool is_modulo = !is_signed;
+        -:  783:
+        -:  784:      static constexpr bool traps = __glibcxx_integral_traps;
+        -:  785:      static constexpr bool tinyness_before = false;
+        -:  786:      static constexpr float_round_style round_style = round_toward_zero;
+        -:  787:    };
+        -:  788:
+        -:  789:  /// numeric_limits<char32_t> specialization.
+        -:  790:  template<>
+        -:  791:    struct numeric_limits<char32_t>
+        -:  792:    {
+        -:  793:      static constexpr bool is_specialized = true;
+        -:  794:
+        -:  795:      static constexpr char32_t 
+        -:  796:      min() noexcept { return __glibcxx_min (char32_t); }
+        -:  797:
+        -:  798:      static constexpr char32_t 
+        -:  799:      max() noexcept { return __glibcxx_max (char32_t); }
+        -:  800:
+        -:  801:      static constexpr char32_t 
+        -:  802:      lowest() noexcept { return min(); }
+        -:  803:
+        -:  804:      static constexpr int digits = __glibcxx_digits (char32_t);
+        -:  805:      static constexpr int digits10 = __glibcxx_digits10 (char32_t);
+        -:  806:      static constexpr int max_digits10 = 0;
+        -:  807:      static constexpr bool is_signed = __glibcxx_signed (char32_t);
+        -:  808:      static constexpr bool is_integer = true;
+        -:  809:      static constexpr bool is_exact = true;
+        -:  810:      static constexpr int radix = 2;
+        -:  811:
+        -:  812:      static constexpr char32_t 
+        -:  813:      epsilon() noexcept { return 0; }
+        -:  814:
+        -:  815:      static constexpr char32_t 
+        -:  816:      round_error() noexcept { return 0; }
+        -:  817:
+        -:  818:      static constexpr int min_exponent = 0;
+        -:  819:      static constexpr int min_exponent10 = 0;
+        -:  820:      static constexpr int max_exponent = 0;
+        -:  821:      static constexpr int max_exponent10 = 0;
+        -:  822:
+        -:  823:      static constexpr bool has_infinity = false;
+        -:  824:      static constexpr bool has_quiet_NaN = false;
+        -:  825:      static constexpr bool has_signaling_NaN = false;
+        -:  826:      static constexpr float_denorm_style has_denorm = denorm_absent;
+        -:  827:      static constexpr bool has_denorm_loss = false;
+        -:  828:
+        -:  829:      static constexpr char32_t 
+        -:  830:      infinity() noexcept { return char32_t(); }
+        -:  831:
+        -:  832:      static constexpr char32_t 
+        -:  833:      quiet_NaN() noexcept { return char32_t(); }
+        -:  834:
+        -:  835:      static constexpr char32_t 
+        -:  836:      signaling_NaN() noexcept { return char32_t(); }
+        -:  837:
+        -:  838:      static constexpr char32_t 
+        -:  839:      denorm_min() noexcept { return char32_t(); }
+        -:  840:
+        -:  841:      static constexpr bool is_iec559 = false;
+        -:  842:      static constexpr bool is_bounded = true;
+        -:  843:      static constexpr bool is_modulo = !is_signed;
+        -:  844:
+        -:  845:      static constexpr bool traps = __glibcxx_integral_traps;
+        -:  846:      static constexpr bool tinyness_before = false;
+        -:  847:      static constexpr float_round_style round_style = round_toward_zero;
+        -:  848:    };
+        -:  849:#endif
+        -:  850:
+        -:  851:  /// numeric_limits<short> specialization.
+        -:  852:  template<>
+        -:  853:    struct numeric_limits<short>
+        -:  854:    {
+        -:  855:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -:  856:
+        -:  857:      static _GLIBCXX_CONSTEXPR short 
+        -:  858:      min() _GLIBCXX_USE_NOEXCEPT { return -__SHRT_MAX__ - 1; }
+        -:  859:
+        -:  860:      static _GLIBCXX_CONSTEXPR short 
+        -:  861:      max() _GLIBCXX_USE_NOEXCEPT { return __SHRT_MAX__; }
+        -:  862:
+        -:  863:#if __cplusplus >= 201103L
+        -:  864:      static constexpr short 
+        -:  865:      lowest() noexcept { return min(); }
+        -:  866:#endif
+        -:  867:
+        -:  868:      static _GLIBCXX_USE_CONSTEXPR int digits = __glibcxx_digits (short);
+        -:  869:      static _GLIBCXX_USE_CONSTEXPR int digits10 = __glibcxx_digits10 (short);
+        -:  870:#if __cplusplus >= 201103L
+        -:  871:      static constexpr int max_digits10 = 0;
+        -:  872:#endif
+        -:  873:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = true;
+        -:  874:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -:  875:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -:  876:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -:  877:
+        -:  878:      static _GLIBCXX_CONSTEXPR short 
+        -:  879:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  880:
+        -:  881:      static _GLIBCXX_CONSTEXPR short 
+        -:  882:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  883:
+        -:  884:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -:  885:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -:  886:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -:  887:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -:  888:
+        -:  889:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -:  890:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -:  891:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -:  892:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -:  893:       = denorm_absent;
+        -:  894:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -:  895:
+        -:  896:      static _GLIBCXX_CONSTEXPR short 
+        -:  897:      infinity() _GLIBCXX_USE_NOEXCEPT { return short(); }
+        -:  898:
+        -:  899:      static _GLIBCXX_CONSTEXPR short 
+        -:  900:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return short(); }
+        -:  901:
+        -:  902:      static _GLIBCXX_CONSTEXPR short 
+        -:  903:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT { return short(); }
+        -:  904:
+        -:  905:      static _GLIBCXX_CONSTEXPR short 
+        -:  906:      denorm_min() _GLIBCXX_USE_NOEXCEPT { return short(); }
+        -:  907:
+        -:  908:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -:  909:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -:  910:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = false;
+        -:  911:
+        -:  912:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -:  913:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -:  914:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -:  915:       = round_toward_zero;
+        -:  916:    };
+        -:  917:
+        -:  918:  /// numeric_limits<unsigned short> specialization.
+        -:  919:  template<>
+        -:  920:    struct numeric_limits<unsigned short>
+        -:  921:    {
+        -:  922:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -:  923:
+        -:  924:      static _GLIBCXX_CONSTEXPR unsigned short 
+        -:  925:      min() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  926:
+        -:  927:      static _GLIBCXX_CONSTEXPR unsigned short 
+        -:  928:      max() _GLIBCXX_USE_NOEXCEPT { return __SHRT_MAX__ * 2U + 1; }
+        -:  929:
+        -:  930:#if __cplusplus >= 201103L
+        -:  931:      static constexpr unsigned short 
+        -:  932:      lowest() noexcept { return min(); }
+        -:  933:#endif
+        -:  934:
+        -:  935:      static _GLIBCXX_USE_CONSTEXPR int digits 
+        -:  936:       = __glibcxx_digits (unsigned short);
+        -:  937:      static _GLIBCXX_USE_CONSTEXPR int digits10 
+        -:  938:       = __glibcxx_digits10 (unsigned short);
+        -:  939:#if __cplusplus >= 201103L
+        -:  940:      static constexpr int max_digits10 = 0;
+        -:  941:#endif
+        -:  942:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = false;
+        -:  943:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -:  944:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -:  945:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -:  946:
+        -:  947:      static _GLIBCXX_CONSTEXPR unsigned short 
+        -:  948:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  949:
+        -:  950:      static _GLIBCXX_CONSTEXPR unsigned short 
+        -:  951:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -:  952:
+        -:  953:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -:  954:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -:  955:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -:  956:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -:  957:
+        -:  958:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -:  959:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -:  960:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -:  961:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -:  962:       = denorm_absent;
+        -:  963:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -:  964:
+        -:  965:      static _GLIBCXX_CONSTEXPR unsigned short 
+        -:  966:      infinity() _GLIBCXX_USE_NOEXCEPT
+        -:  967:      { return static_cast<unsigned short>(0); }
+        -:  968:
+        -:  969:      static _GLIBCXX_CONSTEXPR unsigned short 
+        -:  970:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT
+        -:  971:      { return static_cast<unsigned short>(0); }
+        -:  972:
+        -:  973:      static _GLIBCXX_CONSTEXPR unsigned short 
+        -:  974:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT
+        -:  975:      { return static_cast<unsigned short>(0); }
+        -:  976:
+        -:  977:      static _GLIBCXX_CONSTEXPR unsigned short 
+        -:  978:      denorm_min() _GLIBCXX_USE_NOEXCEPT
+        -:  979:      { return static_cast<unsigned short>(0); }
+        -:  980:
+        -:  981:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -:  982:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -:  983:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = true;
+        -:  984:
+        -:  985:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -:  986:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -:  987:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -:  988:       = round_toward_zero;
+        -:  989:    };
+        -:  990:
+        -:  991:  /// numeric_limits<int> specialization.
+        -:  992:  template<>
+        -:  993:    struct numeric_limits<int>
+        -:  994:    {
+        -:  995:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -:  996:
+        -:  997:      static _GLIBCXX_CONSTEXPR int 
+        -:  998:      min() _GLIBCXX_USE_NOEXCEPT { return -__INT_MAX__ - 1; }
+        -:  999:
+        -: 1000:      static _GLIBCXX_CONSTEXPR int 
+        -: 1001:      max() _GLIBCXX_USE_NOEXCEPT { return __INT_MAX__; }
+        -: 1002:
+        -: 1003:#if __cplusplus >= 201103L
+        -: 1004:      static constexpr int 
+        -: 1005:      lowest() noexcept { return min(); }
+        -: 1006:#endif
+        -: 1007:
+        -: 1008:      static _GLIBCXX_USE_CONSTEXPR int digits = __glibcxx_digits (int);
+        -: 1009:      static _GLIBCXX_USE_CONSTEXPR int digits10 = __glibcxx_digits10 (int);
+        -: 1010:#if __cplusplus >= 201103L
+        -: 1011:      static constexpr int max_digits10 = 0;
+        -: 1012:#endif
+        -: 1013:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = true;
+        -: 1014:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -: 1015:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -: 1016:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -: 1017:
+        -: 1018:      static _GLIBCXX_CONSTEXPR int 
+        -: 1019:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1020:
+        -: 1021:      static _GLIBCXX_CONSTEXPR int 
+        -: 1022:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1023:
+        -: 1024:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -: 1025:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -: 1026:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -: 1027:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -: 1028:
+        -: 1029:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -: 1030:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -: 1031:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -: 1032:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -: 1033:       = denorm_absent;
+        -: 1034:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -: 1035:
+        -: 1036:      static _GLIBCXX_CONSTEXPR int 
+        -: 1037:      infinity() _GLIBCXX_USE_NOEXCEPT { return static_cast<int>(0); }
+        -: 1038:
+        -: 1039:      static _GLIBCXX_CONSTEXPR int 
+        -: 1040:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return static_cast<int>(0); }
+        -: 1041:
+        -: 1042:      static _GLIBCXX_CONSTEXPR int 
+        -: 1043:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT { return static_cast<int>(0); }
+        -: 1044:
+        -: 1045:      static _GLIBCXX_CONSTEXPR int 
+        -: 1046:      denorm_min() _GLIBCXX_USE_NOEXCEPT { return static_cast<int>(0); }
+        -: 1047:
+        -: 1048:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -: 1049:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -: 1050:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = false;
+        -: 1051:
+        -: 1052:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -: 1053:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -: 1054:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -: 1055:       = round_toward_zero;
+        -: 1056:    };
+        -: 1057:
+        -: 1058:  /// numeric_limits<unsigned int> specialization.
+        -: 1059:  template<>
+        -: 1060:    struct numeric_limits<unsigned int>
+        -: 1061:    {
+        -: 1062:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -: 1063:
+        -: 1064:      static _GLIBCXX_CONSTEXPR unsigned int 
+        -: 1065:      min() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1066:
+        -: 1067:      static _GLIBCXX_CONSTEXPR unsigned int 
+        -: 1068:      max() _GLIBCXX_USE_NOEXCEPT { return __INT_MAX__ * 2U + 1; }
+        -: 1069:
+        -: 1070:#if __cplusplus >= 201103L
+        -: 1071:      static constexpr unsigned int 
+        -: 1072:      lowest() noexcept { return min(); }
+        -: 1073:#endif
+        -: 1074:
+        -: 1075:      static _GLIBCXX_USE_CONSTEXPR int digits 
+        -: 1076:       = __glibcxx_digits (unsigned int);
+        -: 1077:      static _GLIBCXX_USE_CONSTEXPR int digits10 
+        -: 1078:       = __glibcxx_digits10 (unsigned int);
+        -: 1079:#if __cplusplus >= 201103L
+        -: 1080:      static constexpr int max_digits10 = 0;
+        -: 1081:#endif
+        -: 1082:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = false;
+        -: 1083:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -: 1084:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -: 1085:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -: 1086:
+        -: 1087:      static _GLIBCXX_CONSTEXPR unsigned int 
+        -: 1088:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1089:
+        -: 1090:      static _GLIBCXX_CONSTEXPR unsigned int 
+        -: 1091:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1092:
+        -: 1093:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -: 1094:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -: 1095:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -: 1096:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -: 1097:
+        -: 1098:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -: 1099:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -: 1100:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -: 1101:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -: 1102:       = denorm_absent;
+        -: 1103:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -: 1104:
+        -: 1105:      static _GLIBCXX_CONSTEXPR unsigned int 
+        -: 1106:      infinity() _GLIBCXX_USE_NOEXCEPT { return static_cast<unsigned int>(0); }
+        -: 1107:
+        -: 1108:      static _GLIBCXX_CONSTEXPR unsigned int 
+        -: 1109:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT
+        -: 1110:      { return static_cast<unsigned int>(0); }
+        -: 1111:
+        -: 1112:      static _GLIBCXX_CONSTEXPR unsigned int 
+        -: 1113:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT
+        -: 1114:      { return static_cast<unsigned int>(0); }
+        -: 1115:
+        -: 1116:      static _GLIBCXX_CONSTEXPR unsigned int 
+        -: 1117:      denorm_min() _GLIBCXX_USE_NOEXCEPT
+        -: 1118:      { return static_cast<unsigned int>(0); }
+        -: 1119:
+        -: 1120:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -: 1121:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -: 1122:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = true;
+        -: 1123:
+        -: 1124:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -: 1125:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -: 1126:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -: 1127:       = round_toward_zero;
+        -: 1128:    };
+        -: 1129:
+        -: 1130:  /// numeric_limits<long> specialization.
+        -: 1131:  template<>
+        -: 1132:    struct numeric_limits<long>
+        -: 1133:    {
+        -: 1134:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -: 1135:
+        -: 1136:      static _GLIBCXX_CONSTEXPR long
+        -: 1137:      min() _GLIBCXX_USE_NOEXCEPT { return -__LONG_MAX__ - 1; }
+        -: 1138:
+        -: 1139:      static _GLIBCXX_CONSTEXPR long 
+        -: 1140:      max() _GLIBCXX_USE_NOEXCEPT { return __LONG_MAX__; }
+        -: 1141:
+        -: 1142:#if __cplusplus >= 201103L
+        -: 1143:      static constexpr long 
+        -: 1144:      lowest() noexcept { return min(); }
+        -: 1145:#endif
+        -: 1146:
+        -: 1147:      static _GLIBCXX_USE_CONSTEXPR int digits = __glibcxx_digits (long);
+        -: 1148:      static _GLIBCXX_USE_CONSTEXPR int digits10 = __glibcxx_digits10 (long);
+        -: 1149:#if __cplusplus >= 201103L
+        -: 1150:      static constexpr int max_digits10 = 0;
+        -: 1151:#endif
+        -: 1152:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = true;
+        -: 1153:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -: 1154:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -: 1155:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -: 1156:
+        -: 1157:      static _GLIBCXX_CONSTEXPR long 
+        -: 1158:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1159:
+        -: 1160:      static _GLIBCXX_CONSTEXPR long 
+        -: 1161:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1162:
+        -: 1163:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -: 1164:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -: 1165:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -: 1166:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -: 1167:
+        -: 1168:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -: 1169:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -: 1170:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -: 1171:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -: 1172:       = denorm_absent;
+        -: 1173:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -: 1174:
+        -: 1175:      static _GLIBCXX_CONSTEXPR long 
+        -: 1176:      infinity() _GLIBCXX_USE_NOEXCEPT { return static_cast<long>(0); }
+        -: 1177:
+        -: 1178:      static _GLIBCXX_CONSTEXPR long 
+        -: 1179:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return static_cast<long>(0); }
+        -: 1180:
+        -: 1181:      static _GLIBCXX_CONSTEXPR long 
+        -: 1182:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT { return static_cast<long>(0); }
+        -: 1183:
+        -: 1184:      static _GLIBCXX_CONSTEXPR long 
+        -: 1185:      denorm_min() _GLIBCXX_USE_NOEXCEPT { return static_cast<long>(0); }
+        -: 1186:
+        -: 1187:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -: 1188:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -: 1189:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = false;
+        -: 1190:
+        -: 1191:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -: 1192:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -: 1193:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -: 1194:       = round_toward_zero;
+        -: 1195:    };
+        -: 1196:
+        -: 1197:  /// numeric_limits<unsigned long> specialization.
+        -: 1198:  template<>
+        -: 1199:    struct numeric_limits<unsigned long>
+        -: 1200:    {
+        -: 1201:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -: 1202:
+        -: 1203:      static _GLIBCXX_CONSTEXPR unsigned long 
+        -: 1204:      min() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1205:
+        -: 1206:      static _GLIBCXX_CONSTEXPR unsigned long 
+    #####: 1207:      max() _GLIBCXX_USE_NOEXCEPT { return __LONG_MAX__ * 2UL + 1; }
+        -: 1208:
+        -: 1209:#if __cplusplus >= 201103L
+        -: 1210:      static constexpr unsigned long 
+        -: 1211:      lowest() noexcept { return min(); }
+        -: 1212:#endif
+        -: 1213:
+        -: 1214:      static _GLIBCXX_USE_CONSTEXPR int digits 
+        -: 1215:       = __glibcxx_digits (unsigned long);
+        -: 1216:      static _GLIBCXX_USE_CONSTEXPR int digits10 
+        -: 1217:       = __glibcxx_digits10 (unsigned long);
+        -: 1218:#if __cplusplus >= 201103L
+        -: 1219:      static constexpr int max_digits10 = 0;
+        -: 1220:#endif
+        -: 1221:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = false;
+        -: 1222:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -: 1223:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -: 1224:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -: 1225:
+        -: 1226:      static _GLIBCXX_CONSTEXPR unsigned long 
+        -: 1227:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1228:
+        -: 1229:      static _GLIBCXX_CONSTEXPR unsigned long 
+        -: 1230:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1231:
+        -: 1232:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -: 1233:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -: 1234:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -: 1235:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -: 1236:
+        -: 1237:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -: 1238:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -: 1239:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -: 1240:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -: 1241:       = denorm_absent;
+        -: 1242:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -: 1243:
+        -: 1244:      static _GLIBCXX_CONSTEXPR unsigned long 
+        -: 1245:      infinity() _GLIBCXX_USE_NOEXCEPT
+        -: 1246:      { return static_cast<unsigned long>(0); }
+        -: 1247:
+        -: 1248:      static _GLIBCXX_CONSTEXPR unsigned long 
+        -: 1249:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT
+        -: 1250:      { return static_cast<unsigned long>(0); }
+        -: 1251:
+        -: 1252:      static _GLIBCXX_CONSTEXPR unsigned long 
+        -: 1253:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT
+        -: 1254:      { return static_cast<unsigned long>(0); }
+        -: 1255:
+        -: 1256:      static _GLIBCXX_CONSTEXPR unsigned long 
+        -: 1257:      denorm_min() _GLIBCXX_USE_NOEXCEPT
+        -: 1258:      { return static_cast<unsigned long>(0); }
+        -: 1259:
+        -: 1260:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -: 1261:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -: 1262:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = true;
+        -: 1263:
+        -: 1264:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -: 1265:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -: 1266:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -: 1267:       = round_toward_zero;
+        -: 1268:    };
+        -: 1269:
+        -: 1270:  /// numeric_limits<long long> specialization.
+        -: 1271:  template<>
+        -: 1272:    struct numeric_limits<long long>
+        -: 1273:    {
+        -: 1274:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -: 1275:
+        -: 1276:      static _GLIBCXX_CONSTEXPR long long 
+        -: 1277:      min() _GLIBCXX_USE_NOEXCEPT { return -__LONG_LONG_MAX__ - 1; }
+        -: 1278:
+        -: 1279:      static _GLIBCXX_CONSTEXPR long long 
+        -: 1280:      max() _GLIBCXX_USE_NOEXCEPT { return __LONG_LONG_MAX__; }
+        -: 1281:
+        -: 1282:#if __cplusplus >= 201103L
+        -: 1283:      static constexpr long long 
+        -: 1284:      lowest() noexcept { return min(); }
+        -: 1285:#endif
+        -: 1286:
+        -: 1287:      static _GLIBCXX_USE_CONSTEXPR int digits 
+        -: 1288:       = __glibcxx_digits (long long);
+        -: 1289:      static _GLIBCXX_USE_CONSTEXPR int digits10 
+        -: 1290:       = __glibcxx_digits10 (long long);
+        -: 1291:#if __cplusplus >= 201103L
+        -: 1292:      static constexpr int max_digits10 = 0;
+        -: 1293:#endif
+        -: 1294:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = true;
+        -: 1295:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -: 1296:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -: 1297:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -: 1298:
+        -: 1299:      static _GLIBCXX_CONSTEXPR long long 
+        -: 1300:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1301:
+        -: 1302:      static _GLIBCXX_CONSTEXPR long long 
+        -: 1303:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1304:
+        -: 1305:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -: 1306:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -: 1307:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -: 1308:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -: 1309:
+        -: 1310:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -: 1311:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -: 1312:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -: 1313:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -: 1314:       = denorm_absent;
+        -: 1315:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -: 1316:
+        -: 1317:      static _GLIBCXX_CONSTEXPR long long 
+        -: 1318:      infinity() _GLIBCXX_USE_NOEXCEPT { return static_cast<long long>(0); }
+        -: 1319:
+        -: 1320:      static _GLIBCXX_CONSTEXPR long long 
+        -: 1321:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return static_cast<long long>(0); }
+        -: 1322:
+        -: 1323:      static _GLIBCXX_CONSTEXPR long long 
+        -: 1324:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT
+        -: 1325:      { return static_cast<long long>(0); }
+        -: 1326:
+        -: 1327:      static _GLIBCXX_CONSTEXPR long long 
+        -: 1328:      denorm_min() _GLIBCXX_USE_NOEXCEPT { return static_cast<long long>(0); }
+        -: 1329:
+        -: 1330:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -: 1331:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -: 1332:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = false;
+        -: 1333:
+        -: 1334:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -: 1335:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -: 1336:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -: 1337:       = round_toward_zero;
+        -: 1338:    };
+        -: 1339:
+        -: 1340:  /// numeric_limits<unsigned long long> specialization.
+        -: 1341:  template<>
+        -: 1342:    struct numeric_limits<unsigned long long>
+        -: 1343:    {
+        -: 1344:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -: 1345:
+        -: 1346:      static _GLIBCXX_CONSTEXPR unsigned long long 
+        -: 1347:      min() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1348:
+        -: 1349:      static _GLIBCXX_CONSTEXPR unsigned long long 
+        -: 1350:      max() _GLIBCXX_USE_NOEXCEPT { return __LONG_LONG_MAX__ * 2ULL + 1; }
+        -: 1351:
+        -: 1352:#if __cplusplus >= 201103L
+        -: 1353:      static constexpr unsigned long long 
+        -: 1354:      lowest() noexcept { return min(); }
+        -: 1355:#endif
+        -: 1356:
+        -: 1357:      static _GLIBCXX_USE_CONSTEXPR int digits 
+        -: 1358:       = __glibcxx_digits (unsigned long long);
+        -: 1359:      static _GLIBCXX_USE_CONSTEXPR int digits10 
+        -: 1360:       = __glibcxx_digits10 (unsigned long long);
+        -: 1361:#if __cplusplus >= 201103L
+        -: 1362:      static constexpr int max_digits10 = 0;
+        -: 1363:#endif
+        -: 1364:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = false;
+        -: 1365:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true;
+        -: 1366:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true;
+        -: 1367:      static _GLIBCXX_USE_CONSTEXPR int radix = 2;
+        -: 1368:
+        -: 1369:      static _GLIBCXX_CONSTEXPR unsigned long long 
+        -: 1370:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1371:
+        -: 1372:      static _GLIBCXX_CONSTEXPR unsigned long long 
+        -: 1373:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; }
+        -: 1374:
+        -: 1375:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0;
+        -: 1376:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0;
+        -: 1377:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0;
+        -: 1378:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0;
+        -: 1379:
+        -: 1380:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false;
+        -: 1381:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false;
+        -: 1382:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false;
+        -: 1383:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 
+        -: 1384:       = denorm_absent;
+        -: 1385:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false;
+        -: 1386:
+        -: 1387:      static _GLIBCXX_CONSTEXPR unsigned long long 
+        -: 1388:      infinity() _GLIBCXX_USE_NOEXCEPT
+        -: 1389:      { return static_cast<unsigned long long>(0); }
+        -: 1390:
+        -: 1391:      static _GLIBCXX_CONSTEXPR unsigned long long 
+        -: 1392:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT
+        -: 1393:      { return static_cast<unsigned long long>(0); }
+        -: 1394:
+        -: 1395:      static _GLIBCXX_CONSTEXPR unsigned long long 
+        -: 1396:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT
+        -: 1397:      { return static_cast<unsigned long long>(0); }
+        -: 1398:
+        -: 1399:      static _GLIBCXX_CONSTEXPR unsigned long long 
+        -: 1400:      denorm_min() _GLIBCXX_USE_NOEXCEPT
+        -: 1401:      { return static_cast<unsigned long long>(0); }
+        -: 1402:
+        -: 1403:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false;
+        -: 1404:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -: 1405:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = true;
+        -: 1406:
+        -: 1407:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps;
+        -: 1408:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false;
+        -: 1409:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -: 1410:       = round_toward_zero;
+        -: 1411:    };
+        -: 1412:
+        -: 1413:#if !defined(__STRICT_ANSI__)
+        -: 1414:
+        -: 1415:#define __INT_N(TYPE, BITSIZE, EXT, UEXT)			\
+        -: 1416:  template<> 									\
+        -: 1417:    struct numeric_limits<TYPE> 						\
+        -: 1418:    { 										\
+        -: 1419:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true; 		\
+        -: 1420: 										\
+        -: 1421:      static _GLIBCXX_CONSTEXPR TYPE 						\
+        -: 1422:	min() _GLIBCXX_USE_NOEXCEPT { return __glibcxx_min_b (TYPE, BITSIZE); } \
+        -: 1423: 										\
+        -: 1424:      static _GLIBCXX_CONSTEXPR TYPE 						\
+        -: 1425:      max() _GLIBCXX_USE_NOEXCEPT { return __glibcxx_max_b (TYPE, BITSIZE); } 	\
+        -: 1426: 										\
+        -: 1427:      static _GLIBCXX_USE_CONSTEXPR int digits 					\
+        -: 1428:       = BITSIZE - 1; 								\
+        -: 1429:      static _GLIBCXX_USE_CONSTEXPR int digits10 				\
+        -: 1430:       = (BITSIZE - 1) * 643L / 2136; 						\
+        -: 1431:      										\
+        -: 1432:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = true; 			\
+        -: 1433:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true; 			\
+        -: 1434:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true; 			\
+        -: 1435:      static _GLIBCXX_USE_CONSTEXPR int radix = 2; 				\
+        -: 1436: 										\
+        -: 1437:      static _GLIBCXX_CONSTEXPR TYPE 						\
+        -: 1438:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; } 				\
+        -: 1439: 										\
+        -: 1440:      static _GLIBCXX_CONSTEXPR TYPE 						\
+        -: 1441:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; } 			\
+        -: 1442: 										\
+        -: 1443:      EXT									\
+        -: 1444: 										\
+        -: 1445:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0; 			\
+        -: 1446:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0; 			\
+        -: 1447:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0; 			\
+        -: 1448:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0; 			\
+        -: 1449: 										\
+        -: 1450:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false; 			\
+        -: 1451:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false; 		\
+        -: 1452:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false; 		\
+        -: 1453:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 		\
+        -: 1454:       = denorm_absent; 							\
+        -: 1455:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false; 		\
+        -: 1456: 										\
+        -: 1457:      static _GLIBCXX_CONSTEXPR TYPE 						\
+        -: 1458:      infinity() _GLIBCXX_USE_NOEXCEPT 						\
+        -: 1459:      { return static_cast<TYPE>(0); } 						\
+        -: 1460: 										\
+        -: 1461:      static _GLIBCXX_CONSTEXPR TYPE 						\
+        -: 1462:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT 					\
+        -: 1463:      { return static_cast<TYPE>(0); } 						\
+        -: 1464:       										\
+        -: 1465:      static _GLIBCXX_CONSTEXPR TYPE 						\
+        -: 1466:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT 					\
+        -: 1467:      { return static_cast<TYPE>(0); } 						\
+        -: 1468:       										\
+        -: 1469:      static _GLIBCXX_CONSTEXPR TYPE 						\
+        -: 1470:      denorm_min() _GLIBCXX_USE_NOEXCEPT 					\
+        -: 1471:      { return static_cast<TYPE>(0); } 						\
+        -: 1472: 										\
+        -: 1473:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false; 			\
+        -: 1474:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true; 			\
+        -: 1475:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = false; 			\
+        -: 1476: 										\
+        -: 1477:      static _GLIBCXX_USE_CONSTEXPR bool traps 					\
+        -: 1478:       = __glibcxx_integral_traps; 						\
+        -: 1479:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false; 		\
+        -: 1480:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 		\
+        -: 1481:       = round_toward_zero; 							\
+        -: 1482:    }; 										\
+        -: 1483: 										\
+        -: 1484:  template<> 									\
+        -: 1485:    struct numeric_limits<unsigned TYPE> 					\
+        -: 1486:    { 										\
+        -: 1487:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true; 		\
+        -: 1488: 										\
+        -: 1489:      static _GLIBCXX_CONSTEXPR unsigned TYPE 					\
+        -: 1490:      min() _GLIBCXX_USE_NOEXCEPT { return 0; } 				\
+        -: 1491: 										\
+        -: 1492:      static _GLIBCXX_CONSTEXPR unsigned TYPE 					\
+        -: 1493:      max() _GLIBCXX_USE_NOEXCEPT						\
+        -: 1494:      { return  __glibcxx_max_b (unsigned TYPE, BITSIZE); }			\
+        -: 1495: 										\
+        -: 1496:      UEXT									\
+        -: 1497: 										\
+        -: 1498:      static _GLIBCXX_USE_CONSTEXPR int digits 					\
+        -: 1499:       = BITSIZE; 								\
+        -: 1500:      static _GLIBCXX_USE_CONSTEXPR int digits10 				\
+        -: 1501:       = BITSIZE * 643L / 2136; 						\
+        -: 1502:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = false; 			\
+        -: 1503:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = true; 			\
+        -: 1504:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = true; 			\
+        -: 1505:      static _GLIBCXX_USE_CONSTEXPR int radix = 2; 				\
+        -: 1506: 										\
+        -: 1507:      static _GLIBCXX_CONSTEXPR unsigned TYPE 					\
+        -: 1508:      epsilon() _GLIBCXX_USE_NOEXCEPT { return 0; } 				\
+        -: 1509: 										\
+        -: 1510:      static _GLIBCXX_CONSTEXPR unsigned TYPE 					\
+        -: 1511:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0; } 			\
+        -: 1512: 										\
+        -: 1513:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = 0; 			\
+        -: 1514:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = 0; 			\
+        -: 1515:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = 0; 			\
+        -: 1516:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = 0; 			\
+        -: 1517: 										\
+        -: 1518:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = false; 			\
+        -: 1519:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = false; 		\
+        -: 1520:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = false; 		\
+        -: 1521:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm 		\
+        -: 1522:       = denorm_absent; 							\
+        -: 1523:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss = false; 		\
+        -: 1524: 										\
+        -: 1525:      static _GLIBCXX_CONSTEXPR unsigned TYPE 					\
+        -: 1526:      infinity() _GLIBCXX_USE_NOEXCEPT 						\
+        -: 1527:      { return static_cast<unsigned TYPE>(0); } 				\
+        -: 1528: 										\
+        -: 1529:      static _GLIBCXX_CONSTEXPR unsigned TYPE 					\
+        -: 1530:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT 					\
+        -: 1531:      { return static_cast<unsigned TYPE>(0); } 				\
+        -: 1532: 										\
+        -: 1533:      static _GLIBCXX_CONSTEXPR unsigned TYPE 					\
+        -: 1534:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT 					\
+        -: 1535:      { return static_cast<unsigned TYPE>(0); } 				\
+        -: 1536: 										\
+        -: 1537:      static _GLIBCXX_CONSTEXPR unsigned TYPE 					\
+        -: 1538:      denorm_min() _GLIBCXX_USE_NOEXCEPT 					\
+        -: 1539:      { return static_cast<unsigned TYPE>(0); } 				\
+        -: 1540: 										\
+        -: 1541:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559 = false; 			\
+        -: 1542:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true; 			\
+        -: 1543:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = true; 			\
+        -: 1544: 										\
+        -: 1545:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_integral_traps; 	\
+        -: 1546:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = false; 		\
+        -: 1547:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 		\
+        -: 1548:       = round_toward_zero; 							\
+        -: 1549:    };
+        -: 1550:
+        -: 1551:#if __cplusplus >= 201103L
+        -: 1552:
+        -: 1553:#define __INT_N_201103(TYPE)							\
+        -: 1554:      static constexpr TYPE 							\
+        -: 1555:      lowest() noexcept { return min(); }					\
+        -: 1556:      static constexpr int max_digits10 = 0;
+        -: 1557:
+        -: 1558:#define __INT_N_U201103(TYPE)							\
+        -: 1559:      static constexpr unsigned TYPE 						\
+        -: 1560:      lowest() noexcept { return min(); }					\
+        -: 1561:      static constexpr int max_digits10 = 0;
+        -: 1562:
+        -: 1563:#else
+        -: 1564:#define __INT_N_201103(TYPE)
+        -: 1565:#define __INT_N_U201103(TYPE)
+        -: 1566:#endif
+        -: 1567:
+        -: 1568:#ifdef __GLIBCXX_TYPE_INT_N_0
+        -: 1569:  __INT_N(__GLIBCXX_TYPE_INT_N_0, __GLIBCXX_BITSIZE_INT_N_0,
+        -: 1570:	  __INT_N_201103 (__GLIBCXX_TYPE_INT_N_0), __INT_N_U201103 (__GLIBCXX_TYPE_INT_N_0))
+        -: 1571:#endif
+        -: 1572:#ifdef __GLIBCXX_TYPE_INT_N_1
+        -: 1573:  __INT_N (__GLIBCXX_TYPE_INT_N_1, __GLIBCXX_BITSIZE_INT_N_1,
+        -: 1574:	  __INT_N_201103 (__GLIBCXX_TYPE_INT_N_1), __INT_N_U201103 (__GLIBCXX_TYPE_INT_N_1))
+        -: 1575:#endif
+        -: 1576:#ifdef __GLIBCXX_TYPE_INT_N_2
+        -: 1577:  __INT_N (__GLIBCXX_TYPE_INT_N_2, __GLIBCXX_BITSIZE_INT_N_2,
+        -: 1578:	  __INT_N_201103 (__GLIBCXX_TYPE_INT_N_2), __INT_N_U201103 (__GLIBCXX_TYPE_INT_N_2))
+        -: 1579:#endif
+        -: 1580:#ifdef __GLIBCXX_TYPE_INT_N_3
+        -: 1581:  __INT_N (__GLIBCXX_TYPE_INT_N_3, __GLIBCXX_BITSIZE_INT_N_3,
+        -: 1582:	  __INT_N_201103 (__GLIBCXX_TYPE_INT_N_3), __INT_N_U201103 (__GLIBCXX_TYPE_INT_N_3))
+        -: 1583:#endif
+        -: 1584:
+        -: 1585:#undef __INT_N
+        -: 1586:#undef __INT_N_201103
+        -: 1587:#undef __INT_N_U201103
+        -: 1588:
+        -: 1589:#endif
+        -: 1590:
+        -: 1591:  /// numeric_limits<float> specialization.
+        -: 1592:  template<>
+        -: 1593:    struct numeric_limits<float>
+        -: 1594:    {
+        -: 1595:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -: 1596:
+        -: 1597:      static _GLIBCXX_CONSTEXPR float 
+        -: 1598:      min() _GLIBCXX_USE_NOEXCEPT { return __FLT_MIN__; }
+        -: 1599:
+        -: 1600:      static _GLIBCXX_CONSTEXPR float 
+        -: 1601:      max() _GLIBCXX_USE_NOEXCEPT { return __FLT_MAX__; }
+        -: 1602:
+        -: 1603:#if __cplusplus >= 201103L
+        -: 1604:      static constexpr float 
+        -: 1605:      lowest() noexcept { return -__FLT_MAX__; }
+        -: 1606:#endif
+        -: 1607:
+        -: 1608:      static _GLIBCXX_USE_CONSTEXPR int digits = __FLT_MANT_DIG__;
+        -: 1609:      static _GLIBCXX_USE_CONSTEXPR int digits10 = __FLT_DIG__;
+        -: 1610:#if __cplusplus >= 201103L
+        -: 1611:      static constexpr int max_digits10
+        -: 1612:	 = __glibcxx_max_digits10 (__FLT_MANT_DIG__);
+        -: 1613:#endif
+        -: 1614:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = true;
+        -: 1615:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = false;
+        -: 1616:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = false;
+        -: 1617:      static _GLIBCXX_USE_CONSTEXPR int radix = __FLT_RADIX__;
+        -: 1618:
+        -: 1619:      static _GLIBCXX_CONSTEXPR float 
+    #####: 1620:      epsilon() _GLIBCXX_USE_NOEXCEPT { return __FLT_EPSILON__; }
+        -: 1621:
+        -: 1622:      static _GLIBCXX_CONSTEXPR float 
+        -: 1623:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0.5F; }
+        -: 1624:
+        -: 1625:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = __FLT_MIN_EXP__;
+        -: 1626:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = __FLT_MIN_10_EXP__;
+        -: 1627:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = __FLT_MAX_EXP__;
+        -: 1628:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = __FLT_MAX_10_EXP__;
+        -: 1629:
+        -: 1630:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = __FLT_HAS_INFINITY__;
+        -: 1631:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = __FLT_HAS_QUIET_NAN__;
+        -: 1632:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = has_quiet_NaN;
+        -: 1633:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm
+        -: 1634:	= bool(__FLT_HAS_DENORM__) ? denorm_present : denorm_absent;
+        -: 1635:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss 
+        -: 1636:       = __glibcxx_float_has_denorm_loss;
+        -: 1637:
+        -: 1638:      static _GLIBCXX_CONSTEXPR float 
+        -: 1639:      infinity() _GLIBCXX_USE_NOEXCEPT { return __builtin_huge_valf(); }
+        -: 1640:
+        -: 1641:      static _GLIBCXX_CONSTEXPR float 
+        -: 1642:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return __builtin_nanf(""); }
+        -: 1643:
+        -: 1644:      static _GLIBCXX_CONSTEXPR float 
+        -: 1645:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT { return __builtin_nansf(""); }
+        -: 1646:
+        -: 1647:      static _GLIBCXX_CONSTEXPR float 
+        -: 1648:      denorm_min() _GLIBCXX_USE_NOEXCEPT { return __FLT_DENORM_MIN__; }
+        -: 1649:
+        -: 1650:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559
+        -: 1651:	= has_infinity && has_quiet_NaN && has_denorm == denorm_present;
+        -: 1652:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -: 1653:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = false;
+        -: 1654:
+        -: 1655:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_float_traps;
+        -: 1656:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before 
+        -: 1657:       = __glibcxx_float_tinyness_before;
+        -: 1658:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -: 1659:       = round_to_nearest;
+        -: 1660:    };
+        -: 1661:
+        -: 1662:#undef __glibcxx_float_has_denorm_loss
+        -: 1663:#undef __glibcxx_float_traps
+        -: 1664:#undef __glibcxx_float_tinyness_before
+        -: 1665:
+        -: 1666:  /// numeric_limits<double> specialization.
+        -: 1667:  template<>
+        -: 1668:    struct numeric_limits<double>
+        -: 1669:    {
+        -: 1670:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -: 1671:
+        -: 1672:      static _GLIBCXX_CONSTEXPR double 
+        -: 1673:      min() _GLIBCXX_USE_NOEXCEPT { return __DBL_MIN__; }
+        -: 1674:
+        -: 1675:      static _GLIBCXX_CONSTEXPR double 
+        -: 1676:      max() _GLIBCXX_USE_NOEXCEPT { return __DBL_MAX__; }
+        -: 1677:
+        -: 1678:#if __cplusplus >= 201103L
+        -: 1679:      static constexpr double 
+        -: 1680:      lowest() noexcept { return -__DBL_MAX__; }
+        -: 1681:#endif
+        -: 1682:
+        -: 1683:      static _GLIBCXX_USE_CONSTEXPR int digits = __DBL_MANT_DIG__;
+        -: 1684:      static _GLIBCXX_USE_CONSTEXPR int digits10 = __DBL_DIG__;
+        -: 1685:#if __cplusplus >= 201103L
+        -: 1686:      static constexpr int max_digits10
+        -: 1687:	 = __glibcxx_max_digits10 (__DBL_MANT_DIG__);
+        -: 1688:#endif
+        -: 1689:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = true;
+        -: 1690:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = false;
+        -: 1691:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = false;
+        -: 1692:      static _GLIBCXX_USE_CONSTEXPR int radix = __FLT_RADIX__;
+        -: 1693:
+        -: 1694:      static _GLIBCXX_CONSTEXPR double 
+        -: 1695:      epsilon() _GLIBCXX_USE_NOEXCEPT { return __DBL_EPSILON__; }
+        -: 1696:
+        -: 1697:      static _GLIBCXX_CONSTEXPR double 
+        -: 1698:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0.5; }
+        -: 1699:
+        -: 1700:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = __DBL_MIN_EXP__;
+        -: 1701:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = __DBL_MIN_10_EXP__;
+        -: 1702:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = __DBL_MAX_EXP__;
+        -: 1703:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = __DBL_MAX_10_EXP__;
+        -: 1704:
+        -: 1705:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = __DBL_HAS_INFINITY__;
+        -: 1706:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = __DBL_HAS_QUIET_NAN__;
+        -: 1707:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = has_quiet_NaN;
+        -: 1708:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm
+        -: 1709:	= bool(__DBL_HAS_DENORM__) ? denorm_present : denorm_absent;
+        -: 1710:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss 
+        -: 1711:        = __glibcxx_double_has_denorm_loss;
+        -: 1712:
+        -: 1713:      static _GLIBCXX_CONSTEXPR double 
+        -: 1714:      infinity() _GLIBCXX_USE_NOEXCEPT { return __builtin_huge_val(); }
+        -: 1715:
+        -: 1716:      static _GLIBCXX_CONSTEXPR double 
+    #####: 1717:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return __builtin_nan(""); }
+        -: 1718:
+        -: 1719:      static _GLIBCXX_CONSTEXPR double 
+        -: 1720:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT { return __builtin_nans(""); }
+        -: 1721:
+        -: 1722:      static _GLIBCXX_CONSTEXPR double 
+        -: 1723:      denorm_min() _GLIBCXX_USE_NOEXCEPT { return __DBL_DENORM_MIN__; }
+        -: 1724:
+        -: 1725:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559
+        -: 1726:	= has_infinity && has_quiet_NaN && has_denorm == denorm_present;
+        -: 1727:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -: 1728:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = false;
+        -: 1729:
+        -: 1730:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_double_traps;
+        -: 1731:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before 
+        -: 1732:       = __glibcxx_double_tinyness_before;
+        -: 1733:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style 
+        -: 1734:       = round_to_nearest;
+        -: 1735:    };
+        -: 1736:
+        -: 1737:#undef __glibcxx_double_has_denorm_loss
+        -: 1738:#undef __glibcxx_double_traps
+        -: 1739:#undef __glibcxx_double_tinyness_before
+        -: 1740:
+        -: 1741:  /// numeric_limits<long double> specialization.
+        -: 1742:  template<>
+        -: 1743:    struct numeric_limits<long double>
+        -: 1744:    {
+        -: 1745:      static _GLIBCXX_USE_CONSTEXPR bool is_specialized = true;
+        -: 1746:
+        -: 1747:      static _GLIBCXX_CONSTEXPR long double 
+        -: 1748:      min() _GLIBCXX_USE_NOEXCEPT { return __LDBL_MIN__; }
+        -: 1749:
+        -: 1750:      static _GLIBCXX_CONSTEXPR long double 
+        -: 1751:      max() _GLIBCXX_USE_NOEXCEPT { return __LDBL_MAX__; }
+        -: 1752:
+        -: 1753:#if __cplusplus >= 201103L
+        -: 1754:      static constexpr long double 
+        -: 1755:      lowest() noexcept { return -__LDBL_MAX__; }
+        -: 1756:#endif
+        -: 1757:
+        -: 1758:      static _GLIBCXX_USE_CONSTEXPR int digits = __LDBL_MANT_DIG__;
+        -: 1759:      static _GLIBCXX_USE_CONSTEXPR int digits10 = __LDBL_DIG__;
+        -: 1760:#if __cplusplus >= 201103L
+        -: 1761:      static _GLIBCXX_USE_CONSTEXPR int max_digits10
+        -: 1762:	 = __glibcxx_max_digits10 (__LDBL_MANT_DIG__);
+        -: 1763:#endif
+        -: 1764:      static _GLIBCXX_USE_CONSTEXPR bool is_signed = true;
+        -: 1765:      static _GLIBCXX_USE_CONSTEXPR bool is_integer = false;
+        -: 1766:      static _GLIBCXX_USE_CONSTEXPR bool is_exact = false;
+        -: 1767:      static _GLIBCXX_USE_CONSTEXPR int radix = __FLT_RADIX__;
+        -: 1768:
+        -: 1769:      static _GLIBCXX_CONSTEXPR long double 
+        -: 1770:      epsilon() _GLIBCXX_USE_NOEXCEPT { return __LDBL_EPSILON__; }
+        -: 1771:
+        -: 1772:      static _GLIBCXX_CONSTEXPR long double 
+        -: 1773:      round_error() _GLIBCXX_USE_NOEXCEPT { return 0.5L; }
+        -: 1774:
+        -: 1775:      static _GLIBCXX_USE_CONSTEXPR int min_exponent = __LDBL_MIN_EXP__;
+        -: 1776:      static _GLIBCXX_USE_CONSTEXPR int min_exponent10 = __LDBL_MIN_10_EXP__;
+        -: 1777:      static _GLIBCXX_USE_CONSTEXPR int max_exponent = __LDBL_MAX_EXP__;
+        -: 1778:      static _GLIBCXX_USE_CONSTEXPR int max_exponent10 = __LDBL_MAX_10_EXP__;
+        -: 1779:
+        -: 1780:      static _GLIBCXX_USE_CONSTEXPR bool has_infinity = __LDBL_HAS_INFINITY__;
+        -: 1781:      static _GLIBCXX_USE_CONSTEXPR bool has_quiet_NaN = __LDBL_HAS_QUIET_NAN__;
+        -: 1782:      static _GLIBCXX_USE_CONSTEXPR bool has_signaling_NaN = has_quiet_NaN;
+        -: 1783:      static _GLIBCXX_USE_CONSTEXPR float_denorm_style has_denorm
+        -: 1784:	= bool(__LDBL_HAS_DENORM__) ? denorm_present : denorm_absent;
+        -: 1785:      static _GLIBCXX_USE_CONSTEXPR bool has_denorm_loss
+        -: 1786:	= __glibcxx_long_double_has_denorm_loss;
+        -: 1787:
+        -: 1788:      static _GLIBCXX_CONSTEXPR long double 
+        -: 1789:      infinity() _GLIBCXX_USE_NOEXCEPT { return __builtin_huge_vall(); }
+        -: 1790:
+        -: 1791:      static _GLIBCXX_CONSTEXPR long double 
+        -: 1792:      quiet_NaN() _GLIBCXX_USE_NOEXCEPT { return __builtin_nanl(""); }
+        -: 1793:
+        -: 1794:      static _GLIBCXX_CONSTEXPR long double 
+        -: 1795:      signaling_NaN() _GLIBCXX_USE_NOEXCEPT { return __builtin_nansl(""); }
+        -: 1796:
+        -: 1797:      static _GLIBCXX_CONSTEXPR long double 
+        -: 1798:      denorm_min() _GLIBCXX_USE_NOEXCEPT { return __LDBL_DENORM_MIN__; }
+        -: 1799:
+        -: 1800:      static _GLIBCXX_USE_CONSTEXPR bool is_iec559
+        -: 1801:	= has_infinity && has_quiet_NaN && has_denorm == denorm_present;
+        -: 1802:      static _GLIBCXX_USE_CONSTEXPR bool is_bounded = true;
+        -: 1803:      static _GLIBCXX_USE_CONSTEXPR bool is_modulo = false;
+        -: 1804:
+        -: 1805:      static _GLIBCXX_USE_CONSTEXPR bool traps = __glibcxx_long_double_traps;
+        -: 1806:      static _GLIBCXX_USE_CONSTEXPR bool tinyness_before = 
+        -: 1807:					 __glibcxx_long_double_tinyness_before;
+        -: 1808:      static _GLIBCXX_USE_CONSTEXPR float_round_style round_style = 
+        -: 1809:						      round_to_nearest;
+        -: 1810:    };
+        -: 1811:
+        -: 1812:#undef __glibcxx_long_double_has_denorm_loss
+        -: 1813:#undef __glibcxx_long_double_traps
+        -: 1814:#undef __glibcxx_long_double_tinyness_before
+        -: 1815:
+        -: 1816:_GLIBCXX_END_NAMESPACE_VERSION
+        -: 1817:} // namespace
+        -: 1818:
+        -: 1819:#undef __glibcxx_signed
+        -: 1820:#undef __glibcxx_min
+        -: 1821:#undef __glibcxx_max
+        -: 1822:#undef __glibcxx_digits
+        -: 1823:#undef __glibcxx_digits10
+        -: 1824:#undef __glibcxx_max_digits10
+        -: 1825:
+        -: 1826:#endif // _GLIBCXX_NUMERIC_LIMITS

@@ -1,0 +1,26 @@
+        -:    0:Source:src/math/Boresight.hpp
+        -:    0:Graph:main.gcno
+        -:    0:Data:-
+        -:    0:Runs:0
+        -:    0:Programs:0
+        -:    1:#ifndef BORESIGHT_HPP
+        -:    2:#define BORESIGHT_HPP
+        -:    3:
+        -:    4:class Boresight{
+        -:    5:	public:
+    #####:    6:		static void buildMatrix(Eigen::Matrix3d & M,Attitude & boresight){
+    #####:    7:			double ch = boresight.getCh();
+    #####:    8:			double sh = boresight.getSh();
+    #####:    9:			double cp = boresight.getCp();
+    #####:   10:			double sp = boresight.getSp();
+    #####:   11:			double cr = boresight.getCr();
+    #####:   12:			double sr = boresight.getSr();
+        -:   13:
+    #####:   14:			M << 	ch*cp , ch*sp*sr - sh*cr  , ch*sp*cr + sh*sr,
+    #####:   15:				sh*cp , sh*sp*sr + ch*cr  , sh*sp*cr - ch*sr,
+    #####:   16:				-sp   , cp*sr		  , cp*cr;
+    #####:   17:		}
+        -:   18:
+        -:   19:};
+        -:   20:
+        -:   21:#endif
