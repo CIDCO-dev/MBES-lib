@@ -37,7 +37,7 @@ test-quick: default
 	mkdir -p $(test_result_dir)
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
-	$(root)/$(test_exec_dir)/tests
+	$(root)/$(test_exec_dir)/tests || true
 
 coverage: default
 	mkdir -p $(coverage_dir)
@@ -45,7 +45,7 @@ coverage: default
 	mkdir -p $(coverage_exec_dir)
 	cppcheck --xml --xml-version=2 --enable=all --inconclusive --language=c++ src 2> $(coverage_report_dir)/cppcheck.xml
 	$(CC) $(OPTIONS) $(INCLUDES) -fprofile-arcs -ftest-coverage -fPIC -O0 test/main.cpp -o $(coverage_exec_dir)/tests
-	$(root)/$(coverage_exec_dir)/tests
+	$(root)/$(coverage_exec_dir)/tests || true
 	cd $(coverage_report_dir)
 	gcovr --branches -r $(root) --xml --xml-pretty -o $(coverage_report_dir)/gcovr-report.xml
 	cd $(root)
