@@ -11,6 +11,9 @@ doc_dir=build/doc
 test_exec_dir=build/test/bin
 test_work_dir=build/test/work
 test_result_dir=build/test-report
+coverage_dir=build/coverage
+coverage_exec_dir=build/coverage/bin
+coverage_report_dir=build/coverage/report
 
 default:
 	mkdir -p $(exec_dir)
@@ -26,7 +29,7 @@ test: default
 	mkdir -p $(test_result_dir)
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
-	$(root)/$(test_exec_dir)/tests -r junit -o $(test_result_dir)/mbes-lib-test-report.xml
+	#$(root)/$(test_exec_dir)/tests -r junit -o $(test_result_dir)/mbes-lib-test-report.xml
 
 test-quick: default
 	mkdir -p $(test_exec_dir)
@@ -35,6 +38,18 @@ test-quick: default
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
 	$(root)/$(test_exec_dir)/tests
+
+coverage: default
+	mkdir -p $(coverage_dir)
+	mkdir -p $(coverage_report_dir)
+	mkdir -p $(coverage_exec_dir)
+	cppcheck --xml --xml-version=2 --enable=all --inconclusive --language=c++ src > $(coverage_report_dir)/cppcheck.xml
+	$(CC) $(OPTIONS) $(INCLUDES) -fprofile-arcs -ftest-coverage -fPIC -O0 test/main.cpp -o $(coverage_exec_dir)/tests
+	#$(root)/$(coverage_exec_dir)/tests
+	cd $(coverage_report_dir)
+	gcovr --branches --xml-pretty -r $(root)
+	gcovr --branches -r $(root) --html --html-details -o $(coverage_report_dir)/gcovr-report.html
+	cd $(root)
 
 doc:
 	rm -rf build/doxygen
