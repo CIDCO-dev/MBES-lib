@@ -113,16 +113,17 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
 			//If LGF, compute centroid
 			if(GeoreferencingLGF * lgf = dynamic_cast<GeoreferencingLGF*>(&georef)){
-				Eigen::Vector3d centroid;
+				Position centroid(0,0,0,0);
 
 				for(auto i=positions.begin();i!=positions.end();i++){
-					Eigen::Vector3d pos;
-					pos << (*i).getLatitude(),(*i).getLongitude(),(*i).getEllipsoidalHeight();
-					centroid += pos;
+					centroid.getVector() += i->getVector();
 				}
-				centroid /= (double) positions.size();
 
-				lgf->setCentroid(centroid);
+				centroid.getVector() /= (double)positions.size();
+
+				lgf->setCentroid(&centroid);
+
+				std::cerr << "LGF centroid:" << centroid << std::endl;
 			}
 
 			//Georef pings

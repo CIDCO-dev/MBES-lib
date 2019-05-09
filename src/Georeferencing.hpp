@@ -81,35 +81,38 @@ public:
 
 
 /*!
- * \brief TRF Georeferencing class
+ * \brief LGF Georeferencing class
  */
 class GeoreferencingLGF : public Georeferencing{
 public:
 
     /**
      * Georeferences a ping in the LGF (NED)
-     * 
+     *
      * @param georeferencedPing vector of a ping georeferenced
      * @param attitude the attitude of the ship in the IM frame
      * @param position the position of the ship in the TRF
      * @param ping the ping of the georeference in the sonar frame
      * @param svp the sound velocity profile
      * @param leverArm vector from the position reference point (PRP) to the acoustic center
-     * 
+     *
      */
     void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
         Eigen::Matrix3d imu2ned;
         CoordinateTransform::getDCM(imu2ned,attitude);
 
-        //Convert position to NED
-	Position pos;
-	pos.setLatitude(position.getLatitude()-centroid(0));
-	pos.setLongitude(position.getLongitude()-centroid(1));
-	pos.setEllipsoidalHeight(position.getEllipsoidalHeight()-centroid(2));
+        //Center position wrt centroid
+	Position pos(
+		position.getTimestamp(),
+		position.getLatitude() 		- centroid->getLatitude(),
+		position.getLongitude()		- centroid->getLongitude(),
+		position.getEllipsoidalHeight()	- centroid->getEllipsoidalHeight()
+	);
 
+	//Convert position's geographic coordinates to ECEF, and then from ECEF to NED
         Eigen::Vector3d positionECEF;
         CoordinateTransform::getPositionECEF(positionECEF,pos);
-	Eigen::Vector3d positionNED = ned2ecef * positionECEF;
+	Eigen::Vector3d positionNED = ecef2ned * positionECEF;
 
         //Convert ping to NED
         Eigen::Vector3d pingVector;
@@ -128,14 +131,15 @@ public:
     /**
      * Sets centroid and inits ECEF 2 NED matrix
      */
-    void setCentroid(Eigen::Vector3d & centroid){
-	CoordinateTransform::ned2ecef(ned2ecef,centroid);
-        ned2ecef.transposeInPlace();
+    void setCentroid(Position * centroid){
+	this->centroid = centroid;
+	CoordinateTransform::ned2ecef(ecef2ned,*centroid);
+        ecef2ned.transposeInPlace();
     }
 
 private:
-	Eigen::Vector3d & centroid; //in geographic coordinates
-	Eigen::Matrix3d ned2ecef;
+	Position * centroid; //in geographic coordinates
+	Eigen::Matrix3d ecef2ned;
 };
 
 #endif
