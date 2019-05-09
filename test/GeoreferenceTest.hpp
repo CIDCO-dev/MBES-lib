@@ -23,7 +23,7 @@
 using namespace std;
 #ifdef _WIN32
 static string GeoBinexec("..\\bin\\georeference.exe");
-static string outputdir(".");
+static string Geooutputdir(".");
 #else
 static string GeoBinexec("build/bin/georeference");
 static string GeoOutputdir(".");
