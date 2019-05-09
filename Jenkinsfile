@@ -39,7 +39,6 @@ pipeline {
         always {
           junit 'build/test-report/*.xml'
           publishCppcheck pattern:'coverage/report/cppcheck.xml'
-          cobertura 'coverage/report'
         }
       }
     }
