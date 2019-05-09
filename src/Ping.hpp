@@ -61,6 +61,7 @@ private:
     /**Cosine value of the across track angle*/
     double cB;
 
+
 public:
     
     /**
@@ -155,6 +156,12 @@ public:
 
     /**Return the intensity of the ping*/
     uint32_t getIntensity() { return intensity;}
+
+
+    static bool sortByTimestamp(Ping & p1,Ping & p2){
+        return p1.getTimestamp() < p2.getTimestamp(); 
+    }
+
 
 };
 

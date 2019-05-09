@@ -12,8 +12,7 @@ test_exec_dir=build/test/bin
 test_work_dir=build/test/work
 test_result_dir=build/test-report
 
-default:
-	mkdir -p $(exec_dir)
+default: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
@@ -49,5 +48,12 @@ clean:
 
 datagram-list: default
 	./build/bin/datagram-list test/data/s7k/20141016_150519_FJ-Saucier.s7k|sort|uniq -c
+
+pcl-viewer: prepare
+	cd build && cmake ../src/examples/viewer/ && make && mv georefPCLviewer bin/
+
+prepare:
+	mkdir -p $(exec_dir)
+
 
 .PHONY: all test clean doc
