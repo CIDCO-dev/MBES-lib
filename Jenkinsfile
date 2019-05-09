@@ -8,6 +8,9 @@ pipeline {
     version="$major.$minor.$patch"
     exec_name="datagram-dump-$version"
     publishDir="/var/www/html/$name/$version"
+    publishDocDir="/var/www/html/$name/$version/doc"
+    publishDoxygenDocDir="/var/www/html/$name/$version/doc/doxygen"
+    publishCoberturaDir="/var/www/html/$name/$version/cobertura"
     lastPublishDir="/var/www/html/$name/last"
     binMasterPublishDir="$publishDir/Linux"
     binWinx64Dir="windows-x64"
@@ -16,6 +19,21 @@ pipeline {
 
   agent none
   stages {
+
+    stage('DOCUMENTATION'){
+      agent { label 'master'}
+      steps {
+        sh "make doc"
+      }
+      post {
+        always {
+          sh 'mkdir -p $publishDocDir'
+          sh 'mkdir -p $publishDoxygenDocDir'
+          sh 'cp -r build/doxygen/* $publishCoberturaDir/'
+        }
+      }
+    }
+
     stage('TEST MASTER'){
       agent { label 'master'}
       steps {
@@ -27,14 +45,9 @@ pipeline {
           publishCppcheck pattern:'build/coverage/report/cppcheck.xml'
           step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'build/coverage/report/gcovr-report.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
           junit 'build/test-report/*.xml'
+          sh 'mkdir -p $publishCoberturaDir'
+          sh 'cp -r build/coverage/report/*.html $publishCoberturaDir/'
         }
-      }
-    }
-
-    stage('DOCUMENTATION'){
-      agent { label 'master'}
-      steps {
-        sh "make doc"
       }
     }
 
