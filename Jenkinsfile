@@ -16,28 +16,17 @@ pipeline {
 
   agent none
   stages {
-
-    stage('COVERAGE'){
-      agent { label 'master'}
-      steps {
-        sh "make coverage"
-      }
-      post {
-        always {
-          publishCppcheck pattern:'build/coverage/report/cppcheck.xml'
-          step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'build/coverage/report/gcovr-report*.html', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
-        }
-      }
-    }
-
     stage('TEST MASTER'){
       agent { label 'master'}
       steps {
+        sh "make coverage"
         sh "make test"
       }
       post {
         always {
           junit 'build/test-report/*.xml'
+          publishCppcheck pattern:'build/coverage/report/cppcheck.xml'
+          step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'build/coverage/report/gcovr-report*.html', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
         }
       }
     }
