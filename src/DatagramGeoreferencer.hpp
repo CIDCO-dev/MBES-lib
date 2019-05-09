@@ -15,7 +15,7 @@
 class DatagramGeoreferencer : public DatagramEventHandler{
         public:
                 /**Create a datagram georeferencer*/
-                DatagramGeoreferencer(){
+                DatagramGeoreferencer(Georeferencing & geo) : georef(geo){
 
                 }
 
@@ -95,6 +95,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
                         if(svps.size() == 1){
 	                        svp = svps[0];
+				std::cerr << "Using SVP from sonar file" << std::endl;
                         }
                         else{
 	                        if(svps.size() > 0){
@@ -106,10 +107,24 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                 	                //use default model
                                         //TODO: allow different models to be used with command line switches
                                         svp = SoundVelocityProfileFactory::buildSaltWaterModel();
-                                        std::cerr << "Using default model" << std::endl;
+                                        std::cerr << "Using default SVP model" << std::endl;
                                 }
                         }
 
+			//If LGF, compute centroid
+			if(GeoreferencingLGF * lgf = dynamic_cast<GeoreferencingLGF*>(&georef)){
+				Position centroid(0,0,0,0);
+
+				for(auto i=positions.begin();i!=positions.end();i++){
+					centroid.getVector() += i->getVector();
+				}
+
+				centroid.getVector() /= (double)positions.size();
+
+				lgf->setCentroid(&centroid);
+
+				std::cerr << "LGF centroid:" << centroid << std::endl;
+			}
 
 			//Georef pings
                         for(auto i=pings.begin();i!=pings.end();i++){
@@ -140,7 +155,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
                                 //georeference
                                 Eigen::Vector3d georeferencedPing;
-                                Georeferencing::georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm,boresight);
+                                georef.georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm,boresight);
 
 				processGeoreferencedPing(georeferencedPing,(*i).getQuality(),(*i).getIntensity());
 
@@ -154,6 +169,8 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                 }
 
         protected:
+		/**the georeferencing method */
+		Georeferencing & georef;
 
                 /**the current surface sound speed*/
                 double                                  currentSurfaceSoundSpeed;

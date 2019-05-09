@@ -556,7 +556,7 @@ void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char 
 }
 
 /**
- * call the process Sonar setting
+ * process Sonar setting datagram
  * 
  * @param drf the S7k data record frame
  * @param data the datagram
@@ -581,7 +581,7 @@ void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char 
     S7kPosition *position = (S7kPosition*) data;
 
     // only process WGS84, ignore grid coordinates
-    if(position->DatumIdentifier == 0 && position->PositioningMethod == 0) {
+    if(position->DatumIdentifier == 0 && position->PositionTypeFlag == 0) {
         processor.processPosition(microEpoch, (double)position->LongitudeOrEasting * R2D, (double)position->LatitudeOrNorthing * R2D, (double)position->Height);
     }
 }
