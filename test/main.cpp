@@ -12,4 +12,7 @@
 #include "S7kParserTest.hpp"
 #include "XtfParserTest.hpp"
 #include "BoresightTest.hpp"
+<<<<<<< HEAD
 #include "GeorefPCLviewerTest.hpp"
+=======
+>>>>>>> 0dc66766cdf2fb38b0165c39e74059dc3a839ae4
