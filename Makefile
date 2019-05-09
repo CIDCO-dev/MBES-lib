@@ -29,7 +29,7 @@ test: default
 	mkdir -p $(test_result_dir)
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
-	#$(root)/$(test_exec_dir)/tests -r junit -o $(test_result_dir)/mbes-lib-test-report.xml
+	$(root)/$(test_exec_dir)/tests -r junit -o $(test_result_dir)/mbes-lib-test-report.xml
 
 test-quick: default
 	mkdir -p $(test_exec_dir)
@@ -45,7 +45,7 @@ coverage: default
 	mkdir -p $(coverage_exec_dir)
 	cppcheck --xml --xml-version=2 --enable=all --inconclusive --language=c++ src 2> $(coverage_report_dir)/cppcheck.xml
 	$(CC) $(OPTIONS) $(INCLUDES) -fprofile-arcs -ftest-coverage -fPIC -O0 test/main.cpp -o $(coverage_exec_dir)/tests
-	#$(root)/$(coverage_exec_dir)/tests
+	$(root)/$(coverage_exec_dir)/tests
 	cd $(coverage_report_dir)
 	gcovr --branches --xml-pretty -r $(root)
 	gcovr --branches -r $(root) --html --html-details -o $(coverage_report_dir)/gcovr-report.html
