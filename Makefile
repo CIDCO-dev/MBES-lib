@@ -46,6 +46,7 @@ coverage: default
 	$(CC) $(OPTIONS) $(INCLUDES) -fprofile-arcs -ftest-coverage -fPIC -O0 test/main.cpp -o $(coverage_exec_dir)/tests
 	$(root)/$(coverage_exec_dir)/tests || true
 	gcovr --branches -r $(root) --xml --xml-pretty -o $(coverage_report_dir)/gcovr-report.xml
+	gcovr --branches -r $(root) --html --html-details -o $(coverage_report_dir)/gcovr-report.html
 
 doc:
 	rm -rf build/doxygen
