@@ -46,9 +46,7 @@ coverage: default
 	cppcheck --xml --xml-version=2 --enable=all --inconclusive --language=c++ src 2> $(coverage_report_dir)/cppcheck.xml
 	$(CC) $(OPTIONS) $(INCLUDES) -fprofile-arcs -ftest-coverage -fPIC -O0 test/main.cpp -o $(coverage_exec_dir)/tests
 	$(root)/$(coverage_exec_dir)/tests || true
-	cd $(coverage_report_dir)
 	gcovr --branches -r $(root) --xml --xml-pretty -o $(coverage_report_dir)/gcovr-report.xml
-	cd $(root)
 
 doc:
 	rm -rf build/doxygen
