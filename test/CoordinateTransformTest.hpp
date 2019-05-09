@@ -297,7 +297,7 @@ TEST_CASE("getDCM Test") {
     REQUIRE(dcmDifferences.maxCoeff() < randomPrecision);
 };
 
-TEST_CASE("Conversion get the navigation position frame")
+TEST_CASE("Test getPositionInNavigationFrame function")
 {
     Eigen::Vector3d posNav;
     Position pos(0,0,0,0);
