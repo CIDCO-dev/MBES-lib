@@ -25,7 +25,7 @@ pipeline {
       post {
         always {
           publishCppcheck pattern:'coverage/report/cppcheck.xml'
-          cobertura 'coverage/report/gcovr-report*.html'
+          step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'coverage/report/gcovr-report*.html', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
         }
       }
     }
