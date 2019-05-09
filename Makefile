@@ -54,7 +54,7 @@ datagram-list: default
 	
 coverage: default
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests -fprofile-arcs -ftest-coverage test/main.cpp
-	mv main.gcno $(coverage_dir)/main.gcno
-	cd build/coverage && gcov main.gcno
+	gcov main.gcno
+	mv *.gcov $(coverage_dir)
 	
 .PHONY: all test clean doc
