@@ -48,7 +48,7 @@ coverage: default
 	$(root)/$(coverage_exec_dir)/tests
 	cd $(coverage_report_dir)
 	gcovr --branches --xml-pretty -r $(root)
-	gcovr --branches -r $(root) --html --html-details -o $(coverage_report_dir)/gcovr-report.html
+	gcovr --branches -r $(root) --html --html-details -o $(coverage_report_dir)/gcovr-report.xml
 	cd $(root)
 
 doc:
