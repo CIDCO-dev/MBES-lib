@@ -11,9 +11,11 @@ doc_dir=build/doc
 test_exec_dir=build/test/bin
 test_work_dir=build/test/work
 test_result_dir=build/test-report
+coverage_dir=build/coverage
 
 default:
 	mkdir -p $(exec_dir)
+	mkdir -p $(coverage_dir)
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
@@ -49,5 +51,10 @@ clean:
 
 datagram-list: default
 	./build/bin/datagram-list test/data/s7k/20141016_150519_FJ-Saucier.s7k|sort|uniq -c
-
+	
+coverage: default
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests -fprofile-arcs -ftest-coverage test/main.cpp
+	mv main.gcno $(coverage_dir)/main.gcno
+	cd build/coverage && gcov main.gcno
+	
 .PHONY: all test clean doc
