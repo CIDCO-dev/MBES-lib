@@ -13,4 +13,3 @@
 #include "XtfParserTest.hpp"
 #include "BoresightTest.hpp"
 #include "GeorefPCLviewerTest.hpp"
-
