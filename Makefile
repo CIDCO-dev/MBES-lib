@@ -55,6 +55,6 @@ coverage: default
 	mkdir -p $(coverage_dir)
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests -fprofile-arcs -ftest-coverage test/main.cpp
 	gcov main.gcno
-	mv *.gcov -c $(coverage_dir)
+	mv *.gcov $(coverage_dir)
 	
 .PHONY: all test clean doc
