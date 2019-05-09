@@ -2,7 +2,7 @@
 #include "catch.hpp"
 
 #include "XtfTypesTest.hpp"
-/*#include "NmeaUtilsTest.hpp"
+#include "NmeaUtilsTest.hpp"
 #include "SoundVelocityProfileTest.hpp"
 #include "SurveySystemTest.hpp"
 #include "CoordinateTransformTest.hpp"
@@ -11,4 +11,4 @@
 #include "KongsbergParserTest.hpp"
 #include "S7kParserTest.hpp"
 #include "XtfParserTest.hpp"
-#include "BoresightTest.hpp"*/
+#include "BoresightTest.hpp"
