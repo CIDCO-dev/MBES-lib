@@ -126,23 +126,37 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 				std::cerr << "LGF centroid:" << centroid << std::endl;
 			}
 
+			//Sort everything
+			std::sort(positions.begin(),positions.end(),&Position::sortByTimestamp);
+			std::sort(attitudes.begin(),attitudes.begin(),&Attitude::sortByTimestamp);
+			std::sort(pings.begin(),pings.end(),&Ping::sortByTimestamp);
+
 			//Georef pings
                         for(auto i=pings.begin();i!=pings.end();i++){
-                                while(attitudeIndex < attitudes.size() && attitudes[attitudeIndex+1].getTimestamp() < (*i).getTimestamp()){
+
+
+                                while(attitudeIndex + 1 < attitudes.size() && attitudes[attitudeIndex + 1].getTimestamp() < (*i).getTimestamp()){
                                         attitudeIndex++;
                                 }
-
-                                if(attitudeIndex == attitudes.size() - 1  && attitudes[attitudeIndex+1].getTimestamp() < (*i).getTimestamp()){
+				
+				//No more attitudes available
+                                if(attitudeIndex >= attitudes.size() - 1){
                                         break;
                                 }
 
-                                while(positionIndex < positions.size() && positions[positionIndex+1].getTimestamp() < (*i).getTimestamp()){
+                                while(positionIndex + 1 < positions.size() && positions[positionIndex + 1].getTimestamp() < (*i).getTimestamp()){
                                         positionIndex++;
                                 }
 
-                                if(positionIndex == positions.size() - 1  && positions[positionIndex+1].getTimestamp() < (*i).getTimestamp()){
+				//No more positions available
+                                if( positionIndex >= positions.size() - 1){
                                         break;
                                 }
+
+				//No position or attitude smaller than ping, so discard this ping
+				if(positions[positionIndex].getTimestamp() > (*i).getTimestamp() || attitudes[attitudeIndex].getTimestamp() > (*i).getTimestamp()){
+					continue;
+				}
 
                                 Attitude & beforeAttitude = attitudes[attitudeIndex];
                                 Attitude & afterAttitude = attitudes[attitudeIndex+1];

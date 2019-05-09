@@ -36,8 +36,8 @@ void printUsage(){
 class PointCloudGeoreferencer : public DatagramGeoreferencer{
 
 	public:
-		PointCloudGeoreferencer( pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud ) 
-			: cloud( cloud ) {
+		PointCloudGeoreferencer( pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, Georeferencing & georef ) 
+			: cloud( cloud ),DatagramGeoreferencer(georef) {
 
 		}
 
@@ -94,7 +94,6 @@ int main(int argc, char ** argv){
 		printUsage();
 	}
 
-	
 	std::string filename1(argv[1]);
 
 
@@ -102,10 +101,16 @@ int main(int argc, char ** argv){
 	Eigen::Vector3d	leverArm;
 	leverArm <<  0, 0, 0;
 
+        Attitude boresightAngles( 0, 0, 0, 0 ); //Attitude boresightAngles(0,roll,pitch,heading);
+        Eigen::Matrix3d boresight;
+        Boresight::buildMatrix( boresight, boresightAngles );
+
+	Georeferencing * georef = new GeoreferencingLGF(); //TODO: allow TRF through CLI
+
 	//Get point clouds from files
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1 (new pcl::PointCloud<pcl::PointXYZRGB>);
 
-	PointCloudGeoreferencer line1(cloud1);
+	PointCloudGeoreferencer line1(cloud1,*georef);
 
 
 	DatagramParser * parser = nullptr;
@@ -136,12 +141,6 @@ int main(int argc, char ** argv){
 		//loadCloudFromFile(filename1,line1);
 
 		std::cout << "\nGeoreferencing point cloud" << std::endl;
-
-		// line1.georeference(leverArm);
-
-		Attitude boresightAngles( 0, 0, 0, 0 ); //Attitude boresightAngles(0,roll,pitch,heading);
-		Eigen::Matrix3d boresight;
-		Boresight::buildMatrix( boresight, boresightAngles );
 
 		line1.georeference( leverArm , boresight  );
 

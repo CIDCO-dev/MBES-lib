@@ -98,6 +98,10 @@ public:
     /**Return the vectorized form of the position*/
     Eigen::Vector3d & getVector() { return vector;}
 
+    static bool sortByTimestamp(Position & p1,Position & p2){
+    	return p1.getTimestamp() < p2.getTimestamp(); 
+    }
+
 private:
     
     /**Timestamp value of the position (micro-second)*/

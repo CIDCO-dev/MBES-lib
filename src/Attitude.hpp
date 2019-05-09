@@ -138,6 +138,11 @@ public:
 	this->timestamp = microEpoch;
     }
 
+    static bool sortByTimestamp(Attitude & a1,Attitude & a2){
+        return a1.getTimestamp() < a2.getTimestamp(); 
+    }
+
+
     /**
      * Return a text value with the informations of the attitude
      * 
