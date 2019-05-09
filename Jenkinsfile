@@ -29,7 +29,7 @@ pipeline {
         always {
           sh 'mkdir -p $publishDocDir'
           sh 'mkdir -p $publishDoxygenDocDir'
-          sh 'cp -r build/doxygen/* $publishCoberturaDir/'
+          sh 'cp -r build/doxygen/* $publishDoxygenDocDir/'
         }
       }
     }
