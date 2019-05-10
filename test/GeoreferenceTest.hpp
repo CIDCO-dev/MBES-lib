@@ -66,7 +66,7 @@ std::stringstream GeoSystem_call(const std::string& command){
 /**Test with file extention valid*/
 TEST_CASE("test the extention of the file receive")
 {
-    string commFile = " test/data/all/example.all 2>&1";
+    string commFile = " test/data/all/0008_20160909_135801_Panopee.all 2>&1";
     string commTest = GeoBinexec+commFile;
     std::stringstream ss;
     ss = GeoSystem_call(std::string(commTest));
@@ -139,7 +139,7 @@ TEST_CASE("test if the parameter x y z are invalid")
     string commX = " -x sjdhsd";
     string commY = " -y gyhgj";
     string commZ = " -z gyigkb";
-    string commFile = " test/data/all/example.all 2>&1";
+    string commFile = " test/data/all/0008_20160909_135801_Panopee.all 2>&1";
     string commTest = GeoBinexec+commX+commFile;
     std::stringstream ss;
     ss = GeoSystem_call(std::string(commTest));
@@ -162,7 +162,7 @@ TEST_CASE("test if parameter p P t are invalid")
     string commp = " -r sjdhsd";
     string commP = " -h gyhgj";
     string commt = " -p gyigkb";
-    string commFile = " test/data/all/example.all 2>&1";
+    string commFile = " test/data/all/0008_20160909_135801_Panopee.all 2>&1";
     string commTest = GeoBinexec+commp+commFile;
     std::stringstream ss;
     ss = GeoSystem_call(std::string(commTest));
@@ -177,4 +177,15 @@ TEST_CASE("test if parameter p P t are invalid")
     ss = GeoSystem_call(std::string(commTest));
     getline(ss,line);
     REQUIRE(line=="Invalid pitch angle offset (-p)");
+}
+
+TEST_CASE("test if parameter L T are not present")
+{
+    string commFile = " test/data/all/0008_20160909_135801_Panopee.all 2>&1";
+    string commTest = GeoBinexec+commFile;
+    std::stringstream ss;
+    ss = GeoSystem_call(std::string(commTest));
+    string line;
+    getline(ss,line);
+    REQUIRE(line=="No georeferencing method defined (-L or -T)");
 }
