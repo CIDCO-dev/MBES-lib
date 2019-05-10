@@ -156,8 +156,8 @@ TEST_CASE("test if the parameter x y z are invalid")
     REQUIRE(line=="Invalid lever arm Z offset (-z)");
 }
 
-/**Test with parameter p P t invalid*/
-TEST_CASE("test if parameter p P t are invalid")
+/**Test with parameter r h p invalid*/
+TEST_CASE("test if parameter r h p are invalid")
 {
     string commp = " -r sjdhsd";
     string commP = " -h gyhgj";
