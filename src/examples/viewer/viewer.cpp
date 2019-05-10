@@ -127,7 +127,8 @@ int main(int argc, char ** argv){
 
 		std::cout << "\nGeoreferencing point cloud" << std::endl;
 
-		line1.georeference( leverArm , boresight  );
+		//TODO: get SVP from CLI
+		line1.georeference( leverArm , boresight , NULL );
 
 	}
 	catch(Exception * error)
