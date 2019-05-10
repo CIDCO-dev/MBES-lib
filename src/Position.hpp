@@ -131,7 +131,7 @@ private:
      * @param obj the position that we need to get the informations
      */
     friend std::ostream& operator<<(std::ostream& os, const Position& obj) {
-        return os << "Latitude: " << obj.vector(0) << std::endl << "Longitude: " << obj.vector(1) << std::endl << "Ellipsoidal Height: " << obj.vector(2) << std::endl;
+        return os << "( " << obj.vector(0) << " , " << obj.vector(1) << " , " << obj.vector(2) << " )" << std::endl;
     }
 };
 
