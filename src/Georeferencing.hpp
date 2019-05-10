@@ -101,8 +101,6 @@ public:
         Eigen::Matrix3d imu2ned;
         CoordinateTransform::getDCM(imu2ned,attitude);
 
-	std::cerr << "LGF centroid: " << centroid << std::endl;
-
         //Center position wrt centroid
 	Position pos(
 		position.getTimestamp(),
