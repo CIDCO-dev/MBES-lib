@@ -165,7 +165,8 @@ else
 	Boresight::buildMatrix(boresight,boresightAngles);
 
 	//Do the georeference dance
-        printer.georeference(leverArm,boresight);
+	//TODO: get SVP file from CLI
+        printer.georeference(leverArm,boresight,NULL);
 
 	delete parser;
     }

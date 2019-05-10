@@ -85,7 +85,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                  * Georeferences all pings
 		 * @param boresight boresight (dPhi,dTheta,dPsi)
                  */
-                void georeference(Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight){
+                void georeference(Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight,SoundVelocityProfile * svpFile){
                         //interpolate attitudes and positions around pings
                         unsigned int attitudeIndex=0;
                         unsigned int positionIndex=0;
@@ -93,7 +93,12 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 			//Choose SVP
                         SoundVelocityProfile * svp = NULL;
 
-                        if(svps.size() == 1){
+			if(svpFile != NULL){
+				//If file is specified, use that
+				svp = svpFile;
+			}
+                        else if(svps.size() == 1){
+				//else if we have an SVP inside the sonar file, use that
 	                        svp = svps[0];
 				std::cerr << "Using SVP from sonar file" << std::endl;
                         }
@@ -104,8 +109,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                                         exit(1);
                                 }
                                 else{
-                	                //use default model
-                                        //TODO: allow different models to be used with command line switches
+                	                //Else use default model
                                         svp = SoundVelocityProfileFactory::buildSaltWaterModel();
                                         std::cerr << "Using default SVP model" << std::endl;
                                 }
@@ -124,7 +128,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
 					lgf->setCentroid(&centroid);
 
-					std::cerr << "LGF centroid:" << centroid << std::endl;
+					std::cerr << "LGF centroid:" << std::endl << centroid << std::endl;
 				}
 			}
 
@@ -140,7 +144,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                                 while(attitudeIndex + 1 < attitudes.size() && attitudes[attitudeIndex + 1].getTimestamp() < (*i).getTimestamp()){
                                         attitudeIndex++;
                                 }
-				
+
 				//No more attitudes available
                                 if(attitudeIndex >= attitudes.size() - 1){
                                         break;
