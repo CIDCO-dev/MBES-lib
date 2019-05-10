@@ -399,6 +399,10 @@ std::string XtfParser::getName(int tag)
             return "XTF_HEADER_AUX_PROC";
         break;
         
+        case 106:
+            return "XTF_HEADER_KLEIN3000_DATA_PAGE";
+        break;
+        
         case 107:
             return "XTF_HEADER_POS_RAW_NAVIGATION";
         break;
