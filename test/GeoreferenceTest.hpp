@@ -91,11 +91,11 @@ TEST_CASE("test the extention of the file receive")
 /**Test with file extention invalid*/
 TEST_CASE("test if the file is invalid")
 {
-    string commFile = " test/data/badextension.bad 2>&1";
+    string commFile = " -L test/data/badextension.bad 2>&1";
     string commTest = GeoBinexec+commFile;
     std::stringstream ss;
     ss = GeoSystem_call(std::string(commTest));
-    std::string line;
+    string line;
     getline(ss,line);
     getline(ss,line);
     REQUIRE(line=="Error while parsing test/data/badextension.bad: Unknown extension");
@@ -104,11 +104,11 @@ TEST_CASE("test if the file is invalid")
 /**Test with no file*/
 TEST_CASE("test if the file is not present")
 {
-    string commFile = " test/data/all/examplee.all 2>&1";
+    string commFile = " -L test/data/all/examplee.all 2>&1";
     string commTest = GeoBinexec+commFile;
     std::stringstream ss;
     ss = GeoSystem_call(std::string(commTest));
-    std::string line;
+    string line;
     getline(ss,line);
     getline(ss,line);
     REQUIRE(line=="Error while parsing test/data/all/examplee.all: File not found");
@@ -125,8 +125,10 @@ TEST_CASE("test if file parameter is not present")
   NAME\n\n\
      georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
   SYNOPSIS\n \
-	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-p roll_angle] [-P heading_angle] [-t pitch_angle] fichier\n\n\
-  DESCRIPTION\n\n \
+	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] fichier\n\n\
+  DESCRIPTION\n \
+	   -L Use a local geographic frame (NED)\n \
+	   -T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
   Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n";
     REQUIRE(ss.str()==result);
 }
@@ -157,22 +159,22 @@ TEST_CASE("test if the parameter x y z are invalid")
 /**Test with parameter p P t invalid*/
 TEST_CASE("test if parameter p P t are invalid")
 {
-    string commp = " -p sjdhsd";
-    string commP = " -P gyhgj";
-    string commt = " -t gyigkb";
+    string commp = " -r sjdhsd";
+    string commP = " -h gyhgj";
+    string commt = " -p gyigkb";
     string commFile = " test/data/all/example.all 2>&1";
     string commTest = GeoBinexec+commp+commFile;
     std::stringstream ss;
     ss = GeoSystem_call(std::string(commTest));
     std::string line;
     getline(ss,line);
-    REQUIRE(line=="Invalid roll angle offset (-p)");
+    REQUIRE(line=="Invalid roll angle offset (-r)");
     commTest = GeoBinexec+commP+commFile;
     ss = GeoSystem_call(std::string(commTest));
     getline(ss,line);
-    REQUIRE(line=="Invalid heading angle offset (-P)");
+    REQUIRE(line=="Invalid heading angle offset (-h)");
     commTest = GeoBinexec+commt+commFile;
     ss = GeoSystem_call(std::string(commTest));
     getline(ss,line);
-    REQUIRE(line=="Invalid pitch angle offset (-t)");
+    REQUIRE(line=="Invalid pitch angle offset (-p)");
 }
