@@ -15,12 +15,11 @@ coverage_dir=build/coverage
 coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
-default: prepare pcl-viewer
+default:
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/viewer src/examples/viewer/viewer.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/data-cleaning src/examples/data-cleaning.cpp
 
 test: default
