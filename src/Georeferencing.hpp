@@ -137,8 +137,14 @@ public:
         ecef2ned.transposeInPlace();
     }
 
+    /**
+    *  Get a pointer to the centroid
+    */
+
+    Position * getCentroid(){ return centroid;};
+
 private:
-	Position * centroid; //in geographic coordinates
+	Position * centroid = NULL; //in geographic coordinates
 	Eigen::Matrix3d ecef2ned;
 };
 

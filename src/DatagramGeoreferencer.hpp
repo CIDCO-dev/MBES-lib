@@ -111,19 +111,21 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                                 }
                         }
 
-			//If LGF, compute centroid
+			//If no centroid defined for LGF georeferencing, compute one
 			if(GeoreferencingLGF * lgf = dynamic_cast<GeoreferencingLGF*>(&georef)){
-				Position centroid(0,0,0,0);
+				if(lgf->getCentroid() != NULL){
+					Position centroid(0,0,0,0);
 
-				for(auto i=positions.begin();i!=positions.end();i++){
-					centroid.getVector() += i->getVector();
+					for(auto i=positions.begin();i!=positions.end();i++){
+						centroid.getVector() += i->getVector();
+					}
+
+					centroid.getVector() /= (double)positions.size();
+
+					lgf->setCentroid(&centroid);
+
+					std::cerr << "LGF centroid:" << centroid << std::endl;
 				}
-
-				centroid.getVector() /= (double)positions.size();
-
-				lgf->setCentroid(&centroid);
-
-				std::cerr << "LGF centroid:" << centroid << std::endl;
 			}
 
 			//Sort everything
