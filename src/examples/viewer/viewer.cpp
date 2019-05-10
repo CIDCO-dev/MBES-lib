@@ -79,7 +79,7 @@ class PointCloudGeoreferencer : public DatagramGeoreferencer{
 
 int main(int argc, char ** argv){
 	//Check CLI parameters for filenames
-	if(argc != 2){
+	if(argc < 2){
 		printUsage();
 	}
 
@@ -174,7 +174,7 @@ int main(int argc, char ** argv){
         Eigen::Matrix3d boresight;
         Boresight::buildMatrix( boresight, boresightAngles );
 
-	Georeferencing * georef = new GeoreferencingLGF(); //TODO: allow TRF through CLI
+	//TODO: allow TRF through CLI
 
 	//Get point clouds from files
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1 (new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -190,18 +190,18 @@ int main(int argc, char ** argv){
 		std::cout << "\nReading sonar file" << std::endl;
 
 		std::ifstream inFile;
-		inFile.open( filename1 );
+		inFile.open( fileName );
 
 		if (inFile)
 		{
-			parser = DatagramParserFactory::build( filename1, line1 );
+			parser = DatagramParserFactory::build( fileName, line1 );
 		}
 		else
 		{
 			throw new Exception("Unknown extension");
 		}
 
-		parser->parse( filename1 );
+		parser->parse( fileName );
 
 		//loadCloudFromFile(filename1,line1);
 
@@ -212,21 +212,21 @@ int main(int argc, char ** argv){
 	}
 	catch(Exception * error)
 	{
-		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\n" << error->getMessage() <<  ".\n";
+		cout << "\nError while parsing file \n\n\"" << fileName << "\":\n\n" << error->getMessage() <<  ".\n";
 
 		if(parser)
 			delete parser;
 	}
 	catch ( const char * message )
 	{
-		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\n" << message <<  ".\n";
+		cout << "\nError while parsing file \n\n\"" << fileName << "\":\n\n" << message <<  ".\n";
 
 		if(parser)
 			delete parser;
 	}
 	catch (...)
 	{
-		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\nOther exception.\n";
+		cout << "\nError while parsing file \n\n\"" << fileName << "\":\n\nOther exception.\n";
 
 		if(parser)
 			delete parser;
