@@ -127,8 +127,6 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 					centroid.getVector() /= (double)positions.size();
 
 					lgf->setCentroid(&centroid);
-
-					std::cerr << "LGF centroid:" << std::endl << centroid << std::endl;
 				}
 			}
 
