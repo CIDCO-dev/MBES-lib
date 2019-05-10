@@ -20,7 +20,7 @@ default: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georefPCLviewer src/examples/viewer/georefPCLviewer.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georefPCLviewer src/examples/viewer/src/georefPCLviewer.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/data-cleaning src/examples/data-cleaning.cpp
 
 test: default
@@ -64,7 +64,7 @@ datagram-list: default
 	
 coverage: default
 	mkdir -p $(coverage_dir)
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests -fprofile-arcs -ftest-coverage test/main.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/testC -fprofile-arcs -ftest-coverage test/main.cpp
 	gcov main.gcno
 	mv *.gcov $(coverage_dir)
 
