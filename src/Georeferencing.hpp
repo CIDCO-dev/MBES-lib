@@ -133,7 +133,7 @@ public:
      */
     void setCentroid(Position * centroid){
 	this->centroid = centroid;
-	CoordinateTransform::ned2ecef(ecef2ned,*centroid);
+	CoordinateTransform::ned2ecef(ecef2ned,*this->centroid);
         ecef2ned.transposeInPlace();
     }
 

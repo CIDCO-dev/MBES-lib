@@ -113,7 +113,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
 			//If no centroid defined for LGF georeferencing, compute one
 			if(GeoreferencingLGF * lgf = dynamic_cast<GeoreferencingLGF*>(&georef)){
-				if(lgf->getCentroid() != NULL){
+				if(lgf->getCentroid() == NULL){
 					Position centroid(0,0,0,0);
 
 					for(auto i=positions.begin();i!=positions.end();i++){
