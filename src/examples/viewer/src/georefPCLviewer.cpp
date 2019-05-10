@@ -141,7 +141,7 @@ int main(int argc, char ** argv){
                 case 'r':
                     if (sscanf(optarg,"%lf", &roll) != 1)
                     {
-                        std::cerr << "Invalid roll angle offset (-p)" << std::endl;
+                        std::cerr << "Invalid roll angle offset (-r)" << std::endl;
                         printUsage();
                     }
                 break;
@@ -149,7 +149,7 @@ int main(int argc, char ** argv){
                 case 'h':
                     if (sscanf(optarg,"%lf", &heading) != 1)
                     {
-                        std::cerr << "Invalid heading angle offset (-P)" << std::endl;
+                        std::cerr << "Invalid heading angle offset (-h)" << std::endl;
                         printUsage();
                     }
                 break;
@@ -157,7 +157,7 @@ int main(int argc, char ** argv){
                 case 'p':
                     if (sscanf(optarg,"%lf", &pitch) != 1)
                     {
-                        std::cerr << "Invalid pitch angle offset (-t)" << std::endl;
+                        std::cerr << "Invalid pitch angle offset (-p)" << std::endl;
                         printUsage();
                     }
                 break;
