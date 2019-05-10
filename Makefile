@@ -20,7 +20,7 @@ default: prepare pcl-viewer
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georefPCLviewer src/examples/viewer/src/georefPCLviewer.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/viewer src/examples/viewer/viewer.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/data-cleaning src/examples/data-cleaning.cpp
 
 test: default
