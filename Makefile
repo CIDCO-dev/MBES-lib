@@ -15,7 +15,7 @@ coverage_dir=build/coverage
 coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
-default: prepare
+default: prepare pcl-viewer
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
@@ -47,6 +47,7 @@ coverage: default
 	$(CC) $(OPTIONS) $(INCLUDES) -fprofile-arcs -ftest-coverage -fPIC -O0 test/main.cpp -o $(coverage_exec_dir)/tests
 	$(root)/$(coverage_exec_dir)/tests || true
 	gcovr --branches -r $(root) --xml --xml-pretty -o $(coverage_report_dir)/gcovr-report.xml
+	gcovr --branches -r $(root) --html --html-details -o $(coverage_report_dir)/gcovr-report.html
 
 doc:
 	rm -rf build/doxygen
@@ -69,7 +70,7 @@ coverage: default
 	mv *.gcov $(coverage_dir)
 
 pcl-viewer: prepare
-	cd build && cmake ../src/examples/viewer/ && make && mv georefPCLviewer bin/
+	cd build && cmake ../src/examples/viewer/ && make && mv viewer bin/
 
 prepare:
 	mkdir -p $(exec_dir)
