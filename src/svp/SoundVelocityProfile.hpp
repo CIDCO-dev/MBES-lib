@@ -185,14 +185,6 @@ public:
                 &year,&yday,&hour,&minute,&second,latdirection,&latdegrees,&latminute,&latsecond,
                 londirection,&londegrees,&lonminute,&lonsecond)==13)
         {
-            year = year-1970;
-            yday = yday-1;
-            nbrM = nbrM+year;
-            nbrM = nbrM*365 + yday;
-            nbrM = nbrM*24 + hour;
-            nbrM = nbrM*60 + minute;
-            nbrM = nbrM*60 + second;
-            nbrM = nbrM*1000000;
             lat = latsecond/60 + latminute;
             lat = lat/60 + latdegrees;
             std::string sdirection;
@@ -216,6 +208,20 @@ public:
             {
                 return false;
             }
+            year = year-1970;
+            yday = yday-1;
+            nbrM = nbrM+year;
+            nbrM = nbrM*365 + yday;
+            int y = year+2;
+            while (y >= 4)
+            {
+                y = y-4;
+                nbrM = nbrM+1;
+            }
+            nbrM = nbrM*24 + hour;
+            nbrM = nbrM*60 + minute;
+            nbrM = nbrM*60 + second;
+            nbrM = nbrM*1000000;
             return true;
         }
         else
