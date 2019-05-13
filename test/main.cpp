@@ -12,3 +12,4 @@
 #include "S7kParserTest.hpp"
 #include "XtfParserTest.hpp"
 #include "BoresightTest.hpp"
+#include "TimeUtilsTest.hpp"
