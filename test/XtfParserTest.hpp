@@ -71,3 +71,54 @@ TEST_CASE("test the function XtfParser::getName")
     REQUIRE(parser.getName(200)=="XTF_HEADER_USERDEFINED");
     REQUIRE(parser.getName(300)=="Invalid tag");
 }
+
+TEST_CASE ("test the XTF parser with a file who doesn't exist")
+{
+    DatagramEventHandler handler;
+    XtfParser parser(handler);
+    std::string file("blabla.xtf");
+    std::string excep = "";
+    try
+    {
+        parser.parse(file);
+    }
+    catch(Exception * error)
+    {
+        excep = error->getMessage();
+    }
+    REQUIRE(excep=="File not found");
+}
+
+TEST_CASE ("test the XTF parser with a invalid file")
+{
+    DatagramEventHandler handler;
+    XtfParser parser(handler);
+    std::string file("test.txt");
+    std::string excep = "";
+    try
+    {
+        parser.parse(file);
+    }
+    catch(Exception * error)
+    {
+        excep = error->getMessage();
+    }
+    REQUIRE(excep=="Couldn't read from file");
+}
+
+TEST_CASE ("test the XTF parser with a invalid datagram")
+{
+    DatagramEventHandler handler;
+    XtfParser parser(handler);
+    std::string file("test/data/xtf/0008_20160909_EM2040C_MIBAC - 0001.xtf");
+    std::string excep = "";
+    try
+    {
+        parser.parse(file);
+    }
+    catch(Exception * error)
+    {
+        excep = error->getMessage();
+    }
+    REQUIRE(excep=="");
+}
