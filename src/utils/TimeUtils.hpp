@@ -26,19 +26,81 @@ public:
  * @param microseconds number of microsecond less than an millisecond
  */
 static uint64_t build_time(int year,int month,int day,int hour,int minutes,int seconds,int millis,int microseconds){
-	struct tm t;
-	memset(&t,0,sizeof(struct tm));
-
-	t.tm_sec=seconds;
-	t.tm_min=minutes;
-	t.tm_hour=hour;
-	t.tm_mday=day;
-	t.tm_mon=month;
-	t.tm_year=year - 1900;
-
-	uint64_t res = mktime(&t)*1000000 + millis * 1000 + microseconds;
-
-	return res;
+        uint64_t nbrM = 0;
+        year = year-1970;
+        nbrM = nbrM+year;
+        int m = month;
+        int yday = 0;
+        while (m>0)
+        {
+            switch(m)
+            {
+                case 11:
+                 yday=yday+30;   
+                break;
+                
+                case 10:
+                 yday=yday+31;   
+                break;
+                
+                case 9:
+                 yday=yday+30;   
+                break;
+                
+                case 8:
+                 yday=yday+31;   
+                break;
+                
+                case 7:
+                 yday=yday+31;   
+                break;
+                
+                case 6:
+                 yday=yday+30;   
+                break;
+                
+                case 5:
+                 yday=yday+31;   
+                break;
+                
+                case 4:
+                 yday=yday+30;   
+                break;
+                
+                case 3:
+                 yday=yday+31;   
+                break;
+                
+                case 2:
+                 if (year % 4 == 0)
+                 {
+                     yday=yday+29;
+                 }
+                 else
+                 {
+                     yday=yday+28;
+                 }
+                break;
+                
+                case 1:
+                 yday=yday+31;   
+                break;
+            }
+            m = m-1;
+        }
+        yday=yday+day;
+        nbrM = nbrM*365 + yday;
+        int y = year+2;
+        while (y >= 4)
+        {
+            y = y-4;
+            nbrM = nbrM+1;
+        }
+        nbrM = nbrM*24 + hour;
+        nbrM = nbrM*60 + minutes;
+        nbrM = nbrM*60 + seconds;
+        nbrM = nbrM*1000000 + millis * 1000 + microseconds;
+	return nbrM;
 }
 
 /**
@@ -50,19 +112,78 @@ static uint64_t build_time(int year,int month,int day,int hour,int minutes,int s
  * @param timeInMilliseconds number of millisecond less than an day
  */
 static uint64_t build_time(int year,int month,int day,long timeInMilliseconds){
-    struct tm t;
-    memset(&t,0,sizeof(struct tm));
-
-    t.tm_sec=0;
-    t.tm_min=0;
-    t.tm_hour=0;
-    t.tm_mday=day;
-    t.tm_mon=month;
-    t.tm_year=year - 1900;
-
-    uint64_t res = mktime(&t)*1000000 + timeInMilliseconds * 1000;
-
-    return res;
+uint64_t nbrM = 0;
+        year = year-1970;
+        nbrM = nbrM+year;
+        int m = month;
+        int yday = 0;
+        while (m>0)
+        {
+            switch(m)
+            {
+                case 11:
+                 yday=yday+30;   
+                break;
+                
+                case 10:
+                 yday=yday+31;   
+                break;
+                
+                case 9:
+                 yday=yday+30;   
+                break;
+                
+                case 8:
+                 yday=yday+31;   
+                break;
+                
+                case 7:
+                 yday=yday+31;   
+                break;
+                
+                case 6:
+                 yday=yday+30;   
+                break;
+                
+                case 5:
+                 yday=yday+31;   
+                break;
+                
+                case 4:
+                 yday=yday+30;   
+                break;
+                
+                case 3:
+                 yday=yday+31;   
+                break;
+                
+                case 2:
+                 if (year % 4 == 0)
+                 {
+                     yday=yday+29;
+                 }
+                 else
+                 {
+                     yday=yday+28;
+                 }
+                break;
+                
+                case 1:
+                 yday=yday+31;   
+                break;
+            }
+            m = m-1;
+        }
+        yday=yday+day;
+        nbrM = nbrM*365 + yday;
+        int y = year+2;
+        while (y >= 4)
+        {
+            y = y-4;
+            nbrM = nbrM+1;
+        }
+        nbrM = nbrM*24*60*60*1000000 + timeInMilliseconds * 1000;
+	return nbrM;
 }
 
 /**
@@ -75,18 +196,20 @@ static uint64_t build_time(int year,int month,int day,long timeInMilliseconds){
  * @param timeMicroseconds number of microsecond less than an minute
  */
 static uint64_t build_time(int year,int yday, int hour, int minutes, long timeInMicroSeconds){
-    struct tm t;
-    memset(&t,0,sizeof(struct tm));
-
-    t.tm_sec=0;
-    t.tm_min=minutes;
-    t.tm_hour=hour;
-    t.tm_mday=yday; //hack around the C-standard: use "January 244th" since yday is an output parameter
-    t.tm_year=year - 1900;
-
-    uint64_t res = mktime(&t)*1000000 + timeInMicroSeconds;
-
-    return res;
+    uint64_t nbrM = 0;
+        year = year-1970;
+        nbrM = nbrM+year;
+        nbrM = nbrM*365 + yday;
+        int y = year+2;
+        while (y >= 4)
+        {
+            y = y-4;
+            nbrM = nbrM+1;
+        }
+        nbrM = nbrM*24 + hour;
+        nbrM = nbrM*60 + minutes;
+        nbrM = nbrM*60*1000000 + timeInMicroSeconds;
+	return nbrM;
 }
 
 /**
@@ -96,9 +219,9 @@ static uint64_t build_time(int year,int yday, int hour, int minutes, long timeIn
  */
 static std::string julianTime(uint64_t microEpoch)
 {
-    time_t date = microEpoch/1000000 + 18000;
+    time_t date = microEpoch/1000000;
     struct tm * timeinfo;
-    timeinfo = localtime (&date);
+    timeinfo = gmtime(&date);
     std::stringstream ssDate;
     ssDate << timeinfo->tm_year + 1900 << "-" << timeinfo->tm_yday + 1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
     return ssDate.str();
