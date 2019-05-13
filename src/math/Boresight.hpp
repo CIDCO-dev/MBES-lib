@@ -1,8 +1,17 @@
 #ifndef BORESIGHT_HPP
 #define BORESIGHT_HPP
 
+/*!
+ * \brief Boresight util. Give matrix between IMU and Sonar.
+ */
 class Boresight{
 	public:
+		/**
+		 * Builds and outputs the boresight matrix.
+		 *
+		 * @param M the boresight matrix
+		 * @param boresight the boresight angles
+		 */
 		static void buildMatrix(Eigen::Matrix3d & M,Attitude & boresight){
 			double ch = boresight.getCh();
 			double sh = boresight.getSh();

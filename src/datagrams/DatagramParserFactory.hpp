@@ -8,6 +8,11 @@
 #include "../utils/StringUtils.hpp"
 #include "../utils/Exception.hpp"
 
+/*!
+ * \brief Datagram parser factory class
+ *
+ * Creates an appropriate parser
+ */
 class DatagramParserFactory{
 	public:
                 /**

@@ -2,14 +2,6 @@
  * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
-/*
- * File:   S7kParser.hpp
- * Author: glm,jordan
- *
- * Created on November 1, 2018, 4:30 PM
- */
-
-
 #ifndef S7KPARSER_HPP
 #define S7KPARSER_HPP
 
@@ -23,73 +15,75 @@
 
 /*!
  * \brief S7k parser class extention of Datagram parser
+ * \author Guillaume Labbe-Morissette, Jordan McManus
+ * \date November 1, 2018, 4:30 PM
  */
 class S7kParser : public DatagramParser {
 public:
 
     /**
-     * Create an S7k parser
+     * Creates an S7k parser
      *
      * @param processor the datagram processor
      */
     S7kParser(DatagramEventHandler & processor);
 
-    /**Destroy the S7k parser*/
+    /**Destroys the S7k parser*/
     ~S7kParser();
 
     /**
-     * Read a file and change the S7k parser depending on the information
-     * 
+     * Read the file and loop through it
+     *
      * @param filename name of the file to read
      */
     void parse(std::string & filename);
-    
+
     std::string getName(int tag);
 
 protected:
 
     /**
-     * set the S7k data record frame
-     * 
+     * Sets the S7k data record frame
+     *
      * @param drf the new S7k data record frame
      */
     void processDataRecordFrame(S7kDataRecordFrame & drf);
-    
+
     /**
-     * call the process Attitude
-     * 
+     * Processes the Attitude
+     *
      * @param drf the S7k data record frame
      * @param data the datagram
      */
     void processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char * data);
-    
+
     /**
-     * call the process Position
-     * 
+     * Processes the Position
+     *
      * @param drf the S7k data record frame
      * @param data the datagram
      */
     void processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data);
-    
+
     /**
-     * call the process Ping
-     * 
+     * Processes the Ping
+     *
      * @param drf the S7k data record frame
      * @param data the datagram
      */
     void processPingDatagram(S7kDataRecordFrame & drf, unsigned char * data);
-    
+
     /**
-     * call the process Sonar setting
-     * 
+     * Processes the Sonar setting
+     *
      * @param drf the S7k data record frame
      * @param data datagram
      */
     void processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned char * data);
-    
+
     /**
-     * call the process Sound Velocity Profile base on the Ctd
-     * 
+     * Processes the Sound Velocity Profile base on the Ctd
+     *
      * @param drf the S7k data record frame
      * @param data the datagram
      */
@@ -102,19 +96,19 @@ protected:
 
 
 private:
-    
+
     /**
-     * Return the Check summary of the S7k data record frame
-     * 
+     * Returns the 'Check summary' of the S7k data record frame
+     *
      * @param drf the S7k data record frame
      * @param data the datagram
      */
     uint32_t computeChecksum(S7kDataRecordFrame * drf, unsigned char * data);
-    
+
     /**
-     * Get the S7k data record frame
-     * 
-     * @param drf the S7k data record frame 
+     * Gets the S7k data record frame
+     *
+     * @param drf the S7k data record frame
      */
     uint64_t extractMicroEpoch(S7kDataRecordFrame & drf);
 
@@ -123,25 +117,15 @@ private:
     std::list<S7kSonarSettings *> pingSettings;
 };
 
-/**
- * Create an S7k parser
- * 
- * @param processor the datagram processor 
- */
+
 S7kParser::S7kParser(DatagramEventHandler & processor) : DatagramParser(processor) {
 
 }
 
-/**Destroy the S7k parser*/
 S7kParser::~S7kParser() {
 
 }
 
-/**
- * Read a file and change the Kongsberg parser depending on the information
- * 
- * @param filename name of the file to read
- */
 void S7kParser::parse(std::string & filename) {
     FILE * file = fopen(filename.c_str(), "rb");
 
@@ -230,259 +214,259 @@ std::string S7kParser::getName(int tag)
         case 1000:
             return "Reference Point";
         break;
-        
+
         case 1001:
             return "Sensor Offset Position";
         break;
-        
+
         case 1002:
             return "Sensor Offset Position Calibrated";
         break;
-        
+
         case 1003:
             return "Position";
         break;
-        
+
         case 1004:
             return "Custom Attitude Information";
         break;
-        
+
         case 1005:
             return "Tide";
         break;
-        
+
         case 1006:
             return "Altitude";
         break;
-        
+
         case 1007:
             return "Motion Over Ground";
         break;
-        
+
         case 1008:
             return "Depth";
         break;
-        
+
         case 1009:
             return "Sound Velocity Profile";
         break;
-        
+
         case 1010:
             return "CTD";
         break;
-        
+
         case 1011:
             return "Geodesy";
         break;
-        
+
         case 1012:
             return "Roll Pitch Heave";
         break;
-        
+
         case 1013:
             return "Heading";
         break;
-        
+
         case 1014:
             return "Survey Line";
         break;
-        
+
         case 1015:
             return "Navigation";
         break;
-        
+
         case 1016:
             return "Attitude";
         break;
-        
+
         case 1017:
             return "Pan Tilt";
         break;
-        
+
         case 1020:
             return "Sonar Installation Identifiers";
         break;
-        
+
         case 2004:
             return "Sonar Pipe Environment";
         break;
-        
+
         case 7000:
             return "7k Sonar Settings";
         break;
-        
+
         case 7001:
             return "7k Configuration";
         break;
-        
+
         case 7002:
             return "7k Match Filter";
         break;
-        
+
         case 7003:
             return "7k Firmware and Hardware Configuration";
         break;
-        
+
         case 7004:
             return "7k Beam Geometry";
         break;
-        
+
         case 7006:
             return "7k Bathymetric Data";
         break;
-        
+
         case 7007:
             return "7k Side Scan Data";
         break;
-        
+
         case 7008:
             return "7k Generic Water Column Data";
         break;
-        
+
         case 7010:
             return "TVQ Values";
         break;
-        
+
         case 7011:
             return "7k Image Data";
         break;
-        
+
         case 7012:
             return "7k Ping Motion Data";
         break;
-        
+
         case 7017:
             return "7k Detection Data Setup";
         break;
-        
+
         case 7018:
             return "7k Beamformed Data";
         break;
-        
+
         case 7019:
             return "Vernier Processing Data";
         break;
-        
+
         case 7021:
             return "7k Built-In Test Environment Data";
         break;
-        
+
         case 7022:
             return "7kCenter Version";
         break;
-        
+
         case 7023:
             return "8k Wet End Version";
         break;
-        
+
         case 7027:
             return "7k RAW Detection Data";
         break;
-        
+
         case 7028:
             return "7k Snippet Data";
         break;
-        
+
         case 7030:
             return "Sonar Installation Parameters";
         break;
-        
+
         case 7031:
             return "7k Built-In Test Environment Data (Summary)";
         break;
-        
+
         case 7041:
             return "Compressed Beamformed Magnitude Data";
         break;
-        
+
         case 7042:
             return "Compressed Watercolumn Data";
         break;
-        
+
         case 7048:
             return "7k Calibrated Beam Data";
         break;
-        
+
         case 7050:
             return "7k System Events";
         break;
-        
+
         case 7051:
             return "7k System Event Message";
         break;
-        
+
         case 7052:
             return "RDR Recording Status";
         break;
-        
+
         case 7053:
             return "7k Subscriptions";
         break;
-        
+
         case 7055:
             return "Calibration Status";
         break;
-        
+
         case 7057:
             return "Calibrated Side-Scan Data";
         break;
-        
+
         case 7058:
             return "Calibrated Snippet Data";
         break;
-        
+
         case 7059:
             return "MB2 specific status";
         break;
-        
+
         case 7200:
             return "7k File Header";
         break;
-                
+
         case 7300:
             return "7k File Catalog Record";
         break;
-                
+
         case 7400:
             return "7k Time Message";
         break;
-                
+
         case 7500:
             return "7k Remote Control";
         break;
-                
+
         case 7501:
             return "7k Remote Control Acknowledge";
         break;
-                
+
         case 7502:
             return "7k Remote Control Not Acknowledge";
         break;
-                
+
         case 7503:
             return "Remote Control Sonar Settings";
         break;
-                
+
         case 7504:
             return "7P Common System Settings";
         break;
-                
+
         case 7510:
             return "SV Filtering";
         break;
-                
+
         case 7511:
             return "System Lock Status";
         break;
-                
+
         case 7610:
             return "7k Sound Velocity";
         break;
-                
+
         case 7611:
             return "7k Absorption Loss";
         break;
-                
+
         case 7612:
             return "7k Spreading Loss";
         break;
@@ -493,11 +477,6 @@ std::string S7kParser::getName(int tag)
     }
 }
 
-/**
- * set the S7k data record frame
- * 
- * @param drf the new S7k data record frame
- */
 void S7kParser::processDataRecordFrame(S7kDataRecordFrame & drf) {
     //TODO: remove later, leave derived classes decide what to do
 /*    printf("--------------------\n");
@@ -508,12 +487,6 @@ void S7kParser::processDataRecordFrame(S7kDataRecordFrame & drf) {
 */
 }
 
-/**
- * Return the Check summary of the S7k data record frame
- * 
- * @param drf the S7k data record frame
- * @param data the datagram
- */
 uint32_t S7kParser::computeChecksum(S7kDataRecordFrame * drf, unsigned char * data) {
     uint32_t checksum = 0;
 
@@ -530,12 +503,6 @@ uint32_t S7kParser::computeChecksum(S7kDataRecordFrame * drf, unsigned char * da
     return checksum;
 }
 
-/**
- * call the process Attitude
- * 
- * @param drf the S7k data record frame
- * @param data the datagram
- */
 void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
     uint64_t microEpoch  = extractMicroEpoch(drf);
     uint8_t  nEntries    = ((uint8_t*)data)[0];
@@ -555,12 +522,6 @@ void S7kParser::processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char 
     }
 }
 
-/**
- * process Sonar setting datagram
- * 
- * @param drf the S7k data record frame
- * @param data the datagram
- */
 void S7kParser::processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned char * data){
     S7kSonarSettings * settings = (S7kSonarSettings*)data;
 
@@ -570,12 +531,6 @@ void S7kParser::processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned 
     pingSettings.push_back(settingsCopy);
 }
 
-/**
- * call the process Position
- * 
- * @param drf the S7k data record frame
- * @param data the datagram
- */
 void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
     uint64_t microEpoch = extractMicroEpoch(drf);
     S7kPosition *position = (S7kPosition*) data;
@@ -586,12 +541,6 @@ void S7kParser::processPositionDatagram(S7kDataRecordFrame & drf, unsigned char 
     }
 }
 
-/**
- * call the process Ping
- * 
- * @param drf the S7k data record frame
- * @param data the datagram
- */
 void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
     uint64_t microEpoch = extractMicroEpoch(drf);
 
@@ -631,11 +580,6 @@ void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * da
     }
 }
 
-/**
- * Get the S7k data record frame
- * 
- * @param drf the S7k data record frame 
- */
 uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
     long microSeconds = drf.Timestamp.Seconds * 1e6;
 
@@ -644,12 +588,6 @@ uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
     return res;
 }
 
-/**
- * call the process Sound Velocity Profile base on the Ctd
- * 
- * @param drf the S7k data record frame
- * @param data the datagram
- */
 void S7kParser::processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data){
         S7kCtdRTH * ctd = (S7kCtdRTH*) data;
 
@@ -658,7 +596,7 @@ void S7kParser::processCtdDatagram(S7kDataRecordFrame & drf,unsigned char * data
 	uint64_t timestamp = extractMicroEpoch(drf);
 
 	svp->setTimestamp(timestamp);
-        
+
         svp->setLatitude(0);
         svp->setLongitude(0);
 
