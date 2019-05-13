@@ -85,3 +85,54 @@ TEST_CASE("test the function S7kParser::getName")
     REQUIRE(parser.getName(7612)=="7k Spreading Loss");
     REQUIRE(parser.getName(7700)=="Invalid tag");
 }
+
+TEST_CASE ("test the S7k parser with a file who doesn't exist")
+{
+    DatagramEventHandler handler;
+    S7kParser parser(handler);
+    std::string file("blabla.s7k");
+    std::string excep = "";
+    try
+    {
+        parser.parse(file);
+    }
+    catch(Exception * error)
+    {
+        excep = error->getMessage();
+    }
+    REQUIRE(excep=="File not found");
+}
+
+TEST_CASE ("test the S7k parser with a invalid file")
+{
+    DatagramEventHandler handler;
+    S7kParser parser(handler);
+    std::string file("test.txt");
+    std::string excep = "";
+    try
+    {
+        parser.parse(file);
+    }
+    catch(Exception * error)
+    {
+        excep = error->getMessage();
+    }
+    REQUIRE(excep=="Couldn't find sync pattern");
+}
+
+TEST_CASE ("test the S7k parser with a valid file")
+{
+    DatagramEventHandler handler;
+    S7kParser parser(handler);
+    std::string file("test/data/s7k/20141016_150519_FJ-Saucier.s7k");
+    std::string excep = "";
+    try
+    {
+        parser.parse(file);
+    }
+    catch(Exception * error)
+    {
+        excep = error->getMessage();
+    }
+    REQUIRE(excep=="");
+}
