@@ -51,3 +51,54 @@ TEST_CASE("test the function KongsbergParser::getName")
     REQUIRE(parser.getName(114)=="Installation parameters or remote information");
     REQUIRE(parser.getName(115)=="Invalid tag");
 }
+
+TEST_CASE ("test the Kongsberg parser with a file who doesn't exist")
+{
+    DatagramEventHandler handler;
+    KongsbergParser parser(handler);
+    std::string file("blabla.all");
+    std::string excep = "";
+    try
+    {
+        parser.parse(file);
+    }
+    catch(Exception * error)
+    {
+        excep = error->getMessage();
+    }
+    REQUIRE(excep=="Couldn't open file blabla.all");
+}
+
+TEST_CASE ("test the Kongsberg parser with a invalid datagram")
+{
+    DatagramEventHandler handler;
+    KongsbergParser parser(handler);
+    std::string file("test.txt");
+    std::string excep = "";
+    try
+    {
+        parser.parse(file);
+    }
+    catch(Exception * error)
+    {
+        excep = error->getMessage();
+    }
+    REQUIRE(excep=="Bad datagram");
+}
+
+TEST_CASE ("test the Kongsberg parser with a valid datagram")
+{
+    DatagramEventHandler handler;
+    KongsbergParser parser(handler);
+    std::string file("test/data/all/0008_20160909_135801_Panopee.all");
+    std::string excep = "";
+    try
+    {
+        parser.parse(file);
+    }
+    catch(Exception * error)
+    {
+        excep = error->getMessage();
+    }
+    REQUIRE(excep=="");
+}
