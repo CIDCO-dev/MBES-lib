@@ -1,6 +1,6 @@
 /*
- * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
- */
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 
 #ifndef SURVEYLINE_HPP
 #define SURVEYLINE_HPP

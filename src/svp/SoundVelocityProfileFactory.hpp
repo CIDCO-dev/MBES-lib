@@ -1,3 +1,7 @@
+/*
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
+
 #ifndef SOUNDVELOCITYPROFILEFACTORY_HPP
 #define SOUNDVELOCITYPROFILEFACTORY_HPP
 

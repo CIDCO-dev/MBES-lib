@@ -1,10 +1,6 @@
 /*
- * Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
- */
-
-/*
- * File:   Raytracing.hpp
- */
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 
 #ifndef RAYTRACING_HPP
 #define RAYTRACING_HPP

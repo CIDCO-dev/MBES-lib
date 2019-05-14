@@ -1,3 +1,6 @@
+/*
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 
 #ifndef KONGSBERG_CPP
 #define KONGSBERG_CPP

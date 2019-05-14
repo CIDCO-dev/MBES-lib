@@ -1,5 +1,5 @@
 /*
-* Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
 */
 
 #ifndef COORDINATETRANSFORM_HPP
