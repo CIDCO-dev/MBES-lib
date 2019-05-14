@@ -1,10 +1,6 @@
 /*
- * Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
- */
-
-/*
- * File:   Raytracing.hpp
- */
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 
 #ifndef RAYTRACING_HPP
 #define RAYTRACING_HPP
@@ -13,15 +9,16 @@
 
 /*!
  * \brief Raytracing class
+ * \author ?
  */
 class Raytracing{
 public:
     /**
-     * Make a raytracing
-     * 
+     * Makes a raytracing
+     *
      * @param raytracedPing the raytraced ping for the raytracing
-     * @param ping the ping for the raytracing
-     * @param svp the sound velocity for the raytracing
+     * @param ping the Ping for the raytracing
+     * @param svp the SoundVelocityProfile for the raytracing
      */
     static void rayTrace(Eigen::Vector3d & raytracedPing,Ping & ping,SoundVelocityProfile & svp){
 	//TODO: do actual raytracing. This is just for quick testing purposes
