@@ -17,11 +17,11 @@
 #include "../../../math/Interpolation.hpp"
 
 /*!
- * \brief "Datagramer Georeferencer to an ostream" class, extention of the Datagramer Georeferencer class
+ * \brief "Datagram Georeferencer to an ostream" class, extention of the Datagram Georeferencer class
  */
 class DatagramGeoreferencerToOstream : public DatagramGeoreferencer{
         public:
-                 /**Create a datagram georeferencer*/
+                 /**Creates a datagram georeferencer*/
                 DatagramGeoreferencerToOstream( std::ostream & out )
                     : out( out )
                 {
@@ -29,7 +29,7 @@ class DatagramGeoreferencerToOstream : public DatagramGeoreferencer{
                     out << std::fixed;
                 }
 
-                /**Destroy the datagram georeferencer*/
+                /**Destroys the datagram georeferencer*/
                 virtual ~DatagramGeoreferencerToOstream() {}
 
 

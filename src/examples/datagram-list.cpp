@@ -1,6 +1,6 @@
-﻿/*
- *  Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
- */
+/*
+*  Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 #ifndef MAIN_CPP
 #define MAIN_CPP
 
@@ -8,66 +8,66 @@
 #include <iostream>
 #include <string>
 
-/**Write the information about the datagram-list*/
+/**Writes the usage information about the datagram-list*/
 void printUsage(){
 	std::cerr << "\n\
-  NAME\n\n\
-     datagram-list - liste les datagrammes contenus dans un fichier binaire\n\n\
-  SYNOPSIS\n \
-	   datagram-list fichier\n\n\
-  DESCRIPTION\n\n \
-  Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
+	NAME\n\n\
+	datagram-list - liste les datagrammes contenus dans un fichier binaire\n\n\
+	SYNOPSIS\n \
+	datagram-list fichier\n\n\
+	DESCRIPTION\n\n \
+	Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
 }
 
 class DatagramPrinter : public DatagramEventHandler{
-	public:
+public:
 
-                /**
-                 * Create a datagram printer and open all the files
-                 */
-		DatagramPrinter(){
+	/**
+	* Creates a datagram printer and open all the files
+	*/
+	DatagramPrinter(){
 
+	}
+
+	/**Destroys the datagram printer and closes all the files*/
+	~DatagramPrinter(){
+
+	}
+
+	/**
+	* Writes a new line with a tag at the start
+	*
+	* @param tag The datagram tag
+	*/
+	void processDatagramTag(int tag){
+		//also display character value for printable characters
+		std::stringstream printableValue;
+
+		if(tag >= 48 && tag <= 122){
+			printableValue << " (" << (char)tag << ")";
 		}
 
-                /**Destroy the datagram printer and close all the files*/
-		~DatagramPrinter(){
-
-		}
-
-                /**
-                 * Write a new line with a tag at the start
-                 * 
-                 * tag the tag
-                 */
-		void processDatagramTag(int tag){
-			//also display character value for printable characters
-			std::stringstream printableValue;
-
-			if(tag >= 48 && tag <= 122){
-				printableValue << " (" << (char)tag << ")";
-			}
-
-			printf("%d%s\n",tag,printableValue.str().c_str());
-		}
+		printf("%d%s\n",tag,printableValue.str().c_str());
+	}
 };
 
 /**
-  * declare the parser depending on argument receive
-  * 
-  * @param argc number of argument
-  * @param argv value of the arguments
-  */
+* Declares the parser depending on argument received
+*
+* @param argc number of argument
+* @param argv value of the arguments
+*/
 int main (int argc , char ** argv ){
 	DatagramParser * parser = NULL;
 	DatagramPrinter  printer;
 
-#ifdef __GNU__
+	#ifdef __GNU__
 	setenv("TZ", "UTC", 1);
-#endif
-#ifdef _WIN32
+	#endif
+	#ifdef _WIN32
 	putenv("TZ");
-#endif
+	#endif
 
 	if(argc != 2){
 		printUsage();

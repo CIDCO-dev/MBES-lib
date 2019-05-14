@@ -1,6 +1,6 @@
 /*
- *  Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
- */
+*  Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 
 #ifndef GEOREFPCLVIEWER_CPP
 #define GEOREFPCLVIEWER_CPP
@@ -12,7 +12,7 @@
 #include <thread>
 
 #include <algorithm>			// For max
-#include <initializer_list>		// To use as parameters to function max 
+#include <initializer_list>		// To use as parameters to function max
 
 #include <pcl/common/common_headers.h>
 #include <pcl/features/normal_3d.h>
@@ -33,47 +33,60 @@ void printUsage(){
 	exit(1);
 }
 
+/*!
+* \brief PCL point cloud georeferencer class
+*/
 class PointCloudGeoreferencer : public DatagramGeoreferencer{
 
-	public:
-		PointCloudGeoreferencer( pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, Georeferencing & georef ) 
-			: cloud( cloud ),DatagramGeoreferencer(georef) {
+public:
+	/**
+	* Creates a PointCloudGeoreferencer
+	* Georeferences a point cloud
+	*
+	* @param cloud Point cloud
+	* @param georef The georeferencer
+	*/
+	PointCloudGeoreferencer( pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, Georeferencing & georef )
+	: cloud( cloud ),DatagramGeoreferencer(georef) {
 
-		}
+	}
 
-		virtual ~PointCloudGeoreferencer() {}
+	/** Destroys  a PointCloudGeoreferencer  */
+	virtual ~PointCloudGeoreferencer() {}
 
-		pcl::PointCloud<pcl::PointXYZRGB>::Ptr getCloud(){
-			cloud->width = (int) cloud->points.size();
-			cloud->height = (int) 1;
+	/** Returns a point cloud */
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr getCloud(){
+		cloud->width = (int) cloud->points.size();
+		cloud->height = (int) 1;
 
-			return cloud;
-		};
+		return cloud;
+	};
 
-		virtual void processGeoreferencedPing(Eigen::Vector3d & ping,uint32_t quality,int32_t intensity){
+	virtual void processGeoreferencedPing(Eigen::Vector3d & ping,uint32_t quality,int32_t intensity){
 
-				pcl::PointXYZRGB point;
+		pcl::PointXYZRGB point;
 
-				point.x = ping(0);
-				point.y = ping(1);
-				point.z = ping(2);
+		point.x = ping(0);
+		point.y = ping(1);
+		point.z = ping(2);
 
-				// White points
-				// uint32_t rgb = (static_cast<uint32_t>(255) << 16 | static_cast<uint32_t>(255) << 8 
-				//   | static_cast<uint32_t>(255));
+		// White points
+		// uint32_t rgb = (static_cast<uint32_t>(255) << 16 | static_cast<uint32_t>(255) << 8
+		//   | static_cast<uint32_t>(255));
 
-				// Blue points
-				uint32_t rgb = (static_cast<uint32_t>(0) << 16 | static_cast<uint32_t>(0) << 8 
-					| static_cast<uint32_t>(255));
+		// Blue points
+		uint32_t rgb = (static_cast<uint32_t>(0) << 16 | static_cast<uint32_t>(0) << 8
+		| static_cast<uint32_t>(255));
 
-				point.rgb = *reinterpret_cast<float*>(&rgb);
+		point.rgb = *reinterpret_cast<float*>(&rgb);
 
-				cloud->push_back(point);
-		}
+		cloud->push_back(point);
+	}
 
 
-	private:
-		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud;
+private:
+	/** Point cloud */
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud;
 };
 
 
@@ -90,9 +103,9 @@ int main(int argc, char ** argv){
 	Eigen::Vector3d	leverArm;
 	leverArm <<  0, 0, 0;
 
-        Attitude boresightAngles( 0, 0, 0, 0 ); //Attitude boresightAngles(0,roll,pitch,heading);
-        Eigen::Matrix3d boresight;
-        Boresight::buildMatrix( boresight, boresightAngles );
+	Attitude boresightAngles( 0, 0, 0, 0 ); //Attitude boresightAngles(0,roll,pitch,heading);
+	Eigen::Matrix3d boresight;
+	Boresight::buildMatrix( boresight, boresightAngles );
 
 	Georeferencing * georef = new GeoreferencingLGF(); //TODO: allow TRF through CLI
 
@@ -136,21 +149,21 @@ int main(int argc, char ** argv){
 		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\n" << error->getMessage() <<  ".\n";
 
 		if(parser)
-			delete parser;
+		delete parser;
 	}
 	catch ( const char * message )
 	{
 		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\n" << message <<  ".\n";
 
 		if(parser)
-			delete parser;
+		delete parser;
 	}
 	catch (...)
 	{
 		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\nOther exception.\n";
 
 		if(parser)
-			delete parser;
+		delete parser;
 	}
 
 
@@ -169,7 +182,7 @@ int main(int argc, char ** argv){
 	std::cout << "Min y: " << minPt.y << std::endl;
 
 	std::cout << "\nMax z: " << maxPt.z << std::endl;
-	std::cout << "Min z: " << minPt.z << std::endl; 
+	std::cout << "Min z: " << minPt.z << std::endl;
 
 
 	//Load viewer
@@ -180,9 +193,9 @@ int main(int argc, char ** argv){
 	// viewer->setBackgroundColor (0, 0, 0);
 
 	// White background
-	viewer->setBackgroundColor ( 1.0, 1.0, 1.0 ); // Doubles between 0.0 and 1.0			  
-	
-	
+	viewer->setBackgroundColor ( 1.0, 1.0, 1.0 ); // Doubles between 0.0 and 1.0
+
+
 	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(line1.getCloud());
 
 	viewer->addPointCloud<pcl::PointXYZRGB> (line1.getCloud(), rgb, "sample cloud");
@@ -200,19 +213,19 @@ int main(int argc, char ** argv){
 
 	double extentx = maxPt.x - minPt.x;
 	double extenty = maxPt.y - minPt.y;
-	double extentz = maxPt.z - minPt.z;		
+	double extentz = maxPt.z - minPt.z;
 
 	double maxExtent = std::max( { extentx, extenty, extentz } );
 
 	cout << "\nmaxExtent: " << maxExtent << endl;
 
 
-	// Center of the point cloud 
+	// Center of the point cloud
 	double view_x = ( minPt.x + maxPt.x ) / 2;
 	double view_y = ( minPt.y + maxPt.y ) / 2;
 	double view_z = ( minPt.z + maxPt.z ) / 2;
 
-	// There are discrepancies between 
+	// There are discrepancies between
 	// pcl::visualization::PCLVisualizer   and     pcl::visualization::Camera
 	// about what "view" is:
 
@@ -232,10 +245,10 @@ int main(int argc, char ** argv){
 
 	// http://pointclouds.org/documentation/tutorials/pcl_visualizer.php
 	cout << "\n\nTo exit the viewer application, press q.\n"
-		<< "Press r to centre and zoom the viewer so that the entire cloud is visible.\n"
-		<< "Use the mouse to rotate the viewpoint by clicking and dragging.\n"
-		<< "You can use the scroll wheel, or right-click and drag up and down, to zoom in and out.\n"
-		<< "Middle-clicking and dragging will move the camera.\n\n";
+	<< "Press r to centre and zoom the viewer so that the entire cloud is visible.\n"
+	<< "Use the mouse to rotate the viewpoint by clicking and dragging.\n"
+	<< "You can use the scroll wheel, or right-click and drag up and down, to zoom in and out.\n"
+	<< "Middle-clicking and dragging will move the camera.\n\n";
 
 	while ( !viewer->wasStopped() ){
 

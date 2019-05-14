@@ -15,7 +15,7 @@
 
 using namespace std;
 
-/**Show the usage information about data-cleaning*/
+/**Shows the usage information about data-cleaning*/
 void printUsage(){
 	std::cerr << "\n\
   NAME\n\n\
@@ -28,8 +28,8 @@ void printUsage(){
 }
 
 /**
- * Filter all point received on standard input
- * 
+ * Filter all points received on standard input
+ *
  * @param argc number of parameter
  * @param argv value of the parameters
  */
@@ -60,7 +60,7 @@ int main(int argc,char** argv){
                         filters.push_back(new QualityFilter(quality));
                     }
                 break;
-                
+
                 case 'i':
                     if(sscanf(optarg,"%d", &intensity) != 1)
                     {
