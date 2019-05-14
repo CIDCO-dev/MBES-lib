@@ -35,7 +35,7 @@ void printUsage(){
 
 /*!
 * \brief PCL point cloud georeferencer class
-* \author ?
+* \author Guillaume Labbe-Morissette, Christian Bouchard
 *
 * Extends from DatagramGeoreferencer
 */
