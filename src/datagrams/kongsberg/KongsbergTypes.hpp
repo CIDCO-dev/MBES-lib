@@ -1,3 +1,9 @@
+
+/*
+* \author ?
+*/
+
+
 #ifndef KONGSBERGTYPES_HPP
 #define KONGSBERGTYPES_HPP
 

@@ -4,6 +4,11 @@
 /*
 *  Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
 */
+
+/*
+* \author ?
+*/
+
 #ifndef GEOREFERENCE_CPP
 #define GEOREFERENCE_CPP
 

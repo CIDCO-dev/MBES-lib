@@ -4,7 +4,10 @@
 #include "PointFilter.hpp"
 
 /*!
-* \brief Quality filter class. Extends from the Point filter class
+* \brief Quality filter class.
+* \author ?
+*
+* Extends from the Point filter class
 */
 class QualityFilter : public PointFilter{
 public:

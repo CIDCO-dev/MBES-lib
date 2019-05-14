@@ -4,7 +4,10 @@
 #include "PointFilter.hpp"
 
 /*!
-* \brief Insane position filter class. Extends from the PointFilter class
+* \brief Insane position filter class.
+* \author ?
+*
+* Extends from the PointFilter class
 */
 class InsanePositionFilter : public PointFilter{
 public:

@@ -4,7 +4,10 @@
 #include "PointFilter.hpp"
 
 /*!
-* \brief Intensity filter class. Extends from the Point filter class
+* \brief Intensity filter class.
+* \author ?
+*
+* Extends from the Point filter class
 * \author Emile Gagne
 */
 class IntensityFilter : public PointFilter{

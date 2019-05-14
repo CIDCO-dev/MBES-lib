@@ -13,15 +13,16 @@
 
 /*!
  * \brief Raytracing class
+ * \author ?
  */
 class Raytracing{
 public:
     /**
-     * Make a raytracing
-     * 
+     * Makes a raytracing
+     *
      * @param raytracedPing the raytraced ping for the raytracing
-     * @param ping the ping for the raytracing
-     * @param svp the sound velocity for the raytracing
+     * @param ping the Ping for the raytracing
+     * @param svp the SoundVelocityProfile for the raytracing
      */
     static void rayTrace(Eigen::Vector3d & raytracedPing,Ping & ping,SoundVelocityProfile & svp){
 	//TODO: do actual raytracing. This is just for quick testing purposes

@@ -1,13 +1,6 @@
 /*
- * Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
- */
-
-/* 
- * File:   Swath.hpp
- * Author: jordan,glm,emilegagne
- *
- * Created on September 14, 2018, 2:39 PM
- */
+* Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 
 #ifndef SWATH_HPP
 #define SWATH_HPP
@@ -17,55 +10,56 @@
 #include "Ping.hpp"
 
 /*!
- * \brief Swath class
- */
+* \brief Swath class
+* \author Guillaume Labbe-Morissette, Jordan McManus, Emile Gagne
+* \date September 14, 2018, 2:39 PM
+*/
 class Swath {
 private:
-    
-    /**Vector who contains the pings of the swath*/
-    std::vector<Ping *>* pings = NULL;
+
+  /**Vector that contains the pings of the swath*/
+  std::vector<Ping *>* pings = NULL;
 
 public:
 
-    /**
-     * Create a swath
-     * 
-     * @param pings the pings who should be present in the swath
-     */
-    Swath(std::vector<Ping*>* pings) : pings(pings) {
-    }
+  /**
+  * Creates a swath
+  *
+  * @param pings the pings that should be present in the swath
+  */
+  Swath(std::vector<Ping*>* pings) : pings(pings) {
+  }
 
-    /**
-     * Destroy the swath and his pings
-     */
-    ~Swath() {
-        if (pings != NULL) {
-            for (unsigned int i = 0; i < pings->size(); i++) {
-                delete (*pings)[i];
-            }
+  /**
+  * Destroys the swath and its pings
+  */
+  ~Swath() {
+    if (pings != NULL) {
+      for (unsigned int i = 0; i < pings->size(); i++) {
+        delete (*pings)[i];
+      }
 
-            delete pings;
-        }
+      delete pings;
     }
+  }
 
-    /**
-     * Return the vector pings
-     */
-    std::vector<Ping*>* getPings() {
-        return pings;
-    }
+  /**
+  * Returns the vector pings
+  */
+  std::vector<Ping*>* getPings() {
+    return pings;
+  }
 
-    /**
-     * 
-     */
-    friend std::ostream& operator<<(std::ostream& os, const Swath& obj) {
-        for (unsigned int i = 0; i < (*obj.pings).size(); i++) {
-            os << *((*obj.pings)[i]) << std::endl;
-        }
-        return os;
+  /**
+  *
+  */
+  friend std::ostream& operator<<(std::ostream& os, const Swath& obj) {
+    for (unsigned int i = 0; i < (*obj.pings).size(); i++) {
+      os << *((*obj.pings)[i]) << std::endl;
     }
+    return os;
+  }
 
 };
 
 #endif /* SWATH_HPP */
-

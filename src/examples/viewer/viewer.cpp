@@ -35,6 +35,9 @@ void printUsage(){
 
 /*!
 * \brief PCL point cloud georeferencer class
+* \author ?
+*
+* Extends from DatagramGeoreferencer
 */
 class PointCloudGeoreferencer : public DatagramGeoreferencer{
 
@@ -51,7 +54,7 @@ public:
 
 	}
 
-	/** Destroys  a PointCloudGeoreferencer  */
+	/** Destroys a PointCloudGeoreferencer  */
 	virtual ~PointCloudGeoreferencer() {}
 
 	/** Returns a point cloud */
@@ -62,6 +65,13 @@ public:
 		return cloud;
 	};
 
+	/**
+	* Displays a georeferenced ping's info
+	*
+	* @param georeferencedPing
+	* @param quality the quality flag
+	* @param intensity the intensity flag
+	*/
 	virtual void processGeoreferencedPing(Eigen::Vector3d & ping,uint32_t quality,int32_t intensity){
 
 		pcl::PointXYZRGB point;

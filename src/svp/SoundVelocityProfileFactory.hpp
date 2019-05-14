@@ -3,6 +3,7 @@
 
 /*!
 * \brief SoundVelocityProfile factory class
+* \author ?
 */
 class SoundVelocityProfileFactory{
 public:

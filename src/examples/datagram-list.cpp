@@ -1,6 +1,11 @@
 /*
 *  Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
 */
+
+/*
+* \author ?
+*/
+
 #ifndef MAIN_CPP
 #define MAIN_CPP
 
@@ -20,6 +25,11 @@ void printUsage(){
 	exit(1);
 }
 
+/*!
+* \brief Datagram Printer class
+*
+* Extends DatagramEventHandler.
+*/
 class DatagramPrinter : public DatagramEventHandler{
 public:
 
