@@ -7,7 +7,7 @@
 
 /*!
 * \brief Boresight util. Give matrix between IMU and Sonar.
-* \author ?
+* \author Guillaume Labbe-Morissette
 */
 class Boresight{
 public:

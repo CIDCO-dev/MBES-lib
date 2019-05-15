@@ -10,7 +10,7 @@
 
 /*!
 * \brief Datagram parser class
-* \author ?
+* \author Guillaume Labbe-Morissette
 */
 class DatagramParser{
 public:

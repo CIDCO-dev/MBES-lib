@@ -7,7 +7,7 @@
 
 /*!
 * \brief SoundVelocityProfile factory class
-* \author ?
+* \author Guillaume Labbe-Morissette
 */
 class SoundVelocityProfileFactory{
 public:
