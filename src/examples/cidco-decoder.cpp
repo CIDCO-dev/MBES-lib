@@ -2,10 +2,6 @@
 * Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
 */
 
-/*
-* \author Guillaume Labbe-Morissette
-*/
-
 #ifndef MAIN_CPP
 #define MAIN_CPP
 
@@ -27,7 +23,7 @@ void printUsage(){
 
 /*!
 * \brief Datagram printer class.
-* \author ?
+* \author Guillaume Labbe-Morissette
 *
 * Extention of Datagram processor class
 */
