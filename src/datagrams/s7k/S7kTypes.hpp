@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
- */
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 
-/* 
+/*
  * File:   S7kTypes.hpp
- * Author: glm,jordan
+ * Author: Guillaume Labbe-Morissette, Jordan McManus
  *
  * Created on November 1, 2018, 11:59 AM
  */
@@ -333,4 +333,3 @@ typedef struct{
 
 
 #endif /* S7KTYPES_HPP */
-

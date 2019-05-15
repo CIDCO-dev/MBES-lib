@@ -1,6 +1,11 @@
 /*
- *  Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
+
+ /*
+ * \author Christian Bouchard
  */
+
 
 #include <QFileDialog>
 
@@ -20,7 +25,7 @@
 #include "../../../datagrams/s7k/S7kParser.hpp"
 
 
-#include "../../../utils/StringUtils.hpp" 
+#include "../../../utils/StringUtils.hpp"
 #include "../../../utils/Exception.hpp"
 #include "../../../math/Boresight.hpp"
 
@@ -60,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEditOutputFile->setText( tr( outputFileName.c_str() ) );
 
 
-    // Disable process button   
+    // Disable process button
     setStateProcess();
 
     setWindowTitle( tr( "MBES-Lib Georeferencing" ) );
@@ -83,7 +88,7 @@ MainWindow::MainWindow(QWidget *parent) :
             inFile >> values[ count ];
 
         if( inFile.fail() == false )
-        {           
+        {
             for ( int count= 0; count < nbValuesD; count++ )
                 valuesD( count ) = values[ count ];
         }
@@ -871,5 +876,3 @@ void MainWindow::on_actionSave_Arms_and_Boresight_Angles_triggered()
 {
     leverArmBoresightSave();
 }
-
-

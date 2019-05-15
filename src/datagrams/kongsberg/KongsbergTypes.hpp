@@ -1,3 +1,12 @@
+/*
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
+
+/*
+* \author ?
+*/
+
+
 #ifndef KONGSBERGTYPES_HPP
 #define KONGSBERGTYPES_HPP
 
