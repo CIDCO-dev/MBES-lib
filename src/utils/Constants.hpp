@@ -3,7 +3,7 @@
 */
 
 /*!
-* \author ?
+* \author Guillaume Labbe-Morissette
 */
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP

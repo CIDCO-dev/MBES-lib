@@ -14,7 +14,7 @@
 #endif
 
 /*!
-* \author ?
+* \author Guillaume Labbe-Morissette
 */
 
 /**

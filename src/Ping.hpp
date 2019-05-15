@@ -2,13 +2,6 @@
 * Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
 */
 
-/*
-* File:   Ping.hpp
-* Author: glm,jordan, emilegagne
-*
-* Created on September 14, 2018, 10:10 AM
-*/
-
 #ifndef PING_HPP
 #define PING_HPP
 
@@ -20,6 +13,7 @@
 /*!
 * \brief Ping class
 * \author Guillaume Labbe-Morissette, Jordan McManus, Emile Gagne
+* \date September 14, 2018, 10:10 AM
 */
 class Ping {
 private:

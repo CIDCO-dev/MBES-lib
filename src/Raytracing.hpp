@@ -9,7 +9,7 @@
 
 /*!
  * \brief Raytracing class
- * \author ?
+ * \author Guillaume Labbe-Morissette
  */
 class Raytracing{
 public:

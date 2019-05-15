@@ -5,7 +5,7 @@
 #include <fstream>
 
 /*
-* \author ?
+* \author Guillaume Labbe-Morissette
 */
 
 #ifndef GEOREFERENCE_CPP
