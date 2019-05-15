@@ -1,9 +1,13 @@
+/*
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 
 #include <fstream>
 
 /*
- *  Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
- */
+* \author ?
+*/
+
 #ifndef GEOREFERENCE_CPP
 #define GEOREFERENCE_CPP
 
@@ -17,33 +21,33 @@
 
 using namespace std;
 
-/**Write the information about the program*/
+/**Writes the usage information about the program*/
 void printUsage(){
 	std::cerr << "\n\
-  NAME\n\n\
-     georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
-  SYNOPSIS\n \
-	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] fichier\n\n\
-  DESCRIPTION\n \
-	   -L Use a local geographic frame (NED)\n \
-	   -T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
-  Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
+	NAME\n\n\
+	georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
+	SYNOPSIS\n \
+	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] fichier\n\n\
+	DESCRIPTION\n \
+	-L Use a local geographic frame (NED)\n \
+	-T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
+	Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
 }
 
 
 /**
-  * declare the parser depending on argument receive
-  * 
-  * @param argc number of argument
-  * @param argv value of the arguments
-  */
+* Declares the parser depending on argument received
+*
+* @param argc number of argument
+* @param argv value of the arguments
+*/
 int main (int argc , char ** argv){
 
-#ifdef __GNU__
+	#ifdef __GNU__
 	setenv("TZ", "UTC", 1);
-#endif
-#ifdef _WIN32
+	#endif
+	#ifdef _WIN32
 	putenv("TZ");
 #endif
 if(argc < 2)

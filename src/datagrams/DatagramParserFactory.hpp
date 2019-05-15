@@ -1,3 +1,7 @@
+/*
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
+
 #ifndef DATAGRAMPARSERFACTORY_HPP
 #define DATAGRAMPARSERFACTORY_HPP
 
@@ -8,6 +12,12 @@
 #include "../utils/StringUtils.hpp"
 #include "../utils/Exception.hpp"
 
+/*!
+ * \brief Datagram parser factory class
+ * \author ?
+ *
+ * Creates an appropriate parser
+ */
 class DatagramParserFactory{
 	public:
                 /**
