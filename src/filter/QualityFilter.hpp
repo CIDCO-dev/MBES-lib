@@ -9,7 +9,7 @@
 
 /*!
 * \brief Quality filter class.
-* \author ?
+* \author Guillaume Labbe-Morissette
 *
 * Extends from the Point filter class
 */

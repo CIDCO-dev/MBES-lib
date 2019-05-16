@@ -12,7 +12,7 @@
 
 /*!
 * \brief TimeUtils class
-* \author ?
+* \author Guillaume Labbe-Morissette
 */
 class TimeUtils{
 public:

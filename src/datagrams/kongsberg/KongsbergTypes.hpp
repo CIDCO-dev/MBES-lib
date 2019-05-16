@@ -3,9 +3,8 @@
 */
 
 /*
-* \author ?
+* \author Guillaume Labbe-Morissette
 */
-
 
 #ifndef KONGSBERGTYPES_HPP
 #define KONGSBERGTYPES_HPP

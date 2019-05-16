@@ -9,7 +9,7 @@
 
 /*!
 * \brief Intensity filter class.
-* \author ?
+* \author Emile Gagne
 *
 * Extends from the Point filter class
 * \author Emile Gagne
