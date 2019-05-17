@@ -8,7 +8,6 @@
 
 
 #include <iostream>
-// #include <fstream>
 #include <cstdint>
 
 #include <sstream>
@@ -40,138 +39,6 @@
 #include "../../../HullOverlap.hpp"
 
 #include "../smallUtilities.hpp"
-
-
-
-
-class PointCloudGeoreferencer : public DatagramGeoreferencer{
-
-public:
-	/**
-	* Creates a PointCloudGeoreferencer
-	* Georeferences a point cloud
-	*
-	* @param cloud Point cloud
-	* @param georef The georeferencer
-	*/
-	PointCloudGeoreferencer( pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, Georeferencing & georef )
-	: cloud( cloud ),DatagramGeoreferencer(georef) {
-
-	}
-
-	/** Destroys a PointCloudGeoreferencer  */
-	virtual ~PointCloudGeoreferencer() {}
-
-	/** Returns a point cloud */
-	pcl::PointCloud<pcl::PointXYZ>::Ptr getCloud(){
-		cloud->width = (int) cloud->points.size();
-		cloud->height = (int) 1;
-
-		return cloud;
-	};
-
-	/**
-	* Displays a georeferenced ping's info
-	*
-	* @param georeferencedPing
-	* @param quality the quality flag
-	* @param intensity the intensity flag
-	*/
-	virtual void processGeoreferencedPing(Eigen::Vector3d & ping,uint32_t quality,int32_t intensity){
-
-		pcl::PointXYZ point;
-
-		point.x = ping(0);
-		point.y = ping(1);
-		point.z = ping(2);
-
-		cloud->push_back(point);
-	}
-
-
-private:
-	/** Point cloud */
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud;
-};
-
-
-
-
-uint64_t readSonarFile( std::string fileName, pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOut, 
-                    Eigen::Vector3d leverArm, Eigen::Matrix3d boresight,
-                    SoundVelocityProfile * svpFile )
-{
-
-	Georeferencing * georef = new GeoreferencingLGF(); //TODO: allow TRF through CLI
-
-	PointCloudGeoreferencer pointCloudGeoreferencer( cloudOut,*georef );
-
-	DatagramParser * parser = nullptr;
-
-	try
-	{
-
-		std::cout << "\nReading sonar file" << std::endl;
-
-		std::ifstream inFile;
-		inFile.open( fileName );
-
-		if (inFile)
-		{
-			parser = DatagramParserFactory::build( fileName, pointCloudGeoreferencer );
-		}
-		else
-		{
-			throw new Exception("Unknown extension");
-		}
-
-		parser->parse( fileName );
-
-		std::cout << "\nGeoreferencing point cloud" << std::endl;
-
-		//TODO: get SVP from CLI
-		pointCloudGeoreferencer.georeference( leverArm , boresight , NULL );
-
-	}
-	catch(Exception * error)
-	{
-		if(parser)
-		    delete parser;        
-
-        std::string text = "\nError while parsing file \n\n\"" + fileName + "\":\n\n" + error->getMessage() + ".\n";
-        throw new Exception( text );
-
-	}
-	catch ( const char * message )
-	{
-		if(parser)
-		    delete parser;
-
-        std::string text = "\nError while parsing file \n\n\"" + fileName + "\":\n\n" + std::string( message ) + ".\n";
-        throw new Exception( text );
-
-	}
-	catch (...)
-	{
-		if(parser)
-		    delete parser;
-
-        std::string text = "\nError while parsing file \n\n\"" + fileName + "\":\n\nOther exception.\n";
-        throw new Exception( text );
-	}
-
-
-    return cloudOut->points.size();
-    
-}
-
-
-
-
-
-
-
-
 
 
 
@@ -212,15 +79,6 @@ void drawLinesFromPointToPoint( pcl::visualization::PCLVisualizer::Ptr viewer,
 
 }
 
-
-
-// ./TestPCLConcaveHullOverlap "/home/christian/Documents/PSR-964 Erreur de celerite/CodeScilabModByCB/SorelErreurCelerite/Line1.txt" "/home/christian/Documents/PSR-964 Erreur de celerite/CodeScilabModByCB/SorelErreurCelerite/Line2.txt"  0.0 0.0 1.0 0.0     1.0 1.0
-
-// ./TestPCLConcaveHullOverlap "../../data/Line1.txt" "../../data/Line2.txt"  0.0 0.0 1.0 0.0     1.0 1.0
-
-// ./TestPCLConcaveHullOverlap "../../data/Asoundings1Observed.txt" "../../data/Asoundings2Observed.txt"  0.0 0.0 1.0 0.0     5.0 5.0
-
-// ./TestPCLConcaveHullOverlap "../../data/Bsoundings1Observed.txt" "../../data/Bsoundings2Observed.txt"  0.0 0.0 1.0 0.0     5.0 5.0
 
 int main( int argc, char* argv[] )
 {
@@ -271,12 +129,13 @@ int main( int argc, char* argv[] )
     // Plane in which to find the hulls and overlap
     // ax + by + cz + d = 0;
 
+    // Initialize to dummy values
     double a = 0;
     double b = 0;
     double c = 1;
     double d = 0;
 
-
+    // Get actual values from CLI
     convertStringToDouble( argv[ 3 ], a, "Plane parameter 'a'" );
     convertStringToDouble( argv[ 4 ], b, "Plane parameter 'b'" );
     convertStringToDouble( argv[ 5 ], c, "Plane parameter 'c'" );
@@ -288,12 +147,13 @@ int main( int argc, char* argv[] )
         << "d: " << d << "\n" << std::endl;
     
 
-
+    // Initialize to dummy values
     double alphaLine1 = 1.0;
     double alphaLine2 = 1.0;
 
     if ( argc == 9 )
     {
+        // Get actual values from CLI
         convertStringToDouble( argv[ 7 ], alphaLine1, "alphaLine1", true );
         convertStringToDouble( argv[ 8 ], alphaLine2, "alphaLine2", true );
     }    
@@ -308,26 +168,20 @@ int main( int argc, char* argv[] )
     pcl::PointCloud<pcl::PointXYZ>::Ptr line2 (new pcl::PointCloud<pcl::PointXYZ>);
 
     std::vector< pcl::PointCloud<pcl::PointXYZ >::Ptr > twoLines;
-
     twoLines.reserve( 2 );
     twoLines.push_back( line1 ) ;
     twoLines.push_back( line2 ) ;
 
 
     std::vector< std::string > twoFileNames;
-
     twoFileNames.reserve( 2 );
     twoFileNames.push_back( fileNameLine1 ) ;
     twoFileNames.push_back( fileNameLine2 ) ;
 
-
-
     for ( int count = 0; count < 2; count++ )
     {
-
-
-        // If ends in .txt: point cloud X, Y, Z
-        if (  ends_with( fileNameLine1.c_str(),".txt") )
+        // If file name ends in .txt: point cloud X, Y, Z
+        if ( ends_with( fileNameLine1.c_str(),".txt") )
         {
             readPointCloud( twoFileNames[ count ], twoLines[ count ] );
         }
@@ -335,7 +189,6 @@ int main( int argc, char* argv[] )
         {
             try
             {
-
                 //TODO: pass as CLI parameter
                 Eigen::Vector3d	leverArm;
                 leverArm <<  0, 0, 0;
@@ -345,39 +198,41 @@ int main( int argc, char* argv[] )
                 Eigen::Matrix3d boresight;
                 Boresight::buildMatrix( boresight, boresightAngles );                
                 
+                //TODO: get SVP from CLI
+
+
                 readSonarFile( twoFileNames[ count ], twoLines[ count ], leverArm , boresight, NULL );
 
-
             }
-            catch(Exception * error)
+            catch ( Exception * error )
             {
                 cout << error->getMessage();
+
+                exit( 1 );
             }
 
 
         }
 
 
+        //Display point cloud stats
+        std::cout << "\nLine #" << count + 1 << ": " << twoLines[ count ]->points.size() << " points loaded" << std::endl;
+
+        pcl::PointXYZ minPt, maxPt;
+        pcl::getMinMax3D( *twoLines[ count ] , minPt, maxPt);
+
+        std::cout << setprecision( 15 );
+
+        std::cout << "\nMax x: " << maxPt.x << std::endl;
+        std::cout << "Min x: " << minPt.x << std::endl;
+
+        std::cout << "\nMax y: " << maxPt.y << std::endl;
+        std::cout << "Min y: " << minPt.y << std::endl;
+
+        std::cout << "\nMax z: " << maxPt.z << std::endl;
+        std::cout << "Min z: " << minPt.z << std::endl;
 
     }
-
-
-
-
-
-
-    // // std::cout << "\nReading both lines from file\n" << std::endl; 
-
-    // // const uint64_t nbPointsLine1 = readPointCloud( fileNameLine1, line1 );
-
-    // // std::cout << "nbPointsLine1: " << nbPointsLine1 << "\n\n" << std::endl;
-
-
-    // // const uint64_t nbPointsLine2 = readPointCloud( fileNameLine2, line2 );
-
-    // // std::cout << "nbPointsLine2: " << nbPointsLine2 << "\n\n" << std::endl;
-
-
 
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr line1InBothHulls (new pcl::PointCloud<pcl::PointXYZ>);
@@ -388,30 +243,17 @@ int main( int argc, char* argv[] )
 
     HullOverlap hullOverlap( line1, line2, a, b, c, d, alphaLine1, alphaLine2 );
 
-    // std::string junk1;
-    // std::cout << "\nBefore computeHull. Enter something to continue: ";
-    // std::cin >> junk1;
-
 
     // std::pair< uint64_t, uint64_t > inBothHulls = hullOverlap.computeHullsAndPointsInBothHulls( nullptr, nullptr, true );
     std::pair< uint64_t, uint64_t > inBothHulls = hullOverlap.computeHullsAndPointsInBothHulls( line1InBothHulls, 
                                                                                         line2InBothHulls, false );    
 
-
-
     std::cout << "Nb points line1 in both hulls: " << inBothHulls.first
         << "\nNb points line2 in both hulls: " << inBothHulls.second << "\n" << std::endl;
 
 
-
     std::chrono::high_resolution_clock::time_point tEnd = std::chrono::high_resolution_clock::now();
     cout << "\n\nTotal time: " << std::chrono::duration_cast<std::chrono::seconds>(tEnd - tStart).count() << "s" << endl;       
-
-
-    // std::string junk2;
-    // std::cout << "\nAfter computeHull. Enter something to continue: ";
-    // std::cin >> junk2;
-
 
     // ------------------------------------ Visualization -----------------------------------------
 
@@ -460,10 +302,6 @@ int main( int argc, char* argv[] )
         hull1VerticesInPlane->push_back( line1InPlane->points[ hull1PointIndices->at( count ) ] );
     }
 
-    std::cout << "Hull 1 index first point: " << hull1PointIndices->front()
-        << "\nHull 1 index last point: " << hull1PointIndices->back() << "\n" << std::endl;
-    std::cout << "Hull 1 first point: " << hull1VerticesInPlane->points.front()
-        << "\nHull 1 last point: " << hull1VerticesInPlane->points.back()<< "\n" << std::endl;
 
 
     drawLinesFromPointToPoint( viewer, hull1VerticesInPlane, 0, 1.0, 0, "segmentHull1", true, viewport1 );
@@ -510,10 +348,6 @@ int main( int argc, char* argv[] )
         hull2VerticesInPlane->push_back( line2InPlane->points[ hull2PointIndices->at( count ) ] );
     }
 
-    std::cout << "Hull 2 index first point: " << hull2PointIndices->front()
-        << "\nHull 2 index last point: " << hull2PointIndices->back() << "\n" << std::endl;
-    std::cout << "Hull 2 first point: " << hull2VerticesInPlane->points.front()
-        << "\nHull 2 last point: " << hull2VerticesInPlane->points.back() << "\n" << std::endl;
 
     drawLinesFromPointToPoint( viewer, hull2VerticesInPlane, 1.0, 0.5, 0, "segmentHull2", true, viewport1 );
 
@@ -538,10 +372,6 @@ int main( int argc, char* argv[] )
     viewer->addPointCloud<pcl::PointXYZ> ( hull2VerticeLastInPlane, "hull2VerticeLastInPlane", viewport1 );
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 0.5, 0, "hull2VerticeLastInPlane");
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 7, "hull2VerticeLastInPlane"); 
-
-
-
-
 
 
 
