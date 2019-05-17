@@ -122,14 +122,14 @@ TEST_CASE("test if file parameter is not present")
     std::stringstream ss;
     ss = GeoSystem_call(std::string(commTest));
     std::string result = "\n\
-  NAME\n\n\
-     georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
-  SYNOPSIS\n \
-	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] fichier\n\n\
-  DESCRIPTION\n \
-	   -L Use a local geographic frame (NED)\n \
-	   -T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
-  Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n";
+	NAME\n\n\
+	georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
+	SYNOPSIS\n \
+	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] fichier\n\n\
+	DESCRIPTION\n \
+	-L Use a local geographic frame (NED)\n \
+	-T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
+	Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n";
     REQUIRE(ss.str()==result);
 }
 
