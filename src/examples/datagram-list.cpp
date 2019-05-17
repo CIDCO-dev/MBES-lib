@@ -3,7 +3,7 @@
 */
 
 /*
-* \author ?
+* \author Guillaume Labbe-Morissette
 */
 
 #ifndef MAIN_CPP

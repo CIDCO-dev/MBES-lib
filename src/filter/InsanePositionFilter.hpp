@@ -9,7 +9,7 @@
 
 /*!
 * \brief Insane position filter class.
-* \author ?
+* \author Emile Gagne
 *
 * Extends from the PointFilter class
 */
