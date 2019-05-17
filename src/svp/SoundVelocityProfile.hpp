@@ -181,23 +181,6 @@ public:
     &year,&yday,&hour,&minute,&second,latdirection,&latdegrees,&latminute,&latsecond,
     londirection,&londegrees,&lonminute,&lonsecond)==13)
     {
-        char latdirection[5];
-        double latdegrees;
-        double latminute;
-        double latsecond;
-        char londirection[4];
-        double londegrees;
-        double lonminute;
-        double lonsecond;
-        int year;
-        int yday;
-        int hour;
-        int minute;
-        int second;
-        if (std::sscanf(row.c_str(), "Section %d-%d %d:%d:%d %5s %lf:%lf:%lf %4s %lf:%lf:%lf",
-                &year,&yday,&hour,&minute,&second,latdirection,&latdegrees,&latminute,&latsecond,
-                londirection,&londegrees,&lonminute,&lonsecond)==13)
-        {
             lat = latsecond/60 + latminute;
             lat = lat/60 + latdegrees;
             std::string sdirection;
@@ -242,7 +225,6 @@ public:
             return false;   
         }
     }
-  }
 
   /**
   * Adds a new value in the vector depths and speeds
