@@ -126,58 +126,60 @@ else
             break;
 
             case 'L':
-		georef = new GeoreferencingLGF();
+		            georef = new GeoreferencingLGF();
             break;
 
             case 'T':
-		georef = new GeoreferencingTRF();
+		            georef = new GeoreferencingTRF();
             break;
         }
     }
 
-    if(georef == NULL){
-	std::cerr << "No georeferencing method defined (-L or -T)" << std::endl;
-	printUsage();
+    if(georef == NULL)
+    {
+	    std::cerr << "No georeferencing method defined (-L or -T)" << std::endl;
+	    printUsage();
     }
 
     try
     {
-	DatagramParser * parser = NULL;
-	DatagramGeoreferencer  printer(*georef);
+	    DatagramParser * parser = NULL;
+	    DatagramGeoreferencer  printer(*georef);
 
-	std::cerr << "Decoding " << fileName << std::endl;
-        std::ifstream inFile;
-        inFile.open(fileName);
-        if (inFile){
-		parser = DatagramParserFactory::build(fileName,printer);
-        }
-        else
-        {
-            throw new Exception("File not found");
-        }
-        parser->parse(fileName);
-	std::cout << std::setprecision(6);
-	std::cout << std::fixed;
+	    std::cerr << "Decoding " << fileName << std::endl;
+      std::ifstream inFile;
+      inFile.open(fileName);
+      if (inFile) 
+      {
+		    parser = DatagramParserFactory::build(fileName,printer);
+      }
+      else
+      {
+        throw new Exception("File not found");
+      }
+      parser->parse(fileName);
+	    std::cout << std::setprecision(6);
+	    std::cout << std::fixed;
 
 	//Lever arm
-	Eigen::Vector3d leverArm;
-	leverArm << leverArmX,leverArmY,leverArmZ;
+	    Eigen::Vector3d leverArm;
+	    leverArm << leverArmX,leverArmY,leverArmZ;
 
 	//Boresight
-	Attitude boresightAngles(0,roll,pitch,heading);
-	Eigen::Matrix3d boresight;
-	Boresight::buildMatrix(boresight,boresightAngles);
+	    Attitude boresightAngles(0,roll,pitch,heading);
+	    Eigen::Matrix3d boresight;
+	    Boresight::buildMatrix(boresight,boresightAngles);
 
 	//Do the georeference dance
-        printer.georeference(leverArm,boresight);
+      printer.georeference(leverArm,boresight);
 
-	delete parser;
+	    delete parser;
     }
     catch(Exception * error)
     {
-	std::cerr << "Error while parsing " << fileName << ": " << error->getMessage() << std::endl;
+	    std::cerr << "Error while parsing " << fileName << ": " << error->getMessage() << std::endl;
     }
-}
+  }
 }
 
 #endif
