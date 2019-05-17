@@ -170,8 +170,10 @@ else
 	    Eigen::Matrix3d boresight;
 	    Boresight::buildMatrix(boresight,boresightAngles);
 
+            SoundVelocityProfile * svp = NULL;
+            
 	//Do the georeference dance
-      printer.georeference(leverArm,boresight);
+      printer.georeference(leverArm,boresight,svp);
 
 	    delete parser;
     }
