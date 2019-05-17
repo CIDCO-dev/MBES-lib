@@ -125,7 +125,7 @@ TEST_CASE("test if file parameter is not present")
 	NAME\n\n\
 	georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
 	SYNOPSIS\n \
-	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] fichier\n\n\
+	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] [-s svp_file] file\n\n\
 	DESCRIPTION\n \
 	-L Use a local geographic frame (NED)\n \
 	-T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
@@ -159,24 +159,37 @@ TEST_CASE("test if the parameter x y z are invalid")
 /**Test with parameter r h p invalid*/
 TEST_CASE("test if parameter r h p are invalid")
 {
-    string commp = " -r sjdhsd";
-    string commP = " -h gyhgj";
-    string commt = " -p gyigkb";
+    string commR = " -r sjdhsd";
+    string commH = " -h gyhgj";
+    string commP = " -p gyigkb";
     string commFile = " test/data/all/0008_20160909_135801_Panopee.all 2>&1";
-    string commTest = GeoBinexec+commp+commFile;
+    string commTest = GeoBinexec+commR+commFile;
     std::stringstream ss;
     ss = GeoSystem_call(std::string(commTest));
     std::string line;
     getline(ss,line);
     REQUIRE(line=="Invalid roll angle offset (-r)");
-    commTest = GeoBinexec+commP+commFile;
+    commTest = GeoBinexec+commH+commFile;
     ss = GeoSystem_call(std::string(commTest));
     getline(ss,line);
     REQUIRE(line=="Invalid heading angle offset (-h)");
-    commTest = GeoBinexec+commt+commFile;
+    commTest = GeoBinexec+commP+commFile;
     ss = GeoSystem_call(std::string(commTest));
     getline(ss,line);
     REQUIRE(line=="Invalid pitch angle offset (-p)");
+}
+
+TEST_CASE("test if parameter s is not valid")
+{
+    string commS = " -s file.ssp -L ";
+    string commFile = " test/data/all/0008_20160909_135801_Panopee.all 2>&1";
+    string commTest = GeoBinexec+commS+commFile;
+    std::stringstream ss;
+    ss = GeoSystem_call(std::string(commTest));
+    std::string line;
+    getline(ss,line);
+    getline(ss,line);
+    REQUIRE(line=="Error while parsing test/data/all/0008_20160909_135801_Panopee.all: Svp file not valid");
 }
 
 TEST_CASE("test if parameter L T are not present")
