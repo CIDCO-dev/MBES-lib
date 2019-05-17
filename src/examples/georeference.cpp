@@ -27,7 +27,7 @@ void printUsage(){
 	NAME\n\n\
 	georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
 	SYNOPSIS\n \
-	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] fichier\n\n\
+	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] [-s svp_file] file\n\n\
 	DESCRIPTION\n \
 	-L Use a local geographic frame (NED)\n \
 	-T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
@@ -70,10 +70,14 @@ else
 
     //Georeference method
     Georeferencing * georef;
-
+    
+    //SoundVelocityProfile
+    SoundVelocityProfile * svp = NULL;
+    std::string svpFile = ""; 
+    char svpChar;
     int index;
 
-    while((index=getopt(argc,argv,"x:y:z:r:p:h:LT"))!=-1)
+    while((index=getopt(argc,argv,"x:y:z:r:p:h:s:LT"))!=-1)
     {
         switch(index)
         {
@@ -124,7 +128,19 @@ else
                     printUsage();
                 }
             break;
-
+            
+            case 's': 
+                if (sscanf(optarg,"%s",&svpChar) != 1)
+                {
+                    std::cerr << "Invalid file name offset (-s)" << std::endl;
+                    printUsage();
+                }
+                else
+                {
+                    svpFile =svpChar;
+                }
+            break;
+                    
             case 'L':
 		            georef = new GeoreferencingLGF();
             break;
@@ -169,8 +185,15 @@ else
 	    Attitude boresightAngles(0,roll,pitch,heading);
 	    Eigen::Matrix3d boresight;
 	    Boresight::buildMatrix(boresight,boresightAngles);
-
-            SoundVelocityProfile * svp = NULL;
+            
+         //Sound Velocity Profile
+            if(svpFile != "")
+            {
+               if(svp->read(svpFile) == false)
+                {
+                   throw new Exception("Svp file not valid");
+                } 
+            }  
             
 	//Do the georeference dance
       printer.georeference(leverArm,boresight,svp);
