@@ -26,18 +26,18 @@
 #include <pcl/visualization/pcl_visualizer.h>
 
 
-#include "../../../PointCloudGeoreferencer.hpp"
+#include "../../PointCloudGeoreferencer.hpp"
 
-#include "../../../svp/SoundVelocityProfile.hpp"
+#include "../../svp/SoundVelocityProfile.hpp"
 
-#include "../../../math/Boresight.hpp"
+#include "../../math/Boresight.hpp"
 
-#include "../../../utils/StringUtils.hpp"
-#include "../../../utils/Exception.hpp"
+#include "../../utils/StringUtils.hpp"
+#include "../../utils/Exception.hpp"
 
-#include "../../../HullOverlapHighLevel.hpp"
+#include "../../HullOverlap.hpp"
 
-#include "../../smallUtilityFunctions.hpp"
+#include "../smallUtilityFunctions.hpp"
 
 
 
@@ -202,10 +202,10 @@ int main( int argc, char* argv[] )
 
     std::cout << "\n\nProcessing to find the overlap\n" << std::endl;
 
-    HullOverlapHighLevel hullOverlapHighLevel( line1, line2, a, b, c, d, alphaLine1, alphaLine2 );
+    HullOverlap hullOverlap( line1, line2, a, b, c, d, alphaLine1, alphaLine2 );
 
 
-    std::pair< uint64_t, uint64_t > inBothHulls = hullOverlapHighLevel.computePointsInBothHulls( line1InBothHulls, 
+    std::pair< uint64_t, uint64_t > inBothHulls = hullOverlap.computePointsInBothHulls( line1InBothHulls, 
                                                                                                     line2InBothHulls );   
 
     std::cout << "Nb points line1 in both hulls: " << inBothHulls.first

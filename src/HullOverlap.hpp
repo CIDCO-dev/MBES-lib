@@ -68,6 +68,17 @@ public:
     }
 
 
+
+    std::pair< uint64_t, uint64_t > computePointsInBothHulls( pcl::PointCloud<pcl::PointXYZ>::Ptr line1InBothHull,
+                                                              pcl::PointCloud<pcl::PointXYZ>::Ptr line2InBothHull )
+    {
+        return computeHullsAndPointsInBothHulls( line1InBothHull, line2InBothHull, true );
+    }
+
+
+private:
+
+    // Was public when wanted to look at details of projection, etc
     std::pair< uint64_t, uint64_t > computeHullsAndPointsInBothHulls( pcl::PointCloud<pcl::PointXYZ>::Ptr line1InBothHull = nullptr,
                                                                         pcl::PointCloud<pcl::PointXYZ>::Ptr line2InBothHull = nullptr, 
                                                                         const bool minimalMemory = false )
@@ -219,34 +230,34 @@ public:
 
     }
 
-    pcl::PointCloud<pcl::PointXYZ>::ConstPtr getConstPtrLineInPlane( const bool isLine1 )
-    {
-        if ( isLine1 )
-            return line1InPlane;
-        else 
-            return line2InPlane;
-    }
+    // These functions were public when wanted to look at details of projection, etc
+    // pcl::PointCloud<pcl::PointXYZ>::ConstPtr getConstPtrLineInPlane( const bool isLine1 )
+    // {
+    //     if ( isLine1 )
+    //         return line1InPlane;
+    //     else 
+    //         return line2InPlane;
+    // }
 
-    const std::vector< int > * getConstPtrVerticesIndices( const bool isLine1 )
-    {
-        if ( isLine1 )
-            return & ( hull1PointIndices.indices );
-        else 
-            return & ( hull2PointIndices.indices );
-    }
+    // const std::vector< int > * getConstPtrVerticesIndices( const bool isLine1 )
+    // {
+    //     if ( isLine1 )
+    //         return & ( hull1PointIndices.indices );
+    //     else 
+    //         return & ( hull2PointIndices.indices );
+    // }
+
+    // const std::vector< uint64_t > * getConstPtrlineInBothHullPointIndices( const bool isLine1 )
+    // {
+    //     if ( isLine1 )
+    //         return & ( line1InBothHullPointIndices );
+    //     else 
+    //         return & ( line2InBothHullPointIndices );
+    // }
 
 
-    const std::vector< uint64_t > * getConstPtrlineInBothHullPointIndices( const bool isLine1 )
-    {
-        if ( isLine1 )
-            return & ( line1InBothHullPointIndices );
-        else 
-            return & ( line2InBothHullPointIndices );
-    }
 
 
-
-private:
 
 
     void createCloudFromProjectionInPlane( pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloudIn,
