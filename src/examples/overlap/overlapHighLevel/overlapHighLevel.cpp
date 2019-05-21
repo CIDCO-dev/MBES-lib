@@ -228,17 +228,11 @@ int main( int argc, char* argv[] )
 	viewer->setBackgroundColor ( 1.0, 1.0, 1.0, viewport0 );		
 
     // Display line 1
-    // pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> line1_colorBlue( line1, 0, 0, 255 );
-    // viewer->addPointCloud<pcl::PointXYZ> ( line1, line1_colorBlue, "line1", viewport0 );
-
     viewer->addPointCloud<pcl::PointXYZ> ( line1, "line1", viewport0 );
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 0, 0, 1, "line1");
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "line1");    
 
     // Display line 2
-    // pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> line2_colorRed( line2, 255, 0, 0 );
-    // viewer->addPointCloud<pcl::PointXYZ> ( line2, line2_colorRed, "line2", viewport0 );
-
     viewer->addPointCloud<pcl::PointXYZ> ( line2, "line2", viewport0 );
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "line2");
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "line2");
@@ -250,18 +244,12 @@ int main( int argc, char* argv[] )
     viewer->createViewPort( 0.5, 0.0, 1.0, 1.0, viewport1 );    
 	viewer->setBackgroundColor ( 1.0, 1.0, 1.0, viewport1 );		
 
-   // Display points of line 1 in both hulls
-    // pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> line1InBothHulls_colorBlue( line1InBothHulls, 0, 0, 255 );
-    // viewer->addPointCloud<pcl::PointXYZ> ( line1InBothHulls, line1InBothHulls_colorBlue, "line1InBothHulls", viewport1 );
-
+    // Display points of line 1 in both hulls
     viewer->addPointCloud<pcl::PointXYZ> ( line1InBothHulls, "line1InBothHulls", viewport1 );
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 0, 0, 1, "line1InBothHulls");
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "line1InBothHulls");    
 
     // Display points of line 2 in both hulls
-    // pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> line2InBothHulls_colorRed( line2InBothHulls, 255, 0, 0 );
-    // viewer->addPointCloud<pcl::PointXYZ> ( line2InBothHulls, line2InBothHulls_colorRed, "line2InBothHulls", viewport1 );
-
     viewer->addPointCloud<pcl::PointXYZ> ( line2InBothHulls, "line2InBothHulls", viewport1 );
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 1, 0, 0, "line2InBothHulls");
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "line2InBothHulls");
