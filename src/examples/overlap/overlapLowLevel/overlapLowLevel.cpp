@@ -181,9 +181,9 @@ int main( int argc, char* argv[] )
     for ( int count = 0; count < 2; count++ )
     {
         // If file name ends in .txt: point cloud X, Y, Z
-        if ( ends_with( fileNameLine1.c_str(),".txt") )
+        if ( ends_with( twoFileNames[ count ].c_str(),".txt" ) )
         {
-            readPointCloud( twoFileNames[ count ], twoLines[ count ] );
+            readTextFileIntoPointCloud( twoFileNames[ count ], twoLines[ count ] );
         }
         else // Georeference
         {
@@ -201,7 +201,7 @@ int main( int argc, char* argv[] )
                 //TODO: get SVP from CLI
 
 
-                readSonarFile( twoFileNames[ count ], twoLines[ count ], leverArm , boresight, NULL );
+                readSonarFileIntoPointCloud( twoFileNames[ count ], twoLines[ count ], leverArm , boresight, NULL );
 
             }
             catch ( Exception * error )
@@ -239,12 +239,11 @@ int main( int argc, char* argv[] )
     pcl::PointCloud<pcl::PointXYZ>::Ptr line2InBothHulls (new pcl::PointCloud<pcl::PointXYZ>);
 
 
-    std::cout << "Processing to find the overlap\n" << std::endl;
+    std::cout << "\n\nProcessing to find the overlap\n" << std::endl;
 
     HullOverlap hullOverlap( line1, line2, a, b, c, d, alphaLine1, alphaLine2 );
 
 
-    // std::pair< uint64_t, uint64_t > inBothHulls = hullOverlap.computeHullsAndPointsInBothHulls( nullptr, nullptr, true );
     std::pair< uint64_t, uint64_t > inBothHulls = hullOverlap.computeHullsAndPointsInBothHulls( line1InBothHulls, 
                                                                                         line2InBothHulls, false );    
 

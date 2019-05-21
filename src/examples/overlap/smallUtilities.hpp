@@ -77,7 +77,7 @@ private:
 
 
 
-uint64_t readSonarFile( std::string fileName, pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOut, 
+uint64_t readSonarFileIntoPointCloud( std::string fileName, pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOut, 
                     Eigen::Vector3d leverArm, Eigen::Matrix3d boresight,
                     SoundVelocityProfile * svpFile )
 {
@@ -149,7 +149,7 @@ uint64_t readSonarFile( std::string fileName, pcl::PointCloud<pcl::PointXYZ>::Pt
 
 
 
-uint64_t readPointCloud( const std::string filename, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, const uint64_t lastLineToInclude = UINT64_MAX )
+uint64_t readTextFileIntoPointCloud( const std::string filename, pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, const uint64_t lastLineToInclude = UINT64_MAX )
 {   
     pcl::PointXYZ point;
 
@@ -217,7 +217,7 @@ uint64_t readPointCloud( const std::string filename, pcl::PointCloud<pcl::PointX
 
 
 void convertStringToDouble( std::string textIn, double & numberOut, 
-                        const std::string whatIsIt, const bool needLargerThanZero = false )
+                        const std::string whatIsIt, const bool needAboveZero = false )
 {
     std::istringstream text( textIn ); 
 
@@ -229,9 +229,9 @@ void convertStringToDouble( std::string textIn, double & numberOut,
     }
     else
     {
-        if ( needLargerThanZero && numberOut <=0 )
+        if ( needAboveZero && numberOut <=0 )
         {
-            std::cout << "\n\n" << whatIsIt << ": " << numberOut << " is invalid, need a double larger than 0\n\n" << std::endl;
+            std::cout << "\n\n" << whatIsIt << ": " << numberOut << " is invalid, need a double bigger than 0\n\n" << std::endl;
             exit( 41 );                            
         }                        
     }
