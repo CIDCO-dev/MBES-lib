@@ -26,8 +26,7 @@
 #include <pcl/visualization/pcl_visualizer.h>
 
 
-#include "../../../DatagramGeoreferencer.hpp"
-#include "../../../datagrams/DatagramParserFactory.hpp"
+#include "../../../PointCloudGeoreferencer.hpp"
 
 #include "../../../svp/SoundVelocityProfile.hpp"
 
@@ -38,7 +37,7 @@
 
 #include "../../../HullOverlapHighLevel.hpp"
 
-#include "../smallUtilities.hpp"
+#include "../../smallUtilityFunctions.hpp"
 
 
 

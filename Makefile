@@ -15,7 +15,7 @@ coverage_dir=build/coverage
 coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
-default: prepare pcl-viewer overlapLowLevel
+default: prepare pcl-viewer overlapHighLevel overlapLowLevel
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
@@ -63,11 +63,22 @@ datagram-list: default
 	./build/bin/datagram-list test/data/s7k/20141016_150519_FJ-Saucier.s7k|sort|uniq -c
 
 pcl-viewer: prepare
-	cd build && cmake ../src/examples/viewer/ && make && mv viewer bin/
+	rm -rf build/tempCMake
+	mkdir -p build/tempCMake
+	cd build/tempCMake && cmake ../../src/examples/viewer/ && make && mv viewer ../bin/
+	rm -rf build/tempCMake
+
+overlapHighLevel: prepare
+	rm -rf build/tempCMake
+	mkdir -p build/tempCMake
+	cd build/tempCMake && cmake ../../src/examples/overlap/overlapHighLevel/ && make && mv overlapHighLevel ../bin/
+	rm -rf build/tempCMake
 
 overlapLowLevel: prepare
-	cd $(root)/build && cmake ../src/examples/overlap/overlapLowLevel/ && make && mv overlapLowLevel bin/
-
+	rm -rf build/tempCMake
+	mkdir -p build/tempCMake
+	cd build/tempCMake && cmake ../../src/examples/overlap/overlapLowLevel/ && make && mv overlapLowLevel ../bin/
+	rm -rf build/tempCMake
 
 prepare:
 	mkdir -p $(exec_dir)
