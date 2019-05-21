@@ -162,7 +162,7 @@ int main( int argc, char* argv[] )
                 //TODO: get SVP from CLI
 
 
-                readSonarFileIntoPointCloud( twoFileNames[ count ], twoLines[ count ], leverArm , boresight, NULL );
+                readSonarFileIntoPointCloud( twoFileNames[ count ], twoLines[ count ], leverArm , boresight, NULL, false );
 
             }
             catch ( Exception * error )

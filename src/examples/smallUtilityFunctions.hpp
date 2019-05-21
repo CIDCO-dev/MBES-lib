@@ -33,12 +33,16 @@
 
 
 uint64_t readSonarFileIntoPointCloud( std::string fileName, pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOut, 
-                    Eigen::Vector3d leverArm, Eigen::Matrix3d boresight,
-                    SoundVelocityProfile * svpFile )
+                    Eigen::Vector3d & leverArm, Eigen::Matrix3d & boresight,
+                    SoundVelocityProfile * svpFile, const bool DoLGF = true )
 {
 
-	// Georeferencing * georef = new GeoreferencingLGF(); //TODO: allow TRF through CLI
-    Georeferencing * georef = new GeoreferencingTRF(); //TODO: allow TRF through CLI
+	Georeferencing * georef;
+    
+    if ( DoLGF ) 
+        georef = new GeoreferencingLGF();
+    else
+        georef = new GeoreferencingTRF();
 
 	PointCloudGeoreferencer pointCloudGeoreferencer( cloudOut,*georef );
 

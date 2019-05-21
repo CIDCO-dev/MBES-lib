@@ -2,8 +2,13 @@
 * Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
 */
 
+ /*
+ * \author Guillaume Labbe-Morissette, Christian Bouchard
+ */
+
 #ifndef GEOREFPCLVIEWER_CPP
 #define GEOREFPCLVIEWER_CPP
+
 
 #include <cstdio>
 #include <cstdlib>
@@ -21,11 +26,12 @@
 #include <pcl/console/parse.h>
 
 
-#include "../../DatagramGeoreferencer.hpp"
-#include "../../datagrams/DatagramParserFactory.hpp"
+#include "../../PointCloudGeoreferencer.hpp"
+
 #include "../../utils/StringUtils.hpp"
 #include "../../math/Boresight.hpp"
 
+#include "../smallUtilityFunctions.hpp"
 
 void printUsage(){
 	//TODO: better synopsis
@@ -33,80 +39,16 @@ void printUsage(){
 	exit(1);
 }
 
-/*!
-* \brief PCL point cloud georeferencer class
-* \author Guillaume Labbe-Morissette, Christian Bouchard
-*
-* Extends from DatagramGeoreferencer
-*/
-class PointCloudGeoreferencer : public DatagramGeoreferencer{
-
-public:
-	/**
-	* Creates a PointCloudGeoreferencer
-	* Georeferences a point cloud
-	*
-	* @param cloud Point cloud
-	* @param georef The georeferencer
-	*/
-	PointCloudGeoreferencer( pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, Georeferencing & georef )
-	: cloud( cloud ),DatagramGeoreferencer(georef) {
-
-	}
-
-	/** Destroys a PointCloudGeoreferencer  */
-	virtual ~PointCloudGeoreferencer() {}
-
-	/** Returns a point cloud */
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr getCloud(){
-		cloud->width = (int) cloud->points.size();
-		cloud->height = (int) 1;
-
-		return cloud;
-	};
-
-	/**
-	* Displays a georeferenced ping's info
-	*
-	* @param georeferencedPing
-	* @param quality the quality flag
-	* @param intensity the intensity flag
-	*/
-	virtual void processGeoreferencedPing(Eigen::Vector3d & ping,uint32_t quality,int32_t intensity){
-
-		pcl::PointXYZRGB point;
-
-		point.x = ping(0);
-		point.y = ping(1);
-		point.z = ping(2);
-
-		// White points
-		// uint32_t rgb = (static_cast<uint32_t>(255) << 16 | static_cast<uint32_t>(255) << 8
-		//   | static_cast<uint32_t>(255));
-
-		// Blue points
-		uint32_t rgb = (static_cast<uint32_t>(0) << 16 | static_cast<uint32_t>(0) << 8
-		| static_cast<uint32_t>(255));
-
-		point.rgb = *reinterpret_cast<float*>(&rgb);
-
-		cloud->push_back(point);
-	}
-
-
-private:
-	/** Point cloud */
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud;
-};
 
 
 int main(int argc, char ** argv){
+
 	//Check CLI parameters for filenames
 	if(argc != 2){
 		printUsage();
 	}
 
-	std::string filename1(argv[1]);
+	std::string filename( argv[1] );
 
 
 	//TODO: pass as CLI parameter
@@ -117,71 +59,29 @@ int main(int argc, char ** argv){
 	Eigen::Matrix3d boresight;
 	Boresight::buildMatrix( boresight, boresightAngles );
 
-	Georeferencing * georef = new GeoreferencingLGF(); //TODO: allow TRF through CLI
+	//TODO: allow TRF through CLI
+
 
 	//Get point clouds from files
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1 (new pcl::PointCloud<pcl::PointXYZRGB>);
-
-	PointCloudGeoreferencer line1(cloud1,*georef);
-
-
-	DatagramParser * parser = nullptr;
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZ>);
 
 	try
 	{
-
-		std::cout << "\nReading sonar file" << std::endl;
-
-		std::ifstream inFile;
-		inFile.open( filename1 );
-
-		if (inFile)
-		{
-			parser = DatagramParserFactory::build( filename1, line1 );
-		}
-		else
-		{
-			throw new Exception("Unknown extension");
-		}
-
-		parser->parse( filename1 );
-
-		//loadCloudFromFile(filename1,line1);
-
-		std::cout << "\nGeoreferencing point cloud" << std::endl;
-
-		//TODO: get SVP from CLI
-		line1.georeference( leverArm , boresight , NULL );
-
+		readSonarFileIntoPointCloud( filename, cloud, leverArm , boresight, NULL, true );
 	}
-	catch(Exception * error)
+	catch ( Exception * error )
 	{
-		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\n" << error->getMessage() <<  ".\n";
+		cout << error->getMessage();
 
-		if(parser)
-		delete parser;
-	}
-	catch ( const char * message )
-	{
-		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\n" << message <<  ".\n";
-
-		if(parser)
-		delete parser;
-	}
-	catch (...)
-	{
-		cout << "\nError while parsing file \n\n\"" << filename1 << "\":\n\nOther exception.\n";
-
-		if(parser)
-		delete parser;
+		exit( 1 );
 	}
 
 
 	//Display point cloud stats
-	std::cout << "Line 1: " << line1.getCloud()->points.size() << " points loaded" << std::endl;
+	std::cout << "Line: " << cloud->points.size() << " points loaded" << std::endl;
 
-	pcl::PointXYZRGB minPt, maxPt;
-	pcl::getMinMax3D (*line1.getCloud(), minPt, maxPt);
+	pcl::PointXYZ minPt, maxPt;
+	pcl::getMinMax3D ( *cloud, minPt, maxPt);
 
 	std::cout << setprecision( 15 );
 
@@ -206,11 +106,9 @@ int main(int argc, char ** argv){
 	viewer->setBackgroundColor ( 1.0, 1.0, 1.0 ); // Doubles between 0.0 and 1.0
 
 
-	pcl::visualization::PointCloudColorHandlerRGBField<pcl::PointXYZRGB> rgb(line1.getCloud());
-
-	viewer->addPointCloud<pcl::PointXYZRGB> (line1.getCloud(), rgb, "sample cloud");
-
-	viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "sample cloud");
+	viewer->addPointCloud<pcl::PointXYZ> ( cloud, "sample cloud" );
+    viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 0, 0, 1, "sample cloud" ); // Blue points
+    viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "sample cloud" );	
 
 
 	// viewer->setPosition( 300, 100 ); // Position of the window on the screen
