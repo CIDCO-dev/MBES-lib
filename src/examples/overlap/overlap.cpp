@@ -3,7 +3,7 @@
 */
 
  /*
- * \author Christian Bouchard
+ * \author Christian Bouchard, Guillaume Labbe-Morissette
  */
 
 
@@ -40,7 +40,34 @@
 #include "../smallUtilityFunctions.hpp"
 
 
+/**Writes the usage information about the program*/
+void printUsage(){
 
+	// TODO: How to indicate that either -L or -T must be present?
+
+	std::cerr << "\n\
+	NAME\n\n\
+	overlap - Displays the overlap area between two multibeam echosounder datagram files\n\n\
+	SYNOPSIS\n \
+	overlap [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] file1 file2 a b c d alpha1 alpha2\n\n\
+	DESCRIPTION\n \
+	-L          Use a local geographic frame (NED)\n \
+	-T          Use a terrestrial geographic frame (WGS84 ECEF)\n \
+	a, b, c, d  Coefficients to define the projection plane, ax + by + cz + d = 0\n \
+	alpha1      Concave hull computation parameter to use with file #1\n \
+	alpha2      Concave hull computation parameter to use with file #2\n\n \
+	Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n" << std::endl;
+	exit(1);
+}
+
+
+
+/**
+* Declares the program depending on argument received
+*
+* @param argc number of argument
+* @param argv value of the arguments
+*/
 int main( int argc, char* argv[] )
 {
     std::cout << "\nStart of function main()\n" << std::endl;    
@@ -50,10 +77,111 @@ int main( int argc, char* argv[] )
     std::chrono::high_resolution_clock::time_point tStart = std::chrono::high_resolution_clock::now();  
 
 
-    if ( argc != 7 && argc != 9 )
+	// TODO: get SVP from CLI
+
+
+	//Lever arm
+	double leverArmX = 0.0;
+	double leverArmY = 0.0;
+	double leverArmZ = 0.0;
+
+	//Boresight
+	double roll     = 0.0;
+	double pitch    = 0.0;
+	double heading  = 0.0;
+
+	bool LorTPresent = false;
+	bool DoLGF = true;
+
+
+    // Read -L or -T, optional parameters preceded by "-"
+
+	int index;
+
+	while((index=getopt(argc,argv,"x:y:z:r:p:h:LT"))!=-1)
+	{
+		switch(index)
+		{
+			case 'x':
+				if(sscanf(optarg,"%lf", &leverArmX) != 1)
+				{
+					std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'y':
+				if (sscanf(optarg,"%lf", &leverArmY) != 1)
+				{
+					std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'z':
+				if (sscanf(optarg,"%lf", &leverArmZ) != 1)
+				{
+					std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'r':
+				if (sscanf(optarg,"%lf", &roll) != 1)
+				{
+					std::cerr << "Invalid roll angle offset (-p)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'h':
+				if (sscanf(optarg,"%lf", &heading) != 1)
+				{
+					std::cerr << "Invalid heading angle offset (-P)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'p':
+				if (sscanf(optarg,"%lf", &pitch) != 1)
+				{
+					std::cerr << "Invalid pitch angle offset (-t)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'L':
+				LorTPresent = true;
+				DoLGF = true;
+				break;
+
+			case 'T':
+				LorTPresent = true;
+				DoLGF = false;
+				break;
+		}
+	}
+
+	if( LorTPresent == false ){
+		std::cerr << "\nNo georeferencing method defined (-L or -T)" << std::endl;
+		printUsage();
+	}
+
+
+	Eigen::Vector3d	leverArm( leverArmX, leverArmY, leverArmZ );
+
+	Attitude boresightAngles( 0, roll, pitch, heading );
+	Eigen::Matrix3d boresight;
+	Boresight::buildMatrix( boresight, boresightAngles );
+
+
+
+    // Read required arguments, they start at index "optind"
+
+    if ( argc != ( optind + 6 ) && argc != ( optind + 8 ) )
     {           
-        std::cout << "\n\nThere should be 6 or 8 arguments after the program name\n\n" << endl;
-        exit( 100 );
+        std::cout << "\n\nThere should be 6 or 8 non-optional arguments" << std::endl;
+        printUsage();
     }
 
     // Arguments:
@@ -77,14 +205,8 @@ int main( int argc, char* argv[] )
     // std::cout << endl;
 
 
-    // TODO: leverArm as CLI parameter
-
-    // TODO: boresight as CLI parameter
-
-    // TODO: get SVP from CLI
-
-    std::string fileNameLine1( argv[ 1 ] );
-    std::string fileNameLine2( argv[ 2 ] );
+    std::string fileNameLine1( argv[ optind ] );
+    std::string fileNameLine2( argv[ optind + 1 ] );
 
 
     // Plane in which to find the hulls and overlap
@@ -97,10 +219,10 @@ int main( int argc, char* argv[] )
     double d = 0;
 
     // Get actual values from CLI
-    convertStringToDouble( argv[ 3 ], a, "Plane parameter 'a'" );
-    convertStringToDouble( argv[ 4 ], b, "Plane parameter 'b'" );
-    convertStringToDouble( argv[ 5 ], c, "Plane parameter 'c'" );
-    convertStringToDouble( argv[ 6 ], d, "Plane parameter 'd'" );
+    convertStringToDouble( argv[ optind + 2 ], a, "Plane parameter 'a'" );
+    convertStringToDouble( argv[ optind + 3 ], b, "Plane parameter 'b'" );
+    convertStringToDouble( argv[ optind + 4 ], c, "Plane parameter 'c'" );
+    convertStringToDouble( argv[ optind + 5 ], d, "Plane parameter 'd'" );
 
     std::cout << "\na: " << a << "\n" 
         << "b: " << b << "\n"
@@ -112,11 +234,11 @@ int main( int argc, char* argv[] )
     double alphaLine1 = 1.0;
     double alphaLine2 = 1.0;
 
-    if ( argc == 9 )
+    if ( argc == ( optind + 8 ) )
     {
         // Get actual values from CLI
-        convertStringToDouble( argv[ 7 ], alphaLine1, "alphaLine1", true );
-        convertStringToDouble( argv[ 8 ], alphaLine2, "alphaLine2", true );
+        convertStringToDouble( argv[ optind + 6 ], alphaLine1, "alphaLine1", true );
+        convertStringToDouble( argv[ optind + 7 ], alphaLine2, "alphaLine2", true );
     }    
 
 
@@ -150,20 +272,7 @@ int main( int argc, char* argv[] )
         {
             try
             {
-                //TODO: pass as CLI parameter
-                Eigen::Vector3d	leverArm;
-                leverArm <<  0, 0, 0;
-
-                //TODO: pass as CLI parameter
-                Attitude boresightAngles( 0, 0, 0, 0 ); //Attitude boresightAngles(0,roll,pitch,heading);
-                Eigen::Matrix3d boresight;
-                Boresight::buildMatrix( boresight, boresightAngles );                
-                
-                //TODO: get SVP from CLI
-
-
-                readSonarFileIntoPointCloud( twoFileNames[ count ], twoLines[ count ], leverArm , boresight, NULL, false );
-
+                readSonarFileIntoPointCloud( twoFileNames[ count ], twoLines[ count ], leverArm , boresight, NULL, DoLGF );
             }
             catch ( Exception * error )
             {

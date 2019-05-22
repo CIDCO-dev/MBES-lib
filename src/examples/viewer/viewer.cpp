@@ -33,33 +33,141 @@
 
 #include "../smallUtilityFunctions.hpp"
 
+
+/**Writes the usage information about the program*/
 void printUsage(){
-	//TODO: better synopsis
-	printf("viewer file\n");
+	// TODO: How to indicate that either -L or -T must be present?
+	std::cerr << "\n\
+	NAME\n\n\
+	viewer - Displays the point cloud from a multibeam echosounder datagram file\n\n\
+	SYNOPSIS\n \
+	viewer [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] fichier\n\n\
+	DESCRIPTION\n \
+	-L Use a local geographic frame (NED)\n \
+	-T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
+	Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n" << std::endl;
 	exit(1);
 }
 
 
-
+/**
+* Declares the viewer depending on argument received
+*
+* @param argc number of argument
+* @param argv value of the arguments
+*/
 int main(int argc, char ** argv){
 
+
+	// TODO: the following is present in the example program "georeference.cpp", is it required here as well?
+	// #ifdef __GNU__
+	// setenv("TZ", "UTC", 1);
+	// #endif
+	// #ifdef _WIN32
+	// putenv("TZ");
+	// #endif	
+
+
 	//Check CLI parameters for filenames
-	if(argc != 2){
+	if(argc < 2){
 		printUsage();
 	}
 
-	std::string filename( argv[1] );
+	std::string filename( argv[ argc - 1 ] );
+
+	// TODO: get SVP from CLI
+
+	//Lever arm
+	double leverArmX = 0.0;
+	double leverArmY = 0.0;
+	double leverArmZ = 0.0;
+
+	//Boresight
+	double roll     = 0.0;
+	double pitch    = 0.0;
+	double heading  = 0.0;
+
+	bool LorTPresent = false;
+	bool DoLGF = true;
+
+	int index;
+
+	while((index=getopt(argc,argv,"x:y:z:r:p:h:LT"))!=-1)
+	{
+		switch(index)
+		{
+			case 'x':
+				if(sscanf(optarg,"%lf", &leverArmX) != 1)
+				{
+					std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'y':
+				if (sscanf(optarg,"%lf", &leverArmY) != 1)
+				{
+					std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'z':
+				if (sscanf(optarg,"%lf", &leverArmZ) != 1)
+				{
+					std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'r':
+				if (sscanf(optarg,"%lf", &roll) != 1)
+				{
+					std::cerr << "Invalid roll angle offset (-p)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'h':
+				if (sscanf(optarg,"%lf", &heading) != 1)
+				{
+					std::cerr << "Invalid heading angle offset (-P)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'p':
+				if (sscanf(optarg,"%lf", &pitch) != 1)
+				{
+					std::cerr << "Invalid pitch angle offset (-t)" << std::endl;
+					printUsage();
+				}
+				break;
+
+			case 'L':
+				LorTPresent = true;
+				DoLGF = true;
+				break;
+
+			case 'T':
+				LorTPresent = true;
+				DoLGF = false;
+				break;
+		}
+	}
+
+	if( LorTPresent == false ){
+		std::cerr << "\nNo georeferencing method defined (-L or -T)" << std::endl;
+		printUsage();
+	}
 
 
-	//TODO: pass as CLI parameter
-	Eigen::Vector3d	leverArm;
-	leverArm <<  0, 0, 0;
+	Eigen::Vector3d	leverArm( leverArmX, leverArmY, leverArmZ );
 
-	Attitude boresightAngles( 0, 0, 0, 0 ); //Attitude boresightAngles(0,roll,pitch,heading);
+	Attitude boresightAngles( 0, roll,pitch,heading );
 	Eigen::Matrix3d boresight;
 	Boresight::buildMatrix( boresight, boresightAngles );
 
-	//TODO: allow TRF through CLI
 
 
 	//Get point clouds from files
@@ -67,7 +175,7 @@ int main(int argc, char ** argv){
 
 	try
 	{
-		readSonarFileIntoPointCloud( filename, cloud, leverArm , boresight, NULL, true );
+		readSonarFileIntoPointCloud( filename, cloud, leverArm , boresight, NULL, DoLGF );
 	}
 	catch ( Exception * error )
 	{

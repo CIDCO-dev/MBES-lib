@@ -37,6 +37,19 @@ class HullOverlap
 {
 
 public:    
+
+	/**
+	* Creates a HullOverlap
+	*
+	* @param line1In Point cloud for line #1
+	* @param line2In Point cloud for line #2
+    * @param a projection plane coefficient 'a' in ax + by + cz + d = 0
+    * @param b projection plane coefficient 'b' in ax + by + cz + d = 0
+    * @param c projection plane coefficient 'c' in ax + by + cz + d = 0
+    * @param d projection plane coefficient 'd' in ax + by + cz + d = 0
+    * @param alpha1 Concave hull computation parameter to use with line #1
+    * @param alpha2 Concave hull computation parameter to use with line #2
+	*/
     HullOverlap( pcl::PointCloud<pcl::PointXYZ>::ConstPtr line1In, 
                     pcl::PointCloud<pcl::PointXYZ>::ConstPtr line2In,
                     double a, double b, double c, double d,
@@ -68,7 +81,13 @@ public:
     }
 
 
-
+	/**
+	* Returns a pair with the number of points in line #1 and in line #2 that are in the overlap area of the two lines.
+	* The points are place in the point clouds pointed to by line1InBothHull and line2InBothHull
+    *    
+	* @param[out] line1InBothHull Point cloud of points in line #1 in the overlap area of the two lines
+	* @param[out] line2InBothHull Point cloud of points in line #2 in the overlap area of the two lines
+	*/
     std::pair< uint64_t, uint64_t > computePointsInBothHulls( pcl::PointCloud<pcl::PointXYZ>::Ptr line1InBothHull,
                                                               pcl::PointCloud<pcl::PointXYZ>::Ptr line2InBothHull )
     {
@@ -78,6 +97,14 @@ public:
 
 private:
 
+	/**
+	* Returns a pair with the number of points in line #1 and in line #2 that are in the overlap area of the two lines,
+	* the points are place in the point clouds pointed to by line1InBothHull and line2InBothHull
+    *    
+	* @param[out] line1InBothHull Point cloud of points in line #1 in the overlap area of the two lines
+	* @param[out] line2InBothHull Point cloud of points in line #2 in the overlap area of the two lines
+    * @param[in] line2InBothHull minimalMemory bool variable, true to specify to try and minimize the memory usage
+	*/
     // Was public when wanted to look at details of projection, etc
     std::pair< uint64_t, uint64_t > computeHullsAndPointsInBothHulls( pcl::PointCloud<pcl::PointXYZ>::Ptr line1InBothHull = nullptr,
                                                                         pcl::PointCloud<pcl::PointXYZ>::Ptr line2InBothHull = nullptr, 
@@ -154,13 +181,18 @@ private:
             << "hull2Vertices->points.size(): " << hull2Vertices->points.size() << "\n" << std::endl;
 
 
+        // If the hulls of the lines where found correctly, points of line 1 are within the hull of line 1.
+        // So only need to check that a point of line 1 is part of hull 2 to know that it is part of both hulls.
+        // Same idea for points of line 2.
+
+
         if ( line1InBothHull != nullptr && line2InBothHull != nullptr )
         {
             if ( minimalMemory )
             {
                 std::cout << "Finding points of Line 1 inside Hull 2\n\n" << std::endl;
             
-                findLineInBothHullOnlyPoints( line1, line1InPlane2D, line1InBothHull, hull2Vertices );
+                findPointsInHullOnlyPoints( line1, line1InPlane2D, line1InBothHull, hull2Vertices );
 
                 // Delete the dynamically allocated memory
                 line1InPlane2D.reset();
@@ -171,7 +203,7 @@ private:
 
                 std::cout << "Finding points of Line 2 inside Hull 1\n\n" << std::endl;
 
-                findLineInBothHullOnlyPoints( line2, line2InPlane2D, line2InBothHull, hull1Vertices );
+                findPointsInHullOnlyPoints( line2, line2InPlane2D, line2InBothHull, hull1Vertices );
 
                 // Delete the dynamically allocated memory
                 line2InPlane2D.reset();
@@ -191,12 +223,12 @@ private:
                 
                 std::cout << "Finding points of Line 1 inside Hull 2 (and the indices)\n\n" << std::endl;
             
-                findLineInBothHull( line1, line1InPlane2D, line1InBothHull, line1InBothHullPointIndices, hull2Vertices );
+                findPointsInHull( line1, line1InPlane2D, line1InBothHull, line1InBothHullPointIndices, hull2Vertices );
 
 
                 std::cout << "Finding points of Line 2 inside Hull 1 (and the indices)\n\n" << std::endl;
 
-                findLineInBothHull( line2, line2InPlane2D, line2InBothHull, line2InBothHullPointIndices, hull1Vertices );
+                findPointsInHull( line2, line2InPlane2D, line2InBothHull, line2InBothHullPointIndices, hull1Vertices );
 
 
                 std::cout << "line1InBothHull->points.size(): " << line1InBothHull->points.size() << "\n" 
@@ -213,12 +245,12 @@ private:
         {
             std::cout << "Finding indices of points of Line 1 inside Hull 2\n\n" << std::endl;
         
-            findLineInBothHullOnlyPointIndices( line1InPlane2D, line1InBothHullPointIndices, hull2Vertices );
+            findPointsInHullOnlyPointIndices( line1InPlane2D, line1InBothHullPointIndices, hull2Vertices );
 
 
             std::cout << "Finding indices of points of Line 2 inside Hull 1\n\n" << std::endl;
 
-            findLineInBothHullOnlyPointIndices( line2InPlane2D, line2InBothHullPointIndices, hull1Vertices );
+            findPointsInHullOnlyPointIndices( line2InPlane2D, line2InBothHullPointIndices, hull1Vertices );
 
 
             std::cout << "line1InBothHullPointIndices.size(): " << line1InBothHullPointIndices.size() << "\n" 
@@ -259,7 +291,12 @@ private:
 
 
 
-
+	/**
+	* Computes the projection of a point cloud onto a plane
+    *  
+    * @param[in] cloudIn Point cloud to project on the plane
+    * @param[out] cloudOut Point cloud resulting from the projection
+	*/
     void createCloudFromProjectionInPlane( pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloudIn,
                                                 pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOut )
     {
@@ -277,6 +314,10 @@ private:
     }
 
 
+	/**
+	* Computes two vectors and sets a reference point used to express point positions on the
+    * projection plane using only two dimensions 
+	*/
     void computeTwoVectorsAndRefPoint()
     {
 
@@ -322,7 +363,12 @@ private:
     }
 
 
-
+	/**
+	* Computes a 2D representation of points on the projection plane
+    *  
+    * @param[in] cloudIn Point cloud on the projection plane expressed in 3D
+    * @param[out] cloudOut Point cloud on the projection plane expressed in 2D
+	*/
     void createCloudInPlane2D( pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloudIn,
                             pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOut )
     {
@@ -354,7 +400,15 @@ private:
     }
 
 
-
+	/**
+	* Computes the vertices of a concave hull for points on the projection plane
+    *  
+    * @param[in] cloudIn Point cloud on the projection plane expressed in 2D
+    * @param[in] alpha Concave hull computation parameter to use
+    * @param[out] hullVertices Computed vertices of the concave hull
+    * @param[out] hullPointIndices Indices of the points in cloudIn making up the hull
+    * @param[in] keepInformation bool variable, true to specify to put the indices of the points in cloudIn in hullPointIndices
+	*/
     void computeVerticesOfConcaveHull( pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloudIn,
                                         const double alpha, 
                                         pcl::PointCloud<pcl::PointXYZ>::Ptr hullVertices,
@@ -377,8 +431,17 @@ private:
             concaveHull.getHullPointIndices( hullPointIndices );
     }
 
-
-    void findLineInBothHull( pcl::PointCloud<pcl::PointXYZ>::ConstPtr lineOriginal,
+	/**
+	* Find points that are within a concave hull. 
+    * Provides the points and their indices within the original line
+    *  
+    * @param[in] lineOriginal Point cloud of points on the line
+    * @param[in] cloudIn Point cloud on the projection plane expressed in 2D
+    * @param[out] cloudOut Point cloud of points on the line that are within the hull
+    * @param[out] indexPointInHull Indices of the points on the line that are within the hull
+    * @param[in] hullVertices Vertices of the concave hull
+	*/
+    void findPointsInHull( pcl::PointCloud<pcl::PointXYZ>::ConstPtr lineOriginal,
                                 pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloudIn, 
                                 pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOut,
                                 std::vector< uint64_t > & indexPointInHull,
@@ -399,8 +462,14 @@ private:
     }
 
 
-
-    void findLineInBothHullOnlyPointIndices( pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloudIn, 
+	/**
+	* Find indices of points that are within a concave hull. 
+    *  
+    * @param[in] cloudIn Point cloud on the projection plane expressed in 2D
+    * @param[out] indexPointInHull Indices of the points on the line that are within the hull
+    * @param[in] hullVertices Vertices of the concave hull
+	*/
+    void findPointsInHullOnlyPointIndices( pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloudIn, 
                                     std::vector< uint64_t > & indexPointInHull,
                                     pcl::PointCloud<pcl::PointXYZ>::ConstPtr hullVertices )    
     {
@@ -414,8 +483,15 @@ private:
     
     }
 
-
-    void findLineInBothHullOnlyPoints( pcl::PointCloud<pcl::PointXYZ>::ConstPtr lineOriginal,
+	/**
+	* Find points that are within a concave hull. 
+    *  
+    * @param[in] lineOriginal Point cloud of points on the line
+    * @param[in] cloudIn Point cloud on the projection plane expressed in 2D
+    * @param[out] cloudOut Point cloud of points on the line that are within the hull
+    * @param[in] hullVertices Vertices of the concave hull
+	*/
+    void findPointsInHullOnlyPoints( pcl::PointCloud<pcl::PointXYZ>::ConstPtr lineOriginal,
                                     pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloudIn, 
                                     pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOut,
                                     pcl::PointCloud<pcl::PointXYZ>::ConstPtr hullVertices )    
@@ -435,42 +511,74 @@ private:
 
 // ----------------------------- Variables ------------------------------------------------
 
-
+    /**Point cloud for line #1*/
     const pcl::PointCloud<pcl::PointXYZ>::ConstPtr line1;
+
+    /**Point cloud for line #2*/
     const pcl::PointCloud<pcl::PointXYZ>::ConstPtr line2;
 
     
-    // Projection plane defined as    ax + by + cz + d = 0;
+    /**Projection plane coefficient 'a' in ax + by + cz + d = 0*/
     const double a;
+
+    /**Projection plane coefficient 'b' in ax + by + cz + d = 0*/
     const double b; 
+
+    /**Projection plane coefficient 'c' in ax + by + cz + d = 0*/
     const double c; 
+
+    /**Projection plane coefficient 'd' in ax + by + cz + d = 0*/
     const double d;
 
+
+    /**Concave hull computation parameter to use with line #1*/
     double alphaLine1; // Alpha value to compute the concave hull for line #1
+
+    /**Concave hull computation parameter to use with line #2*/
     double alphaLine2; // Alpha value to compute the concave hull for line #2
 
+    /**Coefficients for the plane, ax + by + cz + d = 0 */
     pcl::ModelCoefficients::Ptr coefficients;
 
-
+    /**Point cloud of the projection of line #1 on the plane, expressed in 3D*/
     pcl::PointCloud<pcl::PointXYZ>::Ptr line1InPlane;
+
+    /**Point cloud of the projection of line #2 on the plane, expressed in 3D*/    
     pcl::PointCloud<pcl::PointXYZ>::Ptr line2InPlane;
 
+    /**Point cloud of the projection of line #1 on the plane, expressed in 2D*/
     pcl::PointCloud<pcl::PointXYZ>::Ptr line1InPlane2D;
+
+    /**Point cloud of the projection of line #2 on the plane, expressed in 2D*/
     pcl::PointCloud<pcl::PointXYZ>::Ptr line2InPlane2D;
 
+
+    /**Vertices of the concave hull for line #1*/
     pcl::PointCloud<pcl::PointXYZ>::Ptr hull1Vertices;
+
+    /**Vertices of the concave hull for line #2*/
     pcl::PointCloud<pcl::PointXYZ>::Ptr hull2Vertices;
 
+    /**Indices of the points in line #1 whose projection on the plane makes up its hull*/
     pcl::PointIndices hull1PointIndices;
+
+    /**Indices of the points in line #2 whose projection on the plane makes up its hull*/
     pcl::PointIndices hull2PointIndices;
 
+    /**Indices of the points in line #1 that are within both hulls*/
     std::vector< uint64_t > line1InBothHullPointIndices;
+
+    /**Indices of the points in line #2 that are within both hulls*/
     std::vector< uint64_t > line2InBothHullPointIndices;       
 
 
+    /**First computed orthonormal vector used to express points on the projection plane in 2D*/
     Eigen::Vector3d vector1;
+
+    /**Second computed orthonormal vector used to express points on the projection plane in 2D*/
     Eigen::Vector3d vector2;
 
+    /**Referenced point used to express points on the projection plane in 2D*/
     pcl::PointXYZ refPoint;
 
 };
