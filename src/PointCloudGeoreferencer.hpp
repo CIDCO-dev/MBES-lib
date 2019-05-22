@@ -45,7 +45,7 @@ public:
 	/**
 	* Inserts georeferenced ping's position at the end of a point cloud
 	*
-	* @param georeferencedPing
+	* @param ping georeferenced Ping
 	* @param quality the quality flag
 	* @param intensity the intensity flag
 	*/

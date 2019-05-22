@@ -3,7 +3,7 @@
 */
 
  /*
- * \author Christian Bouchard
+ * \author Christian Bouchard, Guillaume Labbe-Morissette
  */
 
 
