@@ -15,7 +15,7 @@ coverage_dir=build/coverage
 coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
-default:
+default: prepare pcl-viewer overlap
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
@@ -69,7 +69,17 @@ coverage: default
 	mv *.gcov $(coverage_dir)
 
 pcl-viewer: prepare
-	cd build && cmake ../src/examples/viewer/ && make && mv viewer bin/
+	rm -rf build/tempCMake
+	mkdir -p build/tempCMake
+	cd build/tempCMake && cmake ../../src/examples/viewer/ && make && mv viewer ../bin/
+	rm -rf build/tempCMake
+
+overlap: prepare
+	rm -rf build/tempCMake
+	mkdir -p build/tempCMake
+	cd build/tempCMake && cmake ../../src/examples/overlap/ && make && mv overlap ../bin/
+	rm -rf build/tempCMake
+
 
 prepare:
 	mkdir -p $(exec_dir)
