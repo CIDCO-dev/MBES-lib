@@ -15,3 +15,4 @@
 #include "TimeUtilsTest.hpp"
 #include "KongsbergTypesTest.hpp"
 #include "S7kTypesTest.hpp"
+#include "StringUtilsTest.hpp"
