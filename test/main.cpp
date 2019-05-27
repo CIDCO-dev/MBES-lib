@@ -12,3 +12,7 @@
 #include "S7kParserTest.hpp"
 #include "XtfParserTest.hpp"
 #include "BoresightTest.hpp"
+#include "TimeUtilsTest.hpp"
+#include "KongsbergTypesTest.hpp"
+#include "S7kTypesTest.hpp"
+#include "StringUtilsTest.hpp"

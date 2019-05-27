@@ -324,7 +324,7 @@ std::string S7kParser::getName(int tag)
         break;
 
         case 7010:
-            return "TVQ Values";
+            return "TVG Values";
         break;
 
         case 7011:
