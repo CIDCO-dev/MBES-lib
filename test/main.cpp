@@ -16,3 +16,4 @@
 #include "KongsbergTypesTest.hpp"
 #include "S7kTypesTest.hpp"
 #include "StringUtilsTest.hpp"
+#include "InterpolationTest.hpp"
