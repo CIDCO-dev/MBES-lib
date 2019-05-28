@@ -11,8 +11,11 @@ doc_dir=build/doc
 test_exec_dir=build/test/bin
 test_work_dir=build/test/work
 test_result_dir=build/test-report
+coverage_dir=build/coverage
+coverage_exec_dir=build/coverage/bin
+coverage_report_dir=build/coverage/report
 
-default: prepare pcl-viewer
+default:
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
@@ -33,7 +36,17 @@ test-quick: default
 	mkdir -p $(test_result_dir)
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
-	$(root)/$(test_exec_dir)/tests
+	$(root)/$(test_exec_dir)/tests || true
+
+coverage: default
+	mkdir -p $(coverage_dir)
+	mkdir -p $(coverage_report_dir)
+	mkdir -p $(coverage_exec_dir)
+	cppcheck --xml --xml-version=2 --enable=all --inconclusive --language=c++ src 2> $(coverage_report_dir)/cppcheck.xml
+	$(CC) $(OPTIONS) $(INCLUDES) -fprofile-arcs -ftest-coverage -fPIC -O0 test/main.cpp -o $(coverage_exec_dir)/tests
+	$(root)/$(coverage_exec_dir)/tests || true
+	gcovr --branches -r $(root) --xml --xml-pretty -o $(coverage_report_dir)/gcovr-report.xml
+	gcovr --branches -r $(root) --html --html-details -o $(coverage_report_dir)/gcovr-report.html
 
 doc:
 	rm -rf build/doxygen
@@ -48,12 +61,26 @@ clean:
 
 datagram-list: default
 	./build/bin/datagram-list test/data/s7k/20141016_150519_FJ-Saucier.s7k|sort|uniq -c
+	
+coverage: default
+	mkdir -p $(coverage_dir)
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/testC -fprofile-arcs -ftest-coverage test/main.cpp
+	gcov main.gcno
+	mv *.gcov $(coverage_dir)
 
 pcl-viewer: prepare
-	cd build && cmake ../src/examples/viewer/ && make && mv viewer bin/
+	rm -rf build/tempCMake
+	mkdir -p build/tempCMake
+	cd build/tempCMake && cmake ../../src/examples/viewer/ && make && mv viewer ../bin/
+	rm -rf build/tempCMake
+
+overlap: prepare
+	rm -rf build/tempCMake
+	mkdir -p build/tempCMake
+	cd build/tempCMake && cmake ../../src/examples/overlap/ && make && mv overlap ../bin/
+	rm -rf build/tempCMake
+
 
 prepare:
 	mkdir -p $(exec_dir)
-
-
 .PHONY: all test clean doc
