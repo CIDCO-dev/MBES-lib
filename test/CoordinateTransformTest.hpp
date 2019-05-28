@@ -175,8 +175,18 @@ TEST_CASE("Conversion between spherical to cartesian"){
 /**Test if the conversion between sonar to cartesian works*/
 TEST_CASE("Conversion between sonar to cartesian"){
     Eigen::Vector3d v;
-
-    REQUIRE(1==2); //TODO FIXME: implementation is dead wrong
+    CoordinateTransform::sonar2cartesian(v,90,0,1);
+    REQUIRE(std::abs(v(0)-1)<1e-10);
+    REQUIRE(std::abs(v(1)-0)<1e-10);
+    REQUIRE(std::abs(v(2)-0)<1e-10);
+    CoordinateTransform::sonar2cartesian(v,0,90,1);
+    REQUIRE(std::abs(v(0)-0)<1e-10);
+    REQUIRE(std::abs(v(1)-1)<1e-10);
+    REQUIRE(std::abs(v(2)-0)<1e-10);
+    CoordinateTransform::sonar2cartesian(v,0,0,1);
+    REQUIRE(std::abs(v(0)-0)<1e-10);
+    REQUIRE(std::abs(v(1)-0)<1e-10);
+    REQUIRE(std::abs(v(2)-1)<1e-10);
 }
 
 /**Test if the conversion between NED to ECEF position works*/
