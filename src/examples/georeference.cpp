@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 #include <fstream>
 
@@ -46,135 +47,135 @@ int main (int argc , char ** argv){
 #ifdef _WIN32
 	putenv("TZ");
 #endif
-if(argc < 2)
-{
-    printUsage();
-}
-else
-{
-    std::string fileName(argv[argc-1]);
-
-    //Lever arm
-    double leverArmX = 0.0;
-    double leverArmY = 0.0;
-    double leverArmZ = 0.0;
-
-    //Boresight
-    double roll     = 0.0;
-    double pitch    = 0.0;
-    double heading  = 0.0;
-
-    //Georeference method
-    Georeferencing * georef;
-
-    int index;
-
-    while((index=getopt(argc,argv,"x:y:z:r:p:h:LT"))!=-1)
+    if(argc < 2)
     {
-        switch(index)
+        printUsage();
+    }
+    else
+    {
+        std::string fileName(argv[argc-1]);
+
+        //Lever arm
+        double leverArmX = 0.0;
+        double leverArmY = 0.0;
+        double leverArmZ = 0.0;
+
+        //Boresight
+        double roll     = 0.0;
+        double pitch    = 0.0;
+        double heading  = 0.0;
+
+        //Georeference method
+        Georeferencing * georef;
+
+        int index;
+
+        while((index=getopt(argc,argv,"x:y:z:r:p:h:LT"))!=-1)
         {
-            case 'x':
-                if(sscanf(optarg,"%lf", &leverArmX) != 1)
-                {
-                    std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
-                    printUsage();
-                }
-           break;
+            switch(index)
+            {
+                case 'x':
+                    if(sscanf(optarg,"%lf", &leverArmX) != 1)
+                    {
+                        std::cerr << "Invalid lever arm X offset (-x)" << std::endl;
+                        printUsage();
+                    }
+               break;
 
-            case 'y':
-                if (sscanf(optarg,"%lf", &leverArmY) != 1)
-                {
-                    std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
-                    printUsage();
-                }
-            break;
+                case 'y':
+                    if (sscanf(optarg,"%lf", &leverArmY) != 1)
+                    {
+                        std::cerr << "Invalid lever arm Y offset (-y)" << std::endl;
+                        printUsage();
+                    }
+                break;
 
-            case 'z':
-                if (sscanf(optarg,"%lf", &leverArmZ) != 1)
-                {
-                    std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
-                    printUsage();
-                }
-            break;
-            
-            case 'r':
-                if (sscanf(optarg,"%lf", &roll) != 1)
-                {
-                    std::cerr << "Invalid roll angle offset (-p)" << std::endl;
-                    printUsage();
-                }
-            break;
-            
-            case 'h':
-                if (sscanf(optarg,"%lf", &heading) != 1)
-                {
-                    std::cerr << "Invalid heading angle offset (-P)" << std::endl;
-                    printUsage();
-                }
-            break;
-            
-            case 'p':
-                if (sscanf(optarg,"%lf", &pitch) != 1)
-                {
-                    std::cerr << "Invalid pitch angle offset (-t)" << std::endl;
-                    printUsage();
-                }
-            break;
+                case 'z':
+                    if (sscanf(optarg,"%lf", &leverArmZ) != 1)
+                    {
+                        std::cerr << "Invalid lever arm Z offset (-z)" << std::endl;
+                        printUsage();
+                    }
+                break;
 
-            case 'L':
-		georef = new GeoreferencingLGF();
-            break;
+                case 'r':
+                    if (sscanf(optarg,"%lf", &roll) != 1)
+                    {
+                        std::cerr << "Invalid roll angle offset (-p)" << std::endl;
+                        printUsage();
+                    }
+                break;
 
-            case 'T':
-		georef = new GeoreferencingTRF();
-            break;
+                case 'h':
+                    if (sscanf(optarg,"%lf", &heading) != 1)
+                    {
+                        std::cerr << "Invalid heading angle offset (-P)" << std::endl;
+                        printUsage();
+                    }
+                break;
+
+                case 'p':
+                    if (sscanf(optarg,"%lf", &pitch) != 1)
+                    {
+                        std::cerr << "Invalid pitch angle offset (-t)" << std::endl;
+                        printUsage();
+                    }
+                break;
+
+                case 'L':
+                    georef = new GeoreferencingLGF();
+                break;
+
+                case 'T':
+                    georef = new GeoreferencingTRF();
+                break;
+            }
         }
-    }
 
-    if(georef == NULL){
-	std::cerr << "No georeferencing method defined (-L or -T)" << std::endl;
-	printUsage();
-    }
-
-    try
-    {
-	DatagramParser * parser = NULL;
-	DatagramGeoreferencer  printer(*georef);
-
-	std::cerr << "[+] Decoding " << fileName << std::endl;
-        std::ifstream inFile;
-        inFile.open(fileName);
-        if (inFile){
-		parser = DatagramParserFactory::build(fileName,printer);
+        if(georef == NULL){
+            std::cerr << "No georeferencing method defined (-L or -T)" << std::endl;
+            printUsage();
         }
-        else
+
+        try
         {
-            throw new Exception("File not found");
+            DatagramParser * parser = NULL;
+            DatagramGeoreferencer  printer(*georef);
+
+            std::cerr << "[+] Decoding " << fileName << std::endl;
+            std::ifstream inFile;
+            inFile.open(fileName);
+            if (inFile){
+                    parser = DatagramParserFactory::build(fileName,printer);
+            }
+            else
+            {
+                throw new Exception("File not found");
+            }
+            parser->parse(fileName);
+            std::cout << std::setprecision(6);
+            std::cout << std::fixed;
+
+            //Lever arm
+            Eigen::Vector3d leverArm;
+            leverArm << leverArmX,leverArmY,leverArmZ;
+
+            //Boresight
+            Attitude boresightAngles(0,roll,pitch,heading);
+            Eigen::Matrix3d boresight;
+            Boresight::buildMatrix(boresight,boresightAngles);
+
+            //Do the georeference dance
+            //TODO: get SVP file from CLI
+            printer.georeference(leverArm,boresight,NULL);
+
+            delete parser;
         }
-        parser->parse(fileName);
-	std::cout << std::setprecision(6);
-	std::cout << std::fixed;
-
-	//Lever arm
-	Eigen::Vector3d leverArm;
-	leverArm << leverArmX,leverArmY,leverArmZ;
-
-	//Boresight
-	Attitude boresightAngles(0,roll,pitch,heading);
-	Eigen::Matrix3d boresight;
-	Boresight::buildMatrix(boresight,boresightAngles);
-
-	//Do the georeference dance
-	//TODO: get SVP file from CLI
-        printer.georeference(leverArm,boresight,NULL);
-
-	delete parser;
+        catch(Exception * error)
+        {
+            std::cerr << "[-] Error while parsing " << fileName << ": " << error->getMessage() << std::endl;
+        }
     }
-    catch(Exception * error)
-    {
-	std::cerr << "[-] Error while parsing " << fileName << ": " << error->getMessage() << std::endl;
-    }
-}
 }
 
 #endif

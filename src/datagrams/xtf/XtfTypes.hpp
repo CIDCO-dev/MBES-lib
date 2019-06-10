@@ -1,11 +1,13 @@
+/*
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
+
 #ifndef XTFTYPES_HPP
 #define XTFTYPES_HPP
 /**
  *  Description des datagrammes pour le format XTF
  *  Référence: Triton Imaging, Inc. eXtended Triton Format (XTF) Rev. 40 (9/22/2015)
  *  Auteurs: Jérémy Viau Trudel,Guillaume Morissette
- *
- *  Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
 

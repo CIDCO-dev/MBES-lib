@@ -1,3 +1,7 @@
+/*
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
+
 #ifndef DATAGRAMGEOREFERENCER_HPP
 #define DATAGRAMGEOREFERENCER_HPP
 #include "Ping.hpp"
@@ -10,8 +14,11 @@
 #include "math/Interpolation.hpp"
 
 /*!
- * \brief Datagramer Georeferencer class extention of the Datagram Processor class
- */
+* \brief Datagram Georeferencer class.
+* \author Guillaume Labbe-Morissette, Jordan McManus, Emile Gagne
+*
+* Extention of the DatagramEventHandler class
+*/
 class DatagramGeoreferencer : public DatagramEventHandler{
         public:
                 /**Create a datagram georeferencer*/
@@ -213,8 +220,8 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                 /**vector of attitudes*/
                 std::vector<Attitude>                   attitudes;
 
-                /**vector of sound velocity profiles*/
-                std::vector<SoundVelocityProfile*>      svps;
+  /**Vector of SoundVelocityProfile*/
+  std::vector<SoundVelocityProfile*>      svps;
 };
 
 #endif

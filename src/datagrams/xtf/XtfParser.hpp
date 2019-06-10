@@ -1,3 +1,7 @@
+/*
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
+
 #ifndef XTFPARSER_HPP
 #define XTFPARSER_HPP
 
@@ -23,68 +27,70 @@
  * Warning: this code runs on little-endian machines. It has not been shielded for variations in endianness, especially when big-endian datagrams are handled.
  */
 
+
 /*!
  * \brief XTF parser class extention datagram parser
+ * \author Guillaume Morissette
  */
 class XtfParser : public DatagramParser{
 	public:
 
                 /**
-                 * Create an XTF parser 
-                 * 
+                 * Create an XTF parser
+                 *
                  * @param processor the datagram processor
                  */
 		XtfParser(DatagramEventHandler & processor);
-                
+
                 /**Destroy the XTF parser*/
 		~XtfParser();
 
                 /**
                  * Parse an XTF file
-                 * 
+                 *
                  * @param filename name of the file to read
                  */
 		void parse(std::string & filename);
-                
+
                 std::string getName(int tag);
-                
+
                 /**Return the number channels in the file*/
 		int getTotalNumberOfChannels();
 
 	protected:
-                
+
                 /**
                  * Process the contents of the XtfPacketHeader
-                 * 
+                 *
                  * @param hdr the XTF PacketHeader
                  */
 		void processPacketHeader(XtfPacketHeader & hdr);
-                
+
                 /**
                  * Dispatch processing to the appropriate callback depending on the content of the XTF Packet header
-                 * 
-                 * @param hdr the XTF Packet Header 
+                 *
+                 * @param hdr the XTF Packet Header
                  * @param packet the packet
                  */
 		void processPacket(XtfPacketHeader & hdr,unsigned char * packet);
-                
+
                 /**
                  * Process the contents of the PingHeader
-                 * 
+                 *
                  * @param hdr the XTF PingHeader
                  */
 	        void processPingHeader(XtfPingHeader & hdr);
-                
+
                 /**
                  * Process the contents of the FileHeader
-                 * 
+                 *
                  * @param hdr the XTF FileHeader
                  */
 	        void processFileHeader(XtfFileHeader & hdr);
-                
+
                 /**
                  * Process the contents of the file ChanInfo
-                 * 
+                 *
                  * @param c the XTF ChanInfo
                  */
 	        void processChanInfo(XtfChanInfo & c);
@@ -99,8 +105,8 @@ class XtfParser : public DatagramParser{
 };
 
 /**
- * Create an XTF parser 
- * 
+ * Create an XTF parser
+ *
  * @param processor the datagram processor
  */
 XtfParser::XtfParser(DatagramEventHandler & processor):DatagramParser(processor){
@@ -114,7 +120,7 @@ XtfParser::~XtfParser(){
 
 /**
  * Read a file and change the XTF parser depending on the information
- * 
+ *
  * @param filename name of the file to read
  */
 void XtfParser::parse(std::string & filename){
@@ -225,203 +231,207 @@ std::string XtfParser::getName(int tag)
         case 0:
             return "XTF_HEADER_SONAR";
         break;
-        
+
         case 1:
             return "XTF_HEADER_NOTES";
         break;
-        
+
         case 2:
             return "XTF_HEADER_BATHY";
         break;
-        
+
         case 3:
             return "XTF_HEADER_ATTITUDE";
         break;
-        
+
         case 4:
             return "XTF_HEADER_FORWARD";
         break;
-        
+
         case 5:
             return "XTF_HEADER_ELAC";
         break;
-        
+
         case 6:
             return "XTF_HEADER_RAW_SERIAL";
         break;
-        
+
         case 7:
             return "XTF_HEADER_EMBED_HEAD";
         break;
-        
+
         case 8:
             return "XTF_HEADER_HIDDEN_SONAR";
         break;
-        
+
         case 9:
             return "XTF_HEADER_SEAVIEW_PROCESSED_BATHY";
         break;
-        
+
         case 10:
             return "XTF_HEADER_SEAVIEW_DEPTHS";
         break;
-        
+
         case 11:
             return "XTF_HEADER_RSVD_HIGHSPEED_SENSOR";
         break;
-        
+
         case 12:
             return "XTF_HEADER_ECHOSTRENGTH";
         break;
-        
+
         case 13:
             return "XTF_HEADER_GEOREC";
         break;
-        
+
         case 14:
             return "XTF_HEADER_KLEIN_RAW_BATHY";
         break;
-        
+
         case 15:
             return "XTF_HEADER_HIGHSPEED_SENSOR2";
         break;
-        
+
         case 16:
             return "XTF_HEADER_ELAC_XSE";
         break;
-        
+
         case 17:
             return "XTF_HEADER_BATHY_XYZA";
         break;
-        
+
         case 18:
             return "XTF_HEADER_K5000_BATHY_IQ";
         break;
-        
+
         case 19:
             return "XTF_HEADER_BATHY_SNIPPET";
         break;
-        
+
         case 20:
             return "XTF_HEADER_GPS";
         break;
-        
+
         case 21:
             return "XTF_HEADER_STAT";
         break;
-        
+
         case 22:
             return "XTF_HEADER_SINGLEBEAM";
         break;
-        
+
         case 23:
             return "XTF_HEADER_GYRO";
         break;
-        
+
         case 24:
             return "XTF_HEADER_TRACKPOINT";
         break;
-        
+
         case 25:
             return "XTF_HEADER_MULTIBEAM";
         break;
-        
+
         case 26:
             return "XTF_HEADER_Q_SINGLEBEAM";
         break;
-        
+
         case 27:
             return "XTF_HEADER_Q_MULTITX";
         break;
-        
+
         case 28:
             return "XTF_HEADER_Q_MULTIBEAM";
         break;
-        
+
         case 50:
             return "XTF_HEADER_TIME";
         break;
-        
+
         case 60:
             return "XTF_HEADER_BENTHOS_CAATI_SARA";
         break;
-        
+
         case 61:
             return "XTF_HEADER_7125";
         break;
-        
+
         case 62:
             return "XTF_HEADER_7125_SNIPPET";
         break;
-        
+
         case 65:
             return "XTF_HEADER_QINSY_R2SONIC_BATHY";
         break;
-        
+
         case 66:
             return "XTF_HEADER_QINSY_R2SONIC_FTS";
         break;
-        
+
         case 68:
             return "XTF_HEADER_R2SONIC_BATHY";
         break;
-        
+
         case 69:
             return "XTF_HEADER_R2SONIC_FTS";
         break;
-        
+
         case 70:
             return "XTF_HEADER_CODA_ECHOSCOPE_DATA";
         break;
-        
+
         case 71:
             return "XTF_HEADER_CODA_ECHOSCOPE_CONFIG";
         break;
-        
+
         case 72:
             return "XTF_HEADER_CODA_ECHOSCOPE_IMAGE";
         break;
-        
+
         case 73:
             return "XTF_HEADER_EDGETECH_4600";
         break;
-        
+
         case 78:
             return "XTF_HEADER_RESON_7018_WATERCOLUMN";
         break;
-        
+
         case 100:
             return "XTF_HEADER_POSITION";
         break;
-        
+
         case 102:
             return "XTF_HEADER_BATHY_PROC";
         break;
-        
+
         case 103:
             return "XTF_HEADER_ATTITUDE_PROC";
         break;
-        
+
         case 104:
             return "XTF_HEADER_SINGLEBEAM_PROC";
         break;
-        
+
         case 105:
             return "XTF_HEADER_AUX_PROC";
+        break;
+        
+        case 106:
+            return "XTF_HEADER_KLEIN3000_DATA_PAGE";
         break;
         
         case 107:
             return "XTF_HEADER_POS_RAW_NAVIGATION";
         break;
-        
+
         case 108:
             return "XTF_HEADER_KLEINV4_DATA_PAGE";
         break;
-        
+
         case 200:
             return "XTF_HEADER_USERDEFINED";
         break;
-        
+
         default:
             return "Invalid tag";
 	break;
@@ -439,7 +449,7 @@ int XtfParser::getTotalNumberOfChannels(){
 
 /**
  * show the contain of the file FileHeader
- * 
+ *
  * @param f the XTF FileHeader
  */
 void XtfParser::processFileHeader(XtfFileHeader & f){
@@ -490,7 +500,7 @@ void XtfParser::processFileHeader(XtfFileHeader & f){
 
 /**
  * show the contain of the file ChanInfo
- * 
+ *
  * @param c the XTF ChanInfo
  */
 void XtfParser::processChanInfo(XtfChanInfo & c){
@@ -522,7 +532,7 @@ void XtfParser::processChanInfo(XtfChanInfo & c){
 
 /**
  * show the contain of the file PacketHeader
- * 
+ *
  * @param hdr the XTF PacketHeader
  */
 void XtfParser::processPacketHeader(XtfPacketHeader & hdr){
@@ -540,7 +550,7 @@ void XtfParser::processPacketHeader(XtfPacketHeader & hdr){
 
 /**
  * show the contain of the file PingHeader
- * 
+ *
  * @param hdr the XTF PingHeader
  */
 void XtfParser::processPingHeader(XtfPingHeader & hdr){
@@ -549,8 +559,8 @@ void XtfParser::processPingHeader(XtfPingHeader & hdr){
 
 /**
  * Set the processor depending by the content of the XTF Packet header
- * 
- * @param hdr the XTF Packet Header 
+ *
+ * @param hdr the XTF Packet Header
  * @param packet the packet
  */
 void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){

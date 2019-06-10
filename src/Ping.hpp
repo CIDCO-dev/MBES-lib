@@ -1,13 +1,6 @@
 /*
- * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
- */
-
-/*
- * File:   Ping.hpp
- * Author: glm,jordan, emilegagne
- *
- * Created on September 14, 2018, 10:10 AM
- */
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 
 #ifndef PING_HPP
 #define PING_HPP
@@ -18,48 +11,50 @@
 #include "Position.hpp"
 
 /*!
- * \brief Ping class
- */
+* \brief Ping class
+* \author Guillaume Labbe-Morissette, Jordan McManus, Emile Gagne
+* \date September 14, 2018, 10:10 AM
+*/
 class Ping {
 private:
-    
-    /**Time value calculated since January 1970 (micro-second)*/
-    uint64_t timestamp; //in microseconds since epoch
-    
-    /**Value of the identification of the ping*/
-    uint64_t id;
-    
-    /**Value of the quality of the ping*/
-    uint32_t quality;
-    
-    /**Value of the intensity of the ping*/
-    int32_t intensity;
 
-    /**The sound speed value of the surface*/
-    double surfaceSoundSpeed;
-    
-    /**Time value of transition between two points (micro-second)*/
-    double twoWayTravelTime;
-    
-    /**Value of the angle who pass along the track (degrees)*/
-    double alongTrackAngle;  // In degrees, AKA emission angle, alpha, kappa or tilt angle
-    
-    /**Value of the angle who pass across the track (degrees)*/
-    double acrossTrackAngle; // In degrees, AKA reception angle, beta, zeta, beam angle
+  /**Time value calculated since January 1970 (micro-second)*/
+  uint64_t timestamp; //in microseconds since epoch
+
+  /**Value of the identification of the ping*/
+  uint64_t id;
+
+  /**Value of the quality of the ping*/
+  uint32_t quality;
+
+  /**Value of the intensity of the ping*/
+  int32_t intensity;
+
+  /**The sound speed value of the surface*/
+  double surfaceSoundSpeed;
+
+  /**Time value of transition between two points (micro-second)*/
+  double twoWayTravelTime;
+
+  /**Value of the angle that passes along the track (degrees)*/
+  double alongTrackAngle;  // In degrees, AKA emission angle, alpha, kappa or tilt angle
+
+  /**Value of the angle that passes across the track (degrees)*/
+  double acrossTrackAngle; // In degrees, AKA reception angle, beta, zeta, beam angle
 
 
-    /*Trigonometry is stored to prevent redundant recalculations*/
-    /**Sine value of the along track angle*/
-    double sA;
-    
-    /**Cosine value of the along track angle*/
-    double cA;
+  /*Trigonometry is stored to prevent redundant recalculations*/
+  /**Sine value of the along track angle*/
+  double sA;
 
-    /**Sine value of the across track angle*/
-    double sB;
-    
-    /**Cosine value of the across track angle*/
-    double cB;
+  /**Cosine value of the along track angle*/
+  double cA;
+
+  /**Sine value of the across track angle*/
+  double sB;
+
+  /**Cosine value of the across track angle*/
+  double cB;
 
 
 public:
@@ -214,4 +209,3 @@ public:
 
 
 #endif /* PING_HPP */
-
