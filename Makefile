@@ -15,7 +15,7 @@ coverage_dir=build/coverage
 coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
-default:
+default: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp

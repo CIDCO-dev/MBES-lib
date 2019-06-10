@@ -686,8 +686,9 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
                 float    scalingFactor = *((float*)&scale);
                 uint32_t sum           = 0;
                 
+                //FIXME: this yields large angles 
                 for(unsigned int i=0;i<nbBeams;i++){
-                    sum += ((uint16_t*)&a2->AngleStepArray)[i];
+                    sum += htons(((uint16_t*)&(a2->AngleStepArray))[i]);
                     float angle = ( angleFirst + sum * scalingFactor ) * R2D;
                     printf("Beam angle: %.4f\n",angle);
                     pings[i].setAcrossTrackAngle(angle);
@@ -695,22 +696,24 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
                 
             }
             else if(sectionName==0x4931){
+                //TODO: process backscatter data
                 //I1
-                XtfHeaderQuinsyR2SonicBathy_I1 * i1 = (XtfHeaderQuinsyR2SonicBathy_I1*) (packet + packetIndex);
+                //XtfHeaderQuinsyR2SonicBathy_I1 * i1 = (XtfHeaderQuinsyR2SonicBathy_I1*) (packet + packetIndex);
             }
             else if(sectionName==0x4730){                    
                 //G0
-                XtfHeaderQuinsyR2SonicBathy_G0 * g0 = (XtfHeaderQuinsyR2SonicBathy_G0*) (packet + packetIndex);
+                //XtfHeaderQuinsyR2SonicBathy_G0 * g0 = (XtfHeaderQuinsyR2SonicBathy_G0*) (packet + packetIndex);
                 //TODO: process depth gates settings?
             }
             else if(sectionName==0x4731){            
                 //G1
-                XtfHeaderQuinsyR2SonicBathy_G1 * g1 = (XtfHeaderQuinsyR2SonicBathy_G1*) (packet + packetIndex);
+                //XtfHeaderQuinsyR2SonicBathy_G1 * g1 = (XtfHeaderQuinsyR2SonicBathy_G1*) (packet + packetIndex);
                 //TODO: process depth gates settings?
             }
             else if(sectionName==0x5130){
+                //TODO: process quality data
                 //Q0
-                XtfHeaderQuinsyR2SonicBathy_Q0 * q0 = (XtfHeaderQuinsyR2SonicBathy_Q0*) (packet + packetIndex);
+                //XtfHeaderQuinsyR2SonicBathy_Q0 * q0 = (XtfHeaderQuinsyR2SonicBathy_Q0*) (packet + packetIndex);
             }
             else if(sectionName==0x5230){
                 //R0

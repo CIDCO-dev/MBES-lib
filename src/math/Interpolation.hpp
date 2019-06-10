@@ -115,30 +115,11 @@ public:
       return psi1;
     }
 
-    /**
-     * Return the linear interpolation between two angle
-     * 
-     * @param psi1 first angle
-     * @param psi2 second angle
-     * @param t number of microsecond since 1st January 1970
-     * @param t1 timestamp link to psi1
-     * @param t2 timestamp link to psi2 
-     */
-    static double linearAngleInterpolation(double psi1, double psi2, uint64_t t, uint64_t t1, uint64_t t2) {
-
-        /*if (psi1 < 0 || psi1 >= 360 || psi2 < 0 || psi2 >= 360) {
-            std::string error("Angles need to be between 0 (inclusive) and 360 (exclusive) degrees");
-            printf("%.6f  %.6f\n",psi1,psi2);
-            throw new Exception( error );
-        }*/
-
-        if (psi1 == psi2) {
-            return psi1;
-        }
-
-        double delta = (t - t1) / (t2 - t1);
-        double dpsi = std::fmod((std::fmod(psi2 - psi1, 360) + 540), 360) - 180;
-        double interpolation = psi1 + dpsi*delta;
+    double x1 = t-t1;
+    double x2 = t2-t1;
+    double delta = (x1 / x2);
+    double dpsi = std::fmod((std::fmod(psi2 - psi1, 360) + 540), 360) - 180;
+    double interpolation = psi1 + dpsi*delta;
 
     if (multiAnswer)
     {
@@ -151,6 +132,13 @@ public:
     }
 
     double moduloInterpolation = std::fmod(interpolation, 360);
+
+    if(moduloInterpolation < 0) {
+       return moduloInterpolation + 360;
+    }
+    
+    return moduloInterpolation;
+  }
 
 
 };

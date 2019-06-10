@@ -1,13 +1,10 @@
-<<<<<<< HEAD
-
-#include <fstream>
-
 /*
  *  Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 #ifndef GEOREFERENCE_CPP
 #define GEOREFERENCE_CPP
 
+#include <fstream>
 #include <Eigen/Dense>
 #include "../DatagramGeoreferencer.hpp"
 #include "../datagrams/DatagramParserFactory.hpp"
