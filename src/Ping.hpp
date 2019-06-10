@@ -100,6 +100,10 @@ public:
     sB(sin(acrossTrackAngle*D2R)),
     cB(cos(acrossTrackAngle*D2R)){
     }
+    
+    Ping(long id):id(id){
+        
+    }
 
     /** Destroy the ping*/
     ~Ping() {
@@ -110,10 +114,22 @@ public:
     double getAcrossTrackAngle() {
         return acrossTrackAngle;
     }
+    
+    void setAcrossTrackAngle(double acrossAngle){
+        acrossTrackAngle = acrossAngle;
+        sB = sin(acrossAngle*D2R);
+        cB = cos(acrossAngle*D2R);
+    }
 
     /**Return the along track angle*/
     double getAlongTrackAngle() {
         return alongTrackAngle;
+    }
+    
+    void setAlongTrackAngle(double alongAngle){
+        alongTrackAngle = alongAngle;
+        sA = sin(alongAngle*D2R);
+        cA = cos(alongAngle*D2R);
     }
 
     /**Return the cosine value of the along track angle*/
@@ -127,7 +143,7 @@ public:
     }
 
     /**Return the timestamp of the ping*/
-    double getTimestamp() {
+    uint64_t getTimestamp() {
         return timestamp;
     }
 
@@ -145,18 +161,49 @@ public:
     double getSurfaceSoundSpeed(){
 	return surfaceSoundSpeed;
     }
+    
+    /**
+     * Set the surface sound speed
+     * @param sss Surface Sound Speed
+     */
+    void setSurfaceSoundSpeed(double sss){
+        surfaceSoundSpeed = sss;
+    }
 
     /**Return the time value of the transition between two points*/
     double getTwoWayTravelTime() {
         return twoWayTravelTime;
     }
+    
+    /**
+     * Set the two-way travel time
+     * @param twtt
+     */
+    void setTwoWayTravelTime(double twtt){
+        twoWayTravelTime = twtt;
+    }
 
     /**Return the quality of the ping*/
     uint32_t getQuality() { return quality;}
 
+    /**
+     * Set the quality factor
+     * @param quality
+     */
+    void setQuality(uint32_t quality){
+        quality=quality;
+    }
+    
     /**Return the intensity of the ping*/
     uint32_t getIntensity() { return intensity;}
 
+    /**
+     * Set the backscatter intensity
+     * @param intensity
+     */
+    void getIntensity(uint32_t intensity){
+        
+    }
 
     static bool sortByTimestamp(Ping & p1,Ping & p2){
         return p1.getTimestamp() < p2.getTimestamp(); 

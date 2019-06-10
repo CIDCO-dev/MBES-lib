@@ -141,7 +141,7 @@ else
 	DatagramParser * parser = NULL;
 	DatagramGeoreferencer  printer(*georef);
 
-	std::cerr << "Decoding " << fileName << std::endl;
+	std::cerr << "[+] Decoding " << fileName << std::endl;
         std::ifstream inFile;
         inFile.open(fileName);
         if (inFile){
@@ -172,7 +172,7 @@ else
     }
     catch(Exception * error)
     {
-	std::cerr << "Error while parsing " << fileName << ": " << error->getMessage() << std::endl;
+	std::cerr << "[-] Error while parsing " << fileName << ": " << error->getMessage() << std::endl;
     }
 }
 }

@@ -132,10 +132,9 @@ public:
      * Sets centroid and inits ECEF 2 NED matrix
      */
     void setCentroid(Position & c){
-	this->centroid.setTimestamp(c.getTimestamp());
-	this->centroid.setLongitude(c.getLongitude());
-	this->centroid.setLatitude(c.getLatitude());
-	this->centroid.setEllipsoidalHeight(c.getEllipsoidalHeight());
+	if(this->centroid) delete centroid;
+
+	this->centroid=new Position(c.getTimestamp(), c.getLatitude(), c.getLongitude(), c.getEllipsoidalHeight());
 
 	CoordinateTransform::ned2ecef(ecef2ned,*this->centroid);
         ecef2ned.transposeInPlace();
@@ -145,10 +144,10 @@ public:
     *  Get a pointer to the centroid
     */
 
-    Position & getCentroid(){ return centroid;};
+    Position * getCentroid(){ return centroid;};
 
 private:
-	Position centroid(0,0,0,0); //in geographic coordinates
+	Position * centroid = NULL; //in geographic coordinates
 	Eigen::Matrix3d ecef2ned;
 };
 

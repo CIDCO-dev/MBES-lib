@@ -100,18 +100,18 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                         else if(svps.size() == 1){
 				//else if we have an SVP inside the sonar file, use that
 	                        svp = svps[0];
-				std::cerr << "Using SVP from sonar file" << std::endl;
+				std::cerr << "[+] Using SVP from sonar file" << std::endl;
                         }
                         else{
 	                        if(svps.size() > 0){
         	                        //TODO: use a strategy (nearest by time, nearest by location, etc)
-                                        std::cerr << "Multiple SVP mode not yet implemented" << std::endl;
+                                        std::cerr << "[-] Multiple SVP mode not yet implemented" << std::endl;
                                         exit(1);
                                 }
                                 else{
                 	                //Else use default model
                                         svp = SoundVelocityProfileFactory::buildSaltWaterModel();
-                                        std::cerr << "Using default SVP model" << std::endl;
+                                        std::cerr << "[+] Using default SVP model" << std::endl;
                                 }
                         }
 
@@ -126,7 +126,9 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
 					centroid.getVector() /= (double)positions.size();
 
-					lgf->setCentroid(&centroid);
+					lgf->setCentroid(centroid);
+
+					std::cerr << "[+] Centroid: " << centroid << std::endl;
 				}
 			}
 
@@ -135,16 +137,24 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 			std::sort(attitudes.begin(),attitudes.begin(),&Attitude::sortByTimestamp);
 			std::sort(pings.begin(),pings.end(),&Ping::sortByTimestamp);
 
+                        fprintf(stderr,"[+] Position data points: %lu [%lu to %lu]\n",positions.size(),positions[0].getTimestamp(),positions[positions.size()-1].getTimestamp());
+                        fprintf(stderr,"[+] Attitude data points: %lu [%lu to %lu]\n",attitudes.size(),attitudes[0].getTimestamp(),attitudes[attitudes.size()-1].getTimestamp());
+                        fprintf(stderr,"[+] Ping data points: %lu [%lu to %lu]\n",pings.size(),pings[0].getTimestamp(),pings[pings.size()-1].getTimestamp());
+                        
+                        
+
+                        
 			//Georef pings
                         for(auto i=pings.begin();i!=pings.end();i++){
 
-
+                            
                                 while(attitudeIndex + 1 < attitudes.size() && attitudes[attitudeIndex + 1].getTimestamp() < (*i).getTimestamp()){
                                         attitudeIndex++;
                                 }
 
 				//No more attitudes available
                                 if(attitudeIndex >= attitudes.size() - 1){
+                                        //std::cerr << "No more attitudes" << std::endl;
                                         break;
                                 }
 
@@ -154,6 +164,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
 				//No more positions available
                                 if( positionIndex >= positions.size() - 1){
+                                        //std::cerr << "No more positions" << std::endl;
                                         break;
                                 }
 
