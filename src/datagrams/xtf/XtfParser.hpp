@@ -648,15 +648,16 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
             printf("%c%c (%u bytes)\n",((char*)&sectionName)[1],((char*)&sectionName)[0],sectionBytes);
 
             if(sectionName==0x4830){ 
-                //H0
+                //H0 - Main header
                 XtfHeaderQuinsyR2SonicBathy_H0 * h0 = (XtfHeaderQuinsyR2SonicBathy_H0*) (packet + packetIndex);
                 nbBeams = htons(h0->Points);
-                //epochSeconds = ...;
-                //epochNanoseconds = ...;
-
+                uint64_t microEpoch = htonl(h0->TimeSeconds)*1000000 + htonl(h0->TimeNanoseconds)/1000;
+                
                 //Init ping array
                 for(unsigned int i=0;i<nbBeams;i++){
-                    pings.push_back(Ping(i));
+                    Ping p(i);
+                    p.setTimestamp(microEpoch);
+                    pings.push_back(p);
                 }
 
                 //surfaceSoundSpeed = htonl( * ((uint32_t*) & h0->SoundSpeed));
@@ -686,11 +687,9 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
                 float    scalingFactor = *((float*)&scale);
                 uint32_t sum           = 0;
                 
-                //FIXME: this yields large angles 
                 for(unsigned int i=0;i<nbBeams;i++){
                     sum += htons(((uint16_t*)&(a2->AngleStepArray))[i]);
                     float angle = ( angleFirst + sum * scalingFactor ) * R2D;
-                    printf("Beam angle: %.4f\n",angle);
                     pings[i].setAcrossTrackAngle(angle);
                 }
                 

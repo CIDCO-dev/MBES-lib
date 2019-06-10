@@ -142,6 +142,11 @@ public:
         return timestamp;
     }
 
+    /**Return the timestamp of the ping*/
+    void setTimestamp(uint64_t t) {
+        timestamp = t;
+    }    
+    
     /**Return the sine value of the along track angle*/
     double getSA(){
 	return sA;
