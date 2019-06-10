@@ -6,7 +6,7 @@
 
 #include <fstream>
 #include <Eigen/Dense>
-#include "../DatagramGeoreferencer.hpp"
+#include "../georeferencing/DatagramGeoreferencer.hpp"
 #include "../datagrams/DatagramParserFactory.hpp"
 #include <iostream>
 #include <string>

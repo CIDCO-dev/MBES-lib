@@ -147,6 +147,22 @@ public:
         timestamp = t;
     }    
     
+    /**
+     * Returns the ID
+     * @return ID
+     */
+    long getId(){
+        return id;
+    }
+    
+    /**
+     * Sets the ID
+     */
+    void setId(long id){
+        id=id;
+    }
+    
+    
     /**Return the sine value of the along track angle*/
     double getSA(){
 	return sA;
@@ -201,8 +217,8 @@ public:
      * Set the backscatter intensity
      * @param intensity
      */
-    void getIntensity(uint32_t intensity){
-        
+    void setIntensity(uint32_t intensity){
+        intensity=intensity;
     }
 
     static bool sortByTimestamp(Ping & p1,Ping & p2){

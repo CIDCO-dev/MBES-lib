@@ -15,6 +15,9 @@ coverage_dir=build/coverage
 coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
+all: default pcl-viewer overlap
+	echo "Building all"
+
 default: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
@@ -61,12 +64,6 @@ clean:
 
 datagram-list: default
 	./build/bin/datagram-list test/data/s7k/20141016_150519_FJ-Saucier.s7k|sort|uniq -c
-	
-coverage: default
-	mkdir -p $(coverage_dir)
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/testC -fprofile-arcs -ftest-coverage test/main.cpp
-	gcov main.gcno
-	mv *.gcov $(coverage_dir)
 
 pcl-viewer: prepare
 	rm -rf build/tempCMake

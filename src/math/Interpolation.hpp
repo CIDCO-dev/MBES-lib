@@ -84,10 +84,6 @@ public:
   * @param t2 timestamp link to psi2
   */
   static double linearAngleInterpolationByTime(double psi1, double psi2, uint64_t t, uint64_t t1, uint64_t t2) {
-
-    if (psi1 < 0 || psi1 >= 360 || psi2 < 0 || psi2 >= 360) {
-      throw new Exception("Angles need to be between 0 (inclusive) and 360 (exclusive) degrees");
-    }
     
     if (t1 == t2)
       {
@@ -102,13 +98,11 @@ public:
           throw new Exception("The first position timestamp is higher than the second position timestamp");
       }
     
-    bool multiAnswer = false;
-    std::stringstream ss;
-    if (std::abs(psi2 - psi1)==180)
-    {
+    if (std::abs(psi2 - psi1)==180){
+        std::stringstream ss;        
         ss << "The angles " << psi1 << " and " << psi2
-                << " have a difference of 180 degrees witch mean there is two possible answer at the timestamp " << t << ": ";
-        multiAnswer = true;
+                << " have a difference of 180 degrees which means there are two possible answers at the timestamp " << t << ": ";
+        throw new Exception(ss.str());
     }
 
     if (psi1 == psi2) {
@@ -119,25 +113,7 @@ public:
     double x2 = t2-t1;
     double delta = (x1 / x2);
     double dpsi = std::fmod((std::fmod(psi2 - psi1, 360) + 540), 360) - 180;
-    double interpolation = psi1 + dpsi*delta;
-
-    if (multiAnswer)
-    {
-        ss << std::abs(std::fmod(interpolation,360)) << " and " << -std::abs(std::fmod(interpolation,360))+360 << "\n";
-        throw new Exception(ss.str());
-    }
-        
-    if(interpolation >= 0 && interpolation < 360) {
-      return interpolation;
-    }
-
-    double moduloInterpolation = std::fmod(interpolation, 360);
-
-    if(moduloInterpolation < 0) {
-       return moduloInterpolation + 360;
-    }
-    
-    return moduloInterpolation;
+    return psi1 + dpsi*delta;
   }
 
 
