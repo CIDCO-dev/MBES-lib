@@ -27,8 +27,8 @@ private:
   /**Value of the quality of the ping*/
   uint32_t quality;
 
-  /**Value of the intensity of the ping*/
-  int32_t intensity;
+  /**Value of the intensity of the ping in decibels*/
+  double intensity;
 
   /**The sound speed value of the surface*/
   double surfaceSoundSpeed;
@@ -75,7 +75,7 @@ public:
 	uint64_t microEpoch,
 	long     id,
 	uint32_t quality,
-	int32_t intensity,
+	double   intensity,
 
         double surfaceSoundSpeed,
         double twoWayTravelTime,
@@ -96,13 +96,20 @@ public:
     cB(cos(acrossTrackAngle*D2R)){
     }
     
-    Ping(long id):id(id){
-        
+    Ping(long id):id(id),quality(0),intensity(0),alongTrackAngle(0),acrossTrackAngle(0){
+        refresh();
     }
 
     /** Destroy the ping*/
     ~Ping() {
 
+    }
+    
+    void refresh(){
+        sA = sin(alongTrackAngle*D2R);
+        cA = cos(alongTrackAngle*D2R);
+        sB = sin(acrossTrackAngle*D2R);
+        cB = cos(acrossTrackAngle*D2R);          
     }
 
     /**Return the across track angle*/
@@ -211,13 +218,13 @@ public:
     }
     
     /**Return the intensity of the ping*/
-    uint32_t getIntensity() { return intensity;}
+    double getIntensity() { return intensity;}
 
     /**
      * Set the backscatter intensity
      * @param intensity
      */
-    void setIntensity(uint32_t intensity){
+    void setIntensity(double intensity){
         intensity=intensity;
     }
 

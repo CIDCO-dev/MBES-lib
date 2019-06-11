@@ -97,19 +97,14 @@ public:
     void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
         Eigen::Matrix3d imu2ned;
         CoordinateTransform::getDCM(imu2ned,attitude);
-
-        //Center position wrt centroid
-	Position pos(
-		position.getTimestamp(),
-		position.getLatitude() 		- centroid->getLatitude(),
-		position.getLongitude()		- centroid->getLongitude(),
-		position.getEllipsoidalHeight()	- centroid->getEllipsoidalHeight()
-	);
-
+       
 	//Convert position's geographic coordinates to ECEF, and then from ECEF to NED
         Eigen::Vector3d positionECEF;
-        CoordinateTransform::getPositionECEF(positionECEF,pos);
-	Eigen::Vector3d positionNED = ecef2ned * positionECEF;
+        CoordinateTransform::getPositionECEF(positionECEF,position);
+
+        Eigen::Vector3d centered = positionECEF-centroidECEF;    
+        
+	Eigen::Vector3d positionNED = ecef2ned * centered;
 
         //Convert ping to NED
         Eigen::Vector3d pingVector;
@@ -132,9 +127,13 @@ public:
 	if(this->centroid) delete centroid;
 
 	this->centroid=new Position(c.getTimestamp(), c.getLatitude(), c.getLongitude(), c.getEllipsoidalHeight());
-
+        CoordinateTransform::getPositionECEF(centroidECEF,*this->centroid);
+        
 	CoordinateTransform::ned2ecef(ecef2ned,*this->centroid);
         ecef2ned.transposeInPlace();
+        
+        std::cerr << "Set centroid: " << *centroid << std::endl;
+        
     }
 
     /**
@@ -145,6 +144,7 @@ public:
 
 private:
 	Position * centroid = NULL; //in geographic coordinates
+        Eigen::Vector3d centroidECEF;
 	Eigen::Matrix3d ecef2ned;
 };
 

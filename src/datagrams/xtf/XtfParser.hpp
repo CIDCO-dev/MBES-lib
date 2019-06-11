@@ -609,7 +609,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 
 		for(unsigned int i = 0;i < hdr.NumChansToFollow;i++){
             		processor.processPing(
-                            microEpoch,
+                            microEpoch + ping[i].DeltaTime * 1000000,
                             ping[i].Id,
                             ping[i].BeamAngle,
                             ping[i].TiltAngle,
@@ -743,11 +743,19 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
                 }
             }
             else if(sectionName==0x4931){
-                //TODO: process backscatter data
                 //I1
+                XtfHeaderQuinsyR2SonicBathy_I1 * i1 = (XtfHeaderQuinsyR2SonicBathy_I1*) (packet + packetIndex);
+                uint32_t scale         = htonl( *((uint32_t*)&i1->ScalingFactor));
+                float    scalingFactor = *((float*)&scale);
+                
                 for(unsigned int i=0;i<nbBeams;i++){
-                    int32_t intensity = 0;
-                    pings[i].setIntensity( intensity );
+                    double microPascals = htons(((uint16_t*)&(i1->IntensityArray))[i]) * scalingFactor;
+                    
+                    // dbSPL = 20 * LOG10(uPa * 1000000/0.00002)
+                    
+                    double intensityDb = (double)20 * log10((double)microPascals * (double)1000000 / (double)0.00002);
+                    
+                    pings[i].setIntensity( intensityDb );
                 }   
             }
             else if(sectionName==0x4730){                    
