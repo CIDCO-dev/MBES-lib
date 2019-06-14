@@ -10,11 +10,11 @@
 #include <iostream> // Temp while using cout?
 #include <iomanip> // Temp while using cout?
 
-#include "../../../DatagramGeoreferencer.hpp"
+#include "../../../georeferencing/DatagramGeoreferencer.hpp"
 #include "../../../Ping.hpp"
 #include "../../../Position.hpp"
 #include "../../../Attitude.hpp"
-#include "../../../Georeferencing.hpp"
+#include "../../../georeferencing/Georeferencing.hpp"
 #include "../../../svp/SoundVelocityProfile.hpp"
 #include "../../../svp/SoundVelocityProfileFactory.hpp"
 #include "../../../datagrams/DatagramEventHandler.hpp"
