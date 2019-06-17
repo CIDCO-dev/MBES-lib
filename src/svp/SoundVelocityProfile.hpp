@@ -44,11 +44,11 @@ public:
   *
   * @param filename the name of the that will use to read
   */
-  bool read(std::string filename);
+  bool read(std::string & filename);
 
   /**Returns the size of the SoundVelocityProfile*/
   unsigned int getSize() {
-    return size;
+    return getDepths().size();
   };
 
   /**Returns the latitude of the SoundVelocityProfile*/
@@ -242,8 +242,6 @@ public:
 
 private:
 
-  /**value of the SoundVelocityProfile size*/
-  unsigned int size;
 
   /**timestamp value of the SoundVelocityProfile (micro-second)*/
   uint64_t  microEpoch; //timestamp
@@ -296,7 +294,7 @@ void SoundVelocityProfile::write(std::string & filename){
   }
 }
 
-bool SoundVelocityProfile::read(std::string filename)
+bool SoundVelocityProfile::read(std::string & filename)
 {
   std::ifstream inFile;
   inFile.open(filename);
@@ -306,64 +304,57 @@ bool SoundVelocityProfile::read(std::string filename)
   if(inFile)
   {
     int i = 0;
-    while ((std::getline(inFile,row))&&(valide))
-    {
-      if (i == 0)
-      {
+    while (std::getline(inFile,row)){
+      if (i == 0){
         int ver;
-        if (std::sscanf(row.c_str(),"[SVP_VERSION_%d]",&ver)!=1)
-        {
-          valide = false;
+        if (std::sscanf(row.c_str(),"[SVP_VERSION_%d]",&ver)!=1){
+	  std::cerr << "Wrong SVP file header" << std::endl;
+	  inFile.close();
+          return false;
         }
       }
-      else if (i==1)
-      {
+      else if (i==1){
         std::string name;
         name = row.substr(0,row.find(" "));
-        if(name.compare(filename)!=0)
-        {
-          valide = false;
+        if(name.compare(filename)!=0){
+	  std::cerr << "Bad file name in SVP header" << std::endl;
+          inFile.close();
+	  return false;
         }
       }
-      else if (i==2)
-      {
+      else if (i==2){
         uint64_t ms = 0;
         double lat = 0;
         double lon = 0;
-        if(readTimeLatLong(row,ms,lat,lon))
-        {
+        if(readTimeLatLong(row,ms,lat,lon)){
           microEpoch = ms;
           latitude = lat;
           longitude = lon;
         }
-        else
-        {
+        else{
           valide = false;
         }
         samples = std::vector<std::pair<double,double>>();
       }
-      else
-      {
+      else{
         double deph;
         double speed;
-        if (std::sscanf(row.c_str(), "%lf %lf",&deph,&speed)==2)
-        {
+        if (std::sscanf(row.c_str(), "%lf %lf",&deph,&speed)==2){
           add(deph,speed);
         }
-        else
-        {
-          valide = false;
+        else{
+          //ignore bad lines
         }
       }
-      i = i+1;
+
+      i++;
     }
+
+    inFile.close();
+    return true;
   }
-  else
-  {
-    valide = false;
-  }
-  inFile.close();
-  return valide;
+
+  return false;
 }
 
 Eigen::VectorXd & SoundVelocityProfile::getDepths(){

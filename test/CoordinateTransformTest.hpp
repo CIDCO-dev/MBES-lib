@@ -55,8 +55,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     Position expectedPosition(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -69,8 +69,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -83,8 +83,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -97,8 +97,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -111,8 +111,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -125,8 +125,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -139,8 +139,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -153,8 +153,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);

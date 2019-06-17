@@ -84,7 +84,7 @@ public:
   * @param t2 timestamp link to psi2
   */
   static double linearAngleInterpolationByTime(double psi1, double psi2, uint64_t t, uint64_t t1, uint64_t t2) {
-    
+
     if (t1 == t2)
       {
           throw new Exception("The two positions timestamp are the same");
@@ -97,11 +97,11 @@ public:
       {
           throw new Exception("The first position timestamp is higher than the second position timestamp");
       }
-    
+
     if (std::abs(psi2 - psi1)==180){
         std::stringstream ss;        
         ss << "The angles " << psi1 << " and " << psi2
-                << " have a difference of 180 degrees which means there are two possible answers at the timestamp " << t << ": ";
+                << " have a difference of 180 degrees which means there are two possible answers at timestamp " << t;
         throw new Exception(ss.str());
     }
 
@@ -113,7 +113,15 @@ public:
     double x2 = t2-t1;
     double delta = (x1 / x2);
     double dpsi = std::fmod((std::fmod(psi2 - psi1, 360) + 540), 360) - 180;
-    return psi1 + dpsi*delta;
+
+    double total = psi1 + dpsi*delta;
+
+    if(total > 0){
+	return (total < 360.0)? total : fmod(total,360.0);
+    }
+    else{
+	return total + 360.0; //TODO: handle angles -360....-520...etc
+    }
   }
 
 

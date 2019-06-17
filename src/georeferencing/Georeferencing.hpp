@@ -63,7 +63,7 @@ public:
 
     //Convert ping to ECEF
     Eigen::Vector3d pingVector;
-    Raytracing::rayTrace(pingVector,ping,svp);
+    Raytracing::rayTrace(pingVector,ping,svp,boresight,imu2ned);
 
     Eigen::Vector3d pingECEF = ned2ecef * (imu2ned * boresight * pingVector);
 
@@ -97,18 +97,18 @@ public:
     void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
         Eigen::Matrix3d imu2ned;
         CoordinateTransform::getDCM(imu2ned,attitude);
-       
+
 	//Convert position's geographic coordinates to ECEF, and then from ECEF to NED
         Eigen::Vector3d positionECEF;
         CoordinateTransform::getPositionECEF(positionECEF,position);
 
         Eigen::Vector3d centered = positionECEF-centroidECEF;    
-        
+
 	Eigen::Vector3d positionNED = ecef2ned * centered;
 
         //Convert ping to NED
         Eigen::Vector3d pingVector;
-        Raytracing::rayTrace(pingVector,ping,svp);
+        Raytracing::rayTrace(pingVector,ping,svp,boresight,imu2ned);
 
         Eigen::Vector3d pingNED = imu2ned * boresight * pingVector;
 

@@ -18,14 +18,14 @@ using namespace std;
 /**Write the information about the program*/
 void printUsage(){
 	std::cerr << "\n\
-  NAME\n\n\
-     georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
-  SYNOPSIS\n \
-	   georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] fichier\n\n\
-  DESCRIPTION\n \
-	   -L Use a local geographic frame (NED)\n \
-	   -T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
-  Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
+NAME\n\n\
+	georeference - Produces a georeferenced point cloud from binary multibeam echosounder datagrams files\n\n\
+SYNOPSIS\n \
+	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] [-s svp_file] file\n\n\
+DESCRIPTION\n \
+	-L Use a local geographic frame (NED)\n \
+	-T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
+Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
 }
 
@@ -65,6 +65,9 @@ int main (int argc , char ** argv){
         //Georeference method
         Georeferencing * georef;
 
+	std::string	     svpFilename;
+	SoundVelocityProfile svp;
+
         int index;
 
         while((index=getopt(argc,argv,"x:y:z:r:p:h:LT"))!=-1)
@@ -98,7 +101,7 @@ int main (int argc , char ** argv){
                 case 'r':
                     if (sscanf(optarg,"%lf", &roll) != 1)
                     {
-                        std::cerr << "Invalid roll angle offset (-p)" << std::endl;
+                        std::cerr << "Invalid roll angle offset (-r)" << std::endl;
                         printUsage();
                     }
                 break;
@@ -106,7 +109,7 @@ int main (int argc , char ** argv){
                 case 'h':
                     if (sscanf(optarg,"%lf", &heading) != 1)
                     {
-                        std::cerr << "Invalid heading angle offset (-P)" << std::endl;
+                        std::cerr << "Invalid heading angle offset (-h)" << std::endl;
                         printUsage();
                     }
                 break;
@@ -114,10 +117,17 @@ int main (int argc , char ** argv){
                 case 'p':
                     if (sscanf(optarg,"%lf", &pitch) != 1)
                     {
-                        std::cerr << "Invalid pitch angle offset (-t)" << std::endl;
+                        std::cerr << "Invalid pitch angle offset (-p)" << std::endl;
                         printUsage();
                     }
                 break;
+
+		case 's':
+			svpFilename = optarg;
+			if(!svp.read(svpFilename)){
+				std::cerr << "Invalid SVP file (-s)" << std::endl;
+				printUsage();
+			}
 
                 case 'L':
                     georef = new GeoreferencingLGF();
@@ -163,8 +173,7 @@ int main (int argc , char ** argv){
             Boresight::buildMatrix(boresight,boresightAngles);
 
             //Do the georeference dance
-            //TODO: get SVP file from CLI
-            printer.georeference(leverArm,boresight,NULL);
+            printer.georeference(leverArm,boresight,(svp.getSize()>0)?&svp:NULL);
 
             delete parser;
         }

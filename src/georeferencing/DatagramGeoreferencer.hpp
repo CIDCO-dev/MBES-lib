@@ -103,6 +103,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 			if(svpFile != NULL){
 				//If file is specified, use that
 				svp = svpFile;
+				std::cerr << "[+] Using SVP file" << std::endl;
 			}
                         else if(svps.size() == 1){
 				//else if we have an SVP inside the sonar file, use that

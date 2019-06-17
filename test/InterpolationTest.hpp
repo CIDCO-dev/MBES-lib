@@ -80,50 +80,6 @@ TEST_CASE("Test the position interpolation")
     REQUIRE(abs(pos->getEllipsoidalHeight()-117.4444444444)<1e-10);
 }
 
-TEST_CASE("Test the angle interpolation with invalid angle")
-{
-    std::string excep;
-    try
-    {
-        Interpolator::linearAngleInterpolationByTime(-1,180,50,0,100);
-    }
-    catch (Exception * error)
-    {
-        excep = error->getMessage();
-    }
-    REQUIRE(excep=="Angles need to be between 0 (inclusive) and 360 (exclusive) degrees");
-    excep="";
-    try
-    {
-        Interpolator::linearAngleInterpolationByTime(360,180,50,0,100);
-    }
-    catch (Exception * error)
-    {
-        excep = error->getMessage();
-    }
-    REQUIRE(excep=="Angles need to be between 0 (inclusive) and 360 (exclusive) degrees");
-    excep="";
-    try
-    {
-        Interpolator::linearAngleInterpolationByTime(0,-1,50,0,100);
-    }
-    catch (Exception * error)
-    {
-        excep = error->getMessage();
-    }
-    REQUIRE(excep=="Angles need to be between 0 (inclusive) and 360 (exclusive) degrees");
-    excep="";
-    try
-    {
-        Interpolator::linearAngleInterpolationByTime(0,360,50,0,100);
-    }
-    catch (Exception * error)
-    {
-        excep = error->getMessage();
-    }
-    REQUIRE(excep=="Angles need to be between 0 (inclusive) and 360 (exclusive) degrees");
-}
-
 TEST_CASE("Test the angle interpolation with invalid timestamp")
 {
     std::string excep = "";
@@ -168,7 +124,7 @@ TEST_CASE("Test the angle interpolation with a difference of 180 degrees")
         excep = error->getMessage();
     }
     REQUIRE(excep == "The angles 0 and 180 have a difference of 180 degrees "
-            "witch mean there is two possible answer at the timestamp 50: 90 and 270\n");
+            "which means there are two possible answers at timestamp 50");
     excep = "";
     try
     {
@@ -179,12 +135,15 @@ TEST_CASE("Test the angle interpolation with a difference of 180 degrees")
         excep = error->getMessage();
     }
     REQUIRE(excep == "The angles 0 and 180 have a difference of 180 degrees "
-            "witch mean there is two possible answer at the timestamp 75: 135 and 225\n");
+            "which means there are two possible answers at timestamp 75");
 }
 
 TEST_CASE("Test the angle interpolation")
 {
     REQUIRE(std::abs(Interpolator::linearAngleInterpolationByTime(0,90,50,0,100)-45)<1e-10);
+
+    std::cout << "ANGLE: " << Interpolator::linearAngleInterpolationByTime(0,270,50,0,100) << std::endl;
+
     REQUIRE(std::abs(Interpolator::linearAngleInterpolationByTime(0,270,50,0,100)-315)<1e-10);
     REQUIRE(std::abs(Interpolator::linearAngleInterpolationByTime(10,20,80,0,100)-18)<1e-10);
     REQUIRE(std::abs(Interpolator::linearAngleInterpolationByTime(0,350,50,0,100)-355)<1e-10);
@@ -192,18 +151,6 @@ TEST_CASE("Test the angle interpolation")
     REQUIRE(std::abs(Interpolator::linearAngleInterpolationByTime(70,90,50,0,100)-80)<1e-10);
     REQUIRE(std::abs(Interpolator::linearAngleInterpolationByTime(0,9,2,0,3)-6)<1e-10);
     REQUIRE(std::abs(Interpolator::linearAngleInterpolationByTime(0,70,50,0,100)-35)<1e-10);
-}
-
-TEST_CASE("Test the angle radians interpolation")
-{
-    REQUIRE(std::abs(Interpolator::linearAngleRadiansInterpolationByTime(0*M_PI/180,90*M_PI/180,50,0,100)-45*M_PI/180)<1e-10);
-    REQUIRE(std::abs(Interpolator::linearAngleRadiansInterpolationByTime(0*M_PI/180,270*M_PI/180,50,0,100)-315*M_PI/180)<1e-10);
-    REQUIRE(std::abs(Interpolator::linearAngleRadiansInterpolationByTime(10*M_PI/180,20*M_PI/180,80,0,100)-18*M_PI/180)<1e-10);
-    REQUIRE(std::abs(Interpolator::linearAngleRadiansInterpolationByTime(0*M_PI/180,350*M_PI/180,50,0,100)-355*M_PI/180)<1e-10);
-    REQUIRE(std::abs(Interpolator::linearAngleRadiansInterpolationByTime(0*M_PI/180,0*M_PI/180,80,9,180)-0*M_PI/180)<1e-10);
-    REQUIRE(std::abs(Interpolator::linearAngleRadiansInterpolationByTime(70*M_PI/180,90*M_PI/180,50,0,100)-80*M_PI/180)<1e-10);
-    REQUIRE(std::abs(Interpolator::linearAngleRadiansInterpolationByTime(0*M_PI/180,9*M_PI/180,2,0,3)-6*M_PI/180)<1e-10);
-    REQUIRE(std::abs(Interpolator::linearAngleRadiansInterpolationByTime(0*M_PI/180,70*M_PI/180,50,0,100)-35*M_PI/180)<1e-10);
 }
 
 TEST_CASE("Test the attitude interpolation")
