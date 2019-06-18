@@ -73,19 +73,19 @@ TEST_CASE("test the extention of the file receive")
     std::string line;
     getline(ss,line);
     getline(ss,line);
-    REQUIRE(line!="Error while parsing test/data/all/example.all: Unknown extension");
+    REQUIRE(line!="[-] Error while parsing test/data/all/example.all: Unknown extension");
     commFile = " test/data/s7k/20141016_150519_FJ-Saucier.s7k 2>&1";
     commTest = GeoBinexec+commFile;
     ss = GeoSystem_call(std::string(commTest));
     getline(ss,line);
     getline(ss,line);
-    REQUIRE(line!="Error while parsing test/data/s7k/20141016_150519_FJ-Saucier.s7k: Unknown extension");
+    REQUIRE(line!="[-] Error while parsing test/data/s7k/20141016_150519_FJ-Saucier.s7k: Unknown extension");
     commFile = " test/data/xtf/example.xtf 2>&1";
     commTest = GeoBinexec+commFile;
     ss = GeoSystem_call(std::string(commTest));
     getline(ss,line);
     getline(ss,line);
-    REQUIRE(line!="Error while parsing test/data/xtf/example.xtf: Unknown extension");
+    REQUIRE(line!="[-] Error while parsing test/data/xtf/example.xtf: Unknown extension");
 }
 
 /**Test with file extention invalid*/
@@ -98,7 +98,7 @@ TEST_CASE("test if the file is invalid")
     string line;
     getline(ss,line);
     getline(ss,line);
-    REQUIRE(line=="Error while parsing test/data/badextension.bad: Unknown extension");
+    REQUIRE(line=="[-] Error while parsing test/data/badextension.bad: Unknown extension");
 }
 
 /**Test with no file*/
@@ -111,7 +111,7 @@ TEST_CASE("test if the file is not present")
     string line;
     getline(ss,line);
     getline(ss,line);
-    REQUIRE(line=="Error while parsing test/data/all/examplee.all: File not found");
+    REQUIRE(line=="[-] Error while parsing test/data/all/examplee.all: File not found");
 }
 
 /**Test with no existent file*/
@@ -122,14 +122,14 @@ TEST_CASE("test if file parameter is not present")
     std::stringstream ss;
     ss = GeoSystem_call(std::string(commTest));
     std::string result = "\n\
-	NAME\n\n\
-	georeference - Produit un nuage de points d'un fichier de datagrammes multifaisceaux\n\n\
-	SYNOPSIS\n \
+NAME\n\n\
+	georeference - Produces a georeferenced point cloud from binary multibeam echosounder datagrams files\n\n\
+SYNOPSIS\n \
 	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] [-s svp_file] file\n\n\
-	DESCRIPTION\n \
+DESCRIPTION\n \
 	-L Use a local geographic frame (NED)\n \
 	-T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
-	Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n";
+Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés\n";
     REQUIRE(ss.str()==result);
 }
 
@@ -181,7 +181,7 @@ TEST_CASE("test if parameter r h p are invalid")
 
 TEST_CASE("test if parameter s is not valid")
 {
-    string commS = " -s file.ssp -L ";
+    string commS = " -s test/data/SVP/SVP.txt -L ";
     string commFile = " test/data/all/0008_20160909_135801_Panopee.all 2>&1";
     string commTest = GeoBinexec+commS+commFile;
     std::stringstream ss;

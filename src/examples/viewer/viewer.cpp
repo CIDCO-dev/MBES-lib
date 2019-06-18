@@ -26,12 +26,12 @@
 #include <pcl/console/parse.h>
 
 
-#include "../../PointCloudGeoreferencer.hpp"
+#include "../../georeferencing/PointCloudGeoreferencer.hpp"
 
 #include "../../utils/StringUtils.hpp"
 #include "../../math/Boresight.hpp"
 
-#include "../smallUtilityFunctions.hpp"
+#include "smallUtilityFunctions.hpp"
 
 
 /**Writes the usage information about the program*/

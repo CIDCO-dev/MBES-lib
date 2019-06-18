@@ -85,10 +85,6 @@ public:
   */
   static double linearAngleInterpolationByTime(double psi1, double psi2, uint64_t t, uint64_t t1, uint64_t t2) {
 
-    if (psi1 < 0 || psi1 >= 360 || psi2 < 0 || psi2 >= 360) {
-      throw new Exception("Angles need to be between 0 (inclusive) and 360 (exclusive) degrees");
-    }
-    
     if (t1 == t2)
       {
           throw new Exception("The two positions timestamp are the same");
@@ -101,14 +97,12 @@ public:
       {
           throw new Exception("The first position timestamp is higher than the second position timestamp");
       }
-    
-    bool multiAnswer = false;
-    std::stringstream ss;
-    if (std::abs(psi2 - psi1)==180)
-    {
+
+    if (std::abs(psi2 - psi1)==180){
+        std::stringstream ss;        
         ss << "The angles " << psi1 << " and " << psi2
-                << " have a difference of 180 degrees witch mean there is two possible answer at the timestamp " << t << ": ";
-        multiAnswer = true;
+                << " have a difference of 180 degrees which means there are two possible answers at timestamp " << t;
+        throw new Exception(ss.str());
     }
 
     if (psi1 == psi2) {
@@ -119,40 +113,18 @@ public:
     double x2 = t2-t1;
     double delta = (x1 / x2);
     double dpsi = std::fmod((std::fmod(psi2 - psi1, 360) + 540), 360) - 180;
-    double interpolation = psi1 + dpsi*delta;
 
-    if (multiAnswer)
-    {
-        ss << std::abs(std::fmod(interpolation,360)) << " and " << -std::abs(std::fmod(interpolation,360))+360 << "\n";
-        throw new Exception(ss.str());
-    }
-        
-    if(interpolation >= 0 && interpolation < 360) {
-      return interpolation;
-    }
+    double total = psi1 + dpsi*delta;
 
-    double moduloInterpolation = std::fmod(interpolation, 360);
-
-    if(moduloInterpolation < 0) {
-       return moduloInterpolation + 360;
+    if(total > 0){
+	return (total < 360.0)? total : fmod(total,360.0);
     }
-    
-    return moduloInterpolation;
+    else{
+	return total + 360.0; //TODO: handle angles -360....-520...etc
+    }
   }
 
-  /**
-  * Returns a linear interpolation between two radian angle
-  *
-  * @param psi1 first angle
-  * @param psi2 second angle
-  * @param t number of microsecond since 1st January 1970
-  * @param t1 timestamp link psi1
-  * @param t2 timestamp link psi2
-  */
-  static double linearAngleRadiansInterpolationByTime(double psi1, double psi2, uint64_t t, uint64_t t1, uint64_t t2) {
-    double interpDegrees = linearAngleInterpolationByTime(psi1*180.0/M_PI, psi2*180.0/M_PI, t, t1, t2);
-    return interpDegrees*M_PI/180.0;
-  }
+
 };
 
 #endif /* INTERPOLATOR_HPP */
