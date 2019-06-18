@@ -66,14 +66,14 @@ public:
        double zff       = 0;
        
         while((DT + dtt)<= (ping.getTwoWayTravelTime()/(double)2) && (N<svp.getSize()-1)){
-                //update of angles
+                //update angles
                 sinBnm1 = sqrt(1 - pow(epsilon*svp.getSpeeds()[N], 2));
                 sinBn   = sqrt(1 - pow(epsilon*svp.getSpeeds()[N+1], 2));
 
                 cosBnm1 = epsilon*svp.getSpeeds()[N];
                 cosBn   = epsilon*svp.getSpeeds()[N+1];
 
-                if (gradient[N] != 0.0) //huehuehue
+                if (gradient[N] != 0.0) //FIXME: huehuehue
                 {
                         // if not null gradient
                         //Radius of curvature
@@ -112,13 +112,11 @@ public:
         // Output variable computation
         double Xf = xff + dxf;
         double Zf = zff + dzf;
-        
+
         raytracedPing(0) = Xf*sinAz;
         raytracedPing(1) = Xf*cosAz;
         raytracedPing(2) = Zf;
     }
-
-    
 };
 
 #endif

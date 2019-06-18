@@ -62,10 +62,10 @@ public:
     CoordinateTransform::getPositionECEF(positionECEF,position);
 
     //Convert ping to ECEF
-    Eigen::Vector3d pingVector;
-    Raytracing::rayTrace(pingVector,ping,svp,boresight,imu2ned);
+    Eigen::Vector3d pingVectorNED;
+    Raytracing::rayTrace(pingVectorNED,ping,svp,boresight,imu2ned);
 
-    Eigen::Vector3d pingECEF = ned2ecef * (imu2ned * boresight * pingVector);
+    Eigen::Vector3d pingECEF = ned2ecef * pingVectorNED;
 
     //Convert lever arm to ECEF
     Eigen::Vector3d leverArmECEF =  ned2ecef * (imu2ned * leverArm);
@@ -107,10 +107,8 @@ public:
 	Eigen::Vector3d positionNED = ecef2ned * centered;
 
         //Convert ping to NED
-        Eigen::Vector3d pingVector;
-        Raytracing::rayTrace(pingVector,ping,svp,boresight,imu2ned);
-
-        Eigen::Vector3d pingNED = imu2ned * boresight * pingVector;
+        Eigen::Vector3d pingNED;
+        Raytracing::rayTrace(pingNED,ping,svp,boresight,imu2ned);
 
         //Convert lever arm to NED
         Eigen::Vector3d leverArmNED =  imu2ned * leverArm;
