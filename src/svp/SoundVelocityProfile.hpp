@@ -162,54 +162,30 @@ public:
   * @param lat value of the latitude we get after the reading
   * @param lon value of the longitude we get after the reading
   */
-  bool readTimeLatLong(std::string & row, uint64_t &nbrM,double &lat, double &lon)
+  bool readSectionHeader(std::string & row, uint64_t &nbrM,double &lat, double &lon)
   {
-    char latdirection[5];
-    double latdegrees;
-    double latminute;
-    double latsecond;
-    char londirection[4];
-    double londegrees;
-    double lonminute;
-    double lonsecond;
+    int latdegrees;
+    int latminute;
+    int latsecond;
+    int londegrees;
+    int lonminute;
+    int lonsecond;
     int year;
     int yday;
     int hour;
     int minute;
     int second;
-    if (std::sscanf(row.c_str(), "Section %d-%d %d:%d:%d %5s %lf:%lf:%lf %4s %lf:%lf:%lf",
-    &year,&yday,&hour,&minute,&second,latdirection,&latdegrees,&latminute,&latsecond,
-    londirection,&londegrees,&lonminute,&lonsecond)==13)
-    {
-            lat = latsecond/60 + latminute;
-            lat = lat/60 + latdegrees;
-            std::string sdirection;
-            sdirection = latdirection;
-            if (sdirection.compare("South") == 0)
-            {
-                lat = -lat;
-            }
-            else if (sdirection.compare("North")!=0)
-            {
-                return false;
-            }
-            lon = lonsecond/60 + lonminute;
-            lon = lon/60 + londegrees;
-            sdirection = londirection;
-            if (sdirection.compare("West") == 0)
-            {
-                lon = -lon;
-            }
-            else if (sdirection.compare("East")!=0)
-            {
-                return false;
-            }
+    if (std::sscanf(row.c_str(), "Section %d-%d %d:%d:%d %d:%d:%d %d:%d:%d", &year,&yday,&hour,&minute,&second,&latdegrees,&latminute,&latsecond,&londegrees,&lonminute,&lonsecond)==11){
+            lat = (double)latsecond/(double)60 + (double)latminute;
+            lat = (double)lat/(double)60 + (double)latdegrees;
+            lon = (double)lonsecond/(double)60 + (double)lonminute;
+            lon = (double)lon/(double)60 + (double)londegrees;
             year = year-1970;
             yday = yday-1;
             nbrM = nbrM+year;
             nbrM = nbrM*365 + yday;
             int y = year+2;
-            while (y >= 4)
+            while (y >= 4) //?
             {
                 y = y-4;
                 nbrM = nbrM+1;
@@ -219,13 +195,10 @@ public:
             nbrM = nbrM*60 + second;
             nbrM = nbrM*1000000;
             return true;
-        }
-        else
-        {
-            return false;   
-        }
     }
 
+    return false;
+  }
   /**
   * Adds a new value in the vector depths and speeds
   *
@@ -296,13 +269,15 @@ void SoundVelocityProfile::write(std::string & filename){
 
 bool SoundVelocityProfile::read(std::string & filename)
 {
-  std::ifstream inFile;
-  inFile.open(filename);
   std::string row;
   std::string cont;
-  bool valide = true;
+
+  std::ifstream inFile(filename);
+
   if(inFile)
   {
+    samples.clear();
+
     int i = 0;
     while (std::getline(inFile,row)){
       if (i == 0){
@@ -316,25 +291,14 @@ bool SoundVelocityProfile::read(std::string & filename)
       else if (i==1){
         std::string name;
         name = row.substr(0,row.find(" "));
-        if(name.compare(filename)!=0){
-	  std::cerr << "Bad file name in SVP header" << std::endl;
+	//Dont care about name, it couldve been renamed
+      }
+      else if (i==2){
+        if(!readSectionHeader(row,microEpoch,latitude,longitude)){
+	  std::cerr << "Bad section label" << std::endl;
           inFile.close();
 	  return false;
         }
-      }
-      else if (i==2){
-        uint64_t ms = 0;
-        double lat = 0;
-        double lon = 0;
-        if(readTimeLatLong(row,ms,lat,lon)){
-          microEpoch = ms;
-          latitude = lat;
-          longitude = lon;
-        }
-        else{
-          valide = false;
-        }
-        samples = std::vector<std::pair<double,double>>();
       }
       else{
         double deph;

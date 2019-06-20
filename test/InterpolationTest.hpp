@@ -141,9 +141,6 @@ TEST_CASE("Test the angle interpolation with a difference of 180 degrees")
 TEST_CASE("Test the angle interpolation")
 {
     REQUIRE(std::abs(Interpolator::linearAngleInterpolationByTime(0,90,50,0,100)-45)<1e-10);
-
-    std::cout << "ANGLE: " << Interpolator::linearAngleInterpolationByTime(0,270,50,0,100) << std::endl;
-
     REQUIRE(std::abs(Interpolator::linearAngleInterpolationByTime(0,270,50,0,100)-315)<1e-10);
     REQUIRE(std::abs(Interpolator::linearAngleInterpolationByTime(10,20,80,0,100)-18)<1e-10);
     REQUIRE(std::abs(Interpolator::linearAngleInterpolationByTime(0,350,50,0,100)-355)<1e-10);

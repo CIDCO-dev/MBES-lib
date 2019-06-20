@@ -351,7 +351,7 @@ typedef struct {
 	uint8_t Hour;
 	uint8_t Minutes;
 	uint8_t Seconds;
-	uint16_t MicroSeconds; //Hundredths of microseconds (0-9999)
+	uint16_t TenthsOfMilliseconds; 
 	double RawYcoordinate;
 	double RawXcoordinate;
 	double RawAltitude;

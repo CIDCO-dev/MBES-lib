@@ -70,7 +70,7 @@ int main (int argc , char ** argv){
 
         int index;
 
-        while((index=getopt(argc,argv,"x:y:z:r:p:h:LT"))!=-1)
+        while((index=getopt(argc,argv,"x:y:z:r:p:h:s:LT"))!=-1)
         {
             switch(index)
             {
