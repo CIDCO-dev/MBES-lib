@@ -93,9 +93,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 		 * @param boresight boresight (dPhi,dTheta,dPsi)
                  */
                 void georeference(Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight,SoundVelocityProfile * svpFile){
-                        //interpolate attitudes and positions around pings
-                        unsigned int attitudeIndex=0;
-                        unsigned int positionIndex=0;
+
 
 			//Choose SVP
                         SoundVelocityProfile * svp = NULL;
@@ -142,21 +140,22 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
 			//Sort everything
 			std::sort(positions.begin(),positions.end(),&Position::sortByTimestamp);
-			std::sort(attitudes.begin(),attitudes.begin(),&Attitude::sortByTimestamp);
+			std::sort(attitudes.begin(),attitudes.end(),&Attitude::sortByTimestamp);
 			std::sort(pings.begin(),pings.end(),&Ping::sortByTimestamp);
 
                         fprintf(stderr,"[+] Position data points: %ld [%lu to %lu]\n",positions.size(),positions[0].getTimestamp(),positions[positions.size()-1].getTimestamp());
                         fprintf(stderr,"[+] Attitude data points: %ld [%lu to %lu]\n",attitudes.size(),attitudes[0].getTimestamp(),attitudes[attitudes.size()-1].getTimestamp());
                         fprintf(stderr,"[+] Ping data points: %ld [%lu to %lu]\n",pings.size(),(pings.size() >0)?pings[0].getTimestamp():0,(pings.size() >0)?pings[pings.size()-1].getTimestamp():0);
                         
-                        
-
+                        //interpolate attitudes and positions around pings
+                        unsigned int attitudeIndex=0;
+                        unsigned int positionIndex=0;                        
                         
 			//Georef pings
                         for(auto i=pings.begin();i!=pings.end();i++){
 
                             
-                                while(attitudeIndex + 1 < attitudes.size() && attitudes[attitudeIndex + 1].getTimestamp() < (*i).getTimestamp()){
+                                while(attitudeIndex +1 < attitudes.size() && attitudes[attitudeIndex + 1].getTimestamp() < (*i).getTimestamp()){
                                         attitudeIndex++;
                                 }
 
@@ -166,7 +165,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                                         break;
                                 }
 
-                                while(positionIndex + 1 < positions.size() && positions[positionIndex + 1].getTimestamp() < (*i).getTimestamp()){
+                                while(positionIndex +1 < positions.size() && positions[positionIndex + 1].getTimestamp() < (*i).getTimestamp()){
                                         positionIndex++;
                                 }
 
@@ -178,7 +177,8 @@ class DatagramGeoreferencer : public DatagramEventHandler{
 
 				//No position or attitude smaller than ping, so discard this ping
 				if(positions[positionIndex].getTimestamp() > (*i).getTimestamp() || attitudes[attitudeIndex].getTimestamp() > (*i).getTimestamp()){
-					continue;
+                                    std::cerr << "rejecting ping " << (*i).getId() << " " << (*i).getTimestamp() << " " << positions[positionIndex].getTimestamp() << " " << attitudes[attitudeIndex].getTimestamp()<< std::endl;
+                                    continue;
 				}
 
                                 Attitude & beforeAttitude = attitudes[attitudeIndex];
@@ -194,15 +194,15 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                                 Eigen::Vector3d georeferencedPing;
                                 georef.georeference(georeferencedPing,*interpolatedAttitude,*interpolatedPosition,(*i),*svp,leverArm,boresight);
 
-				processGeoreferencedPing(georeferencedPing,(*i).getQuality(),(*i).getIntensity());
+				processGeoreferencedPing(georeferencedPing,(*i).getQuality(),(*i).getIntensity(),positionIndex,attitudeIndex);
 
                                 delete interpolatedAttitude;
                                 delete interpolatedPosition;
                  	}
                 }
 
-                virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,int32_t intensity){
-                        std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality  << " " << intensity << std::endl;
+                virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,int32_t intensity,int positionIndex,int attitudeIndex){
+                        std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality  << " " << intensity << " " << positionIndex << " " << attitudeIndex << std::endl;
                 }
 
         protected:
@@ -221,8 +221,8 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                 /**vector of attitudes*/
                 std::vector<Attitude>                   attitudes;
 
-  /**Vector of SoundVelocityProfile*/
-  std::vector<SoundVelocityProfile*>      svps;
+                /**Vector of SoundVelocityProfile*/
+                std::vector<SoundVelocityProfile*>      svps;
 };
 
 #endif

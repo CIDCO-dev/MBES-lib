@@ -573,7 +573,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
         	microEpoch = TimeUtils::build_time(
                         attitude->Year,
                         attitude->Month-1,
-                        attitude->Day-1,
+                        attitude->Day,
                         attitude->Hour,
                         attitude->Minutes,
                         attitude->Seconds,
@@ -584,7 +584,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 			microEpoch,
 			attitude->Heading,
 			(attitude->Pitch < 0) ? attitude->Pitch + 360 : attitude->Pitch,
-			(attitude->Roll  < 0) ? attitude->Roll  + 360 : attitude->Pitch
+			(attitude->Roll  < 0) ? attitude->Roll  + 360 : attitude->Roll
 		);
 
 	}
@@ -600,16 +600,17 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 	        uint64_t microEpoch = TimeUtils::build_time(
                         pingHdr->Year,
                         pingHdr->Month-1,
-                        pingHdr->Day-1,
+                        pingHdr->Day,
                         pingHdr->Hour,
                         pingHdr->Minute,
                         pingHdr->Second,
-                        pingHdr->HSeconds * 10,0
+                        pingHdr->HSeconds * 10,
+                        0
                 );
 
 		for(unsigned int i = 0;i < hdr.NumChansToFollow;i++){
             		processor.processPing(
-                            microEpoch + ping[i].DeltaTime * 1000000,
+                            microEpoch + (ping[i].DeltaTime * 1000000),
                             ping[i].Id,
                             ping[i].BeamAngle,
                             ping[i].TiltAngle,
@@ -625,12 +626,12 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
         	uint64_t microEpoch = TimeUtils::build_time(
                         position->Year,
                         position->Month-1,
-                        position->Day-1,
+                        position->Day,
                         position->Hour,
                         position->Minutes,
                         position->Seconds,
-                        position->MicroSeconds/1000,
-                        position->MicroSeconds%1000
+                        0,
+                        position->TenthsOfMilliseconds *100
                 );
                 
         	processor.processPosition(
@@ -646,12 +647,12 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
         	uint64_t microEpoch = TimeUtils::build_time(
                         position->Year,
                         position->Month-1,
-                        position->Day-1,
+                        position->Day,
                         position->Hour,
                         position->Minute,
                         position->Second,
-                        position->Microseconds/1000,
-                        position->Microseconds%1000
+                        0,
+                        position->Microseconds
                 );
                 
         	processor.processPosition(
@@ -659,13 +660,11 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
                         position->RawXCoordinate,
                         position->RawYCoordinate,
                         position->RawAltitude
-                );            
+                );
         }
         else if(hdr.HeaderType==XTF_HEADER_QUINSY_R2SONIC_BATHY){
 		XtfPingHeader * pingHdr = (XtfPingHeader*) packet;
-
-		processPingHeader(*pingHdr);            
-            
+		processPingHeader(*pingHdr);
                 processQuinsyR2SonicBathy(hdr,packet+sizeof(XtfPingHeader));
         }
 	else{
@@ -700,8 +699,8 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
                 //H0 - Main header
                 XtfHeaderQuinsyR2SonicBathy_H0 * h0 = (XtfHeaderQuinsyR2SonicBathy_H0*) (packet + packetIndex);
                 nbBeams = htons(h0->Points);
-                uint64_t microEpoch =  ((uint64_t)htonl(h0->TimeSeconds)*(uint64_t)1000000) + ((uint64_t)htonl(h0->TimeNanoseconds)/(uint64_t)1000);
-                
+                uint64_t microEpoch =  ((uint64_t)htonl(h0->TimeSeconds)*(uint64_t)1000000) + ((uint64_t)htonl((uint64_t)h0->TimeNanoseconds)/(uint64_t)1000);
+
                 //Init ping array
                 for(unsigned int i=0;i<nbBeams;i++){
                     Ping p(i);

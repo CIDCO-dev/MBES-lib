@@ -1,8 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*/
 
 /* 
  * File:   georeferenceTest.hpp
@@ -181,7 +179,7 @@ TEST_CASE("test if parameter r h p are invalid")
 
 TEST_CASE("test if parameter s is not valid")
 {
-    string commS = " -s test/data/SVP/SVP.txt -L ";
+    string commS = " -s 666.poop -L ";
     string commFile = " test/data/all/0008_20160909_135801_Panopee.all 2>&1";
     string commTest = GeoBinexec+commS+commFile;
     std::stringstream ss;
@@ -189,7 +187,7 @@ TEST_CASE("test if parameter s is not valid")
     std::string line;
     getline(ss,line);
     getline(ss,line);
-    REQUIRE(line=="Error while parsing test/data/all/0008_20160909_135801_Panopee.all: Svp file not valid");
+    REQUIRE(line=="Invalid SVP file (-s)");
 }
 
 TEST_CASE("test if parameter L T are not present")

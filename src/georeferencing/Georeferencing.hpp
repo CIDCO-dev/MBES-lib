@@ -126,12 +126,8 @@ public:
 
 	this->centroid=new Position(c.getTimestamp(), c.getLatitude(), c.getLongitude(), c.getEllipsoidalHeight());
         CoordinateTransform::getPositionECEF(centroidECEF,*this->centroid);
-        
 	CoordinateTransform::ned2ecef(ecef2ned,*this->centroid);
         ecef2ned.transposeInPlace();
-        
-        std::cerr << "Set centroid: " << *centroid << std::endl;
-        
     }
 
     /**

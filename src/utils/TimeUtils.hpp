@@ -6,9 +6,7 @@
 #define TIMEUTILS_HPP
 
 #include <cstring>
-#ifdef _WIN32
 #include <ctime>
-#endif
 
 /*!
 * \brief TimeUtils class
@@ -24,96 +22,35 @@ public:
 /**
  * Return the number microseconds since 1st January 1970 of the parameters in total
  * 
- * @param year number of year
- * @param month number of month less than an year
- * @param day number of day less than an month
- * @param hour number of hour less than an day
- * @param minutes number of minute les than an hour 
- * @param seconds number of second les than an second
- * @param millis number of millisecond less than an second
- * @param microseconds number of microsecond less than an millisecond
+ * @param year number of years (0-3000)
+ * @param month number of months (0-11)
+ * @param day number of days (1-31)
+ * @param hour number of hours (0-23)
+ * @param minutes number of minutes (0-59)
+ * @param seconds number of seconds
+ * @param millis number of milliseconds
+ * @param microseconds number of microseconds 
  */
 static uint64_t build_time(int year,int month,int day,int hour,int minutes,int seconds,int millis,int microseconds){
-        uint64_t nbrM = 0;
-        year = year-1970;
-        nbrM = nbrM+year;
-        int m = month;
-        int yday = 0;
-        while (m>0)
-        {
-            switch(m)
-            {
-                case 11:
-                 yday=yday+30;   
-                break;
-                
-                case 10:
-                 yday=yday+31;   
-                break;
-                
-                case 9:
-                 yday=yday+30;   
-                break;
-                
-                case 8:
-                 yday=yday+31;   
-                break;
-                
-                case 7:
-                 yday=yday+31;   
-                break;
-                
-                case 6:
-                 yday=yday+30;   
-                break;
-                
-                case 5:
-                 yday=yday+31;   
-                break;
-                
-                case 4:
-                 yday=yday+30;   
-                break;
-                
-                case 3:
-                 yday=yday+31;   
-                break;
-                
-                case 2:
-                 if (year % 4 == 0)
-                 {
-                     yday=yday+29;
-                 }
-                 else
-                 {
-                     yday=yday+28;
-                 }
-                break;
-                
-                case 1:
-                 yday=yday+31;   
-                break;
-            }
-            m = m-1;
-        }
-        yday=yday+day;
-        nbrM = nbrM*365 + yday;
-        int y = year+2;
-        while (y >= 4)
-        {
-            y = y-4;
-            nbrM = nbrM+1;
-        }
-        nbrM = nbrM*24 + hour;
-        nbrM = nbrM*60 + minutes;
-        nbrM = nbrM*60 + seconds;
-        nbrM = nbrM*1000000 + millis * 1000 + microseconds;
-	return nbrM;
+    struct tm t;
+    
+    t.tm_year  = year - 1900;
+    t.tm_mon   = month;
+    t.tm_mday  = day;
+    t.tm_hour  = hour;
+    t.tm_min   = minutes;
+    t.tm_sec   = seconds;
+
+    time_t epochTime = timegm(&t);
+    
+    uint64_t microEpoch = (uint64_t)epochTime * 1000000  + (uint64_t)millis * 1000 + (uint64_t)microseconds;
+    
+    return microEpoch;
 }
 
 /**
  * Return the number microseconds since 1st January 1970 of the parameters in total
- * 
+ * << std::endl
  * @param year number of year
  * @param month number of month less than an year
  * @param day number of day less than an month
