@@ -12,28 +12,41 @@ test_exec_dir=build\test\bin
 test_work_dir=build\test\work
 test_result_dir=build\test-report
 
-default:
-	mkdir $(exec_dir)
+default: prepare
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-dump.cpp $(INCLUDES) /EHsc /Fedatagram-dump.exe
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\cidco-decoder.cpp $(INCLUDES) /EHsc /Fecidco-decoder.exe
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-list.cpp $(INCLUDES) /EHsc /Fedatagram-list.exe
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\georeference.cpp $(INCLUDES) /EHsc /Fegeoreference.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\data-cleaning.cpp $(INCLUDES) /EHsc /Fedata-cleaning.exe
 
 test: default
 	mkdir $(test_exec_dir)
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test\\bin &&cl ..\\..\\..\\test\main.cpp $(INCLUDES) /EHsc /Fetests.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test\\bin &&cl ..\\..\\..\\test\\main.cpp $(INCLUDES) /EHsc /Fetests.exe
 	mkdir $(test_result_dir)
 	mkdir $(test_work_dir)
 	cd $(test_work_dir)
-	$(test_exec_dir)\tests -r junit -o $(test_result_dir)\mbes-lib-test-report.xml
-
-doc:
-	rm -rf build\doxygen
-	mkdir -p build\doxygen
-	doxygen
-	mkdir -p $(doc_dir)
+	$(test_exec_dir)\\tests -r junit -o $(test_result_dir)\\mbes-lib-test-report.xml
 
 clean:
 	rmdir /q /s build
+
+doc:
+	mkdir $(doc_dir)
+
+pcl-viewer: prepare
+	if exist build/tempCMake rmdir /s /q build/tempCMake
+	mkdir build/tempCMake
+	cd build/tempCMake && cmake ../../src/examples/viewer/ && make && move viewer ../bin/
+	rmdir /s /q build/tempCMake
+
+overlap: prepare
+	if exist build/tempCMake rmdir /s /q build/tempCMake
+	mkdir build/tempCMake
+	cd build/tempCMake && cmake ../../src/examples/overlap/ && make && move overlap ../bin/
+	rmdir /s /q build/tempCMake
+
+
+prepare:
+	if not exist $(exec_dir) mkdir $(exec_dir)
 
 .PHONY: all test clean doc

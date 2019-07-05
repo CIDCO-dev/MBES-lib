@@ -6,7 +6,11 @@
 #define XTFPARSER_HPP
 
 //TODO: under windows, in winsock.h
+#ifdef _WIN32
+#include <Winsock2.h>
+#else
 #include <arpa/inet.h>
+#endif
 
 #include <string>
 #include <stdio.h>
@@ -94,7 +98,7 @@ class XtfParser : public DatagramParser{
                  * @param c the XTF ChanInfo
                  */
 	        void processChanInfo(XtfChanInfo & c);
-                
+
                 /**
                  * Process Quinsy R2Sonic packets
                  */
@@ -415,11 +419,11 @@ std::string XtfParser::getName(int tag)
         case 105:
             return "XTF_HEADER_AUX_PROC";
         break;
-        
+
         case 106:
             return "XTF_HEADER_KLEIN3000_DATA_PAGE";
         break;
-        
+
         case 107:
             return "XTF_HEADER_POS_RAW_NAVIGATION";
         break;
@@ -622,7 +626,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 	}
 	else if(hdr.HeaderType==XTF_HEADER_POSITION){
 		XtfPosRawNavigation* position = (XtfPosRawNavigation*)packet;
-                
+
         	uint64_t microEpoch = TimeUtils::build_time(
                         position->Year,
                         position->Month-1,
@@ -633,7 +637,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
                         0,
                         position->TenthsOfMilliseconds *100
                 );
-                
+
         	processor.processPosition(
                         microEpoch,
                         position->RawXcoordinate,
@@ -643,7 +647,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 	}
         else if(hdr.HeaderType==XTF_HEADER_POS_RAW_NAVIGATION){
 		XtfHeaderNavigation_type42 * position = (XtfHeaderNavigation_type42*)packet;
-                
+
         	uint64_t microEpoch = TimeUtils::build_time(
                         position->Year,
                         position->Month-1,
@@ -654,7 +658,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
                         0,
                         position->Microseconds
                 );
-                
+
         	processor.processPosition(
                         microEpoch,
                         position->RawXCoordinate,
@@ -673,29 +677,29 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 }
 /**
  * Processes a QUINSy R2Sonic packet
- * 
+ *
  * BEWARE: While the XTF datagrams are little-endian, this packet is in BIG-ENDIAN. Because life is short and we're all going to die soon enough.
  * @param hdr
  * @param packet
  */
-void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * packet){   
-    
+void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * packet){
+
     if(htonl(((XtfHeaderQuinsyR2SonicBathy*)packet)->PacketName)==0x42544830){ //BTH0
         uint32_t nbBytes = htonl(((XtfHeaderQuinsyR2SonicBathy*)packet)->PacketSize);
 
         unsigned int packetIndex = sizeof(XtfHeaderQuinsyR2SonicBathy); //start after the header
 
         uint16_t nbBeams = 0;
-        
+
         std::vector<Ping> pings;
-        
+
         while(packetIndex < nbBytes){
             uint16_t sectionName  =  htons( * ((uint16_t*) (packet + packetIndex)));
             uint16_t sectionBytes =  htons( * ((uint16_t*) (packet + packetIndex + sizeof(uint16_t))));
 
             //printf("%c%c (%u bytes)\n",((char*)&sectionName)[1],((char*)&sectionName)[0],sectionBytes);
 
-            if(sectionName==0x4830){ 
+            if(sectionName==0x4830){
                 //H0 - Main header
                 XtfHeaderQuinsyR2SonicBathy_H0 * h0 = (XtfHeaderQuinsyR2SonicBathy_H0*) (packet + packetIndex);
                 nbBeams = htons(h0->Points);
@@ -715,26 +719,26 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
                 XtfHeaderQuinsyR2SonicBathy_A0 * a0 = (XtfHeaderQuinsyR2SonicBathy_A0*) (packet + packetIndex);
                 uint32_t first = htonl( *((uint32_t*) &a0->AngleFirst) );
                 uint32_t last  = htonl( *((uint32_t*) &a0->AngleLast) );
-                
+
                 double step = (   (*((float*)&first))   -   (*((float*)&last))   )/(double)nbBeams;
-                
+
                 double angle = (*((float*)&first));
-                
+
                 for(unsigned int i =0; i < nbBeams ;i++ ){
                     pings[i].setAcrossTrackAngle(angle);
                     angle += step;
                 }
-            }             
+            }
             else if(sectionName==0x4132){
                 //A2 - equidistant angle mode
-                XtfHeaderQuinsyR2SonicBathy_A2 * a2 = (XtfHeaderQuinsyR2SonicBathy_A2*) (packet + packetIndex); 
+                XtfHeaderQuinsyR2SonicBathy_A2 * a2 = (XtfHeaderQuinsyR2SonicBathy_A2*) (packet + packetIndex);
                 uint32_t first         = htonl( *((uint32_t*)&a2->AngleFirst));
                 float    angleFirst    = *((float*)&first);
-                
+
                 uint32_t scale         = htonl( *((uint32_t*)&a2->ScalingFactor));
                 float    scalingFactor = *((float*)&scale);
                 uint32_t sum           = 0;
-                
+
                 for(unsigned int i=0;i<nbBeams;i++){
                     sum += htons(((uint16_t*)&(a2->AngleStepArray))[i]);
                     float angle = ( angleFirst + sum * scalingFactor ) * R2D;
@@ -746,23 +750,23 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
                 XtfHeaderQuinsyR2SonicBathy_I1 * i1 = (XtfHeaderQuinsyR2SonicBathy_I1*) (packet + packetIndex);
                 uint32_t scale         = htonl( *((uint32_t*)&i1->ScalingFactor));
                 float    scalingFactor = *((float*)&scale);
-                
+
                 for(unsigned int i=0;i<nbBeams;i++){
                     double microPascals = htons(((uint16_t*)&(i1->IntensityArray))[i]) * scalingFactor;
-                    
+
                     // dbSPL = 20 * LOG10(uPa * 1000000/0.00002)
-                    
+
                     double intensityDb = (double)20 * log10((double)microPascals * (double)1000000 / (double)0.00002);
-                    
+
                     pings[i].setIntensity( intensityDb );
-                }   
+                }
             }
-            else if(sectionName==0x4730){                    
+            else if(sectionName==0x4730){
                 //G0
                 //XtfHeaderQuinsyR2SonicBathy_G0 * g0 = (XtfHeaderQuinsyR2SonicBathy_G0*) (packet + packetIndex);
                 //TODO: process depth gates settings?
             }
-            else if(sectionName==0x4731){            
+            else if(sectionName==0x4731){
                 //G1
                 //XtfHeaderQuinsyR2SonicBathy_G1 * g1 = (XtfHeaderQuinsyR2SonicBathy_G1*) (packet + packetIndex);
                 //TODO: process depth gates settings?
@@ -774,14 +778,14 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
                 for(unsigned int i=0;i<nbBeams;i++){
                     uint32_t quality = 0;
                     pings[i].setQuality( quality );
-                }                
+                }
             }
             else if(sectionName==0x5230){
                 //R0
                 XtfHeaderQuinsyR2SonicBathy_R0 * r0 = (XtfHeaderQuinsyR2SonicBathy_R0*) (packet + packetIndex);
                 uint16_t * ranges = &r0->RangeArray;
                 uint32_t scalingFactor=htonl(* ((uint32_t *) &r0->ScalingFactor));
-                
+
                 for(unsigned int i=0;i<nbBeams;i++){
                     double twtt = (*((float*) &scalingFactor )) * htons(ranges[i]);
                     pings[i].setTwoWayTravelTime( twtt );
@@ -793,7 +797,7 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
 
             packetIndex += sectionBytes;
         }
-        
+
         //Process complete pings
         for(auto i=pings.begin();i!=pings.end();i++){
 
