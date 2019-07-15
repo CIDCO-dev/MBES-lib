@@ -10,7 +10,7 @@
 #define GEOREFPCLVIEWER_CPP
 
 #ifdef _WIN32
-#include "src/getopt.h"
+#include "../../utils/getopt.h"
 #endif
 
 #include <cstdio>
