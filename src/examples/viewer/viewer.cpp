@@ -9,6 +9,9 @@
 #ifndef GEOREFPCLVIEWER_CPP
 #define GEOREFPCLVIEWER_CPP
 
+#ifdef _WIN32
+#include "src/getopt.h"
+#endif
 
 #include <cstdio>
 #include <cstdlib>
@@ -65,7 +68,7 @@ int main(int argc, char ** argv){
 	// #endif
 	// #ifdef _WIN32
 	// putenv("TZ");
-	// #endif	
+	// #endif
 
 
 	//Check CLI parameters for filenames
@@ -216,7 +219,7 @@ int main(int argc, char ** argv){
 
 	viewer->addPointCloud<pcl::PointXYZ> ( cloud, "sample cloud" );
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_COLOR, 0, 0, 1, "sample cloud" ); // Blue points
-    viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "sample cloud" );	
+    viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "sample cloud" );
 
 
 	// viewer->setPosition( 300, 100 ); // Position of the window on the screen

@@ -8,6 +8,9 @@
 #include <cstring>
 #include <ctime>
 
+#ifdef _WIN32
+#define timegm _mkgmtime
+#endif
 /*!
 * \brief TimeUtils class
 * \author Guillaume Labbe-Morissette
@@ -21,7 +24,7 @@ public:
 
 /**
  * Return the number microseconds since 1st January 1970 of the parameters in total
- * 
+ *
  * @param year number of years (0-3000)
  * @param month number of months (0-11)
  * @param day number of days (1-31)
@@ -29,11 +32,11 @@ public:
  * @param minutes number of minutes (0-59)
  * @param seconds number of seconds
  * @param millis number of milliseconds
- * @param microseconds number of microseconds 
+ * @param microseconds number of microseconds
  */
 static uint64_t build_time(int year,int month,int day,int hour,int minutes,int seconds,int millis,int microseconds){
     struct tm t;
-    
+
     t.tm_year  = year - 1900;
     t.tm_mon   = month;
     t.tm_mday  = day;
@@ -42,9 +45,9 @@ static uint64_t build_time(int year,int month,int day,int hour,int minutes,int s
     t.tm_sec   = seconds;
 
     time_t epochTime = timegm(&t);
-    
+
     uint64_t microEpoch = (uint64_t)epochTime * 1000000  + (uint64_t)millis * 1000 + (uint64_t)microseconds;
-    
+
     return microEpoch;
 }
 
@@ -67,41 +70,41 @@ uint64_t nbrM = 0;
             switch(m)
             {
                 case 11:
-                 yday=yday+30;   
+                 yday=yday+30;
                 break;
-                
+
                 case 10:
-                 yday=yday+31;   
+                 yday=yday+31;
                 break;
-                
+
                 case 9:
-                 yday=yday+30;   
+                 yday=yday+30;
                 break;
-                
+
                 case 8:
-                 yday=yday+31;   
+                 yday=yday+31;
                 break;
-                
+
                 case 7:
-                 yday=yday+31;   
+                 yday=yday+31;
                 break;
-                
+
                 case 6:
-                 yday=yday+30;   
+                 yday=yday+30;
                 break;
-                
+
                 case 5:
-                 yday=yday+31;   
+                 yday=yday+31;
                 break;
-                
+
                 case 4:
-                 yday=yday+30;   
+                 yday=yday+30;
                 break;
-                
+
                 case 3:
-                 yday=yday+31;   
+                 yday=yday+31;
                 break;
-                
+
                 case 2:
                  if (year % 4 == 0)
                  {
@@ -112,9 +115,9 @@ uint64_t nbrM = 0;
                      yday=yday+28;
                  }
                 break;
-                
+
                 case 1:
-                 yday=yday+31;   
+                 yday=yday+31;
                 break;
             }
             m = m-1;
@@ -133,11 +136,11 @@ uint64_t nbrM = 0;
 
 /**
  * Return the number microseconds since 1st January 1970 of the parameters in total
- * 
+ *
  * @param year number of year
  * @param yday number of day less than an year
  * @param hour number of hour less than an day
- * @param minutes number of minute les than an hour 
+ * @param minutes number of minute les than an hour
  * @param timeMicroseconds number of microsecond less than an minute
  */
 static uint64_t build_time(int year,int yday, int hour, int minutes, long timeInMicroSeconds){
@@ -158,9 +161,9 @@ static uint64_t build_time(int year,int yday, int hour, int minutes, long timeIn
 }
 
 /**
- * Return the timestamp in julian time format (yyyy-ddd hh:mm:ss) 
- * 
- * @param microEpoch number of microsecond of the timestamp 
+ * Return the timestamp in julian time format (yyyy-ddd hh:mm:ss)
+ *
+ * @param microEpoch number of microsecond of the timestamp
  */
 static std::string julianTime(uint64_t microEpoch)
 {
