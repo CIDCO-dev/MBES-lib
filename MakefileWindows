@@ -1,23 +1,23 @@
 CC=g++
 OPTIONS=-Wall #-std=c++0x
-INCLUDES=-IC:\Users\cidco\Library\eigen
+INCLUDES=-IC:\\Users\\cidco\\Library\\eigen
 VERSION=0.1.0
 
 root=$(shell pwd)
 
-exec_dir=build\bin
-doc_dir=build\doc
+exec_dir=build\\bin
+doc_dir=build\\doc
 
-test_exec_dir=build\test\bin
-test_work_dir=build\test\work
-test_result_dir=build\test-report
+test_exec_dir=build\\test\\bin
+test_work_dir=build\\test\\work
+test_result_dir=build\\test-report
 
 default: prepare
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-dump.cpp $(INCLUDES) /EHsc /Fedatagram-dump.exe
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\cidco-decoder.cpp $(INCLUDES) /EHsc /Fecidco-decoder.exe
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-list.cpp $(INCLUDES) /EHsc /Fedatagram-list.exe
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\georeference.cpp $(INCLUDES) /EHsc /Fegeoreference.exe
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\data-cleaning.cpp $(INCLUDES) /EHsc /Fedata-cleaning.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\georeference.cpp ..\\..\\src\\getopt.c $(INCLUDES) /EHsc /Fegeoreference.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\data-cleaning.cpp ..\\..\\src\\getopt.c $(INCLUDES) /EHsc /Fedata-cleaning.exe
 
 test: default
 	mkdir $(test_exec_dir)
@@ -34,17 +34,20 @@ doc:
 	mkdir $(doc_dir)
 
 pcl-viewer: prepare
-	if exist build/tempCMake rmdir /s /q build/tempCMake
-	mkdir build/tempCMake
-	cd build/tempCMake && cmake ../../src/examples/viewer/ && make && move viewer ../bin/
-	rmdir /s /q build/tempCMake
+	if exist build\\tempCMake rmdir /s /q build\\tempCMake
+	if exist $(exec_dir)\\pcl-viewer rmdir /s /q $(exec_dir)\\pcl-viewer
+	mkdir build\\tempCMake
+	mkdir $(exec_dir)\\pcl-viewer
+	cd build\\tempCMake && cmake -Ax64 -DCMAKE_PREFIX_PATH="C:\\Qt\\Qt5.12.2\\msvc2017_64\\lib\\cmake" ..\\..\\src\\examples\\viewer\\ && cmake --build . --config Release && move Release\\viewer.exe ..\\..\\build\\bin\\pcl-viewer
+	rmdir /s /q build\\tempCMake
 
 overlap: prepare
-	if exist build/tempCMake rmdir /s /q build/tempCMake
-	mkdir build/tempCMake
-	cd build/tempCMake && cmake ../../src/examples/overlap/ && make && move overlap ../bin/
-	rmdir /s /q build/tempCMake
-
+	if exist build\\tempCMake rmdir /s /q build\\tempCMake
+	if exist $(exec_dir)\\overlap rmdir /s /q $(exec_dir)\\overlap
+	mkdir build\\tempCMake
+	mkdir $(exec_dir)\\overlap
+	cd build\\tempCMake && cmake -Ax64 -DCMAKE_PREFIX_PATH="C:\\Qt\\Qt5.12.2\\msvc2017_64\\lib\\cmake" ..\\..\\src\\examples\\overlap\\ && cmake --build . --config Release && move Release\\overlap.exe ..\\..\\build\\bin\\overlap
+	rmdir /s /q build\\tempCMake
 
 prepare:
 	if not exist $(exec_dir) mkdir $(exec_dir)
