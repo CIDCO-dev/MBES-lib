@@ -6,6 +6,9 @@
  * \author Christian Bouchard, Guillaume Labbe-Morissette
  */
 
+#ifdef _WIN32
+#include "../../utils/getopt.h"
+#endif
 
 #include <iostream>
 #include <cstdint>
