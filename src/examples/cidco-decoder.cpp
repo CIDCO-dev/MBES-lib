@@ -9,6 +9,8 @@
 #include <iostream>
 #include <string>
 
+#pragma comment(lib, "Ws2_32.lib")
+
 /**Writes the usage information about the cidco-decoder*/
 void printUsage(){
 	std::cerr << "\n\

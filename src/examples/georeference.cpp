@@ -4,6 +4,11 @@
 #ifndef GEOREFERENCE_CPP
 #define GEOREFERENCE_CPP
 
+#ifdef _WIN32
+#include "../utils/getopt.h"
+#pragma comment(lib, "Ws2_32.lib")
+#endif
+
 #include <fstream>
 #include <Eigen/Dense>
 #include "../georeferencing/DatagramGeoreferencer.hpp"

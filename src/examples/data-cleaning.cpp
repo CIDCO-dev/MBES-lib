@@ -9,6 +9,11 @@
 #ifndef DATACLEANING_CPP
 #define DATACLEANING_CPP
 
+#ifdef _WIN32
+#include "../utils/getopt.h"
+#pragma comment(lib, "Ws2_32.lib")
+#endif
+
 #include <cstdio>
 #include <string>
 #include <iostream>
