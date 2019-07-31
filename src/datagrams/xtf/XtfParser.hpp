@@ -24,7 +24,7 @@
 /**
  * @author Guillaume Morissette
  *
- * Warning: this code runs on little-endian machines. It has not been shielded for variations in endianness, especially when big-endian datagrams are handled.
+ * Warning: this code runs on little-endian machines. It has not been shielded for variations in endianness, especially when big-endian vendor-datagrams are handled.
  */
 
 
@@ -82,6 +82,13 @@ class XtfParser : public DatagramParser{
 	        void processPingHeader(XtfPingHeader & hdr);
 
                 /**
+                 * Process the contents of the PingChanHeader
+                 * 
+                 * @param pingChanHdr the ping chan header
+                 */
+                void processPingChanHeader(XtfPingChanHeader & pingChanHdr);
+                
+                /**
                  * Process the contents of the FileHeader
                  *
                  * @param hdr the XTF FileHeader
@@ -96,12 +103,24 @@ class XtfParser : public DatagramParser{
 	        void processChanInfo(XtfChanInfo & c);
                 
                 /**
+                 * Process sidescan data
+                 * @param hdr 
+                 * @param data
+                 */
+                void processSidescanData(XtfPingChanHeader * hdr,void * data);
+                
+                
+                /**
                  * Process Quinsy R2Sonic packets
                  */
                 void processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * packet);
 
                 /**the XTF FileHeader*/
 		XtfFileHeader fileHeader;
+                
+                //FIXME: use a channel map to allow for different settings per channel
+                unsigned int bytesPerSample;
+                uint8_t      sampleFormat;
 };
 
 /**
@@ -142,7 +161,10 @@ void XtfParser::parse(std::string & filename){
 				int channelsInHeader = (channels > 6)?6:channels;
 
 				for(int i=0;i<channelsInHeader;i++){
-					processChanInfo(fileHeader.Channels[i]);
+                                    sampleFormat = fileHeader.Channels[i].SampleFormat;//FIXME: this is wrong
+                                    
+                                    
+                                    processChanInfo(fileHeader.Channels[i]);
 				}
 
 				//Lire les structs CHANINFO qui suivent le header
@@ -453,26 +475,27 @@ int XtfParser::getTotalNumberOfChannels(){
  * @param f the XTF FileHeader
  */
 void XtfParser::processFileHeader(XtfFileHeader & f){
-    /*
-        printf("------------\n");
-        printf("FileFormat: %d\n",f.FileFormat);
-        printf("SystemType: %d\n",f.SystemType);
-        printf("RecordingProgramName: %s\n",f.RecordingProgramName);
-        printf("RecordingProgramVersion: %s\n",f.RecordingProgramVersion);
-        printf("SonarName: %s\n",f.SonarName);
-        printf("sonarType: %d (%s)\n",f.SonarType,SonarTypes[f.SonarType].c_str());
-        printf("NoteString: %s\n",f.NoteString);
-        printf("ThisFileName: %s\n",f.ThisFileName);
-        printf("NavUnits: %d\n",f.NavUnits);
-        printf("NumberOfSonarChannels: %d\n",f.NumberOfSonarChannels);
-        printf("NumberOfBathymetryChannels: %d\n",f.NumberOfBathymetryChannels);
-        printf("NumberOfSnippetChannels: %d\n",f.NumberOfSnippetChannels);
-        printf("NumberOfForwardLookArrays: %d\n",f.NumberOfForwardLookArrays);
-        printf("NumberOfEchoStrengthChannels: %d\n",f.NumberOfEchoStrengthChannels);
-        printf("NumberOfInterferometryChannels: %d\n",f.NumberOfInterferometryChannels);
-        printf("Reserved1: %d\n",f.Reserved1);
-        printf("Reserved2: %d\n",f.Reserved2);
-        printf("ReferencePointHeight: %f\n",f.ReferencePointHeight);
+        fprintf(stderr,"------------\n");
+        fprintf(stderr,"File Header\n\n");        
+        fprintf(stderr,"FileFormat: %d\n",f.FileFormat);
+        fprintf(stderr,"SystemType: %d\n",f.SystemType);
+        fprintf(stderr,"RecordingProgramName: %s\n",f.RecordingProgramName);
+        fprintf(stderr,"RecordingProgramVersion: %s\n",f.RecordingProgramVersion);
+        fprintf(stderr,"SonarName: %s\n",f.SonarName);
+        fprintf(stderr,"sonarType: %d (%s)\n",f.SonarType,SonarTypes[f.SonarType].c_str());
+        fprintf(stderr,"NoteString: %s\n",f.NoteString);
+        fprintf(stderr,"ThisFileName: %s\n",f.ThisFileName);
+        fprintf(stderr,"NavUnits: %d\n",f.NavUnits);
+        fprintf(stderr,"NumberOfSonarChannels: %d\n",f.NumberOfSonarChannels);
+        fprintf(stderr,"NumberOfBathymetryChannels: %d\n",f.NumberOfBathymetryChannels);
+        fprintf(stderr,"NumberOfSnippetChannels: %d\n",f.NumberOfSnippetChannels);
+        fprintf(stderr,"NumberOfForwardLookArrays: %d\n",f.NumberOfForwardLookArrays);
+        fprintf(stderr,"NumberOfEchoStrengthChannels: %d\n",f.NumberOfEchoStrengthChannels);
+        fprintf(stderr,"NumberOfInterferometryChannels: %d\n",f.NumberOfInterferometryChannels);
+        fprintf(stderr,"Reserved1: %d\n",f.Reserved1);
+        fprintf(stderr,"Reserved2: %d\n",f.Reserved2);
+        fprintf(stderr,"ReferencePointHeight: %f\n",f.ReferencePointHeight);
+        
         //TODO
         //printf("ProjectionType: ");
         //print(f.ProjectionType,12);
@@ -481,21 +504,20 @@ void XtfParser::processFileHeader(XtfFileHeader & f){
         //print(f.SpheriodType,10);
         //printf("\n");
 
-        printf("NavigationLatency: %d\n",f.NavigationLatency);
-        printf("OriginY: %f\n",f.OriginY);
-        printf("OriginX: %f\n",f.OriginX);
-        printf("NavOffsetY: %f\n",f.NavOffsetY);
-        printf("NavOffsetX: %f\n",f.NavOffsetX);
-        printf("NavOffsetZ: %f\n",f.NavOffsetZ);
-        printf("NavOffsetYaw: %f\n",f.NavOffsetYaw);
-        printf("MRUOffsetY: %f\n",f.MRUOffsetY);
-        printf("MRUOffsetX: %f\n",f.MRUOffsetX);
-        printf("MRUOffsetZ: %f\n",f.MRUOffsetZ);
-        printf("MRUOffsetYaw: %f\n",f.MRUOffsetYaw);
-        printf("MRUOffsetPitch: %f\n",f.MRUOffsetPitch);
-        printf("MRUOffsetRoll: %f\n",f.MRUOffsetRoll);
-        printf("------------\n");
-        */
+        fprintf(stderr,"NavigationLatency: %d\n",f.NavigationLatency);
+        fprintf(stderr,"OriginY: %f\n",f.OriginY);
+        fprintf(stderr,"OriginX: %f\n",f.OriginX);
+        fprintf(stderr,"NavOffsetY: %f\n",f.NavOffsetY);
+        fprintf(stderr,"NavOffsetX: %f\n",f.NavOffsetX);
+        fprintf(stderr,"NavOffsetZ: %f\n",f.NavOffsetZ);
+        fprintf(stderr,"NavOffsetYaw: %f\n",f.NavOffsetYaw);
+        fprintf(stderr,"MRUOffsetY: %f\n",f.MRUOffsetY);
+        fprintf(stderr,"MRUOffsetX: %f\n",f.MRUOffsetX);
+        fprintf(stderr,"MRUOffsetZ: %f\n",f.MRUOffsetZ);
+        fprintf(stderr,"MRUOffsetYaw: %f\n",f.MRUOffsetYaw);
+        fprintf(stderr,"MRUOffsetPitch: %f\n",f.MRUOffsetPitch);
+        fprintf(stderr,"MRUOffsetRoll: %f\n",f.MRUOffsetRoll);
+        fprintf(stderr,"------------\n");
 }
 
 /**
@@ -504,30 +526,30 @@ void XtfParser::processFileHeader(XtfFileHeader & f){
  * @param c the XTF ChanInfo
  */
 void XtfParser::processChanInfo(XtfChanInfo & c){
-    /*
-        printf("------------\n");
-        printf("TypeOfChannel: %d\n",c.TypeOfChannel);
-        printf("SubChannelNumber: %d\n",c.SubChannelNumber);
-        printf("CorrectionFlags: %d\n",c.CorrectionFlags);
-        printf("UniPolar: %d\n",c.UniPolar);
-        printf("BytesPerSample: %d\n",c.BytesPerSample);
-        printf("Reserved: %d\n",c.Reserved);
-        printf("ChannelName: %s\n",c.ChannelName);
-        printf("VoltScale: %f\n",c.VoltScale);
-        printf("Frequency: %f\n",c.Frequency);
-        printf("HorizBeamAngle: %f\n",c.HorizBeamAngle);
-        printf("TiltAngle: %f\n",c.TiltAngle);
-        printf("BeamWidth: %f\n",c.BeamWidth);
-        printf("OffsetX: %f\n",c.OffsetX));
-        printf("OffsetY: %f\n",c.OffsetY);
-        printf("OffsetZ: %f\n",c.OffsetZ);
-        printf("OffsetYaw: %f\n",c.OffsetYaw);
-        printf("OffsetPitch: %f\n",c.OffsetPitch);
-        printf("OffsetRoll: %f\n",c.OffsetRoll);
-        printf("BeamsPerArray: %d\n",c.BeamsPerArray);
-        printf("ReservedArea2: %s\n",c.ReservedArea2);
-        printf("------------\n");
-        */
+        fprintf(stderr,"------------\n");
+        fprintf(stderr,"Channel Information\n\n");
+        fprintf(stderr,"TypeOfChannel: %d\n",c.TypeOfChannel);
+        fprintf(stderr,"SubChannelNumber: %d\n",c.SubChannelNumber);
+        fprintf(stderr,"CorrectionFlags: %d\n",c.CorrectionFlags);
+        fprintf(stderr,"UniPolar: %d\n",c.UniPolar);
+        fprintf(stderr,"BytesPerSample: %d\n",c.BytesPerSample);
+        fprintf(stderr,"Reserved: %d\n",c.Reserved);
+        fprintf(stderr,"ChannelName: %s\n",c.ChannelName);
+        fprintf(stderr,"VoltScale: %f\n",c.VoltScale);
+        fprintf(stderr,"Frequency: %f\n",c.Frequency);
+        fprintf(stderr,"HorizBeamAngle: %f\n",c.HorizBeamAngle);
+        fprintf(stderr,"TiltAngle: %f\n",c.TiltAngle);
+        fprintf(stderr,"BeamWidth: %f\n",c.BeamWidth);
+        fprintf(stderr,"OffsetX: %f\n",c.OffsetX);
+        fprintf(stderr,"OffsetY: %f\n",c.OffsetY);
+        fprintf(stderr,"OffsetZ: %f\n",c.OffsetZ);
+        fprintf(stderr,"OffsetYaw: %f\n",c.OffsetYaw);
+        fprintf(stderr,"OffsetPitch: %f\n",c.OffsetPitch);
+        fprintf(stderr,"OffsetRoll: %f\n",c.OffsetRoll);
+        fprintf(stderr,"BeamsPerArray: %d\n",c.BeamsPerArray);
+        fprintf(stderr,"SampleFormat: %d\n",c.SampleFormat);
+        fprintf(stderr,"ReservedArea2: %s\n",c.ReservedArea2);
+        fprintf(stderr,"------------\n");
 }
 
 /**
@@ -667,10 +689,69 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 		processPingHeader(*pingHdr);
                 processQuinsyR2SonicBathy(hdr,packet+sizeof(XtfPingHeader));
         }
+        else if(hdr.HeaderType==XTF_HEADER_SONAR){
+            unsigned int sampleBytesRead = 0;
+
+            //sidescan data
+            XtfPingHeader * pingHdr = (XtfPingHeader*) packet;
+            
+            processPingHeader(*pingHdr);
+            
+            for(unsigned int i=0;i<hdr.NumChansToFollow;i++){
+                XtfPingChanHeader * pingChanHdr = (XtfPingChanHeader *) (packet+sizeof(XtfPingHeader) + i*sizeof(XtfPingChanHeader) + sampleBytesRead);
+                processPingChanHeader(*pingChanHdr);
+                
+                unsigned char * data = (unsigned char *) (packet+sizeof(XtfPingHeader) + (i+1)*sizeof(XtfPingChanHeader) + sampleBytesRead);
+                
+                processSidescanData(pingChanHdr,data);
+                
+                sampleBytesRead += pingChanHdr->NumSamples * bytesPerSample;
+            }
+        }
 	else{
 		printf("Unknown packet type: %d\n",(int)hdr.HeaderType);
 	}
 }
+
+void XtfParser::processPingChanHeader(XtfPingChanHeader & pingChanHdr){
+    
+}
+
+void XtfParser::processSidescanData(XtfPingChanHeader * hdr,void * data){
+    //This is not a pretty hack, but we need to support every sample type
+    
+    std::vector<double> samples; //we will boil down all the types to double
+    
+    for(unsigned int i=0;i<hdr->NumSamples;i++){
+        double sample = 0;
+        
+        if(sampleFormat == 1){
+            //TODO: wtf is an "IBM float" in C?
+            throw new std::invalid_argument("Sample format is IBM float");
+        }
+        else if(sampleFormat == 2){
+            sample = ((uint32_t*)data)[i];
+        }
+        else if(sampleFormat == 3){
+            sample = ((uint16_t*)data)[i];
+        }
+        else if(sampleFormat == 5){
+            sample = ((float*)data)[i];
+        }
+        else if(sampleFormat == 8){
+            sample = ((uint8_t*)data)[i];
+        }        
+        else{
+            throw new std::invalid_argument("Sample format unused");
+        }
+
+        samples.push_back(sample);
+    }
+    
+    processor.processSidescanData(samples);
+}
+
+
 /**
  * Processes a QUINSy R2Sonic packet
  * 

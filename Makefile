@@ -24,7 +24,8 @@ default: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/data-cleaning src/examples/data-cleaning.cpp
-
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/sidescan-dump src/examples/sidescan-dump.cpp
+	
 test: default
 	mkdir -p $(test_exec_dir)
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp
