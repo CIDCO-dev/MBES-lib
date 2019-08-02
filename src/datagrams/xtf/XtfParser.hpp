@@ -120,7 +120,7 @@ class XtfParser : public DatagramParser{
                 
                 //FIXME: use a channel map to allow for different settings per channel
                 unsigned int bytesPerSample;
-                uint8_t      sampleFormat;
+                unsigned int sampleFormat;
 };
 
 /**
@@ -161,8 +161,8 @@ void XtfParser::parse(std::string & filename){
 				int channelsInHeader = (channels > 6)?6:channels;
 
 				for(int i=0;i<channelsInHeader;i++){
-                                    sampleFormat = fileHeader.Channels[i].SampleFormat;//FIXME: this is wrong
-                                    
+                                    sampleFormat   = fileHeader.Channels[i].SampleFormat;//FIXME: this is wrong
+                                    bytesPerSample = fileHeader.Channels[i].BytesPerSample;//FIXME: this is wrong
                                     
                                     processChanInfo(fileHeader.Channels[i]);
 				}
@@ -701,7 +701,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
                 XtfPingChanHeader * pingChanHdr = (XtfPingChanHeader *) (packet+sizeof(XtfPingHeader) + i*sizeof(XtfPingChanHeader) + sampleBytesRead);
                 processPingChanHeader(*pingChanHdr);
                 
-                unsigned char * data = (unsigned char *) (packet+sizeof(XtfPingHeader) + (i+1)*sizeof(XtfPingChanHeader) + sampleBytesRead);
+                unsigned char * data = ((unsigned char *)pingChanHdr) + sizeof(XtfPingChanHeader);
                 
                 processSidescanData(pingChanHdr,data);
                 
@@ -717,15 +717,29 @@ void XtfParser::processPingChanHeader(XtfPingChanHeader & pingChanHdr){
     
 }
 
-void XtfParser::processSidescanData(XtfPingChanHeader * hdr,void * data){
-    //This is not a pretty hack, but we need to support every sample type
-    
-    std::vector<double> samples; //we will boil down all the types to double
+void XtfParser::processSidescanData(XtfPingChanHeader * hdr,void * data){   
+    std::vector<double> samples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
     
     for(unsigned int i=0;i<hdr->NumSamples;i++){
         double sample = 0;
         
-        if(sampleFormat == 1){
+        if(sampleFormat == 0){
+            //legacy
+            if(bytesPerSample == 1){
+                sample = ((uint8_t*)data)[i];
+            }
+            else if(bytesPerSample == 2){
+                sample = ((uint16_t*)data)[i];
+            }
+            else if(bytesPerSample == 4){
+                sample = ((uint32_t*)data)[i];
+            }
+            else{
+                std::cerr << "Bytes per sample: " << bytesPerSample << std::endl;
+                throw new std::invalid_argument("Bad bytes per sample format");                
+            }
+        }
+        else if(sampleFormat == 1){
             //TODO: wtf is an "IBM float" in C?
             throw new std::invalid_argument("Sample format is IBM float");
         }
@@ -742,13 +756,14 @@ void XtfParser::processSidescanData(XtfPingChanHeader * hdr,void * data){
             sample = ((uint8_t*)data)[i];
         }        
         else{
+            std::cerr << "Sample Format: " << sampleFormat << std::endl;
             throw new std::invalid_argument("Sample format unused");
         }
 
         samples.push_back(sample);
     }
     
-    processor.processSidescanData(samples);
+    processor.processSidescanData(hdr->ChannelNumber,samples);
 }
 
 

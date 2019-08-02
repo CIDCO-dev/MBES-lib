@@ -11,7 +11,9 @@
 
 #include "../datagrams/DatagramParserFactory.hpp"
 #include <iostream>
+#include <vector>
 #include <string>
+#include "opencv2/highgui/highgui.hpp"
 
 /**Writes the usage information about the datagram-list*/
 void printUsage(){
@@ -32,11 +34,11 @@ void printUsage(){
 */
 class SidescanDataDumper : public DatagramEventHandler{
 public:
-
+        
 	/**
 	* Creates a SidescanDataDumper
 	*/
-	SidescanDataDumper(){
+	SidescanDataDumper(std::string & filename):filename(filename){
 
 	}
 
@@ -45,9 +47,59 @@ public:
 
 	}
 
-        void processSidescanData(std::vector<double> & data){
-            std::cout << data.size() << " samples" << std::endl;
+        void processSidescanData(unsigned int channel,std::vector<double> & data){
+            
+            if(channels.size() < channel+1){
+                std::vector<std::vector<double>*> * u = new std::vector<std::vector<double>*>();
+                channels.push_back(u);
+            }
+            
+            std::vector<double> * v = new std::vector<double>();
+            
+            for(auto i=data.begin();i!=data.end();i++){
+                //std::cerr << *i << " ";
+                v->push_back(*i);
+            }
+            
+            //std::cerr << std::endl;
+
+            channels[channel]->push_back(v);           
         }
+        
+        void generateImages(){
+            std::cerr << "Generating images for " << channels.size() << " channels" << std::endl;
+
+            for(unsigned int i=0;i<channels.size();i++){
+                std::stringstream ss;
+                
+                ss << filename <<  "-channel-" << i << ".jpg";
+                std::cerr << "Channel " << i << std::endl;
+                
+                cv::Mat img(channels[i]->size(),channels[i]->at(0)->size(), CV_64F,cv::Scalar(70));
+                
+                std::cerr << "Rows: " << channels[i]->size() << " Cols: " << channels[i]->at(0)->size() << std::endl;                 
+                
+                for(unsigned int j=0;j<channels[i]->size();j++){ //j indexes rows
+                    for(unsigned int k=0;k<channels[i]->at(j)->size();k++){ //k indexes cols 
+                        img.at<double>(j, k, 0) = channels[i]->at(j)->at(k);
+                    }
+                }
+                
+		/*
+		cv::namedWindow("Image", CV_WINDOW_AUTOSIZE);
+		cv::imshow("Image",img);
+		cv::waitKey(0);
+		cv::destroyWindow("Image");
+		*/
+                cv::normalize(img,img,500000,0);
+		imwrite(ss.str(), img);                
+            }
+        }
+        
+private:
+    std::string filename;
+    
+    std::vector<  std::vector<std::vector<double> * > * > channels;
 };
 
 /**
@@ -58,9 +110,8 @@ public:
 */
 int main (int argc , char ** argv ){
 	DatagramParser *    parser      = NULL;
-	SidescanDataDumper  sidescan;
 
-	#ifdef __GNU__
+        #ifdef __GNU__
 	setenv("TZ", "UTC", 1);
 	#endif
 	#ifdef _WIN32
@@ -74,11 +125,15 @@ int main (int argc , char ** argv ){
 	std::string fileName(argv[1]);
 
 	try{
+            	SidescanDataDumper  sidescan(fileName);
+
 		std::cerr << "Decoding " << fileName << std::endl;
 
 		parser = DatagramParserFactory::build(fileName,sidescan);
 
 		parser->parse(fileName);
+                
+                sidescan.generateImages();
 	}
 	catch(std::exception * e){
 		std::cerr << "Error while parsing " << fileName << ": " << e->what() << std::endl;
