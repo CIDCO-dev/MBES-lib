@@ -13,7 +13,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/opencv.hpp"
 
 /**Writes the usage information about the datagram-list*/
 void printUsage(){
@@ -84,15 +84,18 @@ public:
                         img.at<double>(j, k, 0) = channels[i]->at(j)->at(k);
                     }
                 }
-                
+
 		/*
 		cv::namedWindow("Image", CV_WINDOW_AUTOSIZE);
 		cv::imshow("Image",img);
 		cv::waitKey(0);
 		cv::destroyWindow("Image");
 		*/
-                cv::normalize(img,img,500000,0);
-		imwrite(ss.str(), img);                
+                cv::normalize(img,img,200000,0);
+		cv::Mat I;
+		img.convertTo(I, CV_8UC1);
+		equalizeHist(I,I);
+		imwrite(ss.str(), I);                
             }
         }
         
