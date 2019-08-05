@@ -495,7 +495,7 @@ void KongsbergParser::processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned ch
 
   for(unsigned int i=0;i<data->nbRxPackets;i++){
     //We'll hack-in the the beam angle as ID...May Satan forgive us
-    processor.processPing(microEpoch,rx[i].beamAngle,(double)rx[i].beamAngle/(double)100,(double)txEntries[rx[i].txSectorNumber]->tiltAngle/(double)100,rx[i].twoWayTravelTime,rx[i].qualityFactor,rx[i].reflectivity);
+    processor.processPing(microEpoch,rx[i].beamAngle,(double)rx[i].beamAngle/(double)100,(double)txEntries[rx[i].txSectorNumber]->tiltAngle/(double)100,rx[i].twoWayTravelTime,rx[i].qualityFactor,rx[i].reflectivity * 0.5);
   }
 }
 

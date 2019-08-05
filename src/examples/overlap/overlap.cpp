@@ -6,6 +6,9 @@
  * \author Christian Bouchard, Guillaume Labbe-Morissette
  */
 
+#ifdef _WIN32
+#include "../../utils/getopt.h"
+#endif
 
 #include <iostream>
 #include <cstdint>
@@ -26,7 +29,7 @@
 #include <pcl/visualization/pcl_visualizer.h>
 
 
-#include "../../PointCloudGeoreferencer.hpp"
+#include "../../georeferencing/PointCloudGeoreferencer.hpp"
 
 #include "../../svp/SoundVelocityProfile.hpp"
 
@@ -35,9 +38,9 @@
 #include "../../utils/StringUtils.hpp"
 #include "../../utils/Exception.hpp"
 
-#include "../../HullOverlap.hpp"
+#include "../../geometry/HullOverlap.hpp"
 
-#include "../smallUtilityFunctions.hpp"
+#include "../viewer/smallUtilityFunctions.hpp"
 
 
 /**Writes the usage information about the program*/
@@ -219,10 +222,10 @@ int main( int argc, char* argv[] )
     double d = 0;
 
     // Get actual values from CLI
-    convertStringToDouble( argv[ optind + 2 ], a, "Plane parameter 'a'" );
-    convertStringToDouble( argv[ optind + 3 ], b, "Plane parameter 'b'" );
-    convertStringToDouble( argv[ optind + 4 ], c, "Plane parameter 'c'" );
-    convertStringToDouble( argv[ optind + 5 ], d, "Plane parameter 'd'" );
+    a = atof(argv[ optind + 2 ]);
+    b = atof(argv[ optind + 3 ]);
+    c = atof(argv[ optind + 4 ]);
+    d = atof(argv[ optind + 5 ]);
 
     std::cout << "\na: " << a << "\n" 
         << "b: " << b << "\n"
@@ -237,8 +240,8 @@ int main( int argc, char* argv[] )
     if ( argc == ( optind + 8 ) )
     {
         // Get actual values from CLI
-        convertStringToDouble( argv[ optind + 6 ], alphaLine1, "alphaLine1", true );
-        convertStringToDouble( argv[ optind + 7 ], alphaLine2, "alphaLine2", true );
+        alphaLine1 = atof( argv[ optind + 6 ]);
+        alphaLine2 = atof( argv[ optind + 7 ]);
     }    
 
 

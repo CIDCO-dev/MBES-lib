@@ -1,5 +1,5 @@
 CC=g++
-OPTIONS=-Wall -std=c++11
+OPTIONS=-Wall -std=c++11 -g
 INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
@@ -15,7 +15,10 @@ coverage_dir=build/coverage
 coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
-default: prepare pcl-viewer overlap
+all: default pcl-viewer overlap
+	echo "Building all"
+
+default: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
@@ -77,6 +80,4 @@ overlap: prepare
 
 prepare:
 	mkdir -p $(exec_dir)
-
-
 .PHONY: all test clean doc

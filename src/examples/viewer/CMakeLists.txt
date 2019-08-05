@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
 project(VIEWER)
 find_package(PCL 1.3 REQUIRED)
 find_package(Qt5Widgets REQUIRED)
+find_package (Eigen3 3.3 REQUIRED)
+
 
 include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})

@@ -324,7 +324,7 @@ std::string S7kParser::getName(int tag)
         break;
 
         case 7010:
-            return "TVQ Values";
+            return "TVG Values";
         break;
 
         case 7011:
@@ -569,7 +569,7 @@ void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * da
 	for(unsigned int i = 0;i<nEntries;i++) {
 		S7kRawDetectionDataRD *ping = (S7kRawDetectionDataRD*)(data+sizeof(S7kRawDetectionDataRTH) + i*swath->dataFieldSize);
 		double twoWayTravelTime = (double)ping->detectionPoint / samplingRate; // see Appendix F p. 190
-		double intensity = swath->dataFieldSize > 22 ? ping->signalStrength : 0; //see p. 79-80
+		double intensity = swath->dataFieldSize > 22 ? ping->signalStrength : 0; 
 		processor.processPing(microEpoch,(long)ping->beamDescriptor,(double)ping->receptionAngle*R2D,tiltAngle,twoWayTravelTime,ping->quality,intensity);
         }
 

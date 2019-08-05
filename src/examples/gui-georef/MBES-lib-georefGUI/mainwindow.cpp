@@ -204,8 +204,10 @@ void MainWindow::on_Process_clicked()
 
             if (inFile)
             {
+                //TODO: allow selection between georeferencing modes
+                Georeferencing * georef = new GeoreferencingTRF();
 
-                DatagramGeoreferencerToOstream printer( outFile );
+                DatagramGeoreferencerToOstream printer( outFile ,georef );
 
                 if ( ends_with( inputFileName.c_str(),".all" ) )
                 {
@@ -237,7 +239,9 @@ void MainWindow::on_Process_clicked()
                 Eigen::Matrix3d boresight;
                 Boresight::buildMatrix( boresight, boresightAngles );
 
-                printer.georeference( leverArm, boresight );
+                //TODO: get SVP
+
+                printer.georeference( leverArm, boresight,NULL );
 
                 qDebug() << "Done georeferencing \n" << tr( inputFileName.c_str() );
 

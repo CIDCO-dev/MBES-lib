@@ -27,8 +27,8 @@ private:
   /**Value of the quality of the ping*/
   uint32_t quality;
 
-  /**Value of the intensity of the ping*/
-  int32_t intensity;
+  /**Value of the intensity of the ping in decibels*/
+  double intensity;
 
   /**The sound speed value of the surface*/
   double surfaceSoundSpeed;
@@ -58,109 +58,179 @@ private:
 
 
 public:
+    
+    /**
+     * Create the ping
+     * 
+     * @param microEpoch timestamp value of the ping
+     * @param id identification of the ping
+     * @param quality quality of the ping
+     * @param intensity intensity of the ping
+     * @param surfaceSoundSpeed the sound speed of the surface
+     * @param twoWayTravelTime time value of the transition between
+     * @param alongTrackAngle Angle who pass along the track
+     * @param acrossTrackAngle Angle who pass across the track
+     */
+    Ping(
+	uint64_t microEpoch,
+	long     id,
+	uint32_t quality,
+	double   intensity,
 
-  /**
-  * Creates the ping
-  *
-  * @param microEpoch timestamp value of the ping
-  * @param id identification of the ping
-  * @param quality quality of the ping
-  * @param intensity intensity of the ping
-  * @param surfaceSoundSpeed the sound speed of the surface
-  * @param twoWayTravelTime time value of the transition between
-  * @param alongTrackAngle Angle who pass along the track
-  * @param acrossTrackAngle Angle who pass across the track
-  */
-  Ping(
-    uint64_t microEpoch,
-    long     id,
-    uint32_t quality,
-    int32_t intensity,
+        double surfaceSoundSpeed,
+        double twoWayTravelTime,
+        double alongTrackAngle,
+        double acrossTrackAngle
+    ):
+    timestamp(microEpoch),
+    id(id),
+    quality(quality),
+    intensity(intensity),
+    surfaceSoundSpeed(surfaceSoundSpeed),
+    twoWayTravelTime(twoWayTravelTime),
+    alongTrackAngle(alongTrackAngle),
+    acrossTrackAngle(acrossTrackAngle),
+    sA(sin(alongTrackAngle*D2R)),
+    cA(cos(alongTrackAngle*D2R)),
+    sB(sin(acrossTrackAngle*D2R)),
+    cB(cos(acrossTrackAngle*D2R)){
+    }
+    
+    Ping(long id):id(id),quality(0),intensity(0),alongTrackAngle(0),acrossTrackAngle(0){
+        refresh();
+    }
 
-    double surfaceSoundSpeed,
-    double twoWayTravelTime,
-    double alongTrackAngle,
-    double acrossTrackAngle
-  ):
-  timestamp(microEpoch),
-  id(id),
-  quality(quality),
-  intensity(intensity),
-  surfaceSoundSpeed(surfaceSoundSpeed),
-  twoWayTravelTime(twoWayTravelTime),
-  alongTrackAngle(alongTrackAngle),
-  acrossTrackAngle(acrossTrackAngle),
-  sA(sin(alongTrackAngle*D2R)),
-  cA(cos(alongTrackAngle*D2R)),
-  sB(sin(acrossTrackAngle*D2R)),
-  cB(cos(acrossTrackAngle*D2R)){
-  }
+    /** Destroy the ping*/
+    ~Ping() {
 
-  /** Destroys the ping*/
-  ~Ping() {
+    }
+    
+    void refresh(){
+        sA = sin(alongTrackAngle*D2R);
+        cA = cos(alongTrackAngle*D2R);
+        sB = sin(acrossTrackAngle*D2R);
+        cB = cos(acrossTrackAngle*D2R);          
+    }
 
-  }
+    /**Return the across track angle*/
+    double getAcrossTrackAngle() {
+        return acrossTrackAngle;
+    }
+    
+    void setAcrossTrackAngle(double acrossAngle){
+        acrossTrackAngle = acrossAngle;
+        sB = sin(acrossAngle*D2R);
+        cB = cos(acrossAngle*D2R);
+    }
 
-  /**Returns the across track angle*/
-  double getAcrossTrackAngle() {
-    return acrossTrackAngle;
-  }
+    /**Return the along track angle*/
+    double getAlongTrackAngle() {
+        return alongTrackAngle;
+    }
+    
+    void setAlongTrackAngle(double alongAngle){
+        alongTrackAngle = alongAngle;
+        sA = sin(alongAngle*D2R);
+        cA = cos(alongAngle*D2R);
+    }
 
-  /**Returns the along track angle*/
-  double getAlongTrackAngle() {
-    return alongTrackAngle;
-  }
+    /**Return the cosine value of the along track angle*/
+    double getCA() {
+        return cA;
+    }
 
-  /**Returns the cosine value of the along track angle*/
-  double getCA() {
-    return cA;
-  }
+    /**Return the cosine value of the across track angle*/
+    double getCB() {
+        return cB;
+    }
 
-  /**Returns the cosine value of the across track angle*/
-  double getCB() {
-    return cB;
-  }
+    /**Return the timestamp of the ping*/
+    uint64_t getTimestamp() {
+        return timestamp;
+    }
 
-  /**Returns the timestamp of the ping*/
-  double getTimestamp() {
-    return timestamp;
-  }
+    /**Return the timestamp of the ping*/
+    void setTimestamp(uint64_t t) {
+        timestamp = t;
+    }    
+    
+    /**
+     * Returns the ID
+     * @return ID
+     */
+    long getId(){
+        return id;
+    }
+    
+    /**
+     * Sets the ID
+     */
+    void setId(long id){
+        id=id;
+    }
+    
+    
+    /**Return the sine value of the along track angle*/
+    double getSA(){
+	return sA;
+    }
 
-  /**Returns the sine value of the along track angle*/
-  double getSA(){
-    return sA;
-  }
+    /**Return the sine value of the across track angle*/
+    double getSB() {
+        return sB;
+    }
 
-  /**Returns the sine value of the across track angle*/
-  double getSB() {
-    return sB;
-  }
+    /**Return the sound speed of the surface*/
+    double getSurfaceSoundSpeed(){
+	return surfaceSoundSpeed;
+    }
+    
+    /**
+     * Set the surface sound speed
+     * @param sss Surface Sound Speed
+     */
+    void setSurfaceSoundSpeed(double sss){
+        surfaceSoundSpeed = sss;
+    }
 
-  /**Returns the sound speed of the surface*/
-  double getSurfaceSoundSpeed(){
-    return surfaceSoundSpeed;
-  }
+    /**Return the time value of the transition between two points*/
+    double getTwoWayTravelTime() {
+        return twoWayTravelTime;
+    }
+    
+    /**
+     * Set the two-way travel time
+     * @param twtt
+     */
+    void setTwoWayTravelTime(double twtt){
+        twoWayTravelTime = twtt;
+    }
 
-  /**Returns the time value of the transition between two points*/
-  double getTwoWayTravelTime() {
-    return twoWayTravelTime;
-  }
+    /**Return the quality of the ping*/
+    uint32_t getQuality() { return quality;}
 
-  /**Returns the quality of the ping*/
-  uint32_t getQuality() { return quality;}
+    /**
+     * Set the quality factor
+     * @param quality
+     */
+    void setQuality(uint32_t quality){
+        quality=quality;
+    }
+    
+    /**Return the intensity of the ping*/
+    double getIntensity() { return intensity;}
 
-  /**Returns the intensity of the ping*/
-  uint32_t getIntensity() { return intensity;}
+    /**
+     * Set the backscatter intensity
+     * @param intensity
+     */
+    void setIntensity(double intensity){
+        intensity=intensity;
+    }
 
-  /**
-  * Returns true if the first Ping is smaller than the second
-  *
-  * @param p1 first ping
-  * @param p2 second ping
-  */
-  static bool sortByTimestamp(Ping & p1,Ping & p2){
-    return p1.getTimestamp() < p2.getTimestamp();
-  }
+    static bool sortByTimestamp(Ping & p1,Ping & p2){
+        return p1.getTimestamp() < p2.getTimestamp(); 
+    }
 
 
 };

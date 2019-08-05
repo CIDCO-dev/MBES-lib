@@ -55,8 +55,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     Position expectedPosition(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -69,8 +69,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -83,8 +83,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -97,8 +97,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -111,8 +111,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -125,8 +125,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -139,8 +139,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -153,8 +153,8 @@ TEST_CASE("Conversions between ECEF and Longitude Latitude Height") {
     expectedPosition = Position(0,0,0,0);
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(testPositionECEF, expectedPosition);
 
-    std::cout << "expectedPosition:" << std::endl;
-    std::cout << expectedPosition << std::endl;
+    //std::cout << "expectedPosition:" << std::endl;
+    //std::cout << expectedPosition << std::endl;
 
     REQUIRE(abs((roundf(expectedPosition.getLatitude()*100)/100)-testPosition.getLatitude())<1e-10);
     REQUIRE(abs((roundf(expectedPosition.getLongitude()*100)/100)-testPosition.getLongitude())<1e-10);
@@ -175,8 +175,18 @@ TEST_CASE("Conversion between spherical to cartesian"){
 /**Test if the conversion between sonar to cartesian works*/
 TEST_CASE("Conversion between sonar to cartesian"){
     Eigen::Vector3d v;
-
-    REQUIRE(1==2); //TODO FIXME: implementation is dead wrong
+    CoordinateTransform::sonar2cartesian(v,90,0,1);
+    REQUIRE(std::abs(v(0)-1)<1e-10);
+    REQUIRE(std::abs(v(1)-0)<1e-10);
+    REQUIRE(std::abs(v(2)-0)<1e-10);
+    CoordinateTransform::sonar2cartesian(v,0,90,1);
+    REQUIRE(std::abs(v(0)-0)<1e-10);
+    REQUIRE(std::abs(v(1)-1)<1e-10);
+    REQUIRE(std::abs(v(2)-0)<1e-10);
+    CoordinateTransform::sonar2cartesian(v,0,0,1);
+    REQUIRE(std::abs(v(0)-0)<1e-10);
+    REQUIRE(std::abs(v(1)-0)<1e-10);
+    REQUIRE(std::abs(v(2)-1)<1e-10);
 }
 
 /**Test if the conversion between NED to ECEF position works*/
@@ -296,3 +306,31 @@ TEST_CASE("getDCM Test") {
     dcmDifferences = dcmDifferences.cwiseAbs();
     REQUIRE(dcmDifferences.maxCoeff() < randomPrecision);
 };
+
+TEST_CASE("Test getPositionInNavigationFrame function")
+{
+    Eigen::Vector3d posNav;
+    Position pos(0,0,0,0);
+    Eigen::Matrix3d dcm;
+    dcm << 0,0,0,
+           0,0,0,
+           0,0,0;
+    Eigen::Vector3d origin(0,0,0);
+    CoordinateTransform::getPositionInNavigationFrame(posNav,pos,dcm,origin);
+    REQUIRE(posNav(0) == 0);
+    REQUIRE(posNav(1) == 0);
+    REQUIRE(posNav(2) == 0);
+    
+    pos = Position(0,180,180,0);
+    dcm << 1,0,0,
+           0,1,0,
+           0,0,1;
+    origin(0) = 0;
+    origin(1) = 0;
+    origin(2) = 0;
+    CoordinateTransform::getPositionInNavigationFrame(posNav,pos,dcm,origin);
+    Eigen::Vector3d vectorSearch(6378137,-0.0000000008,0.0000000008);
+    REQUIRE(abs(posNav(0) - vectorSearch(0))< 1e-10);
+    REQUIRE(abs(posNav(1) - vectorSearch(1))< 1e-10);
+    REQUIRE(abs(posNav(2) - vectorSearch(2))< 1e-10);
+}

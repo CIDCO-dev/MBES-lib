@@ -20,15 +20,15 @@
 #include <pcl/common/common_headers.h>
 
 
-#include "../DatagramGeoreferencer.hpp"
-#include "../datagrams/DatagramParserFactory.hpp"
+#include "../../georeferencing/DatagramGeoreferencer.hpp"
+#include "../../datagrams/DatagramParserFactory.hpp"
 
-#include "../svp/SoundVelocityProfile.hpp"
+#include "../../svp/SoundVelocityProfile.hpp"
 
-#include "../math/Boresight.hpp"
+#include "../../math/Boresight.hpp"
 
-#include "../utils/StringUtils.hpp"
-#include "../utils/Exception.hpp"
+#include "../../utils/StringUtils.hpp"
+#include "../../utils/Exception.hpp"
 
 
 
@@ -172,30 +172,6 @@ uint64_t readTextFileIntoPointCloud( const std::string filename, pcl::PointCloud
 }
 
 
-
-
-
-void convertStringToDouble( std::string textIn, double & numberOut, 
-                        const std::string whatIsIt, const bool needAboveZero = false )
-{
-    std::istringstream text( textIn ); 
-
-    text >> numberOut;        
-    if ( text.fail() )
-    {
-        std::cout << "\n\n" << whatIsIt << ": Could not convert \"" << textIn << "\" into a double\n\n" << std::endl;
-        exit( 40 );
-    }
-    else
-    {
-        if ( needAboveZero && numberOut <=0 )
-        {
-            std::cout << "\n\n" << whatIsIt << ": " << numberOut << " is invalid, need a double bigger than 0\n\n" << std::endl;
-            exit( 41 );                            
-        }                        
-    }
-
-}
 
 
 

@@ -13,6 +13,9 @@
 #include <iostream>
 #include <string>
 
+#ifdef _WIN32
+#pragma comment(lib, "Ws2_32.lib")
+#endif
 /**Writes the usage information about the datagram-list*/
 void printUsage(){
 	std::cerr << "\n\

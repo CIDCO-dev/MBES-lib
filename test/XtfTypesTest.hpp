@@ -1,5 +1,5 @@
-#ifndef TEST_XCF_HPP
-#define TEST_XCF_HPP
+#ifndef TESTXTFTYPES_HPP
+#define TESTXTFTYPES_HPP
 
 #include "catch.hpp"
 #include "../src/datagrams/xtf/XtfTypes.hpp"
@@ -21,9 +21,10 @@ TEST_CASE( "Les structs XTF ont la bonne dimensions", "[xtfTypes]" ) {
     REQUIRE( sizeof(XtfQpsMultiTxEntry) == 48);
     REQUIRE( sizeof(XtfQpsMbEntry) == 64 );
     REQUIRE( sizeof(XtfRawCustomHeader) == 64);
-    REQUIRE( sizeof(XtfHeaderNavigation_type42) == 64 );
+    REQUIRE( sizeof(XtfHeaderNavigation_type42)  + sizeof(XtfPacketHeader)== 64 );
     REQUIRE( sizeof(XtfHeaderNavigation_type84) == 64 );
     REQUIRE( sizeof(XtfHeaderGyro) == 64);
+    REQUIRE( sizeof(XtfPacketHeader) == 14);
 
 }
 

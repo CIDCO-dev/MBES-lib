@@ -148,7 +148,6 @@ private:
 
         std::cout << "line2InPlane->points.size(): " << line2InPlane->points.size() << "\n" << std::endl;
 
-
         std::cout << "\nExpressing points of line 2 in the projection plane using a 2D coordinate system\n" << std::endl;
 
         createCloudInPlane2D( line2InPlane, line2InPlane2D );

@@ -13,6 +13,7 @@
 
 #include <stdint.h>
 #include <string>
+#include "vendors/QuinsyR2Sonic.hpp"
 
 #pragma pack(1)
 typedef struct {
@@ -350,7 +351,7 @@ typedef struct {
 	uint8_t Hour;
 	uint8_t Minutes;
 	uint8_t Seconds;
-	uint16_t MicroSeconds; //Hundredths of microseconds (0-9999)
+	uint16_t TenthsOfMilliseconds; 
 	double RawYcoordinate;
 	double RawXcoordinate;
 	double RawAltitude;
@@ -361,6 +362,8 @@ typedef struct {
 	uint8_t Reserved2;
 }XtfPosRawNavigation;
 #pragma pack()
+
+
 
 #pragma pack(1)
 typedef struct {
@@ -441,10 +444,10 @@ typedef struct {
 
 #pragma pack(1)
 typedef struct {
-	uint16_t MagicNumber;
+	/*uint16_t MagicNumber;
 	uint8_t HeaderType;
 	uint8_t Reserved[7];
-	uint32_t NumBytesThisRecord;
+	uint32_t NumBytesThisRecord;*/
 	uint16_t Year;
 	uint8_t Month;
 	uint8_t Day;
@@ -504,10 +507,13 @@ typedef struct {
 }XtfHeaderGyro;
 #pragma pack()
 
+
 #define XTF_HEADER_ATTITUDE 3
 #define XTF_HEADER_Q_MULTIBEAM 28
+#define XTF_HEADER_POS_RAW_NAVIGATION 42
 #define XTF_HEADER_POSITION 107
 #define XTF_HEADER_QUINSY_R2SONIC_BATHY 65
+
 
 const std::string SonarTypes[]{
 	"NONE , default",
