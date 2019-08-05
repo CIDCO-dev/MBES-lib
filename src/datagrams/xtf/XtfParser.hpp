@@ -21,6 +21,7 @@
 #include "../../utils/TimeUtils.hpp"
 #include <vector>
 #include "../../Ping.hpp"
+#include "../../math/SlantRangeCorrection.hpp"
 
 #define MAGIC_NUMBER 123
 #define PACKET_MAGIC_NUMBER 0xFACE
@@ -111,7 +112,7 @@ class XtfParser : public DatagramParser{
                  * @param hdr 
                  * @param data
                  */
-                void processSidescanData(XtfPingChanHeader * hdr,void * data);
+                void processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & pingChanHdr,void * data);
                 
                 
                 /**
@@ -121,6 +122,8 @@ class XtfParser : public DatagramParser{
 
                 /**the XTF FileHeader*/
 		XtfFileHeader fileHeader;
+                
+                std::vector<XtfChanInfo*> channels;
                 
                 //FIXME: use a channel map to allow for different settings per channel
                 unsigned int bytesPerSample;
@@ -147,6 +150,9 @@ XtfParser::~XtfParser(){
  * @param filename name of the file to read
  */
 void XtfParser::parse(std::string & filename){
+    
+    //TODO: reinit internal structures if called twice
+    
 	FILE * file = fopen(filename.c_str(),"rb");
 
         if(file){
@@ -707,7 +713,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
                 
                 unsigned char * data = ((unsigned char *)pingChanHdr) + sizeof(XtfPingChanHeader);
                 
-                processSidescanData(pingChanHdr,data);
+                processSidescanData(*pingHdr,*pingChanHdr,data);
                 
                 sampleBytesRead += pingChanHdr->NumSamples * bytesPerSample;
             }
@@ -721,10 +727,12 @@ void XtfParser::processPingChanHeader(XtfPingChanHeader & pingChanHdr){
     
 }
 
-void XtfParser::processSidescanData(XtfPingChanHeader * hdr,void * data){   
-    std::vector<double> samples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
+void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & pingChanHdr,void * data){   
+    std::vector<double> rawSamples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
     
-    for(unsigned int i=0;i<hdr->NumSamples;i++){
+    std::cerr << "ROLL: " << pingHdr << std::endl; //TODO: REMOVE
+
+    for(unsigned int i=0;i<pingChanHdr.NumSamples;i++){
         double sample = 0;
         
         if(sampleFormat == 0){
@@ -764,10 +772,15 @@ void XtfParser::processSidescanData(XtfPingChanHeader * hdr,void * data){
             throw new std::invalid_argument("Sample format unused");
         }
 
-        samples.push_back(sample);
+        rawSamples.push_back(sample);
     }
     
-    processor.processSidescanData(hdr->ChannelNumber,samples);
+    //Apply corrections to raw samples
+    std::vector<double> correctedSamples;
+    
+    SlantRangeCorrection::correct(samples,pingChanHdr.SlantRange,);
+    
+    processor.processSidescanData(pingChanHdr.ChannelNumber,correctedSamples);
 }
 
 
