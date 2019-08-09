@@ -95,7 +95,6 @@ public:
     }
 
 
-private:
 
 	/**
 	* Returns a pair with the number of points in line #1 and in line #2 that are in the overlap area of the two lines,
@@ -105,10 +104,11 @@ private:
 	* @param[out] line2InBothHull Point cloud of points in line #2 in the overlap area of the two lines
     * @param[in] line2InBothHull minimalMemory bool variable, true to specify to try and minimize the memory usage
 	*/
-    // Was public when wanted to look at details of projection, etc
-    std::pair< uint64_t, uint64_t > computeHullsAndPointsInBothHulls( pcl::PointCloud<pcl::PointXYZ>::Ptr line1InBothHull = nullptr,
-                                                                        pcl::PointCloud<pcl::PointXYZ>::Ptr line2InBothHull = nullptr, 
-                                                                        const bool minimalMemory = false )
+    // Put back to public to be able to get indices to the points
+    std::pair< uint64_t, uint64_t > computeHullsAndPointsInBothHulls( 
+                                                pcl::PointCloud<pcl::PointXYZ>::Ptr line1InBothHull = nullptr,
+                                                pcl::PointCloud<pcl::PointXYZ>::Ptr line2InBothHull = nullptr, 
+                                                const bool minimalMemory = false )
     {
         
         if ( line1InBothHull != nullptr )
@@ -261,6 +261,20 @@ private:
 
     }
 
+
+    // Uncommented to get access to the point indices
+    const std::vector< uint64_t > * getConstPtrlineInBothHullPointIndices( const bool isLine1 )
+    {
+        if ( isLine1 )
+            return & ( line1InBothHullPointIndices );
+        else 
+            return & ( line2InBothHullPointIndices );
+    }
+
+
+
+private:
+
     // These functions were public when wanted to look at details of projection, etc
     // pcl::PointCloud<pcl::PointXYZ>::ConstPtr getConstPtrLineInPlane( const bool isLine1 )
     // {
@@ -278,13 +292,7 @@ private:
     //         return & ( hull2PointIndices.indices );
     // }
 
-    // const std::vector< uint64_t > * getConstPtrlineInBothHullPointIndices( const bool isLine1 )
-    // {
-    //     if ( isLine1 )
-    //         return & ( line1InBothHullPointIndices );
-    //     else 
-    //         return & ( line2InBothHullPointIndices );
-    // }
+
 
 
 
