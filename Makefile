@@ -24,6 +24,9 @@ default: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/data-cleaning src/examples/data-cleaning.cpp
+	
+debugGeoreference: prepare
+	$(CC) $(OPTIONS) -static $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
 
 test: default
 	mkdir -p $(test_exec_dir)
