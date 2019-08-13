@@ -24,6 +24,9 @@ georeference: prepare
 
 data-cleaning: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/data-cleaning src/examples/data-cleaning.cpp
+	
+debugGeoreference: prepare
+	$(CC) $(OPTIONS) -static $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
 
 cidco-decoder: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp

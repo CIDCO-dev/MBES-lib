@@ -8,6 +8,8 @@
 #include <vector>
 #include "../svp/SoundVelocityProfile.hpp"
 #include "../Ping.hpp"
+#include "../math/CoordinateTransform.hpp"
+
 
 /*!
  * \brief Raytracing class
