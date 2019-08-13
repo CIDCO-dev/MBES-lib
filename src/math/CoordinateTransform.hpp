@@ -6,6 +6,7 @@
 #define COORDINATETRANSFORM_HPP
 
 #include "../Position.hpp"
+#include "../Attitude.hpp"
 #include "../utils/Constants.hpp"
 #include <Eigen/Dense>
 
