@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "../svp/SoundVelocityProfile.hpp"
+#include "../Ping.hpp"
 
 /*!
  * \brief Raytracing class
@@ -30,7 +31,12 @@ public:
          */
 
 	Eigen::Vector3d launchVectorSonar; //in sonar frame
-	CoordinateTransform::sonar2cartesian(launchVectorSonar,ping.getAlongTrackAngle(),ping.getAcrossTrackAngle(), (ping.getTwoWayTravelTime()/(double)2) * (double)1480 );
+	CoordinateTransform::sonar2cartesian(launchVectorSonar,ping.getAlongTrackAngle(),ping.getAcrossTrackAngle(), (ping.getTwoWayTravelTime()/(double)2) * (double)1480 ); //FIXME: use surface sound speed
+        
+#ifdef DEBUG
+        std::cerr << "Launch vector: " << std::endl << launchVectorSonar << std::endl << std::endl;
+#endif
+        
 	launchVectorSonar.normalize();
 
 	//convert to navigation frame where the raytracing occurs

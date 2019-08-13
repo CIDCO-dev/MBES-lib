@@ -200,3 +200,4 @@ TEST_CASE("test if parameter L T are not present")
     getline(ss,line);
     REQUIRE(line=="No georeferencing method defined (-L or -T)");
 }
+

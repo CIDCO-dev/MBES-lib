@@ -54,6 +54,7 @@ test-quick: default
 	cd $(test_work_dir)
 	$(root)/$(test_exec_dir)/tests || true
 
+
 coverage: default
 	mkdir -p $(coverage_dir)
 	mkdir -p $(coverage_report_dir)
