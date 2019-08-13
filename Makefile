@@ -90,7 +90,6 @@ overlap: prepare
 	cd build/tempCMake && cmake ../../src/examples/overlap/ && make && mv overlap ../bin/
 	rm -rf build/tempCMake
 
-
 prepare:
 	mkdir -p $(exec_dir)
 .PHONY: all test clean doc

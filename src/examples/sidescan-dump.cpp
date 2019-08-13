@@ -34,10 +34,11 @@ void printUsage(){
 */
 class SidescanDataDumper : public DatagramEventHandler{
 public:
-        
+    
 	/**
 	* Creates a SidescanDataDumper
 	*/
+    
 	SidescanDataDumper(std::string & filename):filename(filename){
 
 	}
@@ -63,7 +64,7 @@ public:
             
             //std::cerr << std::endl;
 
-            channels[channel]->push_back(v);           
+            channels[channel]->push_back(v);
         }
         
         void generateImages(){
@@ -75,7 +76,7 @@ public:
                 ss << filename <<  "-channel-" << i << ".jpg";
                 std::cerr << "Channel " << i << std::endl;
                 
-                cv::Mat img(channels[i]->size(),channels[i]->at(0)->size(), CV_64F,cv::Scalar(70));
+                cv::Mat img(channels[i]->size(),channels[i]->at(0)->size(), CV_64F,cv::Scalar(0));
                 
                 std::cerr << "Rows: " << channels[i]->size() << " Cols: " << channels[i]->at(0)->size() << std::endl;                 
                 
@@ -84,7 +85,7 @@ public:
                         img.at<double>(j, k, 0) = channels[i]->at(j)->at(k);
                     }
                 }
-
+                
 		/*
 		cv::namedWindow("Image", CV_WINDOW_AUTOSIZE);
 		cv::imshow("Image",img);
@@ -94,8 +95,14 @@ public:
                 cv::normalize(img,img,200000,0);
 		cv::Mat I;
 		img.convertTo(I, CV_8UC1);
-		equalizeHist(I,I);
-		imwrite(ss.str(), I);                
+		
+                //post-process greyscale
+                
+                equalizeHist(I,I);
+                fastNlMeansDenoising(I,I);  
+                blur(I,I,cv::Size(2,2));
+                
+		imwrite(ss.str(), I);
             }
         }
         
@@ -130,7 +137,7 @@ int main (int argc , char ** argv ){
 	try{
             	SidescanDataDumper  sidescan(fileName);
 
-		std::cerr << "Decoding " << fileName << std::endl;
+		std::cerr << "[+] Decoding " << fileName << std::endl;
 
 		parser = DatagramParserFactory::build(fileName,sidescan);
 
@@ -139,7 +146,7 @@ int main (int argc , char ** argv ){
                 sidescan.generateImages();
 	}
 	catch(std::exception * e){
-		std::cerr << "Error while parsing " << fileName << ": " << e->what() << std::endl;
+		std::cerr << "[-] Error while parsing " << fileName << ": " << e->what() << std::endl;
 	}
 
 

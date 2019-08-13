@@ -105,7 +105,7 @@ class XtfParser : public DatagramParser{
                  *
                  * @param c the XTF ChanInfo
                  */
-	        void processChanInfo(XtfChanInfo & c);
+	        void processChanInfo(XtfChanInfo * c);
 
                 /**
                  * Process sidescan data
@@ -141,7 +141,9 @@ XtfParser::XtfParser(DatagramEventHandler & processor):DatagramParser(processor)
 
 /**Destroy the XTF parser*/
 XtfParser::~XtfParser(){
-
+    for(auto i=channels.begin();i!=channels.end();i++){
+        free(*i);
+    }
 }
 
 /**
@@ -174,7 +176,7 @@ void XtfParser::parse(std::string & filename){
                                     sampleFormat   = fileHeader.Channels[i].SampleFormat;//FIXME: this is wrong
                                     bytesPerSample = fileHeader.Channels[i].BytesPerSample;//FIXME: this is wrong
                                     
-                                    processChanInfo(fileHeader.Channels[i]);
+                                    processChanInfo(&fileHeader.Channels[i]);
 				}
 
 				//Lire les structs CHANINFO qui suivent le header
@@ -189,7 +191,7 @@ void XtfParser::parse(std::string & filename){
 						if(elementsRead == 8){
 							for(int i=0;i<8;i++){
 								if(channelsLeft > 0){
-									processChanInfo(buf[i]);
+									processChanInfo(&buf[i]);
 									channelsLeft--;
 								}
 								else{
@@ -485,8 +487,7 @@ int XtfParser::getTotalNumberOfChannels(){
  * @param f the XTF FileHeader
  */
 void XtfParser::processFileHeader(XtfFileHeader & f){
-        fprintf(stderr,"------------\n");
-        fprintf(stderr,"File Header\n\n");        
+        fprintf(stderr,"[+] XTF File Header:\n\n");        
         fprintf(stderr,"FileFormat: %d\n",f.FileFormat);
         fprintf(stderr,"SystemType: %d\n",f.SystemType);
         fprintf(stderr,"RecordingProgramName: %s\n",f.RecordingProgramName);
@@ -527,7 +528,7 @@ void XtfParser::processFileHeader(XtfFileHeader & f){
         fprintf(stderr,"MRUOffsetYaw: %f\n",f.MRUOffsetYaw);
         fprintf(stderr,"MRUOffsetPitch: %f\n",f.MRUOffsetPitch);
         fprintf(stderr,"MRUOffsetRoll: %f\n",f.MRUOffsetRoll);
-        fprintf(stderr,"------------\n");
+        fprintf(stderr,"------------\n\n");
 }
 
 /**
@@ -535,31 +536,36 @@ void XtfParser::processFileHeader(XtfFileHeader & f){
  *
  * @param c the XTF ChanInfo
  */
-void XtfParser::processChanInfo(XtfChanInfo & c){
-        fprintf(stderr,"------------\n");
-        fprintf(stderr,"Channel Information\n\n");
-        fprintf(stderr,"TypeOfChannel: %d\n",c.TypeOfChannel);
-        fprintf(stderr,"SubChannelNumber: %d\n",c.SubChannelNumber);
-        fprintf(stderr,"CorrectionFlags: %d\n",c.CorrectionFlags);
-        fprintf(stderr,"UniPolar: %d\n",c.UniPolar);
-        fprintf(stderr,"BytesPerSample: %d\n",c.BytesPerSample);
-        fprintf(stderr,"Reserved: %d\n",c.Reserved);
-        fprintf(stderr,"ChannelName: %s\n",c.ChannelName);
-        fprintf(stderr,"VoltScale: %f\n",c.VoltScale);
-        fprintf(stderr,"Frequency: %f\n",c.Frequency);
-        fprintf(stderr,"HorizBeamAngle: %f\n",c.HorizBeamAngle);
-        fprintf(stderr,"TiltAngle: %f\n",c.TiltAngle);
-        fprintf(stderr,"BeamWidth: %f\n",c.BeamWidth);
-        fprintf(stderr,"OffsetX: %f\n",c.OffsetX);
-        fprintf(stderr,"OffsetY: %f\n",c.OffsetY);
-        fprintf(stderr,"OffsetZ: %f\n",c.OffsetZ);
-        fprintf(stderr,"OffsetYaw: %f\n",c.OffsetYaw);
-        fprintf(stderr,"OffsetPitch: %f\n",c.OffsetPitch);
-        fprintf(stderr,"OffsetRoll: %f\n",c.OffsetRoll);
-        fprintf(stderr,"BeamsPerArray: %d\n",c.BeamsPerArray);
-        fprintf(stderr,"SampleFormat: %d\n",c.SampleFormat);
-        fprintf(stderr,"ReservedArea2: %s\n",c.ReservedArea2);
-        fprintf(stderr,"------------\n");
+void XtfParser::processChanInfo(XtfChanInfo * c){
+    XtfChanInfo * channel = (XtfChanInfo *) malloc(sizeof(XtfChanInfo));
+    memcpy(channel,c,sizeof(XtfChanInfo));
+    
+    channels.push_back(channel);
+    
+    fprintf(stderr,"[+] XTF Channel Information\n\n");
+    fprintf(stderr,"TypeOfChannel: %d\n",channel->TypeOfChannel);
+    fprintf(stderr,"SubChannelNumber: %d\n",channel->SubChannelNumber);
+    fprintf(stderr,"CorrectionFlags: %d\n",channel->CorrectionFlags);
+    fprintf(stderr,"UniPolar: %d\n",channel->UniPolar);
+    fprintf(stderr,"BytesPerSample: %d\n",channel->BytesPerSample);
+    fprintf(stderr,"Reserved: %d\n",channel->Reserved);
+    fprintf(stderr,"ChannelName: %s\n",channel->ChannelName);
+    fprintf(stderr,"VoltScale: %f\n",channel->VoltScale);
+    fprintf(stderr,"Frequency: %f\n",channel->Frequency);
+    fprintf(stderr,"HorizBeamAngle: %f\n",channel->HorizBeamAngle);
+    fprintf(stderr,"TiltAngle: %f\n",channel->TiltAngle);
+    fprintf(stderr,"BeamWidth: %f\n",channel->BeamWidth);
+    fprintf(stderr,"OffsetX: %f\n",channel->OffsetX);
+    fprintf(stderr,"OffsetY: %f\n",channel->OffsetY);
+    fprintf(stderr,"OffsetZ: %f\n",channel->OffsetZ);
+    fprintf(stderr,"OffsetYaw: %f\n",channel->OffsetYaw);
+    fprintf(stderr,"OffsetPitch: %f\n",channel->OffsetPitch);
+    fprintf(stderr,"OffsetRoll: %f\n",channel->OffsetRoll);
+    fprintf(stderr,"BeamsPerArray: %d\n",channel->BeamsPerArray);
+    fprintf(stderr,"SampleFormat: %d\n",channel->SampleFormat);
+    fprintf(stderr,"ReservedArea2: %s\n",channel->ReservedArea2);
+    fprintf(stderr,"------------\n");
+    
 }
 
 /**
@@ -577,7 +583,7 @@ void XtfParser::processPacketHeader(XtfPacketHeader & hdr){
         //printf("Reserved: %",x.Reserved);
         printf("NumBytesThisRecord: %d\n",hdr.NumBytesThisRecord);
         printf("------------\n");
-*/
+    */
 }
 
 /**
@@ -729,8 +735,6 @@ void XtfParser::processPingChanHeader(XtfPingChanHeader & pingChanHdr){
 
 void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & pingChanHdr,void * data){   
     std::vector<double> rawSamples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
-    
-    std::cerr << "ROLL: " << pingHdr << std::endl; //TODO: REMOVE
 
     for(unsigned int i=0;i<pingChanHdr.NumSamples;i++){
         double sample = 0;
@@ -747,13 +751,13 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
                 sample = ((uint32_t*)data)[i];
             }
             else{
-                std::cerr << "Bytes per sample: " << bytesPerSample << std::endl;
+                std::cerr << "[-] Bytes per sample: " << bytesPerSample << std::endl;
                 throw new std::invalid_argument("Bad bytes per sample format");                
             }
         }
         else if(sampleFormat == 1){
             //TODO: wtf is an "IBM float" in C?
-            throw new std::invalid_argument("Sample format is IBM float");
+            throw new std::invalid_argument("[-] Sample format is IBM float");
         }
         else if(sampleFormat == 2){
             sample = ((uint32_t*)data)[i];
@@ -768,19 +772,35 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
             sample = ((uint8_t*)data)[i];
         }        
         else{
-            std::cerr << "Sample Format: " << sampleFormat << std::endl;
+            std::cerr << "[-] Sample Format: " << sampleFormat << std::endl;
             throw new std::invalid_argument("Sample format unused");
         }
 
         rawSamples.push_back(sample);
     }
     
-    //Apply corrections to raw samples
-    std::vector<double> correctedSamples;
-    
-    SlantRangeCorrection::correct(samples,pingChanHdr.SlantRange,);
-    
-    processor.processSidescanData(pingChanHdr.ChannelNumber,correctedSamples);
+    if(channels[pingChanHdr.ChannelNumber]->CorrectionFlags == 2){
+        //ground ranged images, use as-is
+        processor.processSidescanData(pingChanHdr.ChannelNumber,rawSamples);
+    }
+    else{
+        //std::cerr << "[+] Applying slant-range correction" << std::endl;
+        
+        //Slant-range image, apply corrections to raw samples
+        std::vector<double> correctedSamples;
+
+        //Get beam angle , between nadir and slant
+        
+        double beamAngle = 20;
+
+        if(channels[pingChanHdr.ChannelNumber]->TiltAngle > 0){
+            beamAngle = channels[pingChanHdr.ChannelNumber]->TiltAngle;
+        }
+        
+        SlantRangeCorrection::correct(rawSamples,pingChanHdr.SlantRange,0,beamAngle,correctedSamples);
+
+        processor.processSidescanData(pingChanHdr.ChannelNumber,correctedSamples);        
+    }
 }
 
 
@@ -919,6 +939,7 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
                     (*i).getQuality(),
                     (*i).getIntensity()
             );
+
         }
     }
     else{
