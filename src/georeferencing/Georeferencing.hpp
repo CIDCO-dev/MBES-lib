@@ -114,7 +114,6 @@ public:
         Eigen::Vector3d leverArmNED =  imu2ned * leverArm;
 
         //Compute total NED vector
-
         georeferencedPing = positionNED + pingNED + leverArmNED;
     }
 
