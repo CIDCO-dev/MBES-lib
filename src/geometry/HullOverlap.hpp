@@ -271,7 +271,19 @@ public:
             return & ( line2InBothHullPointIndices );
     }
 
+    pcl::PointCloud< pcl::PointXYZ >::ConstPtr getConstPtrlineInPlane2D( const bool isLine1 )
+    {
+        if ( isLine1 )
+            return line1InPlane2D;
+        else 
+            return line2InPlane2D;
+    }
 
+
+
+
+
+//---------------------------------------------------------------------------------------------------------------------
 
 private:
 
