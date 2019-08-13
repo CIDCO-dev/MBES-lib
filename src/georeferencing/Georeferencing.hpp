@@ -129,7 +129,7 @@ public:
         CoordinateTransform::getPositionECEF(positionECEF,position);
         
 #ifdef DEBUG
-        std::cerr << "Position ECEF: " << positionECEF << std::endl;
+        std::cerr << "Position ECEF: " << std::endl << positionECEF << std::endl << std::endl;
 #endif
 
         Eigen::Vector3d centered = positionECEF-centroidECEF;    
