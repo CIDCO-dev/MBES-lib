@@ -16,13 +16,14 @@
 #include "../src/svp/SoundVelocityProfileFactory.hpp"
 #include "../src/Ping.hpp"
 
-TEST_CASE("Georeference TRF with position only"){
-  
+#define POSITION_PRECISION 0.00000001
+
+TEST_CASE("Georeference TRF with position and downward ping only"){
     Eigen::Vector3d         georefedPing;
     
     Attitude                attitude(0,0,0,0);
     Position                position(0,48.4525,-68.5232,15.401);
-    Ping                    ping(0,0,0,0,0,0.1,0.0,0.0);
+    Ping                    ping(0,0,0,0,0,0.01,0.0,0.0);
     SoundVelocityProfile *  svp = SoundVelocityProfileFactory::buildFreshWaterModel();
     Eigen::Vector3d         leverArm(0,0,0);
     Eigen::Matrix3d         boresight = Eigen::Matrix3d::Identity();
@@ -30,18 +31,26 @@ TEST_CASE("Georeference TRF with position only"){
     GeoreferencingTRF geo;
     geo.georeference(georefedPing,attitude,position,ping,*svp,leverArm,boresight);
     
-    std::cout << "GEOREF TRF: " << georefedPing << std::endl;
+    //std::cerr << "GEOREF TRF: " << georefedPing << std::endl;
     
-    REQUIRE(false);
+    Position georefPosition(0,0,0,0);
+    
+    CoordinateTransform::convertECEFToLongitudeLatitudeElevation(georefedPing,georefPosition);
+    
+    //std::cerr << "Final position: " << std::endl << georefPosition << std::endl << std::endl;
+
+    REQUIRE(abs(georefPosition.getLongitude() - position.getLongitude()) < POSITION_PRECISION);
+    REQUIRE(abs(georefPosition.getLatitude() - position.getLatitude()) < POSITION_PRECISION);
+    REQUIRE(abs(georefPosition.getEllipsoidalHeight() - (position.getEllipsoidalHeight()-7.4)) < POSITION_PRECISION);
 }
 
-TEST_CASE("Georeference LGF with position only"){
+TEST_CASE("Georeference LGF with position and downward ping only"){
   
     Eigen::Vector3d         georefedPing;
     
     Attitude                attitude(0,0,0,0);
     Position                position(0,48.4525,-68.5232,15.401);
-    Ping                    ping(0,0,0,0,0,0.1,0,0);
+    Ping                    ping(0,0,0,0,0,0.01,0,0);
     SoundVelocityProfile  *  svp = SoundVelocityProfileFactory::buildFreshWaterModel();
     Eigen::Vector3d         leverArm(0,0,0);
     Eigen::Matrix3d         boresight = Eigen::Matrix3d::Identity();
@@ -49,20 +58,14 @@ TEST_CASE("Georeference LGF with position only"){
     GeoreferencingLGF geo;
     geo.georeference(georefedPing,attitude,position,ping,*svp,leverArm,boresight);
     
-    std::cout << "GEOREF LGF: " << georefedPing << std::endl;
-    
-    REQUIRE(false);
-}
+    //std::cerr << "GEOREF LGF: " << std::endl << georefedPing << std::endl << std::endl;
 
-TEST_CASE("Georeference TRF with position and perpendicular unit vector ping"){
-    REQUIRE(false);
-}
-
-TEST_CASE("Georeference LGF with position and perpendicular unit vector ping"){
-    REQUIRE(false);
+    Eigen::Vector3d expectedPosition(0,0,7.4);
+    REQUIRE(georefedPing.isApprox(expectedPosition,POSITION_PRECISION));
 }
 
 TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and non-zero attitude"){
+    
     REQUIRE(false);
 }
 

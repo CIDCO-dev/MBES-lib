@@ -36,19 +36,33 @@ public:
 	CoordinateTransform::sonar2cartesian(launchVectorSonar,ping.getAlongTrackAngle(),ping.getAcrossTrackAngle(), (ping.getTwoWayTravelTime()/(double)2) * (double)1480 ); //FIXME: use surface sound speed
         
 #ifdef DEBUG
-        std::cerr << "Launch vector: " << std::endl << launchVectorSonar << std::endl << std::endl;
+        std::cerr << "Launch vector: " << std::endl << launchVectorSonar << std::endl << std::endl;
 #endif
         
 	launchVectorSonar.normalize();
 
+#ifdef DEBUG
+        std::cerr << "Unit launch vector: " << std::endl << launchVectorSonar << std::endl << std::endl;
+#endif        
+        
 	//convert to navigation frame where the raytracing occurs
 	Eigen::Vector3d launchVectorNav = imu2nav * (boresightMatrix * launchVectorSonar);
+        
+#ifdef DEBUG
+        std::cerr << "Launch vector in nav frame: " << std::endl << launchVectorNav << std::endl << std::endl;
+#endif                
 
         double vNorm = sqrt(pow(launchVectorNav(0), 2)  + pow(launchVectorNav(1), 2));
         
-	double sinAz= launchVectorNav(0)/ vNorm;
-	double cosAz= launchVectorNav(1)/ vNorm;
+	double sinAz= (vNorm >0)?launchVectorNav(0)/ vNorm : 0;
+	double cosAz= (vNorm >0)?launchVectorNav(1)/ vNorm : 0;
 	double beta0 = asin(launchVectorNav(2));
+        
+#ifdef DEBUG
+        std::cerr << "sinAZ: " << sinAz << std::endl;
+        std::cerr << "cosAz: " << cosAz << std::endl;
+        std::cerr << "beta0: " << beta0 << std::endl << std::endl;
+#endif        
 
         //compute gradient for each layer
         std::vector<double> gradient;
@@ -81,7 +95,7 @@ public:
                 cosBnm1 = epsilon*svp.getSpeeds()[N];
                 cosBn   = epsilon*svp.getSpeeds()[N+1];
 
-                if (gradient[N] != 0.0) //FIXME: huehuehue
+                if (gradient[N] > 0.0) //FIXME: huehuehue
                 {
                         // if not null gradient
                         //Radius of curvature
