@@ -37,7 +37,7 @@ TEST_CASE("Georeference TRF with position and downward ping only"){
     
     CoordinateTransform::convertECEFToLongitudeLatitudeElevation(georefedPing,georefPosition);
     
-    //std::cerr << "Final position: " << std::endl << georefPosition << std::endl << std::endl;
+    std::cerr << "Final position: " << std::endl << georefPosition << std::endl << std::endl;
 
     REQUIRE(abs(georefPosition.getLongitude() - position.getLongitude()) < POSITION_PRECISION);
     REQUIRE(abs(georefPosition.getLatitude() - position.getLatitude()) < POSITION_PRECISION);
