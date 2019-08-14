@@ -21,6 +21,17 @@ public:
 		svp->add(15000,1520);
 		return svp;
 	}
+        
+	/**
+	* Returns a SoundVelocityProfile model with fresh water
+	*/
+	static SoundVelocityProfile * buildFreshWaterModel(){
+		SoundVelocityProfile * svp = new SoundVelocityProfile();
+		//TODO: set time/location?
+		svp->add(0,1480);
+		svp->add(15000,1480);
+		return svp;
+	}        
 };
 
 

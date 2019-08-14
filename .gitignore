@@ -4,6 +4,7 @@ nbproject
 nbproject/*
 !nbproject/project.xml
 *.txt
+*.jpg
 .vscode
 
 src/examples/gui-georef/build-MBES-lib-georefGUI-Desktop-Debug

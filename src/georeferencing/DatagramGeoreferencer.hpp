@@ -202,7 +202,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                 }
 
                 virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing,uint32_t quality,int32_t intensity,int positionIndex,int attitudeIndex){
-                        std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality  << " " << intensity << " " << positionIndex << " " << attitudeIndex << std::endl;
+                        std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality  << " " << intensity << std::endl;
                 }
 
         protected:

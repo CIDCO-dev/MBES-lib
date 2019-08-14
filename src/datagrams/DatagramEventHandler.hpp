@@ -77,6 +77,7 @@ public:
 	*/
 	virtual void processSoundVelocityProfile(SoundVelocityProfile * svp){ delete svp;};
 
+        virtual void processSidescanData(unsigned int channel,std::vector<double> & data){}
 };
 
 

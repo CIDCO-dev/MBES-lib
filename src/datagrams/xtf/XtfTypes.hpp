@@ -36,7 +36,8 @@ typedef struct {
 	float OffsetPitch;
 	float OffsetRoll;
 	uint16_t BeamsPerArray;
-	char ReservedArea2[54];
+        uint8_t SampleFormat;
+	char ReservedArea2[53];
 } XtfChanInfo;
 #pragma pack()
 
@@ -177,11 +178,11 @@ typedef struct {
 typedef struct {
 	uint16_t ChannelNumber;
 	uint16_t DownsampleMethod;
-	float SlantRange;
-	float GroundRange;
-	float TimeDelay;
-	float TimeDuration;
-	float SecondsPerPing;
+	float    SlantRange;
+	float    GroundRange;
+	float    TimeDelay;
+	float    TimeDuration;
+	float    SecondsPerPing;
 	uint16_t ProcessingFlags;
 	uint16_t Frequency;
 	uint16_t InitialGainCode;
@@ -189,16 +190,16 @@ typedef struct {
 	uint16_t BandWidth;
 	uint32_t ContactNumber;
 	uint16_t ContactClassification;
-	uint8_t ContactSubNumber;
-	uint8_t ContactType;
+	uint8_t  ContactSubNumber;
+	uint8_t  ContactType;
 	uint32_t NumSamples;
 	uint16_t MillivoltScale;
-	float ContactTimeOffTrack;
-	uint8_t ContactCloseNumber;
-	uint8_t Reserved2;
-	float FixedVSOP;
-	int16_t Weight;
-	uint8_t ReservedSpace[4];
+	float    ContactTimeOffTrack;
+	uint8_t  ContactCloseNumber;
+	uint8_t  Reserved2;
+	float    FixedVSOP;
+	int16_t  Weight;
+	uint8_t  ReservedSpace[4];
 } XtfPingChanHeader;
 #pragma pack()
 
@@ -507,7 +508,7 @@ typedef struct {
 }XtfHeaderGyro;
 #pragma pack()
 
-
+#define XTF_HEADER_SONAR 0
 #define XTF_HEADER_ATTITUDE 3
 #define XTF_HEADER_Q_MULTIBEAM 28
 #define XTF_HEADER_POS_RAW_NAVIGATION 42

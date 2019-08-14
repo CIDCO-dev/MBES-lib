@@ -10,6 +10,7 @@
 #include "../utils/Constants.hpp"
 #include <Eigen/Dense>
 
+
 /*!
 * \brief Coordinate transform class
 * \author Guillaume Labbe-Morissette, Jordan McManus
