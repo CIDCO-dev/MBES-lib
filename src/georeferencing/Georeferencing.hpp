@@ -58,7 +58,6 @@ public:
 #ifdef DEBUG
         std::cerr << "NED 2 ECEF: " << std::endl << ned2ecef << std::endl << std::endl;
 #endif
-    
 
     Eigen::Matrix3d imu2ned;
     CoordinateTransform::getDCM(imu2ned,attitude);
@@ -120,6 +119,7 @@ public:
      * @param leverArm vector from the position reference point (PRP) to the acoustic center
      *
      */
+    
     void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
         Eigen::Matrix3d imu2ned;
         CoordinateTransform::getDCM(imu2ned,attitude);

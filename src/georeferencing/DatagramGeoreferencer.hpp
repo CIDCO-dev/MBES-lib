@@ -52,7 +52,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                  * @param height the position ellipsoidal height
                  */
                 void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
-                        positions.push_back(Position(microEpoch,longitude,latitude,height));
+                        positions.push_back(Position(microEpoch,latitude,longitude,height));
                 };
 
                 /**
@@ -116,7 +116,7 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                                 }
                                 else{
                 	                //Else use default model
-                                        svp = SoundVelocityProfileFactory::buildSaltWaterModel();
+                                        svp = SoundVelocityProfileFactory::buildFreshWaterModel();
                                         std::cerr << "[+] Using default SVP model" << std::endl;
                                 }
                         }
