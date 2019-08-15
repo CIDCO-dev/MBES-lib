@@ -16,6 +16,9 @@
 
 #include <utility>      // std::pair, std::make_pair
 
+#include <limits>       // std::numeric_limits
+
+
 #include <pcl/common/common_headers.h>
 
 #include <pcl/point_types.h>
@@ -95,7 +98,6 @@ public:
     }
 
 
-private:
 
 	/**
 	* Returns a pair with the number of points in line #1 and in line #2 that are in the overlap area of the two lines,
@@ -105,10 +107,11 @@ private:
 	* @param[out] line2InBothHull Point cloud of points in line #2 in the overlap area of the two lines
     * @param[in] line2InBothHull minimalMemory bool variable, true to specify to try and minimize the memory usage
 	*/
-    // Was public when wanted to look at details of projection, etc
-    std::pair< uint64_t, uint64_t > computeHullsAndPointsInBothHulls( pcl::PointCloud<pcl::PointXYZ>::Ptr line1InBothHull = nullptr,
-                                                                        pcl::PointCloud<pcl::PointXYZ>::Ptr line2InBothHull = nullptr, 
-                                                                        const bool minimalMemory = false )
+    // Put back to public to be able to get indices to the points
+    std::pair< uint64_t, uint64_t > computeHullsAndPointsInBothHulls( 
+                                                pcl::PointCloud<pcl::PointXYZ>::Ptr line1InBothHull = nullptr,
+                                                pcl::PointCloud<pcl::PointXYZ>::Ptr line2InBothHull = nullptr, 
+                                                const bool minimalMemory = false )
     {
         
         if ( line1InBothHull != nullptr )
@@ -261,6 +264,137 @@ private:
 
     }
 
+
+    // Uncommented to get access to the point indices
+    // const std::vector< uint64_t > * getConstPtrlineInBothHullPointIndices( const bool isLine1 )
+    const std::vector< uint64_t > * getConstPtrlineInBothHullPointIndices( const int lineNumber ) const
+    {
+
+        if ( lineNumber < 0 || lineNumber > 1 )
+        {
+            std::cout << "\n\n----- Function HullOverlap::getConstPtrlineInBothHullPointIndices(): lineNumber parameter: "
+                << lineNumber << ".\nIt must be either 0 or 1. Returning nullptr\n" << std::endl;            
+            return nullptr;         
+        }
+
+        if ( lineNumber == 0 )
+            return & ( line1InBothHullPointIndices );
+        else 
+            return & ( line2InBothHullPointIndices );
+
+        // if ( isLine1 )
+        //     return & ( line1InBothHullPointIndices );
+        // else 
+        //     return & ( line2InBothHullPointIndices );
+    }
+
+    // pcl::PointCloud< pcl::PointXYZ >::ConstPtr getConstPtrlineInPlane2D( const bool isLine1 )
+    pcl::PointCloud< pcl::PointXYZ >::ConstPtr getConstPtrlineInPlane2D( const int lineNumber  ) const
+    {
+
+        if ( lineNumber < 0 || lineNumber > 1 )
+        {
+            std::cout << "\n\n----- Function HullOverlap::getConstPtrlineInPlane2D(): lineNumber parameter: "
+                << lineNumber << ".\nIt must be either 0 or 1. Returning nullptr\n" << std::endl;            
+            return nullptr;         
+        }
+
+        if ( lineNumber == 0 )
+            return line1InPlane2D;
+        else 
+            return line2InPlane2D;
+
+        // if ( isLine1 )
+        //     return line1InPlane2D;
+        // else 
+        //     return line2InPlane2D;
+    }
+
+
+    bool getMinMaxPointsInOverlap( pcl::PointXYZ & minPt, pcl::PointXYZ &maxPt )
+    {
+        bool OK = false;
+
+        // if there are points in both lines in the overlap
+        if ( line1InBothHullPointIndices.size() > 0 && line2InBothHullPointIndices.size() > 0 )
+        {
+
+            double xMin = std::numeric_limits<double>::max();
+            double xMax = std::numeric_limits<double>::min();
+
+            double yMin = std::numeric_limits<double>::max();
+            double yMax = std::numeric_limits<double>::min();
+
+            for ( uint64_t count = 0; count < line1InBothHullPointIndices.size(); count++ )
+            {
+                if ( line1InPlane2D->points[ line1InBothHullPointIndices[ count ] ].x < xMin )
+                    xMin = line1InPlane2D->points[ line1InBothHullPointIndices[ count ] ].x;
+
+                if ( line1InPlane2D->points[ line1InBothHullPointIndices[ count ] ].x > xMax )
+                    xMax = line1InPlane2D->points[ line1InBothHullPointIndices[ count ] ].x;
+                    
+                    
+                if ( line1InPlane2D->points[ line1InBothHullPointIndices[ count ] ].y < yMin )
+                    yMin = line1InPlane2D->points[ line1InBothHullPointIndices[ count ] ].y;
+
+                if ( line1InPlane2D->points[ line1InBothHullPointIndices[ count ] ].y > yMax )
+                    yMax = line1InPlane2D->points[ line1InBothHullPointIndices[ count ] ].y;                                    
+            }
+
+            for ( uint64_t count = 0; count < line2InBothHullPointIndices.size(); count++ )
+            {
+                if ( line2InPlane2D->points[ line2InBothHullPointIndices[ count ] ].x < xMin )
+                    xMin = line2InPlane2D->points[ line2InBothHullPointIndices[ count ] ].x;
+
+                if ( line2InPlane2D->points[ line2InBothHullPointIndices[ count ] ].x > xMax )
+                    xMax = line2InPlane2D->points[ line2InBothHullPointIndices[ count ] ].x;
+                    
+                    
+                if ( line2InPlane2D->points[ line2InBothHullPointIndices[ count ] ].y < yMin )
+                    yMin = line2InPlane2D->points[ line2InBothHullPointIndices[ count ] ].y;
+
+                if ( line2InPlane2D->points[ line2InBothHullPointIndices[ count ] ].y > yMax )
+                    yMax = line2InPlane2D->points[ line2InBothHullPointIndices[ count ] ].y;                                    
+            }
+
+            minPt.x = xMin;
+            minPt.y = yMin;
+            minPt.z = 0;
+
+            maxPt.x = xMax;
+            maxPt.y = yMax;
+            maxPt.z = 0;
+
+            OK = true;
+
+        }
+
+        return OK;
+    }
+
+    uint64_t getNbPointsInOverlap( const int lineNumber ) const
+    {
+        if ( lineNumber < 0 || lineNumber > 1 )
+        {
+            std::cout << "\n\n----- Function HullOverlap::getNbPointsInOverlap(): lineNumber parameter: "
+                << lineNumber << ".\nIt must be either 0 or 1. Returning 0\n" << std::endl;            
+            return 0;         
+        }    
+
+
+        if ( lineNumber == 0 )
+            return line1InBothHullPointIndices.size();
+        else 
+            return line2InBothHullPointIndices.size();
+    }
+
+
+
+
+//---------------------------------------------------------------------------------------------------------------------
+
+private:
+
     // These functions were public when wanted to look at details of projection, etc
     // pcl::PointCloud<pcl::PointXYZ>::ConstPtr getConstPtrLineInPlane( const bool isLine1 )
     // {
@@ -278,13 +412,7 @@ private:
     //         return & ( hull2PointIndices.indices );
     // }
 
-    // const std::vector< uint64_t > * getConstPtrlineInBothHullPointIndices( const bool isLine1 )
-    // {
-    //     if ( isLine1 )
-    //         return & ( line1InBothHullPointIndices );
-    //     else 
-    //         return & ( line2InBothHullPointIndices );
-    // }
+
 
 
 
