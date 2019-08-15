@@ -16,7 +16,7 @@ coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
 
-default: prepare datagram-dump sidescan-dump datagram-list georeference data-cleaning cidco-decoder pcl-viewer overlap
+default: prepare datagram-dump datagram-list georeference data-cleaning cidco-decoder
 	echo "Building all"
 
 georeference: prepare
