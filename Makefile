@@ -15,15 +15,31 @@ coverage_dir=build/coverage
 coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
-all: default pcl-viewer overlap
+
+default: prepare datagram-dump sidescan-dump datagram-list georeference data-cleaning cidco-decoder pcl-viewer overlap
 	echo "Building all"
 
-default: prepare
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
+georeference: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
+
+data-cleaning: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/data-cleaning src/examples/data-cleaning.cpp
+	
+debugGeoreference: prepare
+	$(CC) $(OPTIONS) -static $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
+
+cidco-decoder: prepare
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
+
+datagram-dump: prepare
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
+
+datagram-list: prepare
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
+
+sidescan-dump: prepare
+	$(CC) $(OPTIONS) $(pkg-config --cflags opencv) $(INCLUDES) src/examples/sidescan-dump.cpp `pkg-config --libs opencv` -o $(exec_dir)/sidescan-dump
+
 
 test: default
 	mkdir -p $(test_exec_dir)
@@ -40,6 +56,7 @@ test-quick: default
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
 	$(root)/$(test_exec_dir)/tests || true
+
 
 coverage: default
 	mkdir -p $(coverage_dir)
@@ -62,7 +79,7 @@ clean:
 	rm *.txt || true
 	rm *.svp || true
 
-datagram-list: default
+datagram-list-test: default
 	./build/bin/datagram-list test/data/s7k/20141016_150519_FJ-Saucier.s7k|sort|uniq -c
 
 pcl-viewer: prepare
@@ -76,7 +93,6 @@ overlap: prepare
 	mkdir -p build/tempCMake
 	cd build/tempCMake && cmake ../../src/examples/overlap/ && make && mv overlap ../bin/
 	rm -rf build/tempCMake
-
 
 prepare:
 	mkdir -p $(exec_dir)

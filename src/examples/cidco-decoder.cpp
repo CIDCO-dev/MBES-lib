@@ -106,7 +106,6 @@ public:
 	*/
 	void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
 		fprintf(positionFile, "%.6f\t%.10lf\t%.10lf\t%.10lf\n",microEpoch2daySeconds(microEpoch),latitude,longitude,height);
-
 	};
 
 	/**

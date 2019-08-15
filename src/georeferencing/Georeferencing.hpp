@@ -8,6 +8,7 @@
 #include <Eigen/Dense>
 #include "../math/CoordinateTransform.hpp"
 #include "Raytracing.hpp"
+#include "../Ping.hpp"
 
 /*!
 * \brief Georeferencing class
@@ -53,20 +54,44 @@ public:
     //Compute transform matrixes
     Eigen::Matrix3d ned2ecef;
     CoordinateTransform::ned2ecef(ned2ecef,position);
+    
+#ifdef DEBUG
+        std::cerr << "NED 2 ECEF: " << std::endl << ned2ecef << std::endl << std::endl;
+#endif
 
     Eigen::Matrix3d imu2ned;
     CoordinateTransform::getDCM(imu2ned,attitude);
 
+#ifdef DEBUG
+        std::cerr << "IMU 2 NED: " << std::endl << imu2ned << std::endl << std::endl;
+#endif
+    
+    
     //Convert position to ECEF
     Eigen::Vector3d positionECEF;
     CoordinateTransform::getPositionECEF(positionECEF,position);
+    
+#ifdef DEBUG
+        std::cerr << "Position ECEF: " << std::endl << positionECEF << std::endl << std::endl;
+#endif
+    
 
     //Convert ping to ECEF
     Eigen::Vector3d pingVectorNED;
     Raytracing::rayTrace(pingVectorNED,ping,svp,boresight,imu2ned);
+    
+#ifdef DEBUG
+        std::cerr << "Raytraced ping: " << std::endl << pingVectorNED << std::endl << std::endl;
+#endif
+    
 
     Eigen::Vector3d pingECEF = ned2ecef * pingVectorNED;
 
+#ifdef DEBUG
+        std::cerr << "Ping ECEF: " << std::endl << pingECEF << std::endl << std::endl;
+#endif
+    
+    
     //Convert lever arm to ECEF
     Eigen::Vector3d leverArmECEF =  ned2ecef * (imu2ned * leverArm);
 
@@ -94,6 +119,7 @@ public:
      * @param leverArm vector from the position reference point (PRP) to the acoustic center
      *
      */
+    
     void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
         Eigen::Matrix3d imu2ned;
         CoordinateTransform::getDCM(imu2ned,attitude);
@@ -101,6 +127,10 @@ public:
 	//Convert position's geographic coordinates to ECEF, and then from ECEF to NED
         Eigen::Vector3d positionECEF;
         CoordinateTransform::getPositionECEF(positionECEF,position);
+        
+#ifdef DEBUG
+        std::cerr << "Position ECEF: " << std::endl << positionECEF << std::endl << std::endl;
+#endif
 
         Eigen::Vector3d centered = positionECEF-centroidECEF;    
 
@@ -114,7 +144,6 @@ public:
         Eigen::Vector3d leverArmNED =  imu2ned * leverArm;
 
         //Compute total NED vector
-
         georeferencedPing = positionNED + pingNED + leverArmNED;
     }
 
