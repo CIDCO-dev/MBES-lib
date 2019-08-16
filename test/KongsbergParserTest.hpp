@@ -64,7 +64,7 @@ TEST_CASE ("test the Kongsberg parser with a file who doesn't exist")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="Couldn't open file blabla.all");
 }
@@ -81,7 +81,7 @@ TEST_CASE ("test the Kongsberg parser with a invalid datagram")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="Bad datagram");
 }
@@ -98,7 +98,7 @@ TEST_CASE ("test the Kongsberg parser with a valid datagram")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="");
 }

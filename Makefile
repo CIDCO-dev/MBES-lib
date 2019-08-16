@@ -3,6 +3,8 @@ OPTIONS=-Wall -std=c++11 -g
 INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
+FILES=src/datagrams/DatagramParser.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/svp/SoundVelocityProfile.cpp
+
 root=$(shell pwd)
 
 exec_dir=build/bin
@@ -20,30 +22,30 @@ default: prepare datagram-dump sidescan-dump datagram-list georeference data-cle
 	echo "Building all"
 
 georeference: prepare
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp $(FILES)
 
 data-cleaning: prepare
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/data-cleaning src/examples/data-cleaning.cpp
-	
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/data-cleaning src/examples/data-cleaning.cpp $(FILES)
+
 debugGeoreference: prepare
-	$(CC) $(OPTIONS) -static $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp
+	$(CC) $(OPTIONS) -static $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp $(FILES)
 
 cidco-decoder: prepare
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp $(FILES)
 
 datagram-dump: prepare
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp $(FILES)
 
 datagram-list: prepare
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp $(FILES)
 
 sidescan-dump: prepare
-	$(CC) $(OPTIONS) $(pkg-config --cflags opencv) $(INCLUDES) src/examples/sidescan-dump.cpp `pkg-config --libs opencv` -o $(exec_dir)/sidescan-dump
+	$(CC) $(OPTIONS) $(pkg-config --cflags opencv) $(INCLUDES) src/examples/sidescan-dump.cpp $(FILES) `pkg-config --libs opencv` -o $(exec_dir)/sidescan-dump
 
 
 test: default
 	mkdir -p $(test_exec_dir)
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp $(FILES)
 	mkdir -p $(test_result_dir)
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
@@ -51,7 +53,7 @@ test: default
 
 test-quick: default
 	mkdir -p $(test_exec_dir)
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp $(FILES)
 	mkdir -p $(test_result_dir)
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
@@ -63,7 +65,7 @@ coverage: default
 	mkdir -p $(coverage_report_dir)
 	mkdir -p $(coverage_exec_dir)
 	cppcheck --xml --xml-version=2 --enable=all --inconclusive --language=c++ src 2> $(coverage_report_dir)/cppcheck.xml
-	$(CC) $(OPTIONS) $(INCLUDES) -fprofile-arcs -ftest-coverage -fPIC -O0 test/main.cpp -o $(coverage_exec_dir)/tests
+	$(CC) $(OPTIONS) $(INCLUDES) -fprofile-arcs -ftest-coverage -fPIC -O0 test/main.cpp $(FILES) -o $(coverage_exec_dir)/tests
 	$(root)/$(coverage_exec_dir)/tests || true
 	gcovr --branches -r $(root) --xml --xml-pretty -o $(coverage_report_dir)/gcovr-report.xml
 	gcovr --branches -r $(root) --html --html-details -o $(coverage_report_dir)/gcovr-report.html

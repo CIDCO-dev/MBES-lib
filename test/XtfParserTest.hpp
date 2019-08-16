@@ -84,7 +84,7 @@ TEST_CASE ("test the XTF parser with a file who doesn't exist")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="File not found");
 }
@@ -101,7 +101,7 @@ TEST_CASE ("test the XTF parser with a invalid file")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="Couldn't read from file");
 }
@@ -118,7 +118,7 @@ TEST_CASE ("test the XTF parser with a invalid datagram")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="");
 }

@@ -94,7 +94,6 @@ class DatagramGeoreferencer : public DatagramEventHandler{
                  */
                 void georeference(Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight,SoundVelocityProfile * svpFile){
 
-
 			//Choose SVP
                         SoundVelocityProfile * svp = NULL;
 

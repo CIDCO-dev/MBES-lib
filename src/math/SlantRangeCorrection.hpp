@@ -25,7 +25,7 @@ public:
         double theta = beamAngle - roll;
         double sT = sin(theta*(M_PI/180));
         
-        double groundRangePixels =  ceil(abs(samples.size() * sT)); //in pixels
+        double groundRangePixels =  ceil(std::abs(samples.size() * sT)); //in pixels
         
         //reproject pixels into bins according to the slant range
         //std::cerr << "Theta: " << theta << std::endl;
@@ -34,7 +34,7 @@ public:
         out.resize(groundRangePixels);
         
         for(unsigned int i=0;i<samples.size();i++){
-            int pixelIndex = floor(abs(sT * i)); 
+            int pixelIndex = floor(std::abs(sT * i)); 
 
             //std::cerr << "Index: " << i << "       New index: " << pixelIndex << std::endl;
             out[pixelIndex]=samples[i];
