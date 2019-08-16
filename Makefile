@@ -3,7 +3,7 @@ OPTIONS=-Wall -std=c++11 -g
 INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
-FILES=src/datagrams/DatagramParser.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/svp/SoundVelocityProfile.cpp
+FILES=src/datagrams/DatagramParser.cpp src/datagrams/DatagramParserFactory.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/datagrams/xtf/XtfParser.cpp src/svp/SoundVelocityProfile.cpp src/utils/NmeaUtils.cpp src/utils/StringUtils.cpp
 
 root=$(shell pwd)
 

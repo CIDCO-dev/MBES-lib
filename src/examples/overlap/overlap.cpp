@@ -279,7 +279,7 @@ int main( int argc, char* argv[] )
             }
             catch ( Exception * error )
             {
-                cout << error->getMessage();
+                cout << error->what();
 
                 exit( 1 );
             }
