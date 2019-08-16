@@ -28,14 +28,6 @@ typedef struct {
 } S7kTime;
 #pragma pack()
 
-std::ostream& operator<<(std::ostream& os, const S7kTime& time) {
-    return os << std::setprecision(15)
-            << "Year: " << time.Year << std::endl
-            << "Day: " << time.Day << std::endl
-            << "Seconds: " << time.Seconds << std::endl
-            << "Hours: " << time.Hours << std::endl
-            << "Minutes: " << time.Minutes; // no std::endl since it is contained in another record
-}
 
 #pragma pack(1)
 typedef struct { // pp 13-14
@@ -62,27 +54,6 @@ typedef struct { // pp 13-14
 } S7kDataRecordFrame;
 #pragma pack()
 
-std::ostream& operator<<(std::ostream& os, const S7kDataRecordFrame& drf) {
-    return os << "ProtocolVersion: " << drf.ProtocolVersion << std::endl
-            << "Offset: " << drf.Offset << std::endl
-            << "SyncPattern: " << drf.SyncPattern << std::endl
-            << "Size: " << drf.Size << std::endl
-            << "OptionalDataOffset: " << drf.OptionalDataOffset << std::endl
-            << "OptionalDataIdentifier: " << drf.OptionalDataIdentifier << std::endl
-            << "Timestamp: " << drf.Timestamp << std::endl
-            << "RecordVersion: " << drf.RecordVersion << std::endl
-            << "RecordTypeIdentifier: " << drf.RecordTypeIdentifier << std::endl
-            << "DeviceIdentifier: " << drf.DeviceIdentifier << std::endl
-            << "Reserved: " << drf.Reserved << std::endl
-            << "SystemEnumerator: " << drf.SystemEnumerator << std::endl
-            << "Reserved2: " << drf.Reserved2 << std::endl
-            << "Flags: " << drf.Flags << std::endl
-            << "Reserved3: " << drf.Reserved3 << std::endl
-            << "Reserved4: " << drf.Reserved4 << std::endl
-            << "TotalRecordsInFragmentedDataRecordSet: " << drf.TotalRecordsInFragmentedDataRecordSet << std::endl
-            << "FragmentNumber: " << drf.FragmentNumber << std::endl;
-}
-
 #pragma pack(1)
 typedef struct { // pp 102-103
     uint64_t FileIdentifier[2];
@@ -100,18 +71,6 @@ typedef struct { // pp 102-103
 } S7kFileHeader;
 #pragma pack()
 
-std::ostream& operator<<(std::ostream& os, const S7kFileHeader& fh) {
-    return os << "FileIdentifier: " << fh.FileIdentifier << std::endl
-            << "VersionNumber: " << fh.VersionNumber << std::endl
-            << "Reserved: " << fh.Reserved << std::endl
-            << "SessionIdentifier: " << fh.SessionIdentifier << std::endl
-            << "RecordDataSize: " << fh.RecordDataSize << std::endl
-            << "NumberOfDevices: " << fh.NumberOfDevices << std::endl
-            << "RecordingName: " << fh.RecordingName << std::endl
-            << "RecordingProgramVersionNumber: " << fh.RecordingProgramVersionNumber << std::endl
-            << "UserDefinedName: " << fh.UserDefinedName << std::endl
-            << "Notes: " << fh.Notes << std::endl;
-}
 
 #pragma pack(1)
 typedef struct { // p. 103
@@ -121,10 +80,6 @@ typedef struct { // p. 103
 } S7kFileHeaderRecordDatum;
 #pragma pack()
 
-std::ostream& operator<<(std::ostream& os, const S7kFileHeaderRecordDatum& fhrd) {
-    return os << "DeviceIdentifier: " << fhrd.DeviceIdentifier << std::endl
-            << "SystemEnumerator: " << fhrd.SystemEnumerator << std::endl;
-}
 
 #pragma pack(1)
 typedef struct { // p. 103
@@ -132,11 +87,6 @@ typedef struct { // p. 103
     uint64_t Offset;
 } S7kFileHeaderOptionalData;
 #pragma pack()
-
-std::ostream& operator<<(std::ostream& os, const S7kFileHeaderOptionalData& fhod) {
-    return os << "Size: " << fhod.Size << std::endl
-            << "Offset: " << fhod.Offset << std::endl;
-}
 
 #pragma pack(1)
 typedef struct { // pp 25-26
@@ -153,19 +103,6 @@ typedef struct { // pp 25-26
 } S7kPosition;
 #pragma pack()
 
-std::ostream& operator<<(std::ostream& os, const S7kPosition& pos) {
-    return os << "DatumIdentifier: " << pos.DatumIdentifier << std::endl
-            << "Latency: " << pos.Latency << std::endl
-            << "LatitudeOrNorthing: " << pos.LatitudeOrNorthing << std::endl
-            << "LongitudeOrEasting: " << pos.LongitudeOrEasting << std::endl
-            << "Height: " << pos.Height << std::endl
-            << "PositionTypeFlag: " << pos.PositionTypeFlag << std::endl
-            << "UTMZone: " << pos.UTMZone << std::endl
-            << "QualityFlag: " << pos.QualityFlag << std::endl
-            << "PositioningMethod: " << pos.PositioningMethod << std::endl
-            << "Latency: " << pos.Latency << std::endl;
-}
-
 #pragma pack(1)
 typedef struct { // p. 30
     uint8_t DepthDescriptor;
@@ -175,12 +112,6 @@ typedef struct { // p. 30
 } S7kDepth;
 #pragma pack()
 
-std::ostream& operator<<(std::ostream& os, const S7kDepth& depth) {
-    return os << "DepthDescriptor: " << depth.DepthDescriptor << std::endl
-            << "CorrectionFlag: " << depth.CorrectionFlag << std::endl
-            << "Reserved: " << depth.Reserved << std::endl
-            << "Depth: " << depth.Depth << std::endl;
-}
 
 #pragma pack(1)
 typedef struct { // pp 35-36
@@ -195,18 +126,6 @@ typedef struct { // pp 35-36
     float Heading; // radians
 } S7kNavigation;
 #pragma pack()
-
-std::ostream& operator<<(std::ostream& os, const S7kNavigation& nav) {
-    return os << "VerticalReference: " << nav.VerticalReference << std::endl
-            << "Latitude: " << nav.Latitude << std::endl
-            << "Longitude: " << nav.Longitude << std::endl
-            << "HorizontalPositionAccuracy: " << nav.HorizontalPositionAccuracy << std::endl
-            << "VesselHeight: " << nav.VesselHeight << std::endl
-            << "HeightAccuracy: " << nav.HeightAccuracy << std::endl
-            << "SpeedOverGround: " << nav.SpeedOverGround << std::endl
-            << "CourseOverGround: " << nav.CourseOverGround << std::endl
-            << "Heading: " << nav.Heading << std::endl;
-}
 
 #pragma pack(1)
 typedef struct { // pp 35-36

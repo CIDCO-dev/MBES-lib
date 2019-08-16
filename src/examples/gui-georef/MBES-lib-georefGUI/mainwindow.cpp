@@ -209,15 +209,15 @@ void MainWindow::on_Process_clicked()
 
                 DatagramGeoreferencerToOstream printer( outFile ,georef );
 
-                if ( ends_with( inputFileName.c_str(),".all" ) )
+                if ( StringUtils::ends_with( inputFileName.c_str(),".all" ) )
                 {
                     parser = new KongsbergParser(printer);
                 }
-                else if ( ends_with( inputFileName.c_str(),".xtf") )
+                else if ( StringUtils::ends_with( inputFileName.c_str(),".xtf") )
                 {
                     parser = new XtfParser(printer);
                 }
-                else if ( ends_with( inputFileName.c_str(),".s7k") )
+                else if ( StringUtils::ends_with( inputFileName.c_str(),".s7k") )
                 {
                     parser = new S7kParser(printer);
                 }
@@ -260,7 +260,7 @@ void MainWindow::on_Process_clicked()
     }
     catch(Exception * error)
     {
-        std::string toDisplay = "Error while parsing file \n\n\"" + inputFileName + "\":\n\n" + error->getMessage() + ".\n";
+        std::string toDisplay = "Error while parsing file \n\n\"" + inputFileName + "\":\n\n" + error->what() + ".\n";
 
         qDebug() << tr( toDisplay.c_str() );
 

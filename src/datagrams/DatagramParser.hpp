@@ -43,13 +43,6 @@ protected:
 	DatagramEventHandler & processor;
 };
 
-/**
-* Creates a datagram parser
-*
-* @param processor the datagram processor
-*/
-DatagramParser::DatagramParser(DatagramEventHandler & processor) : processor(processor){
 
-}
 
 #endif

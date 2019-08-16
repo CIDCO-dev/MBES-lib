@@ -78,7 +78,7 @@ uint64_t readSonarFileIntoPointCloud( std::string fileName, pcl::PointCloud<pcl:
 		if ( parser )
 		    delete parser;        
 
-        std::string text = "\nError while parsing file \n\n\"" + fileName + "\":\n\n" + error->getMessage() + ".\n";
+        std::string text = "\nError while parsing file \n\n\"" + fileName + "\":\n\n" + error->what() + ".\n";
         throw new Exception( text );
 
 	}
