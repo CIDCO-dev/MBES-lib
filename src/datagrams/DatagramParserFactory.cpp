@@ -11,7 +11,7 @@
 * Creates the appropriate parser for the given file. Throws exception for unknown formats
 * @param filename the name of the file
 */
-static DatagramParser * build(std::string & fileName,DatagramEventHandler & handler){
+DatagramParser * DatagramParserFactory::build(std::string & fileName,DatagramEventHandler & handler){
         DatagramParser * parser;
 
         if(StringUtils::ends_with(fileName.c_str(),".all")){
