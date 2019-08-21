@@ -17,5 +17,5 @@
 #include "RaytracingTest.hpp"
 #include "GeoreferencingTest.hpp"
 #include "TimeUtilsTest.hpp"
-#include "SvpStrategyTest.hpp"
 #include "CarisSvpTest.hpp"
+#include "SvpStrategyTest.hpp"

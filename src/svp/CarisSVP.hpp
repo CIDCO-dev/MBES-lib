@@ -46,7 +46,7 @@ private:
         int minute;
         int second;
 
-        if (std::sscanf(line.c_str(), "Section %d-%d %d:%d:%d %d:%d:%f %d:%d:%f", &year, &yday, &hour, &minute, &second, &latdegrees, &latminute, &latsecond, &londegrees, &lonminute, &lonsecond) == 11) {
+        if (std::sscanf(line.c_str(), "Section %d-%d %d:%d:%d %d:%d:%lf %d:%d:%lf", &year, &yday, &hour, &minute, &second, &latdegrees, &latminute, &latsecond, &londegrees, &lonminute, &lonsecond) == 11) {
             latitude = latdegrees + latminute * 60 + latsecond * 60 * 60;
             longitude = londegrees + lonminute * 60 + lonsecond * 60 * 60;
 
@@ -86,7 +86,10 @@ public:
     bool writeSvpFile(std::string & filename) {
         std::ofstream out;
         out.open(filename);
-        if (out.is_open()) {
+        if (!out.is_open()) {
+            std::cerr << "Could not write svp to file: " << filename << std::endl;
+            return false;
+        } else {
             //write VERSION
             out << "[SVP_VERSION_2]" << std::endl;
             
@@ -117,10 +120,9 @@ public:
                     out << svp->getDepths()[j] << " " << svp->getSpeeds()[j] << std::endl;
                 }
             }
-            
         }
         
-        out.close();
+        return true;
     }
 
     bool readSvpFile(std::string & filename) {

@@ -10,21 +10,25 @@
 #ifndef SVPNEARESTBYLOCATION_HPP
 #define SVPNEARESTBYLOCATION_HPP
 
+#include <cmath>
+#include <vector>
 #include "SoundVelocityProfile.hpp"
 #include "SvpSelectionStrategy.hpp"
+#include "../utils/Exception.hpp"
 
 class SvpNearestByLocation : public SvpSelectionStrategy {
 private:
     std::vector<SoundVelocityProfile*> svps;
 
 public:
+
     SvpNearestByLocation() {
     }
 
     ~SvpNearestByLocation() {
 
     }
-    
+
     void addSvp(SoundVelocityProfile * svp) {
         svps.push_back(svp);
     }
@@ -37,6 +41,10 @@ public:
 
         for (unsigned int i = 0; i < svps.size(); ++i) {
             SoundVelocityProfile* svp = svps[i];
+
+            if (std::isnan(svp->getLatitude()) || std::isnan(svp->getLongitude())) {
+                throw new Exception("Cannot apply NearestByLocation strategy to svp with unknown position");
+            }
 
             double dlat = svp->getLatitude() * D2R - position.getLatitude() * D2R;
             double dlon = svp->getLongitude() * D2R - position.getLongitude() * D2R;

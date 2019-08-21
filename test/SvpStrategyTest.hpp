@@ -18,6 +18,57 @@
 #include "../src/svp/SvpNearestByTime.hpp"
 #include "../src/svp/SvpNearestByLocation.hpp"
 #include "../src/utils/Constants.hpp"
+#include "../src/utils/Exception.hpp"
+
+TEST_CASE("SVP selection with unknown position") {
+    /*Build problematic svp (unknow position, unknown time)*/
+    SoundVelocityProfile * svp = new SoundVelocityProfile();
+    
+    /*Build strategies*/
+    SvpSelectionStrategy * locationStrat = new SvpNearestByLocation();
+    locationStrat->addSvp(svp);
+    
+    SvpSelectionStrategy * timeStrat = new SvpNearestByTime();
+    timeStrat->addSvp(svp);
+    
+    /*Build ping*/
+    Position position(0, 58.1, -77.9, 0);
+    
+    uint64_t microEpoch1 = 1350;
+    long id1 = 0;
+    uint32_t quality1 = 0;
+    double intensity1 = 0;
+    double surfaceSoundSpeed1 = 1446.4250488;
+    double twoWayTravelTime1 = 0.0091418369 * 2;
+    double alongTrackAngle1 = 0.0;
+    double acrossTrackAngle1 = 0.7031931281 * R2D;
+
+    Ping ping(
+            microEpoch1,
+            id1,
+            quality1,
+            intensity1,
+            surfaceSoundSpeed1,
+            twoWayTravelTime1,
+            alongTrackAngle1,
+            acrossTrackAngle1
+            );
+    
+    try {
+        locationStrat->chooseSvp(position, ping);
+        REQUIRE(false);
+    } catch(Exception * error) {
+        REQUIRE(true);
+    }
+    
+    try {
+        timeStrat->chooseSvp(position, ping);
+        REQUIRE(false);
+    } catch(Exception * error) {
+        REQUIRE(true);
+    }
+    
+}
 
 TEST_CASE("SVP selection test") {
     
@@ -120,11 +171,6 @@ TEST_CASE("SVP selection test") {
     //ping2 is neared in time to svp2
     REQUIRE(std::abs(testTimeSvp2->getLatitude() - lat2) < testThreshold);
     REQUIRE(std::abs(testTimeSvp2->getLongitude() - lon2) < testThreshold);
-            
-    
-    
-    
-    
 }
 
 
