@@ -1,6 +1,6 @@
 /*
-* Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
-*/
+ * Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+ */
 
 #ifndef PING_HPP
 #define PING_HPP
@@ -11,54 +11,54 @@
 #include "Position.hpp"
 
 /*!
-* \brief Ping class
-* \author Guillaume Labbe-Morissette, Jordan McManus, Emile Gagne
-* \date September 14, 2018, 10:10 AM
-*/
+ * \brief Ping class
+ * \author Guillaume Labbe-Morissette, Jordan McManus, Emile Gagne
+ * \date September 14, 2018, 10:10 AM
+ */
 class Ping {
 private:
 
-  /**Time value calculated since January 1970 (micro-second)*/
-  uint64_t timestamp; //in microseconds since epoch
+    /**Time value calculated since January 1970 (micro-second)*/
+    uint64_t timestamp; //in microseconds since epoch
 
-  /**Value of the identification of the ping*/
-  uint64_t id;
+    /**Value of the identification of the ping*/
+    uint64_t id;
 
-  /**Value of the quality of the ping*/
-  uint32_t quality;
+    /**Value of the quality of the ping*/
+    uint32_t quality;
 
-  /**Value of the intensity of the ping in decibels*/
-  double intensity;
+    /**Value of the intensity of the ping in decibels*/
+    double intensity;
 
-  /**The sound speed value of the surface*/
-  double surfaceSoundSpeed;
+    /**The sound speed value of the surface*/
+    double surfaceSoundSpeed;
 
-  /**Time value of transition between two points (micro-second)*/
-  double twoWayTravelTime;
+    /**Time value of transition between two points (micro-second)*/
+    double twoWayTravelTime;
 
-  /**Value of the angle that passes along the track (degrees)*/
-  double alongTrackAngle;  // In degrees, AKA emission angle, alpha, kappa or tilt angle
+    /**Value of the angle that passes along the track (degrees)*/
+    double alongTrackAngle; // In degrees, AKA emission angle, alpha, kappa or tilt angle
 
-  /**Value of the angle that passes across the track (degrees)*/
-  double acrossTrackAngle; // In degrees, AKA reception angle, beta, zeta, beam angle
+    /**Value of the angle that passes across the track (degrees)*/
+    double acrossTrackAngle; // In degrees, AKA reception angle, beta, zeta, beam angle
 
 
-  /*Trigonometry is stored to prevent redundant recalculations*/
-  /**Sine value of the along track angle*/
-  double sA;
+    /*Trigonometry is stored to prevent redundant recalculations*/
+    /**Sine value of the along track angle*/
+    double sA;
 
-  /**Cosine value of the along track angle*/
-  double cA;
+    /**Cosine value of the along track angle*/
+    double cA;
 
-  /**Sine value of the across track angle*/
-  double sB;
+    /**Sine value of the across track angle*/
+    double sB;
 
-  /**Cosine value of the across track angle*/
-  double cB;
+    /**Cosine value of the across track angle*/
+    double cB;
 
 
 public:
-    
+
     /**
      * Create the ping
      * 
@@ -72,16 +72,16 @@ public:
      * @param acrossTrackAngle Angle who pass across the track
      */
     Ping(
-	uint64_t microEpoch,
-	long     id,
-	uint32_t quality,
-	double   intensity,
+            uint64_t microEpoch,
+            long id,
+            uint32_t quality,
+            double intensity,
 
-        double surfaceSoundSpeed,
-        double twoWayTravelTime,
-        double alongTrackAngle,
-        double acrossTrackAngle
-    ):
+            double surfaceSoundSpeed,
+            double twoWayTravelTime,
+            double alongTrackAngle,
+            double acrossTrackAngle
+            ) :
     timestamp(microEpoch),
     id(id),
     quality(quality),
@@ -93,10 +93,10 @@ public:
     sA(sin(alongTrackAngle*D2R)),
     cA(cos(alongTrackAngle*D2R)),
     sB(sin(acrossTrackAngle*D2R)),
-    cB(cos(acrossTrackAngle*D2R)){
+    cB(cos(acrossTrackAngle*D2R)) {
     }
-    
-    Ping(long id):id(id),quality(0),intensity(0),alongTrackAngle(0),acrossTrackAngle(0){
+
+    Ping(long id) : id(id), quality(0), intensity(0), alongTrackAngle(0), acrossTrackAngle(0) {
         refresh();
     }
 
@@ -104,34 +104,34 @@ public:
     ~Ping() {
 
     }
-    
-    void refresh(){
-        sA = sin(alongTrackAngle*D2R);
-        cA = cos(alongTrackAngle*D2R);
-        sB = sin(acrossTrackAngle*D2R);
-        cB = cos(acrossTrackAngle*D2R);          
+
+    void refresh() {
+        sA = sin(alongTrackAngle * D2R);
+        cA = cos(alongTrackAngle * D2R);
+        sB = sin(acrossTrackAngle * D2R);
+        cB = cos(acrossTrackAngle * D2R);
     }
 
     /**Return the across track angle*/
     double getAcrossTrackAngle() {
         return acrossTrackAngle;
     }
-    
-    void setAcrossTrackAngle(double acrossAngle){
+
+    void setAcrossTrackAngle(double acrossAngle) {
         acrossTrackAngle = acrossAngle;
-        sB = sin(acrossAngle*D2R);
-        cB = cos(acrossAngle*D2R);
+        sB = sin(acrossAngle * D2R);
+        cB = cos(acrossAngle * D2R);
     }
 
     /**Return the along track angle*/
     double getAlongTrackAngle() {
         return alongTrackAngle;
     }
-    
-    void setAlongTrackAngle(double alongAngle){
+
+    void setAlongTrackAngle(double alongAngle) {
         alongTrackAngle = alongAngle;
-        sA = sin(alongAngle*D2R);
-        cA = cos(alongAngle*D2R);
+        sA = sin(alongAngle * D2R);
+        cA = cos(alongAngle * D2R);
     }
 
     /**Return the cosine value of the along track angle*/
@@ -152,27 +152,26 @@ public:
     /**Return the timestamp of the ping*/
     void setTimestamp(uint64_t t) {
         timestamp = t;
-    }    
-    
+    }
+
     /**
      * Returns the ID
      * @return ID
      */
-    long getId(){
+    long getId() {
         return id;
     }
-    
+
     /**
      * Sets the ID
      */
-    void setId(long id){
-        id=id;
+    void setId(long id) {
+        id = id;
     }
-    
-    
+
     /**Return the sine value of the along track angle*/
-    double getSA(){
-	return sA;
+    double getSA() {
+        return sA;
     }
 
     /**Return the sine value of the across track angle*/
@@ -181,15 +180,15 @@ public:
     }
 
     /**Return the sound speed of the surface*/
-    double getSurfaceSoundSpeed(){
-	return surfaceSoundSpeed;
+    double getSurfaceSoundSpeed() {
+        return surfaceSoundSpeed;
     }
-    
+
     /**
      * Set the surface sound speed
      * @param sss Surface Sound Speed
      */
-    void setSurfaceSoundSpeed(double sss){
+    void setSurfaceSoundSpeed(double sss) {
         surfaceSoundSpeed = sss;
     }
 
@@ -197,42 +196,62 @@ public:
     double getTwoWayTravelTime() {
         return twoWayTravelTime;
     }
-    
+
     /**
      * Set the two-way travel time
      * @param twtt
      */
-    void setTwoWayTravelTime(double twtt){
+    void setTwoWayTravelTime(double twtt) {
         twoWayTravelTime = twtt;
     }
 
     /**Return the quality of the ping*/
-    uint32_t getQuality() { return quality;}
+    uint32_t getQuality() {
+        return quality;
+    }
 
     /**
      * Set the quality factor
      * @param quality
      */
-    void setQuality(uint32_t quality){
-        quality=quality;
+    void setQuality(uint32_t quality) {
+        quality = quality;
     }
-    
+
     /**Return the intensity of the ping*/
-    double getIntensity() { return intensity;}
+    double getIntensity() {
+        return intensity;
+    }
 
     /**
      * Set the backscatter intensity
      * @param intensity
      */
-    void setIntensity(double intensity){
-        intensity=intensity;
+    void setIntensity(double intensity) {
+        intensity = intensity;
     }
 
-    static bool sortByTimestamp(Ping & p1,Ping & p2){
-        return p1.getTimestamp() < p2.getTimestamp(); 
+    static bool sortByTimestamp(Ping & p1, Ping & p2) {
+        return p1.getTimestamp() < p2.getTimestamp();
     }
 
-
+    /**
+     * Returns the stream in which this ping will be writen
+     *
+     * @param os the stream in which to write this ping
+     * @param obj the ping to write in the stream
+     */
+    friend std::ostream& operator<<(std::ostream & os, const Ping & obj) {
+        return os <<
+                "timestamp: " << obj.timestamp << std::endl <<
+                "id: " << obj.id << std::endl <<
+                "quality: " << obj.quality << std::endl <<
+                "intensity: " << obj.intensity << std::endl <<
+                "surfaceSoundSpeed: " << obj.surfaceSoundSpeed << std::endl <<
+                "twoWayTravelTime: " << obj.twoWayTravelTime << std::endl <<
+                "alongTrackAngle: " << obj.alongTrackAngle << std::endl <<
+                "acrossTrackAngle: " << obj.acrossTrackAngle << std::endl;
+    }
 };
 
 

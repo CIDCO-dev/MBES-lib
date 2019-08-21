@@ -17,6 +17,12 @@
 #include <string>
 #include "../utils/Exception.hpp"
 #include "../math/Boresight.hpp"
+#include "../svp/CarisSVP.hpp"
+#include "../svp/SvpSelectionStrategy.hpp"
+#include "../svp/SvpFreshWater.hpp"
+#include "../svp/SvpSaltWater.hpp"
+#include "../svp/SvpNearestByTime.hpp"
+#include "../svp/SvpNearestByLocation.hpp"
 
 using namespace std;
 
@@ -26,14 +32,14 @@ void printUsage(){
 NAME\n\n\
 	georeference - Produces a georeferenced point cloud from binary multibeam echosounder datagrams files\n\n\
 SYNOPSIS\n \
-	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] [-s svp_file] file\n\n\
+	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] [-s svp_file] [-S svpStrategy] file\n\n\
 DESCRIPTION\n \
 	-L Use a local geographic frame (NED)\n \
-	-T Use a terrestrial geographic frame (WGS84 ECEF)\n\n \
+	-T Use a terrestrial geographic frame (WGS84 ECEF)\n \
+        -S choose one: nearestTime, nearestLocation, saltwater or freshwater\n\n \
 Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
 }
-
 
 /**
   * declare the parser depending on argument receive
@@ -66,16 +72,20 @@ int main (int argc , char ** argv){
         double roll     = 0.0;
         double pitch    = 0.0;
         double heading  = 0.0;
+        
+        //SVP strategy
+        std::string userSelectedStrategy;
+        SvpSelectionStrategy * svpStrategy;
 
         //Georeference method
         Georeferencing * georef;
 
 	std::string	     svpFilename;
-	SoundVelocityProfile svp;
+	CarisSVP svps;
 
         int index;
 
-        while((index=getopt(argc,argv,"x:y:z:r:p:h:s:LT"))!=-1)
+        while((index=getopt(argc,argv,"x:y:z:r:p:h:s:S:LT"))!=-1)
         {
             switch(index)
             {
@@ -129,10 +139,32 @@ int main (int argc , char ** argv){
 
 		case 's':
 			svpFilename = optarg;
-			if(!svp.read(svpFilename)){
+			if(!svps.readSvpFile(svpFilename)){
 				std::cerr << "Invalid SVP file (-s)" << std::endl;
 				printUsage();
 			}
+                        break;
+                        
+                case 'S':
+			userSelectedStrategy = optarg;
+                        if(userSelectedStrategy == "freshwater") {
+                            svpStrategy = new SvpFreshWater();
+                        } else if(userSelectedStrategy == "saltwater") {
+                            svpStrategy = new SvpSaltWater();
+                        } else if(userSelectedStrategy == "nearestLocation") {
+                            svpStrategy = new SvpNearestByLocation();
+                        } else if(userSelectedStrategy == "nearestTime") {
+                            svpStrategy = new SvpNearestByTime();
+                        } else {
+                            std::cerr << "Invalid SVP strategy (-v): " << userSelectedStrategy << std::endl;
+                            std::cerr << "Possible choices are:" << std::endl;
+                            std::cerr << "-S nearestTime" << std::endl;
+                            std::cerr << "-S nearestLocation" << std::endl;
+                            std::cerr << "-S saltwater" << std::endl;
+                            std::cerr << "-S freshwater" << std::endl;
+                            printUsage();
+                        }
+                        break;
 
                 case 'L':
                     georef = new GeoreferencingLGF();
@@ -148,11 +180,16 @@ int main (int argc , char ** argv){
             std::cerr << "No georeferencing method defined (-L or -T)" << std::endl;
             printUsage();
         }
+        
+        if(svpStrategy == NULL){
+            std::cerr << "No sound velocity profile selection strategy defined (-S)" << std::endl;
+            printUsage();
+        }
 
         try
         {
             DatagramParser * parser = NULL;
-            DatagramGeoreferencer  printer(*georef);
+            DatagramGeoreferencer  printer(*georef, *svpStrategy);
 
             std::cerr << "[+] Decoding " << fileName << std::endl;
             std::ifstream inFile;
@@ -176,9 +213,9 @@ int main (int argc , char ** argv){
             Attitude boresightAngles(0,roll,pitch,heading);
             Eigen::Matrix3d boresight;
             Boresight::buildMatrix(boresight,boresightAngles);
-
+            
             //Do the georeference dance
-            printer.georeference(leverArm,boresight,(svp.getSize()>0)?&svp:NULL);
+            printer.georeference(leverArm, boresight, svps.getSvps());
 
             delete parser;
         }

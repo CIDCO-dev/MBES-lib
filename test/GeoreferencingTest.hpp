@@ -16,6 +16,7 @@
 #include "../src/math/Boresight.hpp"
 #include "../src/utils/Constants.hpp"
 #include "../src/svp/SoundVelocityProfileFactory.hpp"
+#include "../src/svp/CarisSVP.hpp"
 
 #define POSITION_PRECISION 0.00000001
 
@@ -67,8 +68,9 @@ TEST_CASE("Georeferencing LGF test") {
 
     /*Obtain svp*/
     std::string svpFilePath = "test/data/rayTracingTestData/SVP-0.svp";
-    SoundVelocityProfile svp;
-    svp.read(svpFilePath);
+    CarisSVP svps;
+    svps.readSvpFile(svpFilePath);
+    SoundVelocityProfile * svp = svps.getSvps()[0];
 
 
     Eigen::Vector3d leverArm;
@@ -84,7 +86,7 @@ TEST_CASE("Georeferencing LGF test") {
 
     /*Perform georeferencing in LGF*/
     Eigen::Vector3d georeferencedPing;
-    georef->georeference(georeferencedPing, attitude, position, ping, svp, leverArm, boresightMatrix);
+    georef->georeference(georeferencedPing, attitude, position, ping, *svp, leverArm, boresightMatrix);
 
     Eigen::Vector3d expectedGeoreferencedPing;
     expectedGeoreferencedPing << -26.8825997032, 7.3549385469, 10.4758625062;
