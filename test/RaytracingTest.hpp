@@ -17,13 +17,15 @@
 #include "../src/math/CoordinateTransform.hpp"
 #include "../src/math/Boresight.hpp"
 #include "../src/utils/Constants.hpp"
+#include "../src/svp/CarisSVP.hpp"
 
 TEST_CASE("Ray tracing test") {
     
     /*Obtain svp*/
     std::string svpFilePath = "test/data/rayTracingTestData/SVP-0.svp";
-    SoundVelocityProfile svp;
-    svp.read(svpFilePath);
+    CarisSVP svps;
+    svps.readSvpFile(svpFilePath);
+    SoundVelocityProfile * svp = svps.getSvps()[0];
 
     /*Build Ping*/
     uint64_t microEpoch = 0;
@@ -65,7 +67,7 @@ TEST_CASE("Ray tracing test") {
     
     /* Perform the ray tracing*/
     Eigen::Vector3d ray;
-    Raytracing::rayTrace(ray, ping, svp, boresightMatrix, imu2nav);
+    Raytracing::rayTrace(ray, ping, *svp, boresightMatrix, imu2nav);
     
     /* Test ray tracing values */
     Eigen::Vector3d expectedRay;
