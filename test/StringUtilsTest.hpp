@@ -17,21 +17,21 @@ TEST_CASE("Test the String Utils end with function")
 {
     const char* text = NULL;
     const char* end = NULL;
-    REQUIRE(ends_with(text,end)==false);
+    REQUIRE(StringUtils::ends_with(text,end)==false);
     text = "text";
     end = "texte";
-    REQUIRE(ends_with(text,end)==false);
+    REQUIRE(StringUtils::ends_with(text,end)==false);
     text = "text";
     end = "re";
-    REQUIRE(ends_with(text,end)==false);
+    REQUIRE(StringUtils::ends_with(text,end)==false);
     text = "text";
     end = "ext";
-    REQUIRE(ends_with(text,end));
+    REQUIRE(StringUtils::ends_with(text,end));
 }
 
 TEST_CASE("Test the String Utils trim function")
 {
     const std::string text = "             te xt                 ";
-    REQUIRE(trim(text)=="te xt");
+    REQUIRE(StringUtils::trim(text)=="te xt");
 }
 

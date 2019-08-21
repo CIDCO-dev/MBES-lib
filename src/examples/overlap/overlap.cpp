@@ -267,7 +267,7 @@ int main( int argc, char* argv[] )
     for ( int count = 0; count < 2; count++ )
     {
         // If file name ends in .txt: point cloud X, Y, Z
-        if ( ends_with( twoFileNames[ count ].c_str(),".txt" ) )
+        if ( StringUtils::ends_with( twoFileNames[ count ].c_str(),".txt" ) )
         {
             readTextFileIntoPointCloud( twoFileNames[ count ], twoLines[ count ] );
         }
@@ -279,7 +279,7 @@ int main( int argc, char* argv[] )
             }
             catch ( Exception * error )
             {
-                cout << error->getMessage();
+                cout << error->what();
 
                 exit( 1 );
             }

@@ -221,7 +221,7 @@ int main (int argc , char ** argv){
         }
         catch(Exception * error)
         {
-            std::cerr << "[-] Error while parsing " << fileName << ": " << error->getMessage() << std::endl;
+            std::cerr << "[-] Error while parsing " << fileName << ": " << error->what() << std::endl;
         }
     }
 }

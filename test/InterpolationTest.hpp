@@ -23,7 +23,7 @@ TEST_CASE("Test the linear interpolation with invalid timestamp")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="The two positions timestamp are the same");
     try
@@ -32,7 +32,7 @@ TEST_CASE("Test the linear interpolation with invalid timestamp")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="The first position timestamp is higher than interpolation timestamp");
     try
@@ -41,7 +41,7 @@ TEST_CASE("Test the linear interpolation with invalid timestamp")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="The first position timestamp is higher than the second position timestamp");
 }
@@ -89,7 +89,7 @@ TEST_CASE("Test the angle interpolation with invalid timestamp")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="The two positions timestamp are the same");
     try
@@ -98,7 +98,7 @@ TEST_CASE("Test the angle interpolation with invalid timestamp")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="The first position timestamp is higher than interpolation timestamp");
     try
@@ -107,7 +107,7 @@ TEST_CASE("Test the angle interpolation with invalid timestamp")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="The first position timestamp is higher than the second position timestamp");
 }
@@ -121,7 +121,7 @@ TEST_CASE("Test the angle interpolation with a difference of 180 degrees")
     }
     catch (Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep == "The angles 0 and 180 have a difference of 180 degrees "
             "which means there are two possible answers at timestamp 50");
@@ -132,7 +132,7 @@ TEST_CASE("Test the angle interpolation with a difference of 180 degrees")
     }
     catch (Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep == "The angles 0 and 180 have a difference of 180 degrees "
             "which means there are two possible answers at timestamp 75");

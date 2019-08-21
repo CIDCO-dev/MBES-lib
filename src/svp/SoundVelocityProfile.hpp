@@ -25,10 +25,14 @@ class SoundVelocityProfile {
 public:
 
     /**Creates a sound velocity*/
-    SoundVelocityProfile();
+    SoundVelocityProfile() {
+        longitude = latitude = nan("");
+    }
 
     /**Destroys a sound velocity*/
-    ~SoundVelocityProfile();
+    ~SoundVelocityProfile() {
+
+    }
 
     /**Returns the size of the SoundVelocityProfile*/
     unsigned int getSize() {
@@ -86,21 +90,44 @@ public:
         return ss.str();
     }
 
-
     /**
      * Adds a new value in the vector depths and speeds
      *
      * @param depth value to add in depths
      * @param soundSpeed value to add in speeds
      */
-    void add(double depth, double soundSpeed);
+    void add(double depth, double soundSpeed) {
+        samples.push_back(std::make_pair(depth, soundSpeed));
+    }
 
     /**Returns the depths vector*/
-    Eigen::VectorXd & getDepths();
+    Eigen::VectorXd & getDepths() {
+        //lazy load internal vector
+        if ((unsigned int) depths.size() != samples.size()) {
+            depths.resize(samples.size());
+
+            for (unsigned int i = 0; i < samples.size(); i++) {
+                depths(i) = samples[i].first;
+            }
+        }
+
+        return depths;
+    }
 
     /**Returns the speeds vector*/
-    Eigen::VectorXd & getSpeeds();
-    
+    Eigen::VectorXd & getSpeeds() {
+        //lazy load internal vector
+        if ((unsigned int) speeds.size() != samples.size()) {
+            speeds.resize(samples.size());
+
+            for (unsigned int i = 0; i < samples.size(); i++) {
+                speeds(i) = samples[i].second;
+            }
+        }
+
+        return speeds;
+    }
+
     /**
      * Returns the stream in which this ping will be writen
      *
@@ -111,12 +138,10 @@ public:
         return os <<
                 "timestamp: " << obj.timestamp << std::endl <<
                 "latitude: " << obj.latitude << std::endl <<
-                "longitude: " << obj.longitude << std::endl <<
-                "draft: " << obj.draft << std::endl;
+                "longitude: " << obj.longitude << std::endl;
     }
 
 private:
-
 
     /**timestamp value of the SoundVelocityProfile (micro-second)*/
     uint64_t timestamp; //timestamp
@@ -127,9 +152,6 @@ private:
     /**longitude value of the SoundVelocityProfile*/
     double longitude;
 
-    /**draft value of the draft*/
-    double draft;
-
     /**vector that contains the dephts of the SoundVelocityProfile*/
     Eigen::VectorXd depths;
 
@@ -139,42 +161,5 @@ private:
     /**vector that contain the depths and the speeds*/
     std::vector<std::pair<double, double>> samples;
 };
-
-SoundVelocityProfile::SoundVelocityProfile() {
-    longitude = latitude = nan("");
-};
-
-SoundVelocityProfile::~SoundVelocityProfile() {
-};
-
-void SoundVelocityProfile::add(double depth, double soundSpeed) {
-    samples.push_back(std::make_pair(depth, soundSpeed));
-}
-
-Eigen::VectorXd & SoundVelocityProfile::getDepths() {
-    //lazy load internal vector
-    if ((unsigned int) depths.size() != samples.size()) {
-        depths.resize(samples.size());
-
-        for (unsigned int i = 0; i < samples.size(); i++) {
-            depths(i) = samples[i].first;
-        }
-    }
-
-    return depths;
-}
-
-Eigen::VectorXd & SoundVelocityProfile::getSpeeds() {
-    //lazy load internal vector
-    if ((unsigned int) speeds.size() != samples.size()) {
-        speeds.resize(samples.size());
-
-        for (unsigned int i = 0; i < samples.size(); i++) {
-            speeds(i) = samples[i].second;
-        }
-    }
-
-    return speeds;
-}
 
 #endif /* SOUNDVELOCITYPROFILE_HPP */

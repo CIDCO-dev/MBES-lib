@@ -210,7 +210,6 @@ protected:
     /** the svp selection strategy*/
     SvpSelectionStrategy & svpStrategy;
 
-
     /**the georeferencing method */
     Georeferencing & georef;
 

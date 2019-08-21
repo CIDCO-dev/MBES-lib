@@ -98,7 +98,7 @@ TEST_CASE ("test the S7k parser with a file who doesn't exist")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="File not found");
 }
@@ -115,7 +115,7 @@ TEST_CASE ("test the S7k parser with a invalid file")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="Couldn't find sync pattern");
 }
@@ -132,7 +132,7 @@ TEST_CASE ("test the S7k parser with a valid file")
     }
     catch(Exception * error)
     {
-        excep = error->getMessage();
+        excep = error->what();
     }
     REQUIRE(excep=="");
 }

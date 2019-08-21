@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+set (CMAKE_CXX_STANDARD 11)
 
 project(overlap)
 
@@ -9,6 +10,6 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_executable (overlap overlap.cpp)
+add_executable (overlap overlap.cpp ../../src/svp/SoundVelocityProfile.cpp ../../src/datagrams/DatagramParserFactory.cpp ../../src/datagrams/DatagramParser.cpp ../../src/datagrams/xtf/XtfParser.cpp ../../src/datagrams/s7k/S7kParser.cpp ../../src/datagrams/kongsberg/KongsbergParser.cpp ../../src/utils/NmeaUtils.cpp ../../src/utils/StringUtils.cpp)
 target_link_libraries (overlap ${PCL_LIBRARIES})
 

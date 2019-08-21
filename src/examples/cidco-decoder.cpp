@@ -134,7 +134,7 @@ public:
 	void processSwathStart(double surfaceSoundSpeed){
 		currentSurfaceSoundSpeed = surfaceSoundSpeed;
 		if(nbBeams > 0){
-			std::string cleanPingLine = trim(pingLine.str());
+			std::string cleanPingLine = StringUtils::trim(pingLine.str());
 			fprintf(multibeamFile,"%.6f\t%0.7f\t%d\t%s\n",microEpoch2daySeconds(currentMicroEpoch), surfaceSoundSpeed, nbBeams, cleanPingLine.c_str());
 			pingLine.str(std::string());
 			nbBeams=0;
