@@ -27,6 +27,7 @@ public:
     /**Creates a sound velocity*/
     SoundVelocityProfile() {
         longitude = latitude = nan("");
+        timestamp = 0;
     }
 
     /**Destroys a sound velocity*/
@@ -80,15 +81,6 @@ public:
     void setTimestamp(uint64_t t) {
         timestamp = t;
     };
-
-    std::string latlongFormat(double value) {
-        std::stringstream ss;
-        double degrees = std::trunc(value);
-        double minutes = std::trunc((value - degrees) * 60);
-        double second = (value - minutes) * 60;
-        ss << " " << degrees << ":" << minutes << ":" << second;
-        return ss.str();
-    }
 
     /**
      * Adds a new value in the vector depths and speeds

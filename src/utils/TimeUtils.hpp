@@ -161,7 +161,7 @@ public:
         strptime(carisTime, "%Y-%j %H:%M:%S", &tmTime);
         time_t tTime = timegm(&tmTime);
 
-        return (uint64_t) tTime * 1000000; //seconds to mixroseconds
+        return (uint64_t) tTime * 1000000; //seconds to microseconds
     }
 
     /**

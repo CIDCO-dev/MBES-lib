@@ -10,8 +10,11 @@
 #ifndef SVPNEARESTBYTIME_HPP
 #define SVPNEARESTBYTIME_HPP
 
-#include <stdlib.h>
+
 #include <vector>
+#include "SvpSelectionStrategy.hpp"
+#include "SoundVelocityProfile.hpp"
+#include "../utils/Exception.hpp"
 
 class SvpNearestByTime : public SvpSelectionStrategy {
 private:
@@ -26,16 +29,13 @@ public:
     ~SvpNearestByTime() {
 
     }
-    
+
     void addSvp(SoundVelocityProfile * svp) {
         svps.push_back(svp);
+
     }
 
     SoundVelocityProfile * chooseSvp(Position & position, Ping & ping) {
-
-        if (svps.size() == 1) {
-            return svps[0];
-        }
 
         uint64_t dt = std::numeric_limits<uint64_t>::max();
 
@@ -43,6 +43,10 @@ public:
 
         for (unsigned int i = 0; i < svps.size(); i++) {
             SoundVelocityProfile* svp = svps[i];
+
+            if (svp->getTimestamp() == 0) {
+                throw new Exception("Cannot apply SvpNearestByTime strategy to svp with timestamp==0");
+            }
 
             //Warning: subtracting uint is dangerous!
             //check which is greater first

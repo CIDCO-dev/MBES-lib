@@ -58,6 +58,14 @@ test-quick: default
 	mkdir -p $(test_work_dir)
 	cd $(test_work_dir)
 	$(root)/$(test_exec_dir)/tests || true
+	
+test-debug: default
+	mkdir -p $(test_exec_dir)
+	$(CC) $(OPTIONS) -static $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp $(FILES)
+	mkdir -p $(test_result_dir)
+	mkdir -p $(test_work_dir)
+	cd $(test_work_dir)
+	$(root)/$(test_exec_dir)/tests || true
 
 
 coverage: default
