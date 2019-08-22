@@ -207,11 +207,12 @@ public:
 
 
 protected:
-    /** the svp selection strategy*/
-    SvpSelectionStrategy & svpStrategy;
 
     /**the georeferencing method */
     Georeferencing & georef;
+    
+    /** the svp selection strategy*/
+    SvpSelectionStrategy & svpStrategy;
 
     /**the current surface sound speed*/
     double currentSurfaceSoundSpeed;

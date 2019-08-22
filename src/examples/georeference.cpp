@@ -19,8 +19,6 @@
 #include "../math/Boresight.hpp"
 #include "../svp/CarisSVP.hpp"
 #include "../svp/SvpSelectionStrategy.hpp"
-#include "../svp/SvpFreshWater.hpp"
-#include "../svp/SvpSaltWater.hpp"
 #include "../svp/SvpNearestByTime.hpp"
 #include "../svp/SvpNearestByLocation.hpp"
 
@@ -36,7 +34,7 @@ SYNOPSIS\n \
 DESCRIPTION\n \
 	-L Use a local geographic frame (NED)\n \
 	-T Use a terrestrial geographic frame (WGS84 ECEF)\n \
-        -S choose one: nearestTime, nearestLocation, saltwater or freshwater\n\n \
+        -S choose one: nearestTime or nearestLocation\n\n \
 Copyright 2017-2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés" << std::endl;
 	exit(1);
 }
@@ -147,21 +145,15 @@ int main (int argc , char ** argv){
                         
                 case 'S':
 			userSelectedStrategy = optarg;
-                        if(userSelectedStrategy == "freshwater") {
-                            svpStrategy = new SvpFreshWater();
-                        } else if(userSelectedStrategy == "saltwater") {
-                            svpStrategy = new SvpSaltWater();
-                        } else if(userSelectedStrategy == "nearestLocation") {
+                        if(userSelectedStrategy == "nearestLocation") {
                             svpStrategy = new SvpNearestByLocation();
                         } else if(userSelectedStrategy == "nearestTime") {
                             svpStrategy = new SvpNearestByTime();
                         } else {
-                            std::cerr << "Invalid SVP strategy (-v): " << userSelectedStrategy << std::endl;
+                            std::cerr << "Invalid SVP strategy (-S): " << userSelectedStrategy << std::endl;
                             std::cerr << "Possible choices are:" << std::endl;
                             std::cerr << "-S nearestTime" << std::endl;
                             std::cerr << "-S nearestLocation" << std::endl;
-                            std::cerr << "-S saltwater" << std::endl;
-                            std::cerr << "-S freshwater" << std::endl;
                             printUsage();
                         }
                         break;
@@ -194,12 +186,12 @@ int main (int argc , char ** argv){
             std::cerr << "[+] Decoding " << fileName << std::endl;
             std::ifstream inFile;
             inFile.open(fileName);
-            if (inFile){
+            if (inFile) {
                     parser = DatagramParserFactory::build(fileName,printer);
             }
             else
             {
-                throw new Exception("File not found");
+                throw new Exception("File not found: << fileName");
             }
             parser->parse(fileName);
             std::cout << std::setprecision(6);
