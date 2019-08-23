@@ -26,6 +26,16 @@ public:
      */
 
     /**
+    * Definition for timegm function
+    *
+    * @param __restrict char *
+    * @param __restrict char *
+    * @param __restrict struct tm *
+    */
+    static char *strptime(const char * __restrict, const char * __restrict, struct tm * __restrict);
+
+
+    /**
      * Return the number microseconds since 1st January 1970 of the parameters in total
      *
      * @param year number of years (0-3000)
