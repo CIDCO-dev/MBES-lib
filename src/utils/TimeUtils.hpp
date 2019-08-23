@@ -25,14 +25,16 @@ public:
      * Returns epoch in microseconds since Jan 1 1970
      */
 
-    /**
-    * Definition for timegm function
-    *
-    * @param __restrict char *
-    * @param __restrict char *
-    * @param __restrict struct tm *
-    */
-    static char *strptime(const char * __restrict, const char * __restrict, struct tm * __restrict);
+    #ifdef _WIN32
+	/**
+    	* Definition for timegm function
+	*
+	* @param __restrict char *
+	* @param __restrict char *
+   	* @param __restrict struct tm *
+   	*/
+    	static char *strptime(const char * __restrict, const char * __restrict, struct tm * __restrict);
+    #endif
 
 
     /**
