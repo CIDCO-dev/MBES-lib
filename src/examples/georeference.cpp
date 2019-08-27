@@ -174,8 +174,8 @@ int main (int argc , char ** argv){
         }
         
         if(svpStrategy == NULL){
-            std::cerr << "No sound velocity profile selection strategy defined (-S)" << std::endl;
-            printUsage();
+            std::cerr << "[+] Using nearest in time sound velocity profile selection strategy" << std::endl;
+            svpStrategy = new SvpNearestByTime();
         }
 
         try

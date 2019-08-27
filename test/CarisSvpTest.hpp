@@ -66,7 +66,7 @@ TEST_CASE("CARIS SVP test") {
     SoundVelocityProfile * testSvp1 = svpsCarisIn.getSvps()[0];
     SoundVelocityProfile * testSvp2 = svpsCarisIn.getSvps()[1];
     
-    REQUIRE(std::abs(testSvp1->getTimestamp() - t1) < testThreshold);
+    REQUIRE(testSvp1->getTimestamp() == t1);
     REQUIRE(std::abs(testSvp1->getLatitude() - lat1) < testThreshold);
     REQUIRE(std::abs(testSvp1->getLongitude() - lon1) < testThreshold);
     REQUIRE(std::abs(testSvp1->getDepths()(0) - depth11) < testThreshold);
@@ -74,7 +74,7 @@ TEST_CASE("CARIS SVP test") {
     REQUIRE(std::abs(testSvp1->getSpeeds()(0) - speed11) < testThreshold);
     REQUIRE(std::abs(testSvp1->getSpeeds()(1) - speed12) < testThreshold);
     
-    REQUIRE(std::abs(testSvp2->getTimestamp() - t2) < testThreshold);
+    REQUIRE(testSvp2->getTimestamp() == t2);
     REQUIRE(std::abs(testSvp2->getLatitude() - lat2) < testThreshold);
     REQUIRE(std::abs(testSvp2->getLongitude() - lon2) < testThreshold);
     REQUIRE(std::abs(testSvp2->getDepths()(0) - depth21) < testThreshold);

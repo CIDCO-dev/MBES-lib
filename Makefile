@@ -88,6 +88,8 @@ clean:
 	rm -rf build
 	rm *.txt || true
 	rm *.svp || true
+	rm *.gcno || true
+	rm *.gcda || true
 
 datagram-list-test: default
 	./build/bin/datagram-list test/data/s7k/20141016_150519_FJ-Saucier.s7k|sort|uniq -c

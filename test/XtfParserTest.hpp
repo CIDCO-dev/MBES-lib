@@ -81,12 +81,13 @@ TEST_CASE ("test the XTF parser with a file who doesn't exist")
     try
     {
         parser.parse(file);
+        REQUIRE(false);
     }
     catch(Exception * error)
     {
         excep = error->what();
+        REQUIRE(true);
     }
-    REQUIRE(excep=="File not found");
 }
 
 TEST_CASE ("test the XTF parser with a invalid file")
@@ -98,15 +99,16 @@ TEST_CASE ("test the XTF parser with a invalid file")
     try
     {
         parser.parse(file);
+        REQUIRE(false);
     }
     catch(Exception * error)
     {
         excep = error->what();
+        REQUIRE(true);
     }
-    REQUIRE(excep=="Couldn't read from file");
 }
 
-TEST_CASE ("test the XTF parser with a invalid datagram")
+TEST_CASE ("test the XTF parser with a valid datagram")
 {
     DatagramEventHandler handler;
     XtfParser parser(handler);
@@ -115,10 +117,11 @@ TEST_CASE ("test the XTF parser with a invalid datagram")
     try
     {
         parser.parse(file);
+        REQUIRE(true);
     }
     catch(Exception * error)
     {
         excep = error->what();
+        REQUIRE(false);
     }
-    REQUIRE(excep=="");
 }
