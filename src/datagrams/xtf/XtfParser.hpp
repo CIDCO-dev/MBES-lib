@@ -7,7 +7,8 @@
 
 //TODO: under windows, in winsock.h
 #ifdef _WIN32
-#include <Winsock2.h>
+#include <winsock.h>
+#pragma comment(lib, "Ws2_32.lib")
 #else
 #include <arpa/inet.h>
 #endif
