@@ -120,7 +120,7 @@ public:
      *
      */
     
-    void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
+    virtual void georeference(Eigen::Vector3d & georeferencedPing,Attitude & attitude,Position & position,Ping & ping,SoundVelocityProfile & svp,Eigen::Vector3d & leverArm,Eigen::Matrix3d & boresight) {
         Eigen::Matrix3d imu2ned;
         CoordinateTransform::getDCM(imu2ned,attitude);
 
@@ -165,10 +165,17 @@ public:
 
     Position * getCentroid(){ return centroid;};
 
-private:
-	Position * centroid = NULL; //in geographic coordinates
+protected:
+
         Eigen::Vector3d centroidECEF;
 	Eigen::Matrix3d ecef2ned;
+
+
+private:
+	Position * centroid = NULL; //in geographic coordinates
+
+
+
 };
 
 #endif

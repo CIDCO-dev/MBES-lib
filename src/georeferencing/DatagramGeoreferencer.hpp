@@ -94,7 +94,7 @@ public:
      * Georeferences all pings
      * @param boresight boresight (dPhi,dTheta,dPsi)
      */
-    void georeference(Eigen::Vector3d & leverArm, Eigen::Matrix3d & boresight, std::vector<SoundVelocityProfile*> & externalSvps) {
+    virtual void georeference(Eigen::Vector3d & leverArm, Eigen::Matrix3d & boresight, std::vector<SoundVelocityProfile*> & externalSvps) {
 
         
         if (externalSvps.size() > 0) {
