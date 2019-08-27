@@ -61,12 +61,13 @@ TEST_CASE ("test the Kongsberg parser with a file who doesn't exist")
     try
     {
         parser.parse(file);
+        REQUIRE(false);
     }
     catch(Exception * error)
     {
         excep = error->what();
+        REQUIRE(true);
     }
-    REQUIRE(excep=="Couldn't open file blabla.all");
 }
 
 TEST_CASE ("test the Kongsberg parser with a invalid datagram")
@@ -78,12 +79,13 @@ TEST_CASE ("test the Kongsberg parser with a invalid datagram")
     try
     {
         parser.parse(file);
+        REQUIRE(false);
     }
     catch(Exception * error)
     {
         excep = error->what();
+        REQUIRE(true);
     }
-    REQUIRE(excep=="Bad datagram");
 }
 
 TEST_CASE ("test the Kongsberg parser with a valid datagram")
@@ -95,10 +97,11 @@ TEST_CASE ("test the Kongsberg parser with a valid datagram")
     try
     {
         parser.parse(file);
+        REQUIRE(true);
     }
     catch(Exception * error)
     {
         excep = error->what();
+        REQUIRE(false);
     }
-    REQUIRE(excep=="");
 }

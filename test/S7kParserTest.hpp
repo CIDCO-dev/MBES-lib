@@ -95,12 +95,13 @@ TEST_CASE ("test the S7k parser with a file who doesn't exist")
     try
     {
         parser.parse(file);
+        REQUIRE(false);
     }
     catch(Exception * error)
     {
         excep = error->what();
+        REQUIRE(true);
     }
-    REQUIRE(excep=="File not found");
 }
 
 TEST_CASE ("test the S7k parser with a invalid file")
@@ -112,12 +113,13 @@ TEST_CASE ("test the S7k parser with a invalid file")
     try
     {
         parser.parse(file);
+        REQUIRE(false);
     }
     catch(Exception * error)
     {
         excep = error->what();
+        REQUIRE(true);
     }
-    REQUIRE(excep=="Couldn't find sync pattern");
 }
 
 TEST_CASE ("test the S7k parser with a valid file")
@@ -129,10 +131,11 @@ TEST_CASE ("test the S7k parser with a valid file")
     try
     {
         parser.parse(file);
+        REQUIRE(true);
     }
     catch(Exception * error)
     {
         excep = error->what();
+        REQUIRE(false);
     }
-    REQUIRE(excep=="");
 }
