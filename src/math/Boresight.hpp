@@ -5,6 +5,10 @@
 #ifndef BORESIGHT_HPP
 #define BORESIGHT_HPP
 
+
+#include "../Attitude.hpp"
+
+
 /*!
 * \brief Boresight util. Give matrix between IMU and Sonar.
 * \author Guillaume Labbe-Morissette
