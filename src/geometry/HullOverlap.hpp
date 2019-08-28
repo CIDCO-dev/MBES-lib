@@ -311,7 +311,29 @@ public:
     }
 
 
-    bool getMinMaxPointsInOverlap( pcl::PointXYZ & minPt, pcl::PointXYZ &maxPt )
+
+    pcl::PointCloud< pcl::PointXYZ >::ConstPtr getConstPtrlineInPlane3D( const int lineNumber  ) const
+    {
+
+        if ( lineNumber < 0 || lineNumber > 1 )
+        {
+            std::cout << "\n\n----- Function HullOverlap::getConstPtrlineInPlane3D(): lineNumber parameter: "
+                << lineNumber << ".\nIt must be either 0 or 1. Returning nullptr\n" << std::endl;            
+            return nullptr;         
+        }
+
+        if ( lineNumber == 0 )
+            return line1InPlane;
+        else 
+            return line2InPlane;
+    }
+
+
+
+
+
+
+    bool getMinMaxPointsInOverlapPlane2D( pcl::PointXYZ & minPt, pcl::PointXYZ &maxPt )
     {
         bool OK = false;
 
@@ -371,6 +393,90 @@ public:
 
         return OK;
     }
+
+
+    bool getMinMaxPointsInOverlapPlane3D( pcl::PointXYZ & minPt, pcl::PointXYZ &maxPt )
+    {
+        bool OK = false;
+
+        // if there are points in both lines in the overlap
+        if ( line1InBothHullPointIndices.size() > 0 && line2InBothHullPointIndices.size() > 0 )
+        {
+
+            double xMin = std::numeric_limits<double>::max();
+            double xMax = std::numeric_limits<double>::min();
+
+            double yMin = std::numeric_limits<double>::max();
+            double yMax = std::numeric_limits<double>::min();
+
+            double zMin = std::numeric_limits<double>::max();
+            double zMax = std::numeric_limits<double>::min();            
+
+            for ( uint64_t count = 0; count < line1InBothHullPointIndices.size(); count++ )
+            {
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].x < xMin )
+                    xMin = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].x;
+
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].x > xMax )
+                    xMax = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].x;
+                    
+                    
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].y < yMin )
+                    yMin = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].y;
+
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].y > yMax )
+                    yMax = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].y;     
+
+
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].z < zMin )
+                    zMin = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].z;
+
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].z > zMax )
+                    zMax = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].z;                       
+
+            }
+
+            for ( uint64_t count = 0; count < line2InBothHullPointIndices.size(); count++ )
+            {
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].x < xMin )
+                    xMin = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].x;
+
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].x > xMax )
+                    xMax = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].x;
+                    
+                    
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].y < yMin )
+                    yMin = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].y;
+
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].y > yMax )
+                    yMax = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].y;     
+
+
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].z < zMin )
+                    zMin = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].z;
+
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].z > zMax )
+                    zMax = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].z;                       
+
+            }
+
+            minPt.x = xMin;
+            minPt.y = yMin;
+            minPt.z = zMin;
+
+            maxPt.x = xMax;
+            maxPt.y = yMax;
+            maxPt.z = zMax;
+
+            OK = true;
+
+        }
+
+        return OK;
+    }
+
+
+
 
     uint64_t getNbPointsInOverlap( const int lineNumber ) const
     {
