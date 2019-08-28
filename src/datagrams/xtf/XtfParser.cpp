@@ -49,10 +49,7 @@ void XtfParser::parse(std::string & filename){
 				//Lire structs CHANINFO dans le header
 				int channelsInHeader = (channels > 6)?6:channels;
 
-				for(int i=0;i<channelsInHeader;i++){
-                                    sampleFormat   = fileHeader.Channels[i].SampleFormat;//FIXME: this is wrong
-                                    bytesPerSample = fileHeader.Channels[i].BytesPerSample;//FIXME: this is wrong
-                                    
+				for(int i=0;i<channelsInHeader;i++){                                    
                                     processChanInfo(&fileHeader.Channels[i]);
 				}
 
@@ -598,7 +595,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
                 
                 processSidescanData(*pingHdr,*pingChanHdr,data);
                 
-                sampleBytesRead += pingChanHdr->NumSamples * bytesPerSample;
+                sampleBytesRead += pingChanHdr->NumSamples * channels[pingChanHdr->ChannelNumber]->BytesPerSample;
             }
         }
 	else{
@@ -616,67 +613,73 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
     for(unsigned int i=0;i<pingChanHdr.NumSamples;i++){
         double sample = 0;
         
-        if(sampleFormat == 0){
+        if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 0){
             //legacy
-            if(bytesPerSample == 1){
+            if(channels[pingChanHdr.ChannelNumber]->BytesPerSample == 1){
                 sample = ((uint8_t*)data)[i];
             }
-            else if(bytesPerSample == 2){
+            else if(channels[pingChanHdr.ChannelNumber]->BytesPerSample == 2){
                 sample = ((uint16_t*)data)[i];
             }
-            else if(bytesPerSample == 4){
+            else if(channels[pingChanHdr.ChannelNumber]->BytesPerSample == 4){
                 sample = ((uint32_t*)data)[i];
             }
             else{
-                std::cerr << "[-] Bytes per sample: " << bytesPerSample << std::endl;
+                std::cerr << "[-] Bytes per sample: " << channels[pingChanHdr.ChannelNumber]->BytesPerSample << std::endl;
                 throw new std::invalid_argument("Bad bytes per sample format");                
             }
         }
-        else if(sampleFormat == 1){
+        else if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 1){
             //TODO: wtf is an "IBM float" in C?
             throw new std::invalid_argument("[-] Sample format is IBM float");
         }
-        else if(sampleFormat == 2){
+        else if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 2){
             sample = ((uint32_t*)data)[i];
         }
-        else if(sampleFormat == 3){
+        else if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 3){
             sample = ((uint16_t*)data)[i];
         }
-        else if(sampleFormat == 5){
+        else if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 5){
             sample = ((float*)data)[i];
         }
-        else if(sampleFormat == 8){
+        else if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 8){
             sample = ((uint8_t*)data)[i];
         }        
         else{
-            std::cerr << "[-] Sample Format: " << sampleFormat << std::endl;
+            std::cerr << "[-] Sample Format: " << channels[pingChanHdr.ChannelNumber]->SampleFormat << std::endl;
             throw new std::invalid_argument("Sample format unused");
         }
 
         rawSamples.push_back(sample);
     }
     
+    
+    SidescanPing * ping = new SidescanPing();
+    ping->setChannelNumber(pingChanHdr.ChannelNumber);
+    
     if(channels[pingChanHdr.ChannelNumber]->CorrectionFlags == 2){
         //ground ranged images, use as-is
-        processor.processSidescanData(pingChanHdr.ChannelNumber,rawSamples);
+        ping->setSamples(rawSamples);
+        ping->setDistancePerSample(pingChanHdr.GroundRange/(double)rawSamples.size());
     }
-    else{
-        //std::cerr << "[+] Applying slant-range correction" << std::endl;
-        
+    else{       
         //Slant-range image, apply corrections to raw samples
         std::vector<double> correctedSamples;
 
-        //Get beam angle , between nadir and slant
-        
+        //Get beam angle , between nadir and slant        
         double beamAngle = 20;
 
         if(channels[pingChanHdr.ChannelNumber]->TiltAngle > 0){
             beamAngle = channels[pingChanHdr.ChannelNumber]->TiltAngle;
         }
         
+        //Apply corrections
         SlantRangeCorrection::correct(rawSamples,pingChanHdr.SlantRange,0,beamAngle,correctedSamples);
-
-        processor.processSidescanData(pingChanHdr.ChannelNumber,correctedSamples);        
+        
+        ping->setSamples(correctedSamples);
+        ping->setDistancePerSample((double)pingChanHdr.SlantRange/(double)rawSamples.size());
+        
+        processor.processSidescanData(ping);        
     }
 }
 
