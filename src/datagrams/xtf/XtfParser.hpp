@@ -127,9 +127,7 @@ class XtfParser : public DatagramParser{
                 
                 std::vector<XtfChanInfo*> channels;
                 
-                //FIXME: use a channel map to allow for different settings per channel
-                unsigned int bytesPerSample;
-                unsigned int sampleFormat;
+
 };
 
 
