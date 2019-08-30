@@ -7,6 +7,8 @@
 
 #include "../svp/SoundVelocityProfile.hpp"
 
+#include "../sidescan/SidescanPing.hpp"
+
 /*!
 * \brief Datagram event handler class
 * \author Guillaume Morissette
@@ -77,7 +79,10 @@ public:
 	*/
 	virtual void processSoundVelocityProfile(SoundVelocityProfile * svp){ delete svp;};
 
-        virtual void processSidescanData(unsigned int channel,std::vector<double> & data){}
+        
+        
+        virtual void processSidescanData(SidescanPing * ping){}
+        
 };
 
 
