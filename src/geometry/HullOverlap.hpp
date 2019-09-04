@@ -36,6 +36,86 @@
 #include <Eigen/Geometry> // For cross product
 
 
+//-----------------------------------------------------------------------------------
+// Andrew's monotone chain convex hull algorithm
+// Adapted from 
+// https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain#C++
+
+typedef float coord_t;      // coordinate type (Use float because pcl::PointXYZ's coordinates are float)
+typedef double coord2_t;    // must be big enough to hold 2*max(|coordinate|)^2
+
+struct PointAndrews 
+{
+	coord_t x;
+    coord_t y;
+    uint64_t index;
+
+	bool operator <( const PointAndrews &p ) const 
+    {
+		return x < p.x || (x == p.x && y < p.y);
+	}
+};
+
+
+// 3D cross product of OA and OB vectors, (i.e z-component of their "2D" cross product, 
+// but remember that it is not defined in "2D").
+// Returns a positive value, if OAB makes a counter-clockwise turn,
+// negative for clockwise turn, and zero if the points are collinear.
+coord2_t cross( const PointAndrews &O, const PointAndrews &A, const PointAndrews &B )
+{
+	return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
+}
+
+// Returns a list of points on the convex hull in counter-clockwise order.
+// Note: the last point in the returned list is the same as the first one.
+// CB: vector points is modified by getting sorted.
+void AndrewsConvex_hull( std::vector<PointAndrews> & hull, std::vector<PointAndrews> & points )
+{
+	size_t n = points.size(), k = 0;
+
+    hull.clear();        
+
+    if ( n <= 3 )
+    {
+        hull.reserve( n );
+
+        for ( int count = 0; count < n; count++ )
+            hull.push_back( points[ count ] );
+
+        return;
+    }
+
+    hull.resize( 2 * n );
+
+	// Sort points lexicographically
+	sort(points.begin(), points.end());
+
+	// Build lower hull
+	for (size_t i = 0; i < n; ++i)
+    {
+		while (k >= 2 && cross(hull[k-2], hull[k-1], points[i]) <= 0) 
+            k--;
+
+		hull[k++] = points[i];
+	}
+
+	// Build upper hull
+	for (size_t i = n-1, t = k+1; i > 0; --i)
+    {
+		while (k >= t && cross(hull[k-2], hull[k-1], points[i-1]) <= 0) 
+            k--;
+
+		hull[k++] = points[i-1];
+	}
+
+	hull.resize(k-1);
+
+}
+
+//-----------------------------------------------------------------------------------
+
+
+
 class HullOverlap 
 {
 
@@ -50,15 +130,18 @@ public:
     * @param b projection plane coefficient 'b' in ax + by + cz + d = 0
     * @param c projection plane coefficient 'c' in ax + by + cz + d = 0
     * @param d projection plane coefficient 'd' in ax + by + cz + d = 0
+    * @param hullMethod Method to find the hulls, possible values: "PCL ConcaveHull", "Andrew's"
     * @param alpha1 Concave hull computation parameter to use with line #1
     * @param alpha2 Concave hull computation parameter to use with line #2
 	*/
     HullOverlap( pcl::PointCloud<pcl::PointXYZ>::ConstPtr line1In, 
                     pcl::PointCloud<pcl::PointXYZ>::ConstPtr line2In,
-                    double a, double b, double c, double d,
+                    double a, double b, double c, double d, std::string hullMethod = "Andrew's",
                     double alphaLine1 = 1.0, double alphaLine2 = 1.0 )
                     :   line1( line1In ), line2( line2In ),                     
                         a( a ), b( b ), c( c ), d( d ),
+                        hullMethod( hullMethod ),
+
                         alphaLine1( alphaLine1 ), alphaLine2( alphaLine2 ),
 
                         coefficients ( new pcl::ModelCoefficients() ),
@@ -81,6 +164,16 @@ public:
         coefficients->values[1] = b;
         coefficients->values[2] = c;
         coefficients->values[3] = d;
+
+        if ( hullMethod != "PCL ConcaveHull" && hullMethod != "Andrew's" )
+        {
+            std::cerr << "\n\nHullOverlap::HullOverlap(), method \""<<  hullMethod 
+                << "\" is not a valid method to find the hull.\n\n" << std::endl;
+            exit( 1 );  
+        }
+
+
+
     }
 
 
@@ -166,18 +259,46 @@ public:
         std::cout << "line2InPlane2D->points.size(): " << line2InPlane2D->points.size() << "\n" << std::endl;
 
 
-        //http://www.pointclouds.org/documentation/tutorials/hull_2d.php
 
-        std::cout << "\nFinding Hull 1\n" << std::endl;
+        // const std::string method = "Andrew's";
 
-        // Create a Concave Hull for line 1
-        computeVerticesOfConcaveHull( line1InPlane2D, alphaLine1, hull1Vertices, hull1PointIndices, ! minimalMemory );
+        if ( hullMethod == "PCL ConcaveHull" )
+        {
+            //http://www.pointclouds.org/documentation/tutorials/hull_2d.php
+
+            std::cout << "\nFinding Hull 1\n" << std::endl;
+
+            // Create a Concave Hull for line 1
+            computeVerticesOfConcaveHull( line1InPlane2D, alphaLine1, hull1Vertices, hull1PointIndices, ! minimalMemory );
 
 
-        std::cout << "Finding Hull 2\n" << std::endl;
+            std::cout << "Finding Hull 2\n" << std::endl;
 
-        // Create a Concave Hull for line 2
-        computeVerticesOfConcaveHull( line2InPlane2D, alphaLine2, hull2Vertices, hull2PointIndices, ! minimalMemory );    
+            // Create a Concave Hull for line 2
+            computeVerticesOfConcaveHull( line2InPlane2D, alphaLine2, hull2Vertices, hull2PointIndices, ! minimalMemory );    
+        }
+        else if ( hullMethod == "Andrew's" )
+        {
+            std::cout << "\nFinding Hull 1\n" << std::endl;
+
+            // Create a Hull for line 1
+            computeVerticesOfHullAndrews( line1InPlane2D, hull1Vertices, hull1PointIndices, ! minimalMemory );
+
+
+            std::cout << "Finding Hull 2\n" << std::endl;
+
+            // Create a Concave Hull for line 2
+            computeVerticesOfHullAndrews( line2InPlane2D, hull2Vertices, hull2PointIndices, ! minimalMemory ); 
+        }
+        else
+        {
+            std::cerr << "\n\nHullOverlap::computeHullsAndPointsInBothHulls(), method \""<<  hullMethod 
+                << "\" is not a valid method to find the hull.\n\n" << std::endl;
+            exit( 1 );
+        }
+
+
+
 
         std::cout << "hull1Vertices->points.size(): " << hull1Vertices->points.size() << "\n" 
             << "hull2Vertices->points.size(): " << hull2Vertices->points.size() << "\n" << std::endl;
@@ -311,7 +432,42 @@ public:
     }
 
 
-    bool getMinMaxPointsInOverlap( pcl::PointXYZ & minPt, pcl::PointXYZ &maxPt )
+
+    pcl::PointCloud< pcl::PointXYZ >::ConstPtr getConstPtrlineInPlane3D( const int lineNumber  ) const
+    {
+
+        if ( lineNumber < 0 || lineNumber > 1 )
+        {
+            std::cout << "\n\n----- Function HullOverlap::getConstPtrlineInPlane3D(): lineNumber parameter: "
+                << lineNumber << ".\nIt must be either 0 or 1. Returning nullptr\n" << std::endl;            
+            return nullptr;         
+        }
+
+        if ( lineNumber == 0 )
+            return line1InPlane;
+        else 
+            return line2InPlane;
+    }
+
+
+    const std::vector< int > * getConstPtrVerticesIndices( const int lineNumber ) const
+    {
+        if ( lineNumber < 0 || lineNumber > 1 )
+        {
+            std::cout << "\n\n----- Function HullOverlap::getConstPtrVerticesIndices(): lineNumber parameter: "
+                << lineNumber << ".\nIt must be either 0 or 1. Returning nullptr\n" << std::endl;            
+            return nullptr;         
+        }
+
+        if ( lineNumber == 0 )
+            return & ( hull1PointIndices.indices );
+        else 
+            return & ( hull2PointIndices.indices );
+    }
+
+
+
+    bool getMinMaxPointsInOverlapPlane2D( pcl::PointXYZ & minPt, pcl::PointXYZ &maxPt )
     {
         bool OK = false;
 
@@ -372,6 +528,90 @@ public:
         return OK;
     }
 
+
+    bool getMinMaxPointsInOverlapPlane3D( pcl::PointXYZ & minPt, pcl::PointXYZ &maxPt )
+    {
+        bool OK = false;
+
+        // if there are points in both lines in the overlap
+        if ( line1InBothHullPointIndices.size() > 0 && line2InBothHullPointIndices.size() > 0 )
+        {
+
+            double xMin = std::numeric_limits<double>::max();
+            double xMax = std::numeric_limits<double>::min();
+
+            double yMin = std::numeric_limits<double>::max();
+            double yMax = std::numeric_limits<double>::min();
+
+            double zMin = std::numeric_limits<double>::max();
+            double zMax = std::numeric_limits<double>::min();            
+
+            for ( uint64_t count = 0; count < line1InBothHullPointIndices.size(); count++ )
+            {
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].x < xMin )
+                    xMin = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].x;
+
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].x > xMax )
+                    xMax = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].x;
+                    
+                    
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].y < yMin )
+                    yMin = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].y;
+
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].y > yMax )
+                    yMax = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].y;     
+
+
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].z < zMin )
+                    zMin = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].z;
+
+                if ( line1InPlane->points[ line1InBothHullPointIndices[ count ] ].z > zMax )
+                    zMax = line1InPlane->points[ line1InBothHullPointIndices[ count ] ].z;                       
+
+            }
+
+            for ( uint64_t count = 0; count < line2InBothHullPointIndices.size(); count++ )
+            {
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].x < xMin )
+                    xMin = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].x;
+
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].x > xMax )
+                    xMax = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].x;
+                    
+                    
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].y < yMin )
+                    yMin = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].y;
+
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].y > yMax )
+                    yMax = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].y;     
+
+
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].z < zMin )
+                    zMin = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].z;
+
+                if ( line2InPlane->points[ line2InBothHullPointIndices[ count ] ].z > zMax )
+                    zMax = line2InPlane->points[ line2InBothHullPointIndices[ count ] ].z;                       
+
+            }
+
+            minPt.x = xMin;
+            minPt.y = yMin;
+            minPt.z = zMin;
+
+            maxPt.x = xMax;
+            maxPt.y = yMax;
+            maxPt.z = zMax;
+
+            OK = true;
+
+        }
+
+        return OK;
+    }
+
+
+
+
     uint64_t getNbPointsInOverlap( const int lineNumber ) const
     {
         if ( lineNumber < 0 || lineNumber > 1 )
@@ -404,13 +644,7 @@ private:
     //         return line2InPlane;
     // }
 
-    // const std::vector< int > * getConstPtrVerticesIndices( const bool isLine1 )
-    // {
-    //     if ( isLine1 )
-    //         return & ( hull1PointIndices.indices );
-    //     else 
-    //         return & ( hull2PointIndices.indices );
-    // }
+
 
 
 
@@ -540,8 +774,7 @@ private:
                                         const double alpha, 
                                         pcl::PointCloud<pcl::PointXYZ>::Ptr hullVertices,
                                         pcl::PointIndices & hullPointIndices, const bool keepInformation = true )
-    {
-
+    {        
         hullVertices->clear();
 
         pcl::ConcaveHull<pcl::PointXYZ> concaveHull;
@@ -557,6 +790,74 @@ private:
             // Get indices of points making the hull
             concaveHull.getHullPointIndices( hullPointIndices );
     }
+
+
+	/**
+	* Computes the vertices of a hull for points on the projection plane, using Andrew's monotone chain
+    *  
+    * @param[in] cloudIn Point cloud on the projection plane expressed in 2D
+    * @param[out] hullVertices Computed vertices of the concave hull
+    * @param[out] hullPointIndices Indices of the points in cloudIn making up the hull
+    * @param[in] keepInformation bool variable, true to specify to put the indices of the points in cloudIn in hullPointIndices
+	*/
+    void computeVerticesOfHullAndrews( pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloudIn,
+                                        pcl::PointCloud<pcl::PointXYZ>::Ptr hullVertices,
+                                        pcl::PointIndices & hullPointIndices, const bool keepInformation = true )
+    {
+
+        std::cout << "\nBefore building vector for Andrews\n" << std::endl;
+
+        std::vector< PointAndrews > points;
+        points.reserve( cloudIn->size() );
+
+        for ( uint64_t count; count < cloudIn->size(); count++ )
+        {  
+            PointAndrews point;
+
+            point.x = cloudIn->points[ count ].x;
+            point.y = cloudIn->points[ count ].y;
+            point.index = count;
+
+            points.push_back( point );
+        }
+
+        std::cout << "\nBefore calling Andrews\n" << std::endl;    
+
+        std::vector< PointAndrews > hullAndrews;
+        AndrewsConvex_hull( hullAndrews, points ); 
+
+        hullVertices->clear();
+        hullVertices->reserve( hullAndrews.size() );
+
+        std::cout << "\nAfter calling Andrews\n" << std::endl; 
+
+        for ( uint64_t count; count < hullAndrews.size(); count++ )
+        {  
+            pcl::PointXYZ point;
+
+            point.x = hullAndrews[ count ].x;
+            point.y = hullAndrews[ count ].y;
+            point.z = 0;
+            hullVertices->push_back( point );
+
+        }
+
+
+        if ( keepInformation )
+        {
+            // Get indices of points making the hull
+
+            hullPointIndices.indices.clear();
+            hullPointIndices.indices.reserve( hullAndrews.size() );
+
+            for ( uint64_t count; count < hullAndrews.size(); count++ ) 
+                hullPointIndices.indices.push_back( static_cast< int >( hullAndrews[ count ].index ) );
+
+        }
+
+    }
+
+
 
 	/**
 	* Find points that are within a concave hull. 
@@ -657,6 +958,8 @@ private:
     /**Projection plane coefficient 'd' in ax + by + cz + d = 0*/
     const double d;
 
+    //** Method to find the hulls, possible values: "PCL ConcaveHull", "Andrew's"*/
+    std::string hullMethod;
 
     /**Concave hull computation parameter to use with line #1*/
     double alphaLine1; // Alpha value to compute the concave hull for line #1
