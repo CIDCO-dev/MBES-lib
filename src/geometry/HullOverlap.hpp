@@ -130,15 +130,18 @@ public:
     * @param b projection plane coefficient 'b' in ax + by + cz + d = 0
     * @param c projection plane coefficient 'c' in ax + by + cz + d = 0
     * @param d projection plane coefficient 'd' in ax + by + cz + d = 0
+    * @param hullMethod Method to find the hulls, possible values: "PCL ConcaveHull", "Andrew's"
     * @param alpha1 Concave hull computation parameter to use with line #1
     * @param alpha2 Concave hull computation parameter to use with line #2
 	*/
     HullOverlap( pcl::PointCloud<pcl::PointXYZ>::ConstPtr line1In, 
                     pcl::PointCloud<pcl::PointXYZ>::ConstPtr line2In,
-                    double a, double b, double c, double d,
+                    double a, double b, double c, double d, std::string hullMethod = "Andrew's",
                     double alphaLine1 = 1.0, double alphaLine2 = 1.0 )
                     :   line1( line1In ), line2( line2In ),                     
                         a( a ), b( b ), c( c ), d( d ),
+                        hullMethod( hullMethod ),
+
                         alphaLine1( alphaLine1 ), alphaLine2( alphaLine2 ),
 
                         coefficients ( new pcl::ModelCoefficients() ),
@@ -161,6 +164,16 @@ public:
         coefficients->values[1] = b;
         coefficients->values[2] = c;
         coefficients->values[3] = d;
+
+        if ( hullMethod != "PCL ConcaveHull" && hullMethod != "Andrew's" )
+        {
+            std::cerr << "\n\nHullOverlap::HullOverlap(), method \""<<  hullMethod 
+                << "\" is not a valid method to find the hull.\n\n" << std::endl;
+            exit( 1 );  
+        }
+
+
+
     }
 
 
@@ -247,9 +260,9 @@ public:
 
 
 
-        const std::string method = "Andrew's";
+        // const std::string method = "Andrew's";
 
-        if ( method == "PCL ConcaveHull" )
+        if ( hullMethod == "PCL ConcaveHull" )
         {
             //http://www.pointclouds.org/documentation/tutorials/hull_2d.php
 
@@ -264,7 +277,7 @@ public:
             // Create a Concave Hull for line 2
             computeVerticesOfConcaveHull( line2InPlane2D, alphaLine2, hull2Vertices, hull2PointIndices, ! minimalMemory );    
         }
-        else if ( method == "Andrew's" )
+        else if ( hullMethod == "Andrew's" )
         {
             std::cout << "\nFinding Hull 1\n" << std::endl;
 
@@ -279,7 +292,7 @@ public:
         }
         else
         {
-            std::cerr << "\n\nHullOverlap::computeHullsAndPointsInBothHulls(), method \""<<  method 
+            std::cerr << "\n\nHullOverlap::computeHullsAndPointsInBothHulls(), method \""<<  hullMethod 
                 << "\" is not a valid method to find the hull.\n\n" << std::endl;
             exit( 1 );
         }
@@ -945,6 +958,8 @@ private:
     /**Projection plane coefficient 'd' in ax + by + cz + d = 0*/
     const double d;
 
+    //** Method to find the hulls, possible values: "PCL ConcaveHull", "Andrew's"*/
+    std::string hullMethod;
 
     /**Concave hull computation parameter to use with line #1*/
     double alphaLine1; // Alpha value to compute the concave hull for line #1
