@@ -6,7 +6,7 @@
 #define MAIN_CPP
 
 #include "../datagrams/DatagramParserFactory.hpp"
-#include "../svp/CarisSVP.hpp"
+#include "../svp/CarisSvpFile.hpp"
 #include <iostream>
 #include <string>
 
@@ -156,7 +156,7 @@ public:
                 std::vector<SoundVelocityProfile*> svps;
                 svps.push_back(svp);
                 
-                CarisSVP carisSvp;
+                CarisSvpFile carisSvp;
                 carisSvp.setSvps(svps);
 
 		carisSvp.writeSvpFile(f);

@@ -173,9 +173,6 @@ protected:
 
 private:
 	Position * centroid = NULL; //in geographic coordinates
-
-
-
 };
 
 #endif

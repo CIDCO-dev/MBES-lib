@@ -7,8 +7,8 @@
  * Author: jordan
  */
 
-#ifndef CARISSVP_HPP
-#define CARISSVP_HPP
+#ifndef CARISSVPFILE_HPP
+#define CARISSVPFILE_HPP
 
 #include <vector>
 #include <string>
@@ -16,7 +16,7 @@
 
 #include "SoundVelocityProfile.hpp"
 
-class CarisSVP {
+class CarisSvpFile {
 private:
 
     /**Vector of SoundVelocityProfile*/
@@ -70,12 +70,13 @@ private:
 
 public:
 
-    CarisSVP() 
+
+    CarisSvpFile() 
     : fname( "" ) {
 
     }
 
-    ~CarisSVP() {
+    ~CarisSvpFile() {
         clearSVPs();
     }
 
