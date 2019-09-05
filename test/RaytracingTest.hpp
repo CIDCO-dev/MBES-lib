@@ -17,13 +17,13 @@
 #include "../src/math/CoordinateTransform.hpp"
 #include "../src/math/Boresight.hpp"
 #include "../src/utils/Constants.hpp"
-#include "../src/svp/CarisSVP.hpp"
+#include "../src/svp/CarisSvpFile.hpp"
 
 TEST_CASE("Ray tracing test") {
     
     /*Obtain svp*/
     std::string svpFilePath = "test/data/rayTracingTestData/SVP-0.svp";
-    CarisSVP svps;
+    CarisSvpFile svps;
     svps.readSvpFile(svpFilePath);
     SoundVelocityProfile * svp = svps.getSvps()[0];
 

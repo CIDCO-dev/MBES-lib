@@ -16,7 +16,7 @@
 #include "../src/math/Boresight.hpp"
 #include "../src/utils/Constants.hpp"
 #include "../src/svp/SoundVelocityProfileFactory.hpp"
-#include "../src/svp/CarisSVP.hpp"
+#include "../src/svp/CarisSvpFile.hpp"
 
 #define POSITION_PRECISION 0.00000001
 
