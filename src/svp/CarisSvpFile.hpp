@@ -212,5 +212,5 @@ public:
 
 };
 
-#endif /* CARISSVP_HPP */
+#endif /* CARISSVPFILE_HPP */
 
