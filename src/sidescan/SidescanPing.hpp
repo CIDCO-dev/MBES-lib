@@ -33,10 +33,15 @@ public:
     int getChannelNumber(){ return channelNumber;};
     void setChannelNumber(int channel){ channelNumber = channel;};
     
+    uint64_t getTimestamp() {return timestamp;};
+    void setTimestamp(uint64_t newTimestamp){ timestamp=newTimestamp;};
+    
+    
 private:
     std::vector<double> samples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
-    double distancePerSample;
-    int channelNumber;
+    double      distancePerSample;
+    int         channelNumber;
+    uint64_t    timestamp;
 };
 
 #endif /* SIDESCANPING_HPP */

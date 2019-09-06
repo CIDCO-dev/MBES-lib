@@ -655,6 +655,20 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
     
     
     SidescanPing * ping = new SidescanPing();
+    
+    uint64_t microEpoch = TimeUtils::build_time(
+                pingHdr->Year,
+                pingHdr->Month-1,
+                pingHdr->Day,
+                pingHdr->Hour,
+                pingHdr->Minute,
+                pingHdr->Second,
+                pingHdr->HSeconds * 10,
+                0
+        );
+    
+    ping->setTimestamp(microEpoch);
+    
     ping->setChannelNumber(pingChanHdr.ChannelNumber);
     
     if(channels[pingChanHdr.ChannelNumber]->CorrectionFlags == 2){
