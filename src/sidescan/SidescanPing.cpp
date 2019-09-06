@@ -10,12 +10,13 @@
 
 #include "SidescanPing.hpp"
 
-SidescanPing::SidescanPing() {
+SidescanPing::SidescanPing() : position(NULL) {
 }
 
 SidescanPing::SidescanPing(const SidescanPing& orig) {
 }
 
 SidescanPing::~SidescanPing() {
+    if(position) delete position;
 }
 
