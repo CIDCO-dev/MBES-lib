@@ -68,7 +68,7 @@ TEST_CASE("Georeferencing LGF test") {
 
     /*Obtain svp*/
     std::string svpFilePath = "test/data/rayTracingTestData/SVP-0.svp";
-    CarisSVP svps;
+    CarisSvpFile svps;
     svps.readSvpFile(svpFilePath);
     SoundVelocityProfile * svp = svps.getSvps()[0];
 
