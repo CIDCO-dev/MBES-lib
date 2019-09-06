@@ -23,7 +23,7 @@ private:
     std::vector<SoundVelocityProfile*> svps;
 
     // Filename inside svp file
-    std::string fname;
+    std::string fileName;
 
     void clearSVPs() {
         for (unsigned int i = 0; i < svps.size(); ++i) {
@@ -72,7 +72,7 @@ public:
 
 
     CarisSvpFile() 
-    : fname( "" ) {
+    : fileName( "" ) {
 
     }
 
@@ -152,9 +152,9 @@ public:
                 return false;
             }
 
-            //Read filename
+            //Read filename that is inside the file
             // std::string fname;
-            std::getline(inFile, fname);
+            std::getline(inFile, fileName);
 
             //Start reading SVP sections
             SoundVelocityProfile * currentSVP = NULL;
@@ -206,8 +206,8 @@ public:
         return true;
     }
 
-    std::string getFilename() const {
-        return fname;
+    const std::string & getFilename() const {
+        return fileName;
     }
 
 };
