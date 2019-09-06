@@ -13,6 +13,8 @@
 #define SIDESCANPING_HPP
 
 #include <vector>
+#include <cstdint>
+
 
 class SidescanPing {
 public:
