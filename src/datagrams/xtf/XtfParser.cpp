@@ -609,7 +609,9 @@ void XtfParser::processPingChanHeader(XtfPingChanHeader & pingChanHdr){
 
 void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & pingChanHdr,void * data){   
     std::vector<double> rawSamples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
-
+    
+    std::cerr << "Ding: " << pingHdr. << std::endl;
+    
     for(unsigned int i=0;i<pingChanHdr.NumSamples;i++){
         double sample = 0;
         
@@ -668,6 +670,17 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
         );
     
     ping->setTimestamp(microEpoch);
+    
+    if(pingHdr.SensorXcoordinate != 0.0 && pingHdr.SensorYcoordinate != 0.0){ //this would cause weird issues at coordinates... (0.0,0.0)
+        ping->setPosition(
+            new Position(
+                    microEpoch,
+                    pingHdr.SensorXcoordinate,
+                    pingHdr.SensorYcoordinate,
+                    pingHdr.SensorPrimaryAltitude
+            )
+        );
+    }
     
     ping->setChannelNumber(pingChanHdr.ChannelNumber);
     
