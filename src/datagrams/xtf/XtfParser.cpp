@@ -610,8 +610,6 @@ void XtfParser::processPingChanHeader(XtfPingChanHeader & pingChanHdr){
 void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & pingChanHdr,void * data){   
     std::vector<double> rawSamples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
     
-    std::cerr << "Ding: " << pingHdr. << std::endl;
-    
     for(unsigned int i=0;i<pingChanHdr.NumSamples;i++){
         double sample = 0;
         
