@@ -364,12 +364,12 @@ void XtfParser::processFileHeader(XtfFileHeader & f){
         fprintf(stderr,"[+] XTF File Header:\n\n");        
         fprintf(stderr,"FileFormat: %d\n",f.FileFormat);
         fprintf(stderr,"SystemType: %d\n",f.SystemType);
-        fprintf(stderr,"RecordingProgramName: %s\n",f.RecordingProgramName);
-        fprintf(stderr,"RecordingProgramVersion: %s\n",f.RecordingProgramVersion);
-        fprintf(stderr,"SonarName: %s\n",f.SonarName);
-        fprintf(stderr,"sonarType: %d (%s)\n",f.SonarType,SonarTypes[f.SonarType].c_str());
-        fprintf(stderr,"NoteString: %s\n",f.NoteString);
-        fprintf(stderr,"ThisFileName: %s\n",f.ThisFileName);
+        //fprintf(stderr,"RecordingProgramName: %s\n",f.RecordingProgramName);
+        //fprintf(stderr,"RecordingProgramVersion: %s\n",f.RecordingProgramVersion);
+        //fprintf(stderr,"SonarName: %s\n",f.SonarName);
+        //fprintf(stderr,"sonarType: %d (%s)\n",f.SonarType,SonarTypes[f.SonarType].c_str());
+        //fprintf(stderr,"NoteString: %s\n",f.NoteString);
+        //fprintf(stderr,"ThisFileName: %s\n",f.ThisFileName);
         fprintf(stderr,"NavUnits: %d\n",f.NavUnits);
         fprintf(stderr,"NumberOfSonarChannels: %d\n",f.NumberOfSonarChannels);
         fprintf(stderr,"NumberOfBathymetryChannels: %d\n",f.NumberOfBathymetryChannels);
@@ -380,6 +380,17 @@ void XtfParser::processFileHeader(XtfFileHeader & f){
         fprintf(stderr,"Reserved1: %d\n",f.Reserved1);
         fprintf(stderr,"Reserved2: %d\n",f.Reserved2);
         fprintf(stderr,"ReferencePointHeight: %f\n",f.ReferencePointHeight);
+        
+        std::map<std::string,std::string> * fileProperties = new std::map<std::string,std::string>();
+        
+        fileProperties->insert(std::pair<std::string,std::string>("Recording Program Name",f.RecordingProgramName));
+        fileProperties->insert(std::pair<std::string,std::string>("Recording Program Version",f.RecordingProgramVersion));
+        fileProperties->insert(std::pair<std::string,std::string>("Sonar Name",f.SonarName));
+        fileProperties->insert(std::pair<std::string,std::string>("Sonar Type",SonarTypes[f.SonarType]));
+        fileProperties->insert(std::pair<std::string,std::string>("Note String",f.NoteString));
+        fileProperties->insert(std::pair<std::string,std::string>("This File Name",f.ThisFileName));
+        
+        processor.processFileProperties(fileProperties);
         
         //TODO
         //printf("ProjectionType: ");
