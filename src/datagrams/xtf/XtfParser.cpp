@@ -361,35 +361,58 @@ int XtfParser::getTotalNumberOfChannels(){
  * @param f the XTF FileHeader
  */
 void XtfParser::processFileHeader(XtfFileHeader & f){
-        fprintf(stderr,"[+] XTF File Header:\n\n");        
-        fprintf(stderr,"FileFormat: %d\n",f.FileFormat);
-        fprintf(stderr,"SystemType: %d\n",f.SystemType);
+        //fprintf(stderr,"[+] XTF File Header:\n\n");        
+        //fprintf(stderr,"FileFormat: %d\n",f.FileFormat);
+        //fprintf(stderr,"SystemType: %d\n",f.SystemType);
         //fprintf(stderr,"RecordingProgramName: %s\n",f.RecordingProgramName);
         //fprintf(stderr,"RecordingProgramVersion: %s\n",f.RecordingProgramVersion);
         //fprintf(stderr,"SonarName: %s\n",f.SonarName);
         //fprintf(stderr,"sonarType: %d (%s)\n",f.SonarType,SonarTypes[f.SonarType].c_str());
         //fprintf(stderr,"NoteString: %s\n",f.NoteString);
         //fprintf(stderr,"ThisFileName: %s\n",f.ThisFileName);
-        fprintf(stderr,"NavUnits: %d\n",f.NavUnits);
-        fprintf(stderr,"NumberOfSonarChannels: %d\n",f.NumberOfSonarChannels);
-        fprintf(stderr,"NumberOfBathymetryChannels: %d\n",f.NumberOfBathymetryChannels);
-        fprintf(stderr,"NumberOfSnippetChannels: %d\n",f.NumberOfSnippetChannels);
-        fprintf(stderr,"NumberOfForwardLookArrays: %d\n",f.NumberOfForwardLookArrays);
-        fprintf(stderr,"NumberOfEchoStrengthChannels: %d\n",f.NumberOfEchoStrengthChannels);
-        fprintf(stderr,"NumberOfInterferometryChannels: %d\n",f.NumberOfInterferometryChannels);
-        fprintf(stderr,"Reserved1: %d\n",f.Reserved1);
-        fprintf(stderr,"Reserved2: %d\n",f.Reserved2);
-        fprintf(stderr,"ReferencePointHeight: %f\n",f.ReferencePointHeight);
+        //fprintf(stderr,"NavUnits: %d\n",f.NavUnits);
+        //fprintf(stderr,"NumberOfSonarChannels: %d\n",f.NumberOfSonarChannels);
+        //fprintf(stderr,"NumberOfBathymetryChannels: %d\n",f.NumberOfBathymetryChannels);
+        //fprintf(stderr,"NumberOfSnippetChannels: %d\n",f.NumberOfSnippetChannels);
+        //fprintf(stderr,"NumberOfForwardLookArrays: %d\n",f.NumberOfForwardLookArrays);
+        //fprintf(stderr,"NumberOfEchoStrengthChannels: %d\n",f.NumberOfEchoStrengthChannels);
+        //fprintf(stderr,"NumberOfInterferometryChannels: %d\n",f.NumberOfInterferometryChannels);
+        //fprintf(stderr,"Reserved1: %d\n",f.Reserved1);
+        //fprintf(stderr,"Reserved2: %d\n",f.Reserved2);
+        //fprintf(stderr,"ReferencePointHeight: %f\n",f.ReferencePointHeight);
         
         std::map<std::string,std::string> * fileProperties = new std::map<std::string,std::string>();
         
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Sonar)",std::to_string(f.NumberOfSonarChannels)));
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Bathymetry)",std::to_string(f.NumberOfBathymetryChannels)));
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Snippet)",std::to_string(f.NumberOfSnippetChannels)));
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Interferometry)",std::to_string(f.NumberOfInterferometryChannels)));
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Forward Look)",std::to_string(f.NumberOfForwardLookArrays)));
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Echo Strength)",std::to_string(f.NumberOfEchoStrengthChannels)));
+        fileProperties->insert(std::pair<std::string,std::string>("File Format",std::to_string(f.FileFormat)));
+        fileProperties->insert(std::pair<std::string,std::string>("System Type",std::to_string(f.SystemType)));
         fileProperties->insert(std::pair<std::string,std::string>("Recording Program Name",f.RecordingProgramName));
         fileProperties->insert(std::pair<std::string,std::string>("Recording Program Version",f.RecordingProgramVersion));
         fileProperties->insert(std::pair<std::string,std::string>("Sonar Name",f.SonarName));
         fileProperties->insert(std::pair<std::string,std::string>("Sonar Type",SonarTypes[f.SonarType]));
         fileProperties->insert(std::pair<std::string,std::string>("Note String",f.NoteString));
-        fileProperties->insert(std::pair<std::string,std::string>("This File Name",f.ThisFileName));
+        fileProperties->insert(std::pair<std::string,std::string>("Nav Units",std::string(f.NavUnits)));
+        fileProperties->insert(std::pair<std::string,std::string>("Original File Name",f.ThisFileName));
+        fileProperties->insert(std::pair<std::string,std::string>("Reference Point Height",std::to_string(f.ReferencePointHeight)));
+        fileProperties->insert(std::pair<std::string,std::string>("Origin Y",std::to_string(f.OriginY)));
+        fileProperties->insert(std::pair<std::string,std::string>("Origin X",std::to_string(f.OriginX)));
+        fileProperties->insert(std::pair<std::string,std::string>("Nav Offset X",std::to_string(f.NavOffsetX)));
+        fileProperties->insert(std::pair<std::string,std::string>("Nav Offset Y",std::to_string(f.NavOffsetY)));
+        fileProperties->insert(std::pair<std::string,std::string>("Nav Offset Z",std::to_string(f.NavOffsetZ)));
+        fileProperties->insert(std::pair<std::string,std::string>("Nav Offset Yaw",std::to_string(f.NavOffsetYaw)));
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset X",std::to_string(f.MRUOffsetX)));
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset Y",std::to_string(f.MRUOffsetY)));
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset Z",std::to_string(f.MRUOffsetZ)));        
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset Yaw",std::to_string(f.MRUOffsetYaw)));
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset Pitch",std::to_string(f.MRUOffsetPitch)));
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset Roll",std::to_string(f.MRUOffsetRoll)));         
         
+
         processor.processFileProperties(fileProperties);
         
         //TODO
@@ -400,20 +423,20 @@ void XtfParser::processFileHeader(XtfFileHeader & f){
         //print(f.SpheriodType,10);
         //printf("\n");
 
-        fprintf(stderr,"NavigationLatency: %d\n",f.NavigationLatency);
-        fprintf(stderr,"OriginY: %f\n",f.OriginY);
-        fprintf(stderr,"OriginX: %f\n",f.OriginX);
-        fprintf(stderr,"NavOffsetY: %f\n",f.NavOffsetY);
-        fprintf(stderr,"NavOffsetX: %f\n",f.NavOffsetX);
-        fprintf(stderr,"NavOffsetZ: %f\n",f.NavOffsetZ);
-        fprintf(stderr,"NavOffsetYaw: %f\n",f.NavOffsetYaw);
-        fprintf(stderr,"MRUOffsetY: %f\n",f.MRUOffsetY);
-        fprintf(stderr,"MRUOffsetX: %f\n",f.MRUOffsetX);
-        fprintf(stderr,"MRUOffsetZ: %f\n",f.MRUOffsetZ);
-        fprintf(stderr,"MRUOffsetYaw: %f\n",f.MRUOffsetYaw);
-        fprintf(stderr,"MRUOffsetPitch: %f\n",f.MRUOffsetPitch);
-        fprintf(stderr,"MRUOffsetRoll: %f\n",f.MRUOffsetRoll);
-        fprintf(stderr,"------------\n\n");
+        //fprintf(stderr,"NavigationLatency: %d\n",f.NavigationLatency);
+        //fprintf(stderr,"OriginY: %f\n",f.OriginY);
+        //fprintf(stderr,"OriginX: %f\n",f.OriginX);
+        //fprintf(stderr,"NavOffsetY: %f\n",f.NavOffsetY);
+        //fprintf(stderr,"NavOffsetX: %f\n",f.NavOffsetX);
+        //fprintf(stderr,"NavOffsetZ: %f\n",f.NavOffsetZ);
+        //fprintf(stderr,"NavOffsetYaw: %f\n",f.NavOffsetYaw);
+        //fprintf(stderr,"MRUOffsetY: %f\n",f.MRUOffsetY);
+        //fprintf(stderr,"MRUOffsetX: %f\n",f.MRUOffsetX);
+        //fprintf(stderr,"MRUOffsetZ: %f\n",f.MRUOffsetZ);
+        //fprintf(stderr,"MRUOffsetYaw: %f\n",f.MRUOffsetYaw);
+        //fprintf(stderr,"MRUOffsetPitch: %f\n",f.MRUOffsetPitch);
+        //fprintf(stderr,"MRUOffsetRoll: %f\n",f.MRUOffsetRoll);
+        //fprintf(stderr,"------------\n\n");
 }
 
 /**
