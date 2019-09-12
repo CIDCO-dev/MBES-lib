@@ -396,7 +396,7 @@ void XtfParser::processFileHeader(XtfFileHeader & f){
         fileProperties->insert(std::pair<std::string,std::string>("Sonar Name",f.SonarName));
         fileProperties->insert(std::pair<std::string,std::string>("Sonar Type",SonarTypes[f.SonarType]));
         fileProperties->insert(std::pair<std::string,std::string>("Note String",f.NoteString));
-        fileProperties->insert(std::pair<std::string,std::string>("Nav Units",std::string(f.NavUnits)));
+        fileProperties->insert(std::pair<std::string,std::string>("Nav Units",std::to_string(f.NavUnits)));
         fileProperties->insert(std::pair<std::string,std::string>("Original File Name",f.ThisFileName));
         fileProperties->insert(std::pair<std::string,std::string>("Reference Point Height",std::to_string(f.ReferencePointHeight)));
         fileProperties->insert(std::pair<std::string,std::string>("Origin Y",std::to_string(f.OriginY)));
