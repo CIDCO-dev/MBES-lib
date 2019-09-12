@@ -5,6 +5,8 @@
 #ifndef DATAGRAMPROCESSOR_HPP
 #define DATAGRAMPROCESSOR_HPP
 
+#include <map>
+
 #include "../svp/SoundVelocityProfile.hpp"
 
 #include "../sidescan/SidescanPing.hpp"
@@ -31,7 +33,14 @@ public:
 	*/
 	virtual void processDatagramTag(int id){};
 
-
+        /**
+         * Process a map of file-wide properties
+         * @param properties
+         */
+        virtual void processFileProperties(std::map<std::string,std::string> * properties){
+            delete properties;
+        }
+        
 	/**
 	* Convention for attitude angles (in degrees)
 	*
