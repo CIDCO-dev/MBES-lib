@@ -15,6 +15,8 @@
 #define D2R (M_PI / 180)
 
 class Distance{
+public:
+    
     static double haversine(double longitude1, double latitude1, double longitude2, double latitude2){
 
 	double dx, dy, dz;
