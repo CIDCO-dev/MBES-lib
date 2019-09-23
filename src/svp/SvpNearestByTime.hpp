@@ -16,6 +16,9 @@
 #include "SoundVelocityProfile.hpp"
 #include "../utils/Exception.hpp"
 
+#undef max
+#undef min
+
 class SvpNearestByTime : public SvpSelectionStrategy {
 private:
     std::vector<SoundVelocityProfile*> svps;
