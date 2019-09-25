@@ -2,7 +2,7 @@
  * Copyright 2017 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
-/* 
+/*
  * File:   SvpNearestByTime.hpp
  * Author: jordan
  */
@@ -16,8 +16,10 @@
 #include "SoundVelocityProfile.hpp"
 #include "../utils/Exception.hpp"
 
+#ifdef _WIN32
 #undef max
 #undef min
+#endif
 
 class SvpNearestByTime : public SvpSelectionStrategy {
 private:
@@ -67,4 +69,3 @@ public:
 
 
 #endif /* SVPNEARESTBYTIME_HPP */
-
