@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   data-cleaningTest.hpp
  * Author: emile
  *
@@ -22,7 +22,7 @@
 #include "../src/utils/Exception.hpp"
 using namespace std;
 #ifdef _WIN32
-static string DataBinexec("..\\bin\\data-cleaning.exe");
+static string dataBinexec("..\\bin\\data-cleaning.exe");
 static string outputdir(".");
 #else
 static string dataBinexec("build/bin/data-cleaning");
@@ -31,7 +31,7 @@ static string dataOutputdir(".");
 
 /**
  * Execute the data-cleaning main function
- * 
+ *
  * @param command the parameters for the execution
  */
 std::stringstream DataSystem_call(const std::string& command){
