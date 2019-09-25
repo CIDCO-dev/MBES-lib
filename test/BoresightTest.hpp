@@ -4,14 +4,14 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   BoresightTest.hpp
  * Author: emile
  *
  * Created on May 7, 2019, 9:49 AM
  */
 
-#include <eigen3/Eigen/src/Core/Matrix.h>
+#include <Eigen/src/Core/Matrix.h>
 
 #include "catch.hpp"
 #include "../src/math/Boresight.hpp"
