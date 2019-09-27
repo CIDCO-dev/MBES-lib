@@ -878,6 +878,32 @@ private:
         cloudOut->clear();
         indexPointInHull.clear();
 
+        if ( hullVertices->size() < 3 )
+            return;
+
+        // Test that the points forming the hull are not collinear
+
+        bool collinear = true;
+
+        int count2 = 2;
+
+        while ( collinear == true && count2 < hullVertices->size() )
+        {
+            // http://mathworld.wolfram.com/Collinear.html
+            double test = hullVertices->points[ 0 ].x * ( hullVertices->points[ 1 ].y - hullVertices->points[ count2 ].y )
+                    + hullVertices->points[ 1 ].x * ( hullVertices->points[ count2 ].y - hullVertices->points[ 0 ].y )
+                    + hullVertices->points[ count2 ].x * ( hullVertices->points[ 0 ].y - hullVertices->points[ 1 ].y );
+
+            if ( test != 0 )
+                collinear = false;
+
+            count2++;
+        }
+
+        if ( collinear )
+            return;
+
+
         for ( uint64_t count = 0; count < cloudIn->points.size(); count++ )
         {
             if ( pcl::isXYPointIn2DXYPolygon( cloudIn->points[ count ], *hullVertices ) )
@@ -903,6 +929,32 @@ private:
     {
         indexPointInHull.clear();
 
+        if ( hullVertices->size() < 3 )
+            return;
+
+        // Test that the points forming the hull are not collinear
+
+        bool collinear = true;
+
+        int count2 = 2;
+
+        while ( collinear == true && count2 < hullVertices->size() )
+        {
+            // http://mathworld.wolfram.com/Collinear.html
+            double test = hullVertices->points[ 0 ].x * ( hullVertices->points[ 1 ].y - hullVertices->points[ count2 ].y )
+                    + hullVertices->points[ 1 ].x * ( hullVertices->points[ count2 ].y - hullVertices->points[ 0 ].y )
+                    + hullVertices->points[ count2 ].x * ( hullVertices->points[ 0 ].y - hullVertices->points[ 1 ].y );
+
+            if ( test != 0 )
+                collinear = false;
+
+            count2++;
+        }
+
+        if ( collinear )
+            return;
+
+        
         for ( uint64_t count = 0; count < cloudIn->points.size(); count++ )
         {
             if ( pcl::isXYPointIn2DXYPolygon( cloudIn->points[ count ], *hullVertices ) )
@@ -924,7 +976,41 @@ private:
                                     pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOut,
                                     pcl::PointCloud<pcl::PointXYZ>::ConstPtr hullVertices )
     {
+
+        // std::cout << "\nHullOverlap::findPointsInHullOnlyPoints()\n" << std::endl;
+
         cloudOut->clear();
+
+
+        if ( hullVertices->size() < 3 )
+            return;
+
+        // Test that the points forming the hull are not collinear
+
+        bool collinear = true;
+
+        int count2 = 2;
+
+        while ( collinear == true && count2 < hullVertices->size() )
+        {
+            // http://mathworld.wolfram.com/Collinear.html
+            double test = hullVertices->points[ 0 ].x * ( hullVertices->points[ 1 ].y - hullVertices->points[ count2 ].y )
+                    + hullVertices->points[ 1 ].x * ( hullVertices->points[ count2 ].y - hullVertices->points[ 0 ].y )
+                    + hullVertices->points[ count2 ].x * ( hullVertices->points[ 0 ].y - hullVertices->points[ 1 ].y );
+
+            // std::cout << "Count2: " << count2 << ", test: " << test << std::endl;
+
+            if ( test != 0 )
+                collinear = false;
+
+            count2++;
+        }
+
+        // std::cout << "\ncollinear: " << std::boolalpha << collinear << std::noboolalpha << "\n" << std::endl;
+
+        if ( collinear )
+            return;
+
 
         for ( uint64_t count = 0; count < cloudIn->points.size(); count++ )
         {

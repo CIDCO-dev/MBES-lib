@@ -417,6 +417,10 @@ int main( int argc, char* argv[] )
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "line2");
 
 
+	viewer->resetCameraViewpoint("Everything");
+
+    viewer->resetCamera();
+
 
     // Viewport for line 1 and 2 part of both hulls
     int viewport1 = 0;
@@ -437,7 +441,9 @@ int main( int argc, char* argv[] )
 	// viewer->setPosition( 300, 100 ); // Position of the window on the screen
 	// viewer->setSize( 1800, 1200 );		// Size of the window on the screen
 	
-	viewer->resetCameraViewpoint("Everything");
+	// viewer->resetCameraViewpoint("Everything");
+
+    // viewer->resetCamera();
 
 	// viewer->addCoordinateSystem( 10, 0, 0, 0 );
 
