@@ -7,6 +7,11 @@
 
 #include "XtfParser.hpp"
 
+
+/**
+ * @author Guillaume Morissette
+ */
+
 /**
  * Create an XTF parser
  *
@@ -450,30 +455,54 @@ void XtfParser::processChanInfo(XtfChanInfo * c){
     
     channels.push_back(channel);
     
-    fprintf(stderr,"[+] XTF Channel Information\n\n");
-    fprintf(stderr,"TypeOfChannel: %d\n",channel->TypeOfChannel);
-    fprintf(stderr,"SubChannelNumber: %d\n",channel->SubChannelNumber);
-    fprintf(stderr,"CorrectionFlags: %d\n",channel->CorrectionFlags);
-    fprintf(stderr,"UniPolar: %d\n",channel->UniPolar);
-    fprintf(stderr,"BytesPerSample: %d\n",channel->BytesPerSample);
-    fprintf(stderr,"Reserved: %d\n",channel->Reserved);
-    fprintf(stderr,"ChannelName: %s\n",channel->ChannelName);
-    fprintf(stderr,"VoltScale: %f\n",channel->VoltScale);
-    fprintf(stderr,"Frequency: %f\n",channel->Frequency);
-    fprintf(stderr,"HorizBeamAngle: %f\n",channel->HorizBeamAngle);
-    fprintf(stderr,"TiltAngle: %f\n",channel->TiltAngle);
-    fprintf(stderr,"BeamWidth: %f\n",channel->BeamWidth);
-    fprintf(stderr,"OffsetX: %f\n",channel->OffsetX);
-    fprintf(stderr,"OffsetY: %f\n",channel->OffsetY);
-    fprintf(stderr,"OffsetZ: %f\n",channel->OffsetZ);
-    fprintf(stderr,"OffsetYaw: %f\n",channel->OffsetYaw);
-    fprintf(stderr,"OffsetPitch: %f\n",channel->OffsetPitch);
-    fprintf(stderr,"OffsetRoll: %f\n",channel->OffsetRoll);
-    fprintf(stderr,"BeamsPerArray: %d\n",channel->BeamsPerArray);
-    fprintf(stderr,"SampleFormat: %d\n",channel->SampleFormat);
-    fprintf(stderr,"ReservedArea2: %s\n",channel->ReservedArea2);
-    fprintf(stderr,"------------\n");
+    //fprintf(stderr,"[+] XTF Channel Information\n\n");
+    //fprintf(stderr,"TypeOfChannel: %d\n",channel->TypeOfChannel);
+    //fprintf(stderr,"SubChannelNumber: %d\n",channel->SubChannelNumber);
+    //fprintf(stderr,"CorrectionFlags: %d\n",channel->CorrectionFlags);
+    //fprintf(stderr,"UniPolar: %d\n",channel->UniPolar);
+    //fprintf(stderr,"BytesPerSample: %d\n",channel->BytesPerSample);
+    //fprintf(stderr,"Reserved: %d\n",channel->Reserved);
+    //fprintf(stderr,"ChannelName: %s\n",channel->ChannelName);
+    //fprintf(stderr,"VoltScale: %f\n",channel->VoltScale);
+    //fprintf(stderr,"Frequency: %f\n",channel->Frequency);
+    //fprintf(stderr,"HorizBeamAngle: %f\n",channel->HorizBeamAngle);
+    //fprintf(stderr,"TiltAngle: %f\n",channel->TiltAngle);
+    //fprintf(stderr,"BeamWidth: %f\n",channel->BeamWidth);
+    //fprintf(stderr,"OffsetX: %f\n",channel->OffsetX);
+    //fprintf(stderr,"OffsetY: %f\n",channel->OffsetY);
+    //fprintf(stderr,"OffsetZ: %f\n",channel->OffsetZ);
+    //fprintf(stderr,"OffsetYaw: %f\n",channel->OffsetYaw);
+    //fprintf(stderr,"OffsetPitch: %f\n",channel->OffsetPitch);
+    //fprintf(stderr,"OffsetRoll: %f\n",channel->OffsetRoll);
+    //fprintf(stderr,"BeamsPerArray: %d\n",channel->BeamsPerArray);
+    //fprintf(stderr,"SampleFormat: %d\n",channel->SampleFormat);
+    //fprintf(stderr,"ReservedArea2: %s\n",channel->ReservedArea2);
+    //fprintf(stderr,"------------\n");
     
+    std::map<std::string,std::string> * properties = new std::map<std::string,std::string>();
+    
+    properties->insert(std::pair<std::string,std::string>("Channel Type",std::to_string(channel->TypeOfChannel)));
+    properties->insert(std::pair<std::string,std::string>("Channel Number",std::to_string(channel->SubChannelNumber)));
+    properties->insert(std::pair<std::string,std::string>("Correction Flags",std::to_string(channel->CorrectionFlags)));
+    properties->insert(std::pair<std::string,std::string>("UniPolar",std::to_string(channel->UniPolar)));
+    properties->insert(std::pair<std::string,std::string>("Bytes Per Sample",std::to_string(channel->BytesPerSample)));
+    properties->insert(std::pair<std::string,std::string>("Channel Name",channel->ChannelName));
+    properties->insert(std::pair<std::string,std::string>("Volt Scale",std::to_string(channel->VoltScale)));
+    properties->insert(std::pair<std::string,std::string>("Frequency",std::to_string(channel->Frequency)));
+    properties->insert(std::pair<std::string,std::string>("Horizontal Beam Angle",std::to_string(channel->HorizBeamAngle)));
+    properties->insert(std::pair<std::string,std::string>("Tilt Angle",std::to_string(channel->TiltAngle)));
+    properties->insert(std::pair<std::string,std::string>("Beam Width",std::to_string(channel->BeamWidth)));
+    properties->insert(std::pair<std::string,std::string>("Offset X",std::to_string(channel->OffsetX)));
+    properties->insert(std::pair<std::string,std::string>("Offset Y",std::to_string(channel->OffsetY)));
+    properties->insert(std::pair<std::string,std::string>("Offset Z",std::to_string(channel->OffsetZ)));
+    properties->insert(std::pair<std::string,std::string>("Offset Yaw",std::to_string(channel->OffsetYaw)));
+    properties->insert(std::pair<std::string,std::string>("Offset Pitch",std::to_string(channel->OffsetPitch)));
+    properties->insert(std::pair<std::string,std::string>("Offset Roll",std::to_string(channel->OffsetRoll)));
+    properties->insert(std::pair<std::string,std::string>("Beams Per Array",std::to_string(channel->BeamsPerArray)));
+    properties->insert(std::pair<std::string,std::string>("Sample Format",std::to_string(channel->SampleFormat)));
+    
+    
+    processor.processChannelProperties(properties);
 }
 
 /**
@@ -496,7 +525,7 @@ void XtfParser::processPacketHeader(XtfPacketHeader & hdr){
 
 /**
  * show the contain of the file PingHeader
- *
+ *XTF_HEADER_KLEINV4_DATA_PAGE
  * @param hdr the XTF PingHeader
  */
 void XtfParser::processPingHeader(XtfPingHeader & hdr){
