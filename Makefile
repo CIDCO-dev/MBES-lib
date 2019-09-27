@@ -39,9 +39,6 @@ datagram-dump: prepare
 datagram-list: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp $(FILES)
 
-sidescan-dump: prepare
-	$(CC) $(OPTIONS) $(pkg-config --cflags opencv) $(INCLUDES) src/examples/sidescan-dump.cpp $(FILES) `pkg-config --libs opencv` -o $(exec_dir)/sidescan-dump
-
 
 test: default
 	mkdir -p $(test_exec_dir)
