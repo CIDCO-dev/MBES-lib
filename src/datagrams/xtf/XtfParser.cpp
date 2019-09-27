@@ -502,7 +502,7 @@ void XtfParser::processChanInfo(XtfChanInfo * c){
     properties->insert(std::pair<std::string,std::string>("Sample Format",std::to_string(channel->SampleFormat)));
     
     
-    processor.processChannelProperties(properties);
+    processor.processChannelProperties(channel->SubChannelNumber,channel->ChannelName,properties);
 }
 
 /**
@@ -525,7 +525,6 @@ void XtfParser::processPacketHeader(XtfPacketHeader & hdr){
 
 /**
  * show the contain of the file PingHeader
- *XTF_HEADER_KLEINV4_DATA_PAGE
  * @param hdr the XTF PingHeader
  */
 void XtfParser::processPingHeader(XtfPingHeader & hdr){
