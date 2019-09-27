@@ -14,6 +14,8 @@
 #include "DatagramGeoreferencer.hpp"
 #include "../datagrams/DatagramParserFactory.hpp"
 
+#include "../svp/SvpSelectionStrategy.hpp"
+
 
 
 /*!
@@ -34,8 +36,9 @@ public:
 	* @param cloud Point cloud
 	* @param georef The georeferencer
 	*/
-	PointCloudGeoreferencer( pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, Georeferencing & georef )
-	: cloud( cloud ),DatagramGeoreferencer(georef) {
+	PointCloudGeoreferencer( pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, Georeferencing & georef,
+							SvpSelectionStrategy & svpStrat )
+	: cloud( cloud ),DatagramGeoreferencer(georef, svpStrat) {
 
 	}
 
@@ -49,13 +52,14 @@ public:
 	* @param quality the quality flag
 	* @param intensity the intensity flag
 	*/
-	virtual void processGeoreferencedPing(Eigen::Vector3d & ping,uint32_t quality,int32_t intensity){
+	virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing, uint32_t quality, 
+											int32_t intensity, int positionIndex, int attitudeIndex){
 
 		pcl::PointXYZ point;
 
-		point.x = ping(0);
-		point.y = ping(1);
-		point.z = ping(2);
+		point.x = georeferencedPing(0);
+		point.y = georeferencedPing(1);
+		point.z = georeferencedPing(2);
 
 		cloud->push_back(point);
 	}
