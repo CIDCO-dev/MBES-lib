@@ -528,7 +528,15 @@ void XtfParser::processPacketHeader(XtfPacketHeader & hdr){
  * @param hdr the XTF PingHeader
  */
 void XtfParser::processPingHeader(XtfPingHeader & hdr){
-    processor.processSwathStart(hdr.SoundVelocity);
+    
+    double sss = hdr.SoundVelocity;
+    
+    if(hdr.SoundVelocity < 800){
+        //Not the best check, but if it's using the one-way format, we'll want to double it up
+        sss *= 2;
+    }
+    
+    processor.processSwathStart(sss);
 }
 
 /**
