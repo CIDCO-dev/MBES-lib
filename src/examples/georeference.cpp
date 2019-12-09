@@ -171,7 +171,7 @@ int main (int argc , char ** argv){
         }
 
         if(georef == NULL){
-            std::cerr << "No georeferencing method defined (-L or -T). Using TRF by default" << std::endl;
+            std::cerr << "[+] No georeferencing method defined (-L or -T). Using TRF by default" << std::endl;
             georef = new GeoreferencingTRF();
         }
         
