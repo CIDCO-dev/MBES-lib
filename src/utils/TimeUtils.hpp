@@ -29,10 +29,7 @@ public:
      */
 
 #ifdef _WIN32
-#ifdef __cplusplus
-
-    extern "C" char* strptime(const char* s, const char* f, struct tm* tm) {
-#endif
+    static char *strptime(const char * s, const char* f, struct tm* tm);
         std::istringstream input(s);
         input.imbue(std::locale(setlocale(LC_ALL, nullptr)));
         input >> std::get_time(tm, f);
