@@ -12,6 +12,7 @@
 
 
 #include <vector>
+#include <limits>
 #include "SvpSelectionStrategy.hpp"
 #include "SoundVelocityProfile.hpp"
 #include "../utils/Exception.hpp"
@@ -37,7 +38,7 @@ public:
 
     SoundVelocityProfile * chooseSvp(Position & position, Ping & ping) {
 
-        uint64_t dt = std::numeric_limits<uint64_t>::max();
+        uint64_t dt = (std::numeric_limits<uint64_t>::max)();
 
         unsigned int indexNearest = 0;
 
