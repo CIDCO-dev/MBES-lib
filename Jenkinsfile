@@ -19,6 +19,7 @@ pipeline {
 
   agent none
   stages {
+/*
     stage('TEST MASTER'){
       agent { label 'master'}
       steps {
@@ -50,7 +51,7 @@ pipeline {
         }
       }
     }
-
+*/
     stage('BUILD WINDOWS 10 AND TEST'){
       agent { label 'windows10-x64-2'}
       steps {
