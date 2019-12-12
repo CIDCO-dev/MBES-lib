@@ -3,6 +3,8 @@ OPTIONS=-Wall #-std=c++0x
 INCLUDES=-IC:\\Users\\cidco\\Library\\eigen
 VERSION=0.1.0
 
+FILES=..\\..\\src\\datagrams\\DatagramParser.cpp ..\\..\\src\\datagrams\\DatagramParserFactory.cpp ..\\..\\src\\datagrams\\s7k\\S7kParser.cpp ..\\..\\src\\datagrams\\kongsberg\\KongsbergParser.cpp ..\\..\\src\\datagrams\\xtf\\XtfParser.cpp ..\\..\\src\\utils\\NmeaUtils.cpp ..\\..\\src\\utils\\StringUtils.cpp
+
 root=$(shell pwd)
 
 exec_dir=build\\bin
@@ -13,15 +15,15 @@ test_work_dir=build\\test\\work
 test_result_dir=build\\test-report
 
 default: prepare
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-dump.cpp $(INCLUDES) /EHsc /Fedatagram-dump.exe
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\cidco-decoder.cpp $(INCLUDES) /EHsc /Fecidco-decoder.exe
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-list.cpp $(INCLUDES) /EHsc /Fedatagram-list.exe
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\georeference.cpp ..\\..\\src\\getopt.c $(INCLUDES) /EHsc /Fegeoreference.exe
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\data-cleaning.cpp ..\\..\\src\\getopt.c $(INCLUDES) /EHsc /Fedata-cleaning.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-dump.cpp $(INCLUDES) /EHsc $(FILES) /Fedatagram-dump.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\cidco-decoder.cpp $(INCLUDES) /EHsc $(FILES) /Fecidco-decoder.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-list.cpp $(INCLUDES) /EHsc $(FILES) /Fedatagram-list.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\georeference.cpp ..\\..\\src\\getopt.c $(INCLUDES) /EHsc $(FILES) /Fegeoreference.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\data-cleaning.cpp ..\\..\\src\\getopt.c $(INCLUDES) /EHsc $(FILES) /Fedata-cleaning.exe
 
 test: default
 	mkdir $(test_exec_dir)
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test\\bin &&cl ..\\..\\..\\test\\main.cpp $(INCLUDES) /EHsc /Fetests.exe
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test\\bin &&cl ..\\..\\..\\test\\main.cpp $(INCLUDES) /EHsc $(FILES) /Fetests.exe
 	mkdir $(test_result_dir)
 	mkdir $(test_work_dir)
 	$(test_exec_dir)\\tests -r junit -o $(test_result_dir)\\mbes-lib-test-report.xml
