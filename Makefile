@@ -12,7 +12,7 @@ doc_dir=build/doc
 
 test_exec_dir=build/test/bin
 test_work_dir=build/test/work
-test_result_dir=build/test-report
+test_result_dir=build/reports
 coverage_dir=build/coverage
 coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
@@ -72,7 +72,6 @@ coverage: default
 	mkdir -p $(coverage_dir)
 	mkdir -p $(coverage_report_dir)
 	mkdir -p $(coverage_exec_dir)
-	mkdir -p $(test_work_dir)
 	cppcheck --xml --xml-version=2 --enable=all --inconclusive --language=c++ src 2> $(coverage_report_dir)/cppcheck.xml
 	$(CC) $(OPTIONS) $(INCLUDES) -fprofile-arcs -ftest-coverage -fPIC -O0 test/main.cpp $(FILES) -o $(coverage_exec_dir)/tests
 	$(root)/$(coverage_exec_dir)/tests || true

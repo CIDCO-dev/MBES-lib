@@ -30,8 +30,7 @@ pipeline {
         always {
           publishCppcheck pattern:'build/coverage/report/cppcheck.xml'
           step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'build/coverage/report/gcovr-report.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
-          sh 'cp -r build/test-report $WORKSPACE/test-report'
-          junit '**/test-report/*.xml'
+          junit 'build/reports/**/*.xml'
           sh 'mkdir -p $publishCoberturaDir'
           sh 'cp -r build/coverage/report/*.html $publishCoberturaDir/'
         }
@@ -72,7 +71,7 @@ pipeline {
       }
       post {
         always {
-          junit 'build\\test-report\\*.xml'
+          junit 'build\\reports\\*.xml'
         }
       }
     }
