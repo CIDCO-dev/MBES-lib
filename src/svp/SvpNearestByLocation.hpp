@@ -12,6 +12,7 @@
 
 #include <cmath>
 #include <vector>
+#include <limits>
 #include "SoundVelocityProfile.hpp"
 #include "SvpSelectionStrategy.hpp"
 #include "../utils/Exception.hpp"
