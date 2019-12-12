@@ -35,7 +35,7 @@ public:
     }
 
     SoundVelocityProfile * chooseSvp(Position & position, Ping & ping) {
-        double d = std::numeric_limits<double>::max();
+        double d = (std::numeric_limits<double>::max)();
 
         unsigned int indexNearest = 0;
 
