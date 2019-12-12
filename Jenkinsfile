@@ -22,6 +22,7 @@ pipeline {
     stage('TEST MASTER'){
       agent { label 'master'}
       steps {
+        sh "make clean"
         sh "make coverage"
         sh "make test"
       }
