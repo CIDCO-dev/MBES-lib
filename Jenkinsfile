@@ -56,10 +56,13 @@ pipeline {
       agent { label 'windows10-x64-2'}
       steps {
         bat "Scripts\\change_makefile_name.bat"
+        bat "echo %cd%"
         bat "make clean"
+        bat "echo %cd%"
         //compile
         bat "make test"
-        bat "make"
+        bat "echo %cd%"
+        //bat "make"
         bat "Scripts\\package_pcl-viewer.bat"
         bat "Scripts\\package_overlap.bat"
 
