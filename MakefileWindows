@@ -23,11 +23,11 @@ default: prepare
 
 test: default
 	mkdir $(test_exec_dir)
-	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test\\bin &&cl ..\\..\\..\\test\\main.cpp $(INCLUDES) /EHsc $(FILES) /Fetests.exe
-	call "cd ..\\..\\.."
 	mkdir $(test_result_dir)
 	mkdir $(test_work_dir)
+	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test\\bin &&cl ..\\..\\..\\test\\main.cpp $(INCLUDES) /EHsc $(FILES) /Fetests.exe
 	$(test_exec_dir)\\tests -r junit -o $(test_result_dir)\\mbes-lib-test-report.xml
+	
 
 clean:
 	rmdir /q /s build
