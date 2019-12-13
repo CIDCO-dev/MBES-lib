@@ -22,11 +22,9 @@
 #include "../src/utils/Exception.hpp"
 using namespace std;
 #ifdef _WIN32
-static string DataBinexec("..\\bin\\data-cleaning.exe");
-static string outputdir(".");
+static string dataBinexec("build\\bin\\data-cleaning.exe");
 #else
 static string dataBinexec("build/bin/data-cleaning");
-static string dataOutputdir(".");
 #endif
 
 /**
