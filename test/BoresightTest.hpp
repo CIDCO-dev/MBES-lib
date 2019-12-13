@@ -11,7 +11,7 @@
  * Created on May 7, 2019, 9:49 AM
  */
 
-#include <eigen3/Eigen/src/Core/Matrix.h>
+#include <Eigen/Dense>
 
 #include "catch.hpp"
 #include "../src/math/Boresight.hpp"
