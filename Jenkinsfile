@@ -55,8 +55,8 @@ pipeline {
     stage('BUILD WINDOWS 10 AND TEST'){
       agent { label 'windows10-x64-2'}
       steps {
-        bat "make clean"
         bat "Scripts\\change_makefile_name.bat"
+        bat "make clean"
         //compile
         bat "make test"
         bat "make"
