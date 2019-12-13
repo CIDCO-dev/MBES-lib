@@ -13,7 +13,7 @@ doc_dir=build\\doc
 
 test_exec_dir=build\\test\\bin
 test_work_dir=build\\test\\work
-test_result_dir=build\\test-report
+test_result_dir=build\\reports
 
 default: prepare
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\bin &&cl ..\\..\\src\\examples\\datagram-dump.cpp $(INCLUDES) /EHsc $(FILES) /Fedatagram-dump.exe
@@ -26,8 +26,11 @@ test: default
 	mkdir $(test_exec_dir)
 	mkdir $(test_result_dir)
 	mkdir $(test_work_dir)
+	call "echo %cd%"
 	call "%windows10_x64_BUILD_TOOLS_ROOT%\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64 && cd build\\test\\bin &&cl ..\\..\\..\\test\\main.cpp $(INCLUDES) /EHsc $(FILES_RELATIVE_TO_TEST) /Fetests.exe
+	call "echo %cd%"
 	$(test_exec_dir)\\tests -r junit -o $(test_result_dir)\\mbes-lib-test-report.xml
+	call "echo %cd%"
 	
 
 clean:
