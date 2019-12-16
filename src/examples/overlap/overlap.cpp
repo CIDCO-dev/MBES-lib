@@ -31,7 +31,7 @@
 
 #include "../../georeferencing/PointCloudGeoreferencer.hpp"
 
-#include "../../svp/SoundVelocityProfile.hpp"
+// #include "../../svp/SoundVelocityProfile.hpp"
 
 #include "../../math/Boresight.hpp"
 
@@ -52,7 +52,7 @@ void printUsage(){
 	NAME\n\n\
 	overlap - Displays the overlap area between two multibeam echosounder datagram files\n\n\
 	SYNOPSIS\n \
-	overlap [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] file1 file2 a b c d alpha1 alpha2\n\n\
+	overlap [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] [-s svp_file] [-c svp_file1] [-v svp_file2] file1 file2 a b c d alpha1 alpha2\n\n\
 	DESCRIPTION\n \
 	-L          Use a local geographic frame (NED)\n \
 	-T          Use a terrestrial geographic frame (WGS84 ECEF)\n \
@@ -80,9 +80,6 @@ int main( int argc, char* argv[] )
     std::chrono::high_resolution_clock::time_point tStart = std::chrono::high_resolution_clock::now();  
 
 
-	// TODO: get SVP from CLI
-
-
 	//Lever arm
 	double leverArmX = 0.0;
 	double leverArmY = 0.0;
@@ -97,11 +94,17 @@ int main( int argc, char* argv[] )
 	bool DoLGF = true;
 
 
+    std::string svpFilename1;
+    std::string svpFilename2;
+
+    bool svpFilename1Provided = false;
+    bool svpFilename2Provided = false;
+
     // Read -L or -T, optional parameters preceded by "-"
 
 	int index;
 
-	while((index=getopt(argc,argv,"x:y:z:r:p:h:LT"))!=-1)
+	while((index=getopt(argc,argv,"x:y:z:r:p:h:s:c:v:LT"))!=-1)
 	{
 		switch(index)
 		{
@@ -153,6 +156,51 @@ int main( int argc, char* argv[] )
 				}
 				break;
 
+            case 's':
+
+                std::cout << "\n\ncase 's':\n" << std::endl;
+
+                svpFilename1 = optarg;
+                svpFilename2 = optarg;
+
+                svpFilename1Provided = true;
+                svpFilename2Provided = true;
+
+                std::cout << "\n\nsvpFilename:\n\"" << svpFilename1 << "\"" << std::endl;
+                
+                break;
+
+
+            case 'c':
+
+                std::cout << "\n\ncase 'c':\n" << std::endl;
+
+                std::cout << "\n\noptarg:\n\"" << optarg << "\"" << std::endl;
+
+                svpFilename1 = optarg;
+
+                svpFilename1Provided = true;
+
+
+                std::cout << "\n\nsvpFilename:\n\"" << svpFilename1 << "\"" << std::endl;
+
+                break;
+
+            case 'v':
+
+                std::cout << "\n\ncase 'v':\n" << std::endl;
+
+                std::cout << "\n\noptarg:\n\"" << optarg << "\"" << std::endl;
+
+                svpFilename2 = optarg;      
+
+                svpFilename2Provided = true;
+
+                std::cout << "\n\nsvpFilename:\n\"" << svpFilename2 << "\"" << std::endl;               
+
+                break;  
+
+
 			case 'L':
 				LorTPresent = true;
 				DoLGF = true;
@@ -163,11 +211,6 @@ int main( int argc, char* argv[] )
 				DoLGF = false;
 				break;
 		}
-	}
-
-	if( LorTPresent == false ){
-		std::cerr << "\nNo georeferencing method defined (-L or -T)" << std::endl;
-		printUsage();
 	}
 
 
@@ -181,9 +224,11 @@ int main( int argc, char* argv[] )
 
     // Read required arguments, they start at index "optind"
 
-    if ( argc != ( optind + 6 ) && argc != ( optind + 8 ) )
+    if ( argc != ( optind + 2 ) && argc != ( optind + 6 ) && argc != ( optind + 8 ) )
     {           
-        std::cout << "\n\nThere should be 6 or 8 non-optional arguments" << std::endl;
+        std::cout << "\n\nThere should be 2 non-optional arguments (2 MBES file names)\n" 
+            << "or 6 non-optional arguments (2 MBES file names + projection plane parameters a b c d)"
+            << std::endl;
         printUsage();
     }
 
@@ -221,11 +266,14 @@ int main( int argc, char* argv[] )
     double c = 1;
     double d = 0;
 
-    // Get actual values from CLI
-    a = atof(argv[ optind + 2 ]);
-    b = atof(argv[ optind + 3 ]);
-    c = atof(argv[ optind + 4 ]);
-    d = atof(argv[ optind + 5 ]);
+    if ( argc > ( optind + 2 ) )
+    {
+        // Get actual values from CLI
+        a = atof(argv[ optind + 2 ]);
+        b = atof(argv[ optind + 3 ]);
+        c = atof(argv[ optind + 4 ]);
+        d = atof(argv[ optind + 5 ]);
+    }
 
     std::cout << "\na: " << a << "\n" 
         << "b: " << b << "\n"
@@ -237,7 +285,7 @@ int main( int argc, char* argv[] )
     double alphaLine1 = 1.0;
     double alphaLine2 = 1.0;
 
-    if ( argc == ( optind + 8 ) )
+    if ( argc > ( optind + 6 ) )
     {
         // Get actual values from CLI
         alphaLine1 = atof( argv[ optind + 6 ]);
@@ -264,6 +312,13 @@ int main( int argc, char* argv[] )
     twoFileNames.push_back( fileNameLine1 ) ;
     twoFileNames.push_back( fileNameLine2 ) ;
 
+
+    std::vector< std::string > twoSvpFilenames;
+    twoSvpFilenames.reserve( 2 );
+    twoSvpFilenames.push_back( svpFilename1 ) ;
+    twoSvpFilenames.push_back( svpFilename2 ) ;
+
+
     for ( int count = 0; count < 2; count++ )
     {
         // If file name ends in .txt: point cloud X, Y, Z
@@ -273,9 +328,22 @@ int main( int argc, char* argv[] )
         }
         else // Georeference
         {
+            if( LorTPresent == false ){
+                std::cerr << "\nNo georeferencing method defined (-L or -T)" << std::endl;
+                printUsage();
+            }
+
+            if ( svpFilename1Provided == false || svpFilename2Provided == false  )
+            {
+                std::cerr << "No SVP files provided. Need to provide one SVP file using option -s\n" 
+                    << "or an SVP file for line #1, using -c, and an SVP file for line #2, using -v\n" << std::endl;
+                printUsage();
+            }
+
             try
             {
-                readSonarFileIntoPointCloud( twoFileNames[ count ], twoLines[ count ], leverArm , boresight, NULL, DoLGF );
+                readSonarFileIntoPointCloud( twoFileNames[ count ], twoLines[ count ], leverArm , boresight, 
+                                                twoSvpFilenames[ count ], DoLGF );
             }
             catch ( Exception * error )
             {
@@ -314,7 +382,7 @@ int main( int argc, char* argv[] )
 
     std::cout << "\n\nProcessing to find the overlap\n" << std::endl;
 
-    HullOverlap hullOverlap( line1, line2, a, b, c, d, alphaLine1, alphaLine2 );
+    HullOverlap hullOverlap( line1, line2, a, b, c, d, "Andrew's", alphaLine1, alphaLine2 );
 
 
     std::pair< uint64_t, uint64_t > inBothHulls = hullOverlap.computePointsInBothHulls( line1InBothHulls, 
@@ -349,6 +417,10 @@ int main( int argc, char* argv[] )
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "line2");
 
 
+	viewer->resetCameraViewpoint("Everything");
+
+    viewer->resetCamera();
+
 
     // Viewport for line 1 and 2 part of both hulls
     int viewport1 = 0;
@@ -369,7 +441,9 @@ int main( int argc, char* argv[] )
 	// viewer->setPosition( 300, 100 ); // Position of the window on the screen
 	// viewer->setSize( 1800, 1200 );		// Size of the window on the screen
 	
-	viewer->resetCameraViewpoint("Everything");
+	// viewer->resetCameraViewpoint("Everything");
+
+    // viewer->resetCamera();
 
 	// viewer->addCoordinateSystem( 10, 0, 0, 0 );
 

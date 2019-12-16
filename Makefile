@@ -3,7 +3,7 @@ OPTIONS=-Wall -std=c++11 -g
 INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
-FILES=src/datagrams/DatagramParser.cpp src/datagrams/DatagramParserFactory.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/datagrams/xtf/XtfParser.cpp src/utils/NmeaUtils.cpp src/utils/StringUtils.cpp
+FILES=src/datagrams/DatagramParser.cpp src/datagrams/DatagramParserFactory.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/datagrams/xtf/XtfParser.cpp src/utils/NmeaUtils.cpp src/utils/StringUtils.cpp src/sidescan/SidescanPing.cpp
 
 root=$(shell pwd)
 
@@ -38,9 +38,6 @@ datagram-dump: prepare
 
 datagram-list: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp $(FILES)
-
-sidescan-dump: prepare
-	$(CC) $(OPTIONS) $(pkg-config --cflags opencv) $(INCLUDES) src/examples/sidescan-dump.cpp $(FILES) `pkg-config --libs opencv` -o $(exec_dir)/sidescan-dump
 
 
 test: default

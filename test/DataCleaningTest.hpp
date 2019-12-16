@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-/* 
+/*
  * File:   data-cleaningTest.hpp
  * Author: emile
  *
@@ -33,7 +33,7 @@ static string dumpContentsCommand("cat ");
 
 /**
  * Execute the data-cleaning main function
- * 
+ *
  * @param command the parameters for the execution
  */
 std::stringstream DataSystem_call(const std::string& command){

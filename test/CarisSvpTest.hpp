@@ -11,7 +11,7 @@
 #define CARISSVPTEST_HPP
 
 #include "catch.hpp"
-#include "../src/svp/CarisSVP.hpp"
+#include "../src/svp/CarisSvpFile.hpp"
 
 TEST_CASE("CARIS SVP test") {
     /*Build first svp*/
@@ -47,14 +47,14 @@ TEST_CASE("CARIS SVP test") {
     svps.push_back(svp2);
     
     /*test write and read*/
-    CarisSVP svpsCarisOut;
+    CarisSvpFile svpsCarisOut;
     svpsCarisOut.setSvps(svps);
     
     std::string outputFilename = "build/test/output.svp";
     
     svpsCarisOut.writeSvpFile(outputFilename);
     
-    CarisSVP svpsCarisIn;
+    CarisSvpFile svpsCarisIn;
     bool svpRead = svpsCarisIn.readSvpFile(outputFilename);
     
     REQUIRE(svpRead);

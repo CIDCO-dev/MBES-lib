@@ -32,9 +32,17 @@
 
 
 
+#include "../../svp/SvpSelectionStrategy.hpp"
+#include "../../svp/SvpNearestByTime.hpp"
+
+#include "../../svp/CarisSvpFile.hpp"
+
+
+
 uint64_t readSonarFileIntoPointCloud( std::string fileName, pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOut, 
                     Eigen::Vector3d & leverArm, Eigen::Matrix3d & boresight,
-                    SoundVelocityProfile * svpFile, const bool DoLGF = true )
+                    std::string svpFilename,
+                    const bool DoLGF = true )
 {
 
 	Georeferencing * georef;
@@ -44,7 +52,25 @@ uint64_t readSonarFileIntoPointCloud( std::string fileName, pcl::PointCloud<pcl:
     else
         georef = new GeoreferencingTRF();
 
-	PointCloudGeoreferencer pointCloudGeoreferencer( cloudOut,*georef );
+    SvpSelectionStrategy * svpStrategy = new SvpNearestByTime();
+
+
+    CarisSvpFile svps;
+
+
+    if( !svps.readSvpFile(svpFilename) ) {
+        std::cerr << "Invalid SVP file (-s)" << std::endl;
+
+        delete svpStrategy;
+        delete georef;
+
+        throw new Exception("Invalid SVP file: \"" + svpFilename + "\"" );
+
+    }
+
+
+
+	PointCloudGeoreferencer pointCloudGeoreferencer( cloudOut,*georef, *svpStrategy );
 
 	DatagramParser * parser = nullptr;
 
@@ -70,13 +96,16 @@ uint64_t readSonarFileIntoPointCloud( std::string fileName, pcl::PointCloud<pcl:
 		std::cout << "\nGeoreferencing point cloud" << std::endl;
 
 		
-		pointCloudGeoreferencer.georeference( leverArm , boresight , svpFile );
+		pointCloudGeoreferencer.georeference( leverArm , boresight , svps.getSvps() );
 
 	}
 	catch ( Exception * error )
 	{
 		if ( parser )
-		    delete parser;        
+		    delete parser;
+
+        delete svpStrategy;
+        delete georef;   
 
         std::string text = "\nError while parsing file \n\n\"" + fileName + "\":\n\n" + error->what() + ".\n";
         throw new Exception( text );
@@ -87,6 +116,9 @@ uint64_t readSonarFileIntoPointCloud( std::string fileName, pcl::PointCloud<pcl:
 		if ( parser )
 		    delete parser;
 
+        delete svpStrategy;
+        delete georef;   
+
         std::string text = "\nError while parsing file \n\n\"" + fileName + "\":\n\n" + std::string( message ) + ".\n";
         throw new Exception( text );
 
@@ -95,6 +127,9 @@ uint64_t readSonarFileIntoPointCloud( std::string fileName, pcl::PointCloud<pcl:
 	{
 		if ( parser )
 		    delete parser;
+
+        delete svpStrategy;
+        delete georef; 
 
         std::string text = "\nError while parsing file \n\n\"" + fileName + "\":\n\nOther exception.\n";
         throw new Exception( text );

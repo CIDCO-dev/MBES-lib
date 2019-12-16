@@ -5,7 +5,11 @@
 #ifndef DATAGRAMPROCESSOR_HPP
 #define DATAGRAMPROCESSOR_HPP
 
+#include <map>
+
 #include "../svp/SoundVelocityProfile.hpp"
+
+#include "../sidescan/SidescanPing.hpp"
 
 /*!
 * \brief Datagram event handler class
@@ -29,7 +33,22 @@ public:
 	*/
 	virtual void processDatagramTag(int id){};
 
-
+        /**
+         * Process a map of file-wide properties
+         * @param properties
+         */
+        virtual void processFileProperties(std::map<std::string,std::string> * properties){
+            delete properties;
+        }
+        
+        /**
+         * Process a map of channel-specific properties
+         * @param properties
+         */
+        virtual void processChannelProperties(unsigned int channelNumber,std::string channelName,std::map<std::string,std::string> * properties){
+            delete properties;
+        }        
+        
 	/**
 	* Convention for attitude angles (in degrees)
 	*
@@ -77,7 +96,10 @@ public:
 	*/
 	virtual void processSoundVelocityProfile(SoundVelocityProfile * svp){ delete svp;};
 
-        virtual void processSidescanData(unsigned int channel,std::vector<double> & data){}
+        
+        
+        virtual void processSidescanData(SidescanPing * ping){}
+        
 };
 
 

@@ -8,6 +8,7 @@
 #include <iostream>
 #include "utils/Constants.hpp"
 #include <cmath>
+#include <Eigen/Dense>
 
 /*!
 * \brief Position class

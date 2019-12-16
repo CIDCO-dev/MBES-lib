@@ -7,6 +7,11 @@
 
 #include "XtfParser.hpp"
 
+
+/**
+ * @author Guillaume Morissette
+ */
+
 /**
  * Create an XTF parser
  *
@@ -49,10 +54,7 @@ void XtfParser::parse(std::string & filename){
 				//Lire structs CHANINFO dans le header
 				int channelsInHeader = (channels > 6)?6:channels;
 
-				for(int i=0;i<channelsInHeader;i++){
-                                    sampleFormat   = fileHeader.Channels[i].SampleFormat;//FIXME: this is wrong
-                                    bytesPerSample = fileHeader.Channels[i].BytesPerSample;//FIXME: this is wrong
-                                    
+				for(int i=0;i<channelsInHeader;i++){                                    
                                     processChanInfo(&fileHeader.Channels[i]);
 				}
 
@@ -364,25 +366,59 @@ int XtfParser::getTotalNumberOfChannels(){
  * @param f the XTF FileHeader
  */
 void XtfParser::processFileHeader(XtfFileHeader & f){
-        fprintf(stderr,"[+] XTF File Header:\n\n");        
-        fprintf(stderr,"FileFormat: %d\n",f.FileFormat);
-        fprintf(stderr,"SystemType: %d\n",f.SystemType);
-        fprintf(stderr,"RecordingProgramName: %s\n",f.RecordingProgramName);
-        fprintf(stderr,"RecordingProgramVersion: %s\n",f.RecordingProgramVersion);
-        fprintf(stderr,"SonarName: %s\n",f.SonarName);
-        fprintf(stderr,"sonarType: %d (%s)\n",f.SonarType,SonarTypes[f.SonarType].c_str());
-        fprintf(stderr,"NoteString: %s\n",f.NoteString);
-        fprintf(stderr,"ThisFileName: %s\n",f.ThisFileName);
-        fprintf(stderr,"NavUnits: %d\n",f.NavUnits);
-        fprintf(stderr,"NumberOfSonarChannels: %d\n",f.NumberOfSonarChannels);
-        fprintf(stderr,"NumberOfBathymetryChannels: %d\n",f.NumberOfBathymetryChannels);
-        fprintf(stderr,"NumberOfSnippetChannels: %d\n",f.NumberOfSnippetChannels);
-        fprintf(stderr,"NumberOfForwardLookArrays: %d\n",f.NumberOfForwardLookArrays);
-        fprintf(stderr,"NumberOfEchoStrengthChannels: %d\n",f.NumberOfEchoStrengthChannels);
-        fprintf(stderr,"NumberOfInterferometryChannels: %d\n",f.NumberOfInterferometryChannels);
-        fprintf(stderr,"Reserved1: %d\n",f.Reserved1);
-        fprintf(stderr,"Reserved2: %d\n",f.Reserved2);
-        fprintf(stderr,"ReferencePointHeight: %f\n",f.ReferencePointHeight);
+        //fprintf(stderr,"[+] XTF File Header:\n\n");        
+        //fprintf(stderr,"FileFormat: %d\n",f.FileFormat);
+        //fprintf(stderr,"SystemType: %d\n",f.SystemType);
+        //fprintf(stderr,"RecordingProgramName: %s\n",f.RecordingProgramName);
+        //fprintf(stderr,"RecordingProgramVersion: %s\n",f.RecordingProgramVersion);
+        //fprintf(stderr,"SonarName: %s\n",f.SonarName);
+        //fprintf(stderr,"sonarType: %d (%s)\n",f.SonarType,SonarTypes[f.SonarType].c_str());
+        //fprintf(stderr,"NoteString: %s\n",f.NoteString);
+        //fprintf(stderr,"ThisFileName: %s\n",f.ThisFileName);
+        //fprintf(stderr,"NavUnits: %d\n",f.NavUnits);
+        //fprintf(stderr,"NumberOfSonarChannels: %d\n",f.NumberOfSonarChannels);
+        //fprintf(stderr,"NumberOfBathymetryChannels: %d\n",f.NumberOfBathymetryChannels);
+        //fprintf(stderr,"NumberOfSnippetChannels: %d\n",f.NumberOfSnippetChannels);
+        //fprintf(stderr,"NumberOfForwardLookArrays: %d\n",f.NumberOfForwardLookArrays);
+        //fprintf(stderr,"NumberOfEchoStrengthChannels: %d\n",f.NumberOfEchoStrengthChannels);
+        //fprintf(stderr,"NumberOfInterferometryChannels: %d\n",f.NumberOfInterferometryChannels);
+        //fprintf(stderr,"Reserved1: %d\n",f.Reserved1);
+        //fprintf(stderr,"Reserved2: %d\n",f.Reserved2);
+        //fprintf(stderr,"ReferencePointHeight: %f\n",f.ReferencePointHeight);
+        
+        std::map<std::string,std::string> * fileProperties = new std::map<std::string,std::string>();
+        
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Sonar)",std::to_string(f.NumberOfSonarChannels)));
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Bathymetry)",std::to_string(f.NumberOfBathymetryChannels)));
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Snippet)",std::to_string(f.NumberOfSnippetChannels)));
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Interferometry)",std::to_string(f.NumberOfInterferometryChannels)));
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Forward Look)",std::to_string(f.NumberOfForwardLookArrays)));
+        fileProperties->insert(std::pair<std::string,std::string>("Channels (Echo Strength)",std::to_string(f.NumberOfEchoStrengthChannels)));
+        fileProperties->insert(std::pair<std::string,std::string>("File Format",std::to_string(f.FileFormat)));
+        fileProperties->insert(std::pair<std::string,std::string>("System Type",std::to_string(f.SystemType)));
+        fileProperties->insert(std::pair<std::string,std::string>("Recording Program Name",f.RecordingProgramName));
+        fileProperties->insert(std::pair<std::string,std::string>("Recording Program Version",f.RecordingProgramVersion));
+        fileProperties->insert(std::pair<std::string,std::string>("Sonar Name",f.SonarName));
+        fileProperties->insert(std::pair<std::string,std::string>("Sonar Type",SonarTypes[f.SonarType]));
+        fileProperties->insert(std::pair<std::string,std::string>("Note String",f.NoteString));
+        fileProperties->insert(std::pair<std::string,std::string>("Nav Units",std::to_string(f.NavUnits)));
+        fileProperties->insert(std::pair<std::string,std::string>("Original File Name",f.ThisFileName));
+        fileProperties->insert(std::pair<std::string,std::string>("Reference Point Height",std::to_string(f.ReferencePointHeight)));
+        fileProperties->insert(std::pair<std::string,std::string>("Origin Y",std::to_string(f.OriginY)));
+        fileProperties->insert(std::pair<std::string,std::string>("Origin X",std::to_string(f.OriginX)));
+        fileProperties->insert(std::pair<std::string,std::string>("Nav Offset X",std::to_string(f.NavOffsetX)));
+        fileProperties->insert(std::pair<std::string,std::string>("Nav Offset Y",std::to_string(f.NavOffsetY)));
+        fileProperties->insert(std::pair<std::string,std::string>("Nav Offset Z",std::to_string(f.NavOffsetZ)));
+        fileProperties->insert(std::pair<std::string,std::string>("Nav Offset Yaw",std::to_string(f.NavOffsetYaw)));
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset X",std::to_string(f.MRUOffsetX)));
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset Y",std::to_string(f.MRUOffsetY)));
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset Z",std::to_string(f.MRUOffsetZ)));        
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset Yaw",std::to_string(f.MRUOffsetYaw)));
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset Pitch",std::to_string(f.MRUOffsetPitch)));
+        fileProperties->insert(std::pair<std::string,std::string>("MRU Offset Roll",std::to_string(f.MRUOffsetRoll)));         
+        
+
+        processor.processFileProperties(fileProperties);
         
         //TODO
         //printf("ProjectionType: ");
@@ -392,20 +428,20 @@ void XtfParser::processFileHeader(XtfFileHeader & f){
         //print(f.SpheriodType,10);
         //printf("\n");
 
-        fprintf(stderr,"NavigationLatency: %d\n",f.NavigationLatency);
-        fprintf(stderr,"OriginY: %f\n",f.OriginY);
-        fprintf(stderr,"OriginX: %f\n",f.OriginX);
-        fprintf(stderr,"NavOffsetY: %f\n",f.NavOffsetY);
-        fprintf(stderr,"NavOffsetX: %f\n",f.NavOffsetX);
-        fprintf(stderr,"NavOffsetZ: %f\n",f.NavOffsetZ);
-        fprintf(stderr,"NavOffsetYaw: %f\n",f.NavOffsetYaw);
-        fprintf(stderr,"MRUOffsetY: %f\n",f.MRUOffsetY);
-        fprintf(stderr,"MRUOffsetX: %f\n",f.MRUOffsetX);
-        fprintf(stderr,"MRUOffsetZ: %f\n",f.MRUOffsetZ);
-        fprintf(stderr,"MRUOffsetYaw: %f\n",f.MRUOffsetYaw);
-        fprintf(stderr,"MRUOffsetPitch: %f\n",f.MRUOffsetPitch);
-        fprintf(stderr,"MRUOffsetRoll: %f\n",f.MRUOffsetRoll);
-        fprintf(stderr,"------------\n\n");
+        //fprintf(stderr,"NavigationLatency: %d\n",f.NavigationLatency);
+        //fprintf(stderr,"OriginY: %f\n",f.OriginY);
+        //fprintf(stderr,"OriginX: %f\n",f.OriginX);
+        //fprintf(stderr,"NavOffsetY: %f\n",f.NavOffsetY);
+        //fprintf(stderr,"NavOffsetX: %f\n",f.NavOffsetX);
+        //fprintf(stderr,"NavOffsetZ: %f\n",f.NavOffsetZ);
+        //fprintf(stderr,"NavOffsetYaw: %f\n",f.NavOffsetYaw);
+        //fprintf(stderr,"MRUOffsetY: %f\n",f.MRUOffsetY);
+        //fprintf(stderr,"MRUOffsetX: %f\n",f.MRUOffsetX);
+        //fprintf(stderr,"MRUOffsetZ: %f\n",f.MRUOffsetZ);
+        //fprintf(stderr,"MRUOffsetYaw: %f\n",f.MRUOffsetYaw);
+        //fprintf(stderr,"MRUOffsetPitch: %f\n",f.MRUOffsetPitch);
+        //fprintf(stderr,"MRUOffsetRoll: %f\n",f.MRUOffsetRoll);
+        //fprintf(stderr,"------------\n\n");
 }
 
 /**
@@ -419,30 +455,54 @@ void XtfParser::processChanInfo(XtfChanInfo * c){
     
     channels.push_back(channel);
     
-    fprintf(stderr,"[+] XTF Channel Information\n\n");
-    fprintf(stderr,"TypeOfChannel: %d\n",channel->TypeOfChannel);
-    fprintf(stderr,"SubChannelNumber: %d\n",channel->SubChannelNumber);
-    fprintf(stderr,"CorrectionFlags: %d\n",channel->CorrectionFlags);
-    fprintf(stderr,"UniPolar: %d\n",channel->UniPolar);
-    fprintf(stderr,"BytesPerSample: %d\n",channel->BytesPerSample);
-    fprintf(stderr,"Reserved: %d\n",channel->Reserved);
-    fprintf(stderr,"ChannelName: %s\n",channel->ChannelName);
-    fprintf(stderr,"VoltScale: %f\n",channel->VoltScale);
-    fprintf(stderr,"Frequency: %f\n",channel->Frequency);
-    fprintf(stderr,"HorizBeamAngle: %f\n",channel->HorizBeamAngle);
-    fprintf(stderr,"TiltAngle: %f\n",channel->TiltAngle);
-    fprintf(stderr,"BeamWidth: %f\n",channel->BeamWidth);
-    fprintf(stderr,"OffsetX: %f\n",channel->OffsetX);
-    fprintf(stderr,"OffsetY: %f\n",channel->OffsetY);
-    fprintf(stderr,"OffsetZ: %f\n",channel->OffsetZ);
-    fprintf(stderr,"OffsetYaw: %f\n",channel->OffsetYaw);
-    fprintf(stderr,"OffsetPitch: %f\n",channel->OffsetPitch);
-    fprintf(stderr,"OffsetRoll: %f\n",channel->OffsetRoll);
-    fprintf(stderr,"BeamsPerArray: %d\n",channel->BeamsPerArray);
-    fprintf(stderr,"SampleFormat: %d\n",channel->SampleFormat);
-    fprintf(stderr,"ReservedArea2: %s\n",channel->ReservedArea2);
-    fprintf(stderr,"------------\n");
+    //fprintf(stderr,"[+] XTF Channel Information\n\n");
+    //fprintf(stderr,"TypeOfChannel: %d\n",channel->TypeOfChannel);
+    //fprintf(stderr,"SubChannelNumber: %d\n",channel->SubChannelNumber);
+    //fprintf(stderr,"CorrectionFlags: %d\n",channel->CorrectionFlags);
+    //fprintf(stderr,"UniPolar: %d\n",channel->UniPolar);
+    //fprintf(stderr,"BytesPerSample: %d\n",channel->BytesPerSample);
+    //fprintf(stderr,"Reserved: %d\n",channel->Reserved);
+    //fprintf(stderr,"ChannelName: %s\n",channel->ChannelName);
+    //fprintf(stderr,"VoltScale: %f\n",channel->VoltScale);
+    //fprintf(stderr,"Frequency: %f\n",channel->Frequency);
+    //fprintf(stderr,"HorizBeamAngle: %f\n",channel->HorizBeamAngle);
+    //fprintf(stderr,"TiltAngle: %f\n",channel->TiltAngle);
+    //fprintf(stderr,"BeamWidth: %f\n",channel->BeamWidth);
+    //fprintf(stderr,"OffsetX: %f\n",channel->OffsetX);
+    //fprintf(stderr,"OffsetY: %f\n",channel->OffsetY);
+    //fprintf(stderr,"OffsetZ: %f\n",channel->OffsetZ);
+    //fprintf(stderr,"OffsetYaw: %f\n",channel->OffsetYaw);
+    //fprintf(stderr,"OffsetPitch: %f\n",channel->OffsetPitch);
+    //fprintf(stderr,"OffsetRoll: %f\n",channel->OffsetRoll);
+    //fprintf(stderr,"BeamsPerArray: %d\n",channel->BeamsPerArray);
+    //fprintf(stderr,"SampleFormat: %d\n",channel->SampleFormat);
+    //fprintf(stderr,"ReservedArea2: %s\n",channel->ReservedArea2);
+    //fprintf(stderr,"------------\n");
     
+    std::map<std::string,std::string> * properties = new std::map<std::string,std::string>();
+    
+    properties->insert(std::pair<std::string,std::string>("Channel Type",std::to_string(channel->TypeOfChannel)));
+    properties->insert(std::pair<std::string,std::string>("Channel Number",std::to_string(channel->SubChannelNumber)));
+    properties->insert(std::pair<std::string,std::string>("Correction Flags",std::to_string(channel->CorrectionFlags)));
+    properties->insert(std::pair<std::string,std::string>("UniPolar",std::to_string(channel->UniPolar)));
+    properties->insert(std::pair<std::string,std::string>("Bytes Per Sample",std::to_string(channel->BytesPerSample)));
+    properties->insert(std::pair<std::string,std::string>("Channel Name",channel->ChannelName));
+    properties->insert(std::pair<std::string,std::string>("Volt Scale",std::to_string(channel->VoltScale)));
+    properties->insert(std::pair<std::string,std::string>("Frequency",std::to_string(channel->Frequency)));
+    properties->insert(std::pair<std::string,std::string>("Horizontal Beam Angle",std::to_string(channel->HorizBeamAngle)));
+    properties->insert(std::pair<std::string,std::string>("Tilt Angle",std::to_string(channel->TiltAngle)));
+    properties->insert(std::pair<std::string,std::string>("Beam Width",std::to_string(channel->BeamWidth)));
+    properties->insert(std::pair<std::string,std::string>("Offset X",std::to_string(channel->OffsetX)));
+    properties->insert(std::pair<std::string,std::string>("Offset Y",std::to_string(channel->OffsetY)));
+    properties->insert(std::pair<std::string,std::string>("Offset Z",std::to_string(channel->OffsetZ)));
+    properties->insert(std::pair<std::string,std::string>("Offset Yaw",std::to_string(channel->OffsetYaw)));
+    properties->insert(std::pair<std::string,std::string>("Offset Pitch",std::to_string(channel->OffsetPitch)));
+    properties->insert(std::pair<std::string,std::string>("Offset Roll",std::to_string(channel->OffsetRoll)));
+    properties->insert(std::pair<std::string,std::string>("Beams Per Array",std::to_string(channel->BeamsPerArray)));
+    properties->insert(std::pair<std::string,std::string>("Sample Format",std::to_string(channel->SampleFormat)));
+    
+    
+    processor.processChannelProperties(channel->SubChannelNumber,channel->ChannelName,properties);
 }
 
 /**
@@ -465,11 +525,18 @@ void XtfParser::processPacketHeader(XtfPacketHeader & hdr){
 
 /**
  * show the contain of the file PingHeader
- *
  * @param hdr the XTF PingHeader
  */
 void XtfParser::processPingHeader(XtfPingHeader & hdr){
-    processor.processSwathStart(hdr.SoundVelocity);
+    
+    double sss = hdr.SoundVelocity;
+    
+    if(hdr.SoundVelocity < 800){
+        //Not the best check, but if it's using the one-way format, we'll want to double it up
+        sss *= 2;
+    }
+    
+    processor.processSwathStart(sss);
 }
 
 /**
@@ -598,7 +665,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
                 
                 processSidescanData(*pingHdr,*pingChanHdr,data);
                 
-                sampleBytesRead += pingChanHdr->NumSamples * bytesPerSample;
+                sampleBytesRead += pingChanHdr->NumSamples * channels[pingChanHdr->ChannelNumber]->BytesPerSample;
             }
         }
 	else{
@@ -612,71 +679,102 @@ void XtfParser::processPingChanHeader(XtfPingChanHeader & pingChanHdr){
 
 void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & pingChanHdr,void * data){   
     std::vector<double> rawSamples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
-
+    
     for(unsigned int i=0;i<pingChanHdr.NumSamples;i++){
         double sample = 0;
         
-        if(sampleFormat == 0){
+        if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 0){
             //legacy
-            if(bytesPerSample == 1){
+            if(channels[pingChanHdr.ChannelNumber]->BytesPerSample == 1){
                 sample = ((uint8_t*)data)[i];
             }
-            else if(bytesPerSample == 2){
+            else if(channels[pingChanHdr.ChannelNumber]->BytesPerSample == 2){
                 sample = ((uint16_t*)data)[i];
             }
-            else if(bytesPerSample == 4){
+            else if(channels[pingChanHdr.ChannelNumber]->BytesPerSample == 4){
                 sample = ((uint32_t*)data)[i];
             }
             else{
-                std::cerr << "[-] Bytes per sample: " << bytesPerSample << std::endl;
+                std::cerr << "[-] Bytes per sample: " << channels[pingChanHdr.ChannelNumber]->BytesPerSample << std::endl;
                 throw new std::invalid_argument("Bad bytes per sample format");                
             }
         }
-        else if(sampleFormat == 1){
+        else if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 1){
             //TODO: wtf is an "IBM float" in C?
             throw new std::invalid_argument("[-] Sample format is IBM float");
         }
-        else if(sampleFormat == 2){
+        else if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 2){
             sample = ((uint32_t*)data)[i];
         }
-        else if(sampleFormat == 3){
+        else if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 3){
             sample = ((uint16_t*)data)[i];
         }
-        else if(sampleFormat == 5){
+        else if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 5){
             sample = ((float*)data)[i];
         }
-        else if(sampleFormat == 8){
+        else if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 8){
             sample = ((uint8_t*)data)[i];
         }        
         else{
-            std::cerr << "[-] Sample Format: " << sampleFormat << std::endl;
+            std::cerr << "[-] Sample Format: " << channels[pingChanHdr.ChannelNumber]->SampleFormat << std::endl;
             throw new std::invalid_argument("Sample format unused");
         }
 
         rawSamples.push_back(sample);
     }
     
+    
+    SidescanPing * ping = new SidescanPing();
+    
+    uint64_t microEpoch = TimeUtils::build_time(
+                pingHdr.Year,
+                pingHdr.Month-1,
+                pingHdr.Day,
+                pingHdr.Hour,
+                pingHdr.Minute,
+                pingHdr.Second,
+                pingHdr.HSeconds * 10,
+                0
+        );
+    
+    ping->setTimestamp(microEpoch);
+    
+    if(pingHdr.SensorXcoordinate != 0.0 && pingHdr.SensorYcoordinate != 0.0){ //this would cause weird issues at coordinates... (0.0,0.0)
+        ping->setPosition(
+            new Position(
+                    microEpoch,
+                    pingHdr.SensorXcoordinate,
+                    pingHdr.SensorYcoordinate,
+                    pingHdr.SensorPrimaryAltitude
+            )
+        );
+    }
+    
+    ping->setChannelNumber(pingChanHdr.ChannelNumber);
+    
     if(channels[pingChanHdr.ChannelNumber]->CorrectionFlags == 2){
         //ground ranged images, use as-is
-        processor.processSidescanData(pingChanHdr.ChannelNumber,rawSamples);
+        ping->setSamples(rawSamples);
+        ping->setDistancePerSample(pingChanHdr.GroundRange/(double)rawSamples.size());
     }
-    else{
-        //std::cerr << "[+] Applying slant-range correction" << std::endl;
-        
+    else{       
         //Slant-range image, apply corrections to raw samples
         std::vector<double> correctedSamples;
 
-        //Get beam angle , between nadir and slant
-        
+        //Get beam angle , between nadir and slant        
         double beamAngle = 20;
 
         if(channels[pingChanHdr.ChannelNumber]->TiltAngle > 0){
             beamAngle = channels[pingChanHdr.ChannelNumber]->TiltAngle;
         }
         
+        //Apply corrections
         SlantRangeCorrection::correct(rawSamples,pingChanHdr.SlantRange,0,beamAngle,correctedSamples);
-
-        processor.processSidescanData(pingChanHdr.ChannelNumber,correctedSamples);        
+        
+        ping->setSamples(correctedSamples);
+        ping->setDistancePerSample((double)pingChanHdr.SlantRange/(double)rawSamples.size());
+        
+        processor.processSidescanData(ping);
     }
 }
 

@@ -17,7 +17,7 @@
 #include <string>
 #include "../utils/Exception.hpp"
 #include "../math/Boresight.hpp"
-#include "../svp/CarisSVP.hpp"
+#include "../svp/CarisSvpFile.hpp"
 #include "../svp/SvpSelectionStrategy.hpp"
 #include "../svp/SvpNearestByTime.hpp"
 #include "../svp/SvpNearestByLocation.hpp"
@@ -73,13 +73,13 @@ int main (int argc , char ** argv){
         
         //SVP strategy
         std::string userSelectedStrategy;
-        SvpSelectionStrategy * svpStrategy;
+        SvpSelectionStrategy * svpStrategy = NULL;
 
         //Georeference method
-        Georeferencing * georef;
+        Georeferencing * georef = NULL;
 
 	std::string	     svpFilename;
-	CarisSVP svps;
+	CarisSvpFile svps;
 
         int index;
 
@@ -146,8 +146,10 @@ int main (int argc , char ** argv){
                 case 'S':
 			userSelectedStrategy = optarg;
                         if(userSelectedStrategy == "nearestLocation") {
+                            std::cerr << "[+] Using nearest location sound velocity profile selection strategy" << std::endl;
                             svpStrategy = new SvpNearestByLocation();
                         } else if(userSelectedStrategy == "nearestTime") {
+                            std::cerr << "[+] Using nearest location sound velocity profile selection strategy" << std::endl;
                             svpStrategy = new SvpNearestByTime();
                         } else {
                             std::cerr << "Invalid SVP strategy (-S): " << userSelectedStrategy << std::endl;
@@ -169,12 +171,12 @@ int main (int argc , char ** argv){
         }
 
         if(georef == NULL){
-            std::cerr << "No georeferencing method defined (-L or -T)" << std::endl;
-            printUsage();
+            std::cerr << "[+] No georeferencing method defined (-L or -T). Using TRF by default" << std::endl;
+            georef = new GeoreferencingTRF();
         }
         
         if(svpStrategy == NULL){
-            std::cerr << "[+] Using nearest in time sound velocity profile selection strategy" << std::endl;
+            std::cerr << "[+] Using nearest in time sound velocity profile selection strategy by default" << std::endl;
             svpStrategy = new SvpNearestByTime();
         }
 
