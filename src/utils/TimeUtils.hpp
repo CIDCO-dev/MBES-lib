@@ -12,6 +12,7 @@
 #include <time.h>
 #include <iomanip>
 #include <sstream>
+#include "Exception.hpp"
 
 #ifdef _WIN32
 #define timegm _mkgmtime
@@ -29,6 +30,7 @@ public:
      */
 
 #ifdef _WIN32
+
     static char *strptime(const char * s, const char* f, struct tm* tm) {
         std::istringstream input(s);
         input.imbue(std::locale(setlocale(LC_ALL, nullptr)));
@@ -190,6 +192,73 @@ public:
         timeinfo = gmtime(&date);
         std::stringstream ssDate;
         ssDate << timeinfo->tm_year + 1900 << "-" << timeinfo->tm_yday + 1 << " " << timeinfo->tm_hour << ":" << timeinfo->tm_min << ":" << timeinfo->tm_sec;
+        return ssDate.str();
+    }
+
+    /**
+     * Convert julian time format (YYYY-jjj) to year-month-day (YYYY-MM-DD)
+     *
+     * @param year the year
+     * @param yday the day of year
+     */
+    static std::string convertDayOfYear2YearMonthDay(int year, int yday) {
+        
+        if(yday > 366) {
+            std::stringstream message;
+            message << "Can't convert day of year to YYYY-MM-DD format since day number is greater than 366: " << yday;
+            throw new Exception(message.str());
+        }
+        
+        int daysInMonths[12] = {
+            31, // Jan
+            28, // Feb (leap years handled below)
+            31, // Mar
+            30, // Apr
+            31, // May
+            30, // Jun
+            31, // Jul
+            31, // Aug
+            30, // Sep
+            31, // Oct
+            30, // Nov
+            31  // Dec
+        };
+        
+        //Increment days in february for leap year
+        if(year % 4 == 0) {
+            if(year % 100 == 0) {
+                if(year % 400 == 0) {
+                    ++daysInMonths[1];
+                }
+            } else {
+                ++daysInMonths[1];
+            }
+        }
+        
+        int monthIndex = 0;
+        int dayCounter = yday;
+        
+        while(dayCounter - daysInMonths[monthIndex] > 0 && monthIndex < 12) {
+            daycounter -= daysInMonths[monthIndex];
+            ++monthIndex;
+        }
+        
+        std::stringstream ssDate;
+        
+        ssDate << year << "-";
+        
+        if(monthIndex < 9) {
+            ssDate << "0" << monthIndex+1 << "-";
+        } else {
+            ssDate << monthIndex+1 << "-";
+        }
+        
+        if(dayCounter < 10) {
+            ssDate << "0" << dayCounter;
+        } else {
+            ssDate << dayCounter;
+        }
+        
         return ssDate.str();
     }
 

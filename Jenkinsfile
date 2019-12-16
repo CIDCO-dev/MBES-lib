@@ -55,14 +55,14 @@ pipeline {
     stage('BUILD WINDOWS 10 AND TEST'){
       agent { label 'windows10-x64-2'}
       steps {
-        bat "Scripts\\change_makefile_name.bat"
+        //bat "Scripts\\change_makefile_name.bat"
         bat "echo %cd%"
-        bat "make clean"
+        bat "make -f MakefileWindows clean"
         bat "echo %cd%"
         //compile
-        bat "make test"
+        bat "make -f MakefileWindows test"
         bat "echo %cd%"
-        //bat "make"
+        //bat "make -f MakefileWindows"
         bat "Scripts\\package_pcl-viewer.bat"
         bat "Scripts\\package_overlap.bat"
 
