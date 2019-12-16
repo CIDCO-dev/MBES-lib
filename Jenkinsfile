@@ -19,6 +19,7 @@ pipeline {
 
   agent none
   stages {
+/*
     stage('TEST MASTER'){
       agent { label 'master'}
       steps {
@@ -30,7 +31,7 @@ pipeline {
         always {
           publishCppcheck pattern:'build/coverage/report/cppcheck.xml'
           step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'build/coverage/report/gcovr-report.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
-          junit 'build/reports/**/*.xml'
+          junit 'build/reports/mbes-lib-test-report.xml'
           sh 'mkdir -p $publishCoberturaDir'
           sh 'cp -r build/coverage/report/*.html $publishCoberturaDir/'
         }
@@ -50,14 +51,18 @@ pipeline {
         }
       }
     }
-
+*/
     stage('BUILD WINDOWS 10 AND TEST'){
       agent { label 'windows10-x64-2'}
       steps {
-        bat "Scripts\\change_makefile_name.bat"
+        //bat "Scripts\\change_makefile_name.bat"
+        bat "echo %cd%"
+        bat "make -f MakefileWindows clean"
+        bat "echo %cd%"
         //compile
-        bat "make test"
-        bat "make"
+        bat "make -f MakefileWindows test"
+        bat "echo %cd%"
+        //bat "make -f MakefileWindows"
         bat "Scripts\\package_pcl-viewer.bat"
         bat "Scripts\\package_overlap.bat"
 

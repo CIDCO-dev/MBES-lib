@@ -22,11 +22,13 @@
 #include "../src/utils/Exception.hpp"
 using namespace std;
 #ifdef _WIN32
-static string dataBinexec("..\\bin\\data-cleaning.exe");
-static string outputdir(".");
+static string dataBinexec("build\\bin\\data-cleaning.exe");
+static string output = "test\\data\\dataCleanTest.dat | ";
+static string dumpContentsCommand("type ");
 #else
 static string dataBinexec("build/bin/data-cleaning");
-static string dataOutputdir(".");
+static string output = "test/data/dataCleanTest.dat | ";
+static string dumpContentsCommand("cat ");
 #endif
 
 /**
@@ -69,9 +71,9 @@ TEST_CASE("test insane position filter")
     std::ifstream inFile;
     inFile.open("test/data/dataCleanTest.dat");
     REQUIRE(inFile);
-    string output = "cat test/data/dataCleanTest.dat | ./";
+    
     std::stringstream ss;
-    ss = DataSystem_call(std::string(output+dataBinexec));
+    ss = DataSystem_call(std::string(dumpContentsCommand+output+dataBinexec));
     string line;
     uint64_t microEpoch;
     double x,y,z;
@@ -100,10 +102,10 @@ TEST_CASE("test with the quality parameter")
     std::ifstream inFile;
     inFile.open("test/data/dataCleanTest.dat");
     REQUIRE(inFile);
-    string output = "cat test/data/dataCleanTest.dat | ./";
+    
     string param = " -q 8";
     std::stringstream ss;
-    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    ss = DataSystem_call(std::string(dumpContentsCommand+output+dataBinexec+param));
     string line;
     uint64_t microEpoch;
     double x,y,z;
@@ -127,10 +129,10 @@ TEST_CASE("test with the intensity parameter")
     std::ifstream inFile;
     inFile.open("test/data/dataCleanTest.dat");
     REQUIRE(inFile);
-    string output = "cat test/data/dataCleanTest.dat | ./";
+    
     string param = " -i 9";
     std::stringstream ss;
-    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    ss = DataSystem_call(std::string(dumpContentsCommand+output+dataBinexec+param));
     string line;
     uint64_t microEpoch;
     double x,y,z;
@@ -154,10 +156,10 @@ TEST_CASE("test with invalid quality parameter")
     std::ifstream inFile;
     inFile.open("test/data/dataCleanTest.dat");
     REQUIRE(inFile);
-    string output = "cat test/data/dataCleanTest.dat | ./";
+    
     string param = " -q oio 2>&1";
     std::stringstream ss;
-    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    ss = DataSystem_call(std::string(dumpContentsCommand+output+dataBinexec+param));
     string line;
     getline(ss,line);
     REQUIRE(line=="Error: -q invalid quality parameter");
@@ -169,10 +171,10 @@ TEST_CASE("test with invalid intensity parameter")
     std::ifstream inFile;
     inFile.open("test/data/dataCleanTest.dat");
     REQUIRE(inFile);
-    string output = "cat test/data/dataCleanTest.dat | ./";
+    
     string param = " -i oek 2>&1";
     std::stringstream ss;
-    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    ss = DataSystem_call(std::string(dumpContentsCommand+output+dataBinexec+param));
     string line;
     getline(ss,line);
     REQUIRE(line=="Error: -i invalid intensity parameter");
@@ -184,10 +186,10 @@ TEST_CASE("test with multiple character parameter")
     std::ifstream inFile;
     inFile.open("test/data/dataCleanTest.dat");
     REQUIRE(inFile);
-    string output = "cat test/data/dataCleanTest.dat | ./";
+    
     string param = " -q 9 -i 10";
     std::stringstream ss;
-    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    ss = DataSystem_call(std::string(dumpContentsCommand+output+dataBinexec+param));
     string line;
     uint64_t microEpoch;
     double x,y,z;
@@ -212,10 +214,10 @@ TEST_CASE("test with invalid line input")
     std::ifstream inFile;
     inFile.open("test/data/dataCleanTest.dat");
     REQUIRE(inFile);
-    string output = "cat test/data/dataCleanTest.dat | ./";
+    
     string param = " -q 0 2>&1";
     std::stringstream ss;
-    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    ss = DataSystem_call(std::string(dumpContentsCommand+output+dataBinexec+param));
     string line;
     uint64_t microEpoch;
     double x,y,z;
@@ -240,10 +242,10 @@ TEST_CASE("test with no lines who respect the filters")
     std::ifstream inFile;
     inFile.open("test/data/dataCleanTest.dat");
     REQUIRE(inFile);
-    string output = "cat test/data/dataCleanTest.dat | ./";
+    
     string param = " -q 100 -i 100";
     std::stringstream ss;
-    ss = DataSystem_call(std::string(output+dataBinexec+param));
+    ss = DataSystem_call(std::string(dumpContentsCommand+output+dataBinexec+param));
     string line;
     uint64_t microEpoch;
     double x,y,z;
