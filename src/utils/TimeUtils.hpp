@@ -239,7 +239,7 @@ public:
         int dayCounter = yday;
         
         while(dayCounter - daysInMonths[monthIndex] > 0 && monthIndex < 12) {
-            daycounter -= daysInMonths[monthIndex];
+            dayCounter -= daysInMonths[monthIndex];
             ++monthIndex;
         }
         
