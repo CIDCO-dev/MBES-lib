@@ -251,3 +251,23 @@ TEST_CASE("Conversion between YYYY-jjj and YYYY-MM-DD for December 31st 2016") {
     
     REQUIRE(resultYearDay == yday);
 }
+
+TEST_CASE("Conversion between YYYY-jjj and YYYY-MM-DD for September 24th 2016") {
+    int year = 2016;
+    int month = 9;
+    int day = 24;
+    int yday = 268; // from epoch converter
+    
+    int resultMonth, resultDayOfMonth;
+    
+    TimeUtils::convertDayOfYear2YearMonthDay(year, yday, resultMonth, resultDayOfMonth);
+    
+    REQUIRE(resultMonth == month);
+    REQUIRE(resultDayOfMonth == day);
+    
+    int resultYearDay;
+    
+    TimeUtils::convertYearMonthDay2DayOfYear(year, month, day, resultYearDay);
+    
+    REQUIRE(resultYearDay == yday);
+}
