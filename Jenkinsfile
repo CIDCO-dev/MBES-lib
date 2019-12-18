@@ -19,7 +19,7 @@ pipeline {
 
   agent none
   stages {
-/*
+
     stage('TEST MASTER'){
       agent { label 'master'}
       steps {
@@ -51,7 +51,7 @@ pipeline {
         }
       }
     }
-*/
+
     stage('BUILD WINDOWS 10 AND TEST'){
       agent { label 'windows10-x64-2'}
       steps {
@@ -63,15 +63,15 @@ pipeline {
         bat "make -f MakefileWindows test"
         bat "echo %cd%"
         //bat "make -f MakefileWindows"
-        bat "Scripts\\package_pcl-viewer.bat"
-        bat "Scripts\\package_overlap.bat"
+        //bat "Scripts\\package_pcl-viewer.bat"
+        //bat "Scripts\\package_overlap.bat"
 
         archiveArtifacts('build\\bin\\datagram-dump.exe')
         archiveArtifacts('build\\bin\\cidco-decoder.exe')
         archiveArtifacts('build\\bin\\datagram-list.exe')
         archiveArtifacts('build\\bin\\georeference.exe')
-        archiveArtifacts('build\\bin\\pcl-viewer.zip')
-        archiveArtifacts('build\\bin\\overlap.zip')
+        //archiveArtifacts('build\\bin\\pcl-viewer.zip')
+        //archiveArtifacts('build\\bin\\overlap.zip')
 
       }
       post {
@@ -101,8 +101,8 @@ pipeline {
         sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/cidco-decoder.exe  $binWinx64PublishDir/cidco-decoder-$version.exe'
         sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/datagram-list.exe  $binWinx64PublishDir/datagram-list-$version.exe'
         sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/georeference.exe  $binWinx64PublishDir/georeference-$version.exe'
-        sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/pcl-viewer.zip  $binWinx64PublishDir/pcl-viewer-$version.zip'
-        sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/overlap.zip  $binWinx64PublishDir/overlap-$version.zip'
+        //sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/pcl-viewer.zip  $binWinx64PublishDir/pcl-viewer-$version.zip'
+        //sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/overlap.zip  $binWinx64PublishDir/overlap-$version.zip'
       }
     }
   }

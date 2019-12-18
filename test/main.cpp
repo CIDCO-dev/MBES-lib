@@ -16,6 +16,6 @@
 #include "InterpolationTest.hpp"
 #include "RaytracingTest.hpp"
 #include "GeoreferencingTest.hpp"
-#include "TimeUtilsTest.hpp"
 #include "CarisSvpTest.hpp"
 #include "SvpStrategyTest.hpp"
+#include "TimeUtilsTest.hpp"

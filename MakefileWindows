@@ -3,8 +3,8 @@ OPTIONS=-Wall #-std=c++0x
 INCLUDES=-IC:\\Users\\cidco\\Library\\eigen
 VERSION=0.1.0
 
-FILES=..\\..\\src\\datagrams\\DatagramParser.cpp ..\\..\\src\\datagrams\\DatagramParserFactory.cpp ..\\..\\src\\datagrams\\s7k\\S7kParser.cpp ..\\..\\src\\datagrams\\kongsberg\\KongsbergParser.cpp ..\\..\\src\\datagrams\\xtf\\XtfParser.cpp ..\\..\\src\\utils\\NmeaUtils.cpp ..\\..\\src\\utils\\StringUtils.cpp
-FILES_RELATIVE_TO_TEST=..\\..\\..\\src\\datagrams\\DatagramParser.cpp ..\\..\\..\\src\\datagrams\\DatagramParserFactory.cpp ..\\..\\..\\src\\datagrams\\s7k\\S7kParser.cpp ..\\..\\..\\src\\datagrams\\kongsberg\\KongsbergParser.cpp ..\\..\\..\\src\\datagrams\\xtf\\XtfParser.cpp ..\\..\\..\\src\\utils\\NmeaUtils.cpp ..\\..\\..\\src\\utils\\StringUtils.cpp
+FILES=..\\..\\src\\datagrams\\DatagramParser.cpp ..\\..\\src\\datagrams\\DatagramParserFactory.cpp ..\\..\\src\\datagrams\\s7k\\S7kParser.cpp ..\\..\\src\\datagrams\\kongsberg\\KongsbergParser.cpp ..\\..\\src\\datagrams\\xtf\\XtfParser.cpp ..\\..\\src\\utils\\NmeaUtils.cpp ..\\..\\src\\utils\\StringUtils.cpp ..\\..\\src\\sidescan\\SidescanPing.cpp
+FILES_RELATIVE_TO_TEST=..\\..\\..\\src\\datagrams\\DatagramParser.cpp ..\\..\\..\\src\\datagrams\\DatagramParserFactory.cpp ..\\..\\..\\src\\datagrams\\s7k\\S7kParser.cpp ..\\..\\..\\src\\datagrams\\kongsberg\\KongsbergParser.cpp ..\\..\\..\\src\\datagrams\\xtf\\XtfParser.cpp ..\\..\\..\\src\\utils\\NmeaUtils.cpp ..\\..\\..\\src\\utils\\StringUtils.cpp ..\..\\..\\src\\sidescan\\SidescanPing.cpp
 
 root=$(shell pwd)
 
