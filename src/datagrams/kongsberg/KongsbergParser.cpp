@@ -261,7 +261,7 @@ void KongsbergParser::processAttitudeDatagram(KongsbergHeader & hdr,unsigned cha
 
   KongsbergAttitudeEntry * p = (KongsbergAttitudeEntry*) ((unsigned char*)datagram + sizeof(uint16_t));
 
-  for(unsigned int i = 0;i<nEntries;i++){
+  for(unsigned int i = 0;i<nEntries;i++) {
     double heading = (double)p[i].heading/(double)100;
     double pitch   = (double)p[i].pitch/(double)100;
     double roll    = (double)p[i].roll/(double)100;
@@ -305,8 +305,8 @@ long KongsbergParser::convertTime(long datagramDate,long datagramTime){
   int month = (datagramDate - (datagramDate / 10000))/100;
   int day = datagramDate - ((datagramDate - (datagramDate / 10000))/100);
 
-  //month is 1-12, day is 1-31, shift to zero offset
-  return TimeUtils::build_time(year,month-1,day-1,datagramTime);
+  //month is 1-12, day is 1-31
+  return TimeUtils::build_time(year,month,day,datagramTime);
 }
 
 void KongsbergParser::processPositionDatagram(KongsbergHeader & hdr,unsigned char * datagram){

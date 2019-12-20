@@ -139,3 +139,28 @@ TEST_CASE ("test the S7k parser with a valid file")
         REQUIRE(false);
     }
 }
+
+TEST_CASE ("test the S7k parser date time decoding") {
+    
+    uint64_t microEpochAttitudeTest = 0;
+    uint64_t microEpochPositionTest = 0;
+    uint64_t microEpochPingTest = 0;
+    /*
+    class S7kDatagramTester : public DatagramEventHandler {
+        void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
+            REQUIRE(microEpoch == microEpochAttitudeTest);
+	};
+        
+	void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
+            REQUIRE(microEpoch == microEpochPositionTest);
+	};
+        
+	void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,int32_t intensity){
+            REQUIRE(microEpoch == microEpochPingTest);
+	};
+    };
+*/
+    
+    
+    
+}

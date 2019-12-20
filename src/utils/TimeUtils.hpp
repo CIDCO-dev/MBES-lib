@@ -24,6 +24,8 @@
  */
 class TimeUtils {
 public:
+    
+    
 
 
     /**
@@ -64,72 +66,17 @@ public:
      * @param timeInMilliseconds number of millisecond less than an day
      */
     static uint64_t build_time(int year, int month, int day, long timeInMilliseconds) {
-        uint64_t nbrM = 0;
-        year = year - 1970;
-        nbrM = nbrM + year;
-        int m = month;
-        int yday = 0;
-        while (m > 0) {
-            switch (m) {
-                case 11:
-                    yday = yday + 30;
-                    break;
-
-                case 10:
-                    yday = yday + 31;
-                    break;
-
-                case 9:
-                    yday = yday + 30;
-                    break;
-
-                case 8:
-                    yday = yday + 31;
-                    break;
-
-                case 7:
-                    yday = yday + 31;
-                    break;
-
-                case 6:
-                    yday = yday + 30;
-                    break;
-
-                case 5:
-                    yday = yday + 31;
-                    break;
-
-                case 4:
-                    yday = yday + 30;
-                    break;
-
-                case 3:
-                    yday = yday + 31;
-                    break;
-
-                case 2:
-                    if (year % 4 == 0) {
-                        yday = yday + 29;
-                    } else {
-                        yday = yday + 28;
-                    }
-                    break;
-
-                case 1:
-                    yday = yday + 31;
-                    break;
-            }
-            m = m - 1;
-        }
-        yday = yday + day;
-        nbrM = nbrM * 365 + yday;
-        int y = year + 2;
-        while (y >= 4) {
-            y = y - 4;
-            nbrM = nbrM + 1;
-        }
-        nbrM = nbrM * 24 * 60 * 60 * 1000000 + timeInMilliseconds * 1000;
-        return nbrM;
+        
+        struct std::tm tm = {0};
+        std::stringstream ssDate = convertDateTimeInfo2Stringstream(year, month, day, 0, 0, 0);
+        ssDate >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+        
+        time_t tTime = timegm(&tm);
+        
+        uint64_t epochMicro = 0;
+        epochMicro = (uint64_t) tTime * 1000000 + timeInMilliseconds*1000;
+        
+        return epochMicro;
     }
     
     /**

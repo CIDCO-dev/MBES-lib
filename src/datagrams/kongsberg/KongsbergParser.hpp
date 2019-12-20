@@ -45,7 +45,7 @@ public:
 
   std::string getName(int tag);
 
-private:
+protected:
 
   /**
   * Processes the datagram depending on the type of the Kongsberg Header
