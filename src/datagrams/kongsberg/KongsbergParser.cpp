@@ -302,8 +302,8 @@ void KongsbergParser::processSoundSpeedProfile(KongsbergHeader & hdr,unsigned ch
 
 long KongsbergParser::convertTime(long datagramDate,long datagramTime){
   int year = datagramDate / 10000;
-  int month = (datagramDate - (datagramDate / 10000))/100;
-  int day = datagramDate - ((datagramDate - (datagramDate / 10000))/100);
+  int month = (datagramDate - (year * 10000))/100;
+  int day = datagramDate - (year * 10000) - (month * 100);
 
   //month is 1-12, day is 1-31
   return TimeUtils::build_time(year,month,day,datagramTime);

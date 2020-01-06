@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
 #include "catch.hpp"
-
+/*
 #include "XtfTypesTest.hpp"
 #include "NmeaUtilsTest.hpp"
 #include "SurveySystemTest.hpp"
@@ -18,4 +18,5 @@
 #include "SvpStrategyTest.hpp"
 #include "TimeUtilsTest.hpp"
 #include "KongsbergTypesTest.hpp"
+*/
 #include "KongsbergParserTest.hpp"
