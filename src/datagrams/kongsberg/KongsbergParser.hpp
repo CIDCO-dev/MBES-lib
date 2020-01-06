@@ -126,7 +126,7 @@ protected:
   * @param datagramDate the datagram date
   * @param datagramTime the datagram time
   */
-  long convertTime(long datagramDate,long datagramTime);
+  uint64_t convertTime(uint32_t datagramDate,uint32_t datagramTime);
 
   /**
   * Returns a human readable name for a given datagram tag

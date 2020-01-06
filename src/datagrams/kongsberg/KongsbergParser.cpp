@@ -300,7 +300,7 @@ void KongsbergParser::processSoundSpeedProfile(KongsbergHeader & hdr,unsigned ch
   processor.processSoundVelocityProfile(svp);
 }
 
-long KongsbergParser::convertTime(long datagramDate,long datagramTime){
+uint64_t KongsbergParser::convertTime(uint32_t datagramDate,uint32_t datagramTime){
   int year = datagramDate / 10000;
   int month = (datagramDate - (year * 10000))/100;
   int day = datagramDate - (year * 10000) - (month * 100);
