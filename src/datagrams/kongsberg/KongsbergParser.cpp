@@ -304,11 +304,6 @@ uint64_t KongsbergParser::convertTime(uint32_t datagramDate,uint32_t datagramTim
   int year = datagramDate / 10000;
   int month = (datagramDate - (year * 10000))/100;
   int day = datagramDate - (year * 10000) - (month * 100);
-  
-  std::cout << "year: " << year << std::endl;
-  std::cout << "month: " << month << std::endl;
-  std::cout << "day: " << day << std::endl;
-  std::cout << "datagramTime: " << datagramTime << std::endl;
 
   //month is 1-12, day is 1-31
   return TimeUtils::build_time(year,month,day,datagramTime);
