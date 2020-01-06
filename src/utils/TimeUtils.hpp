@@ -65,7 +65,7 @@ public:
      * @param day number of day less than an month
      * @param timeInMilliseconds number of millisecond less than an day
      */
-    static uint64_t build_time(int year, int month, int day, long timeInMilliseconds) {
+    static uint64_t build_time(int year, int month, int day, uint32_t timeInMilliseconds) {
         
         struct std::tm tm = {0};
         std::stringstream ssDate = convertDateTimeInfo2Stringstream(year, month, day, 0, 0, 0);

@@ -19,7 +19,7 @@ pipeline {
 
   agent none
   stages {
-
+/*
     stage('TEST MASTER'){
       agent { label 'master'}
       steps {
@@ -51,7 +51,7 @@ pipeline {
         }
       }
     }
-
+*/
     stage('BUILD WINDOWS 10 AND TEST'){
       agent { label 'windows10-x64-2'}
       steps {
@@ -80,7 +80,7 @@ pipeline {
         }
       }
     }
-
+/*
     stage('BUILD MASTER'){
       agent { label 'master'}
       steps {
@@ -105,6 +105,7 @@ pipeline {
         //sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/overlap.zip  $binWinx64PublishDir/overlap-$version.zip'
       }
     }
+*/
   }
 
 }
