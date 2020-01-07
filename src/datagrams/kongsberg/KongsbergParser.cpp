@@ -316,8 +316,8 @@ void KongsbergParser::processPositionDatagram(KongsbergHeader & hdr,unsigned cha
 
   //printf("%s",p->inputDatagram);
 
-  double longitude = (double)p->longitude/(double)20000000;
-  double latitude  = (double)p->lattitude/(double)20000000;
+  double longitude = (double)p->longitude/(double)LON_FACTOR;
+  double latitude  = (double)p->lattitude/(double)LAT_FACTOR;
 
   std::string inputDatagram(p->inputDatagram);
 

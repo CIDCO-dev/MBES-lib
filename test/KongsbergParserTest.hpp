@@ -145,6 +145,15 @@ TEST_CASE("test Kongsberg parser decoding") {
     static uint32_t year = 2020;
     static uint32_t month = 1;
     static uint32_t day = 6;
+    
+    //expected result of position extraction
+    static double testLatitude = 48.3533333;
+    static double testLongitude = -65.825;
+    static double testHeight = 23.45;
+    
+    //representation of attitude in datagram
+    static int32_t latitudeData = testLatitude*LAT_FACTOR;
+    static int32_t longitudeData = testLongitude*LON_FACTOR;
 
     static uint32_t millisSinceMidnight = 3600 * 1000; // 1 am
 
@@ -201,6 +210,30 @@ TEST_CASE("test Kongsberg parser decoding") {
             attitude.heading = headingData; // in 0.01 degrees as int16_t
             attitude.pitch = pitchData; // in 0.01 degrees as int16_t
             attitude.roll = rollData; // in 0.01 degrees as int16_t
+
+            unsigned char * datagram = new unsigned char[ sizeof (KongsbergAttitudePacket) / sizeof (unsigned char) ];
+            KongsbergAttitudePacket * attPacket = new (datagram) KongsbergAttitudePacket();
+            attPacket->numAttitudeEntries = numAttitudeEntries;
+            attPacket->attitude = attitude;
+
+            processAttitudeDatagram(hdr, datagram);
+
+            delete datagram;
+        }
+        
+        void testProcessPositionDatagram() {
+            KongsbergHeader hdr = {0};
+
+            //static values defined earlier in test case
+            hdr.date = 10000 * year + 100 * month + day;
+            hdr.time = millisSinceMidnight;
+
+            uint16_t numAttitudeEntries = 1;
+
+            KongsbergPositionDatagram position = {0};
+            position.lattitude = latitudeData;
+            position.longitude = longitudeData;
+            //position.inputDatagram
 
             unsigned char * datagram = new unsigned char[ sizeof (KongsbergAttitudePacket) / sizeof (unsigned char) ];
             KongsbergAttitudePacket * attPacket = new (datagram) KongsbergAttitudePacket();

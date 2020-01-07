@@ -12,6 +12,9 @@
 #define STX 0x02
 #define ETX 0x03
 
+#define LAT_FACTOR 20000000
+#define LON_FACTOR 10000000
+
 #pragma pack(1)
 typedef struct{
     uint32_t            size; //Size is computed starting from STX, so it excludes this one
