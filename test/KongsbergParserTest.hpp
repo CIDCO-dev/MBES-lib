@@ -145,17 +145,21 @@ TEST_CASE("test Kongsberg parser decoding") {
     static uint32_t year = 2020;
     static uint32_t month = 1;
     static uint32_t day = 6;
+    static uint32_t millisSinceMidnight = 3600 * 1000; // 1 am
     
     //expected result of position extraction
     static double testLatitude = 48.3533333;
     static double testLongitude = -65.825;
-    static double testHeight = 23.45;
+    static double testOrthometricHeight = 18.893;
+    static double testGeoidSeparation = -25.669;
+    static double testHeight = testGeoidSeparation + testOrthometricHeight;
     
     //representation of attitude in datagram
     static int32_t latitudeData = testLatitude*LAT_FACTOR;
     static int32_t longitudeData = testLongitude*LON_FACTOR;
+    static std::string nmeaPosition = "$GPGGA,,,,,,,,,18.893,M,-25.669,M,,*00";
 
-    static uint32_t millisSinceMidnight = 3600 * 1000; // 1 am
+    
 
     // From https://www.epochconverter.com/
     static uint64_t testMicroEpoch = 1578272400000 * 1000; // 2020-01-06 01:00:00 GMT
@@ -173,7 +177,13 @@ TEST_CASE("test Kongsberg parser decoding") {
         }
 
         void processPosition(uint64_t microEpoch, double longitude, double latitude, double height) {
-
+            REQUIRE(microEpoch == testMicroEpoch);
+            double angleTreshold = 1e-12;
+            REQUIRE(abs(longitude - testLongitude) < angleTreshold);
+            REQUIRE(abs(latitude - testLatitude) < angleTreshold);
+            
+            double heightTreshold = 1e-9;
+            REQUIRE(abs(height - testHeight) < heightTreshold);
         }
 
         void processPing(uint64_t microEpoch, long id, double beamAngle, double tiltAngle, double twoWayTravelTime, uint32_t quality, int32_t intensity) {
@@ -213,6 +223,7 @@ TEST_CASE("test Kongsberg parser decoding") {
 
             unsigned char * datagram = new unsigned char[ sizeof (KongsbergAttitudePacket) / sizeof (unsigned char) ];
             KongsbergAttitudePacket * attPacket = new (datagram) KongsbergAttitudePacket();
+            
             attPacket->numAttitudeEntries = numAttitudeEntries;
             attPacket->attitude = attitude;
 
@@ -228,21 +239,7 @@ TEST_CASE("test Kongsberg parser decoding") {
             hdr.date = 10000 * year + 100 * month + day;
             hdr.time = millisSinceMidnight;
 
-            uint16_t numAttitudeEntries = 1;
-
-            KongsbergPositionDatagram position = {0};
-            position.lattitude = latitudeData;
-            position.longitude = longitudeData;
-            //position.inputDatagram
-
-            unsigned char * datagram = new unsigned char[ sizeof (KongsbergAttitudePacket) / sizeof (unsigned char) ];
-            KongsbergAttitudePacket * attPacket = new (datagram) KongsbergAttitudePacket();
-            attPacket->numAttitudeEntries = numAttitudeEntries;
-            attPacket->attitude = attitude;
-
-            processAttitudeDatagram(hdr, datagram);
-
-            delete datagram;
+            //TODO: Test position datagram decoding
         }
     };
 

@@ -43,7 +43,7 @@ typedef struct{
 #pragma pack(1)
 typedef struct{
     int32_t  lattitude;          // decimal degrees * 20,000,000
-    int32_t  longitude;          // decimal degrees * 20,000,000
+    int32_t  longitude;          // decimal degrees * 10,000,000
     uint16_t fixQuality;        // in cm
     uint16_t speedOverGround;   // in cm/s
     uint16_t courseOverGround;  // in 0.01deg
