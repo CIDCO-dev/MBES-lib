@@ -261,7 +261,7 @@ void KongsbergParser::processAttitudeDatagram(KongsbergHeader & hdr,unsigned cha
 
   KongsbergAttitudeEntry * p = (KongsbergAttitudeEntry*) ((unsigned char*)datagram + sizeof(uint16_t));
 
-  for(unsigned int i = 0;i<nEntries;i++){
+  for(unsigned int i = 0;i<nEntries;i++) {
     double heading = (double)p[i].heading/(double)100;
     double pitch   = (double)p[i].pitch/(double)100;
     double roll    = (double)p[i].roll/(double)100;
@@ -300,13 +300,13 @@ void KongsbergParser::processSoundSpeedProfile(KongsbergHeader & hdr,unsigned ch
   processor.processSoundVelocityProfile(svp);
 }
 
-long KongsbergParser::convertTime(long datagramDate,long datagramTime){
+uint64_t KongsbergParser::convertTime(uint32_t datagramDate,uint32_t datagramTime){
   int year = datagramDate / 10000;
-  int month = (datagramDate - (datagramDate / 10000))/100;
-  int day = datagramDate - ((datagramDate - (datagramDate / 10000))/100);
+  int month = (datagramDate - (year * 10000))/100;
+  int day = datagramDate - (year * 10000) - (month * 100);
 
-  //month is 1-12, day is 1-31, shift to zero offset
-  return TimeUtils::build_time(year,month-1,day-1,datagramTime);
+  //month is 1-12, day is 1-31
+  return TimeUtils::build_time(year,month,day,datagramTime);
 }
 
 void KongsbergParser::processPositionDatagram(KongsbergHeader & hdr,unsigned char * datagram){
@@ -316,8 +316,8 @@ void KongsbergParser::processPositionDatagram(KongsbergHeader & hdr,unsigned cha
 
   //printf("%s",p->inputDatagram);
 
-  double longitude = (double)p->longitude/(double)20000000;
-  double latitude  = (double)p->lattitude/(double)20000000;
+  double longitude = (double)p->longitude/(double)LON_FACTOR;
+  double latitude  = (double)p->lattitude/(double)LAT_FACTOR;
 
   std::string inputDatagram(p->inputDatagram);
 

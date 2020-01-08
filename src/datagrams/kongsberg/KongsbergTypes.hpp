@@ -12,6 +12,9 @@
 #define STX 0x02
 #define ETX 0x03
 
+#define LAT_FACTOR 20000000
+#define LON_FACTOR 10000000
+
 #pragma pack(1)
 typedef struct{
     uint32_t            size; //Size is computed starting from STX, so it excludes this one
@@ -40,7 +43,7 @@ typedef struct{
 #pragma pack(1)
 typedef struct{
     int32_t  lattitude;          // decimal degrees * 20,000,000
-    int32_t  longitude;          // decimal degrees * 20,000,000
+    int32_t  longitude;          // decimal degrees * 10,000,000
     uint16_t fixQuality;        // in cm
     uint16_t speedOverGround;   // in cm/s
     uint16_t courseOverGround;  // in 0.01deg
