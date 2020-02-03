@@ -744,7 +744,9 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
             new Position(
                     microEpoch,
                     pingHdr.SensorXcoordinate,
-                    pingHdr.SensorYcoordinate,
+                    pingHdr.SensorYcoordinate,                    
+                    // pingHdr.SensorYcoordinate,
+                    // pingHdr.SensorXcoordinate,                  
                     pingHdr.SensorPrimaryAltitude
             )
         );
