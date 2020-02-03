@@ -35,7 +35,12 @@ public:
     * @param s text that needs to be trimmed
     */
     static std::string trim(const std::string &s);
-    
+
+    /**
+     * Returns the number in string form with the requested amount of decimal digits
+     */
+    static std::string  to_string_with_precision(const double a_value, const int n = 6);
 };
 
 #endif
+

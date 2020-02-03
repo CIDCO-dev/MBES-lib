@@ -11,6 +11,7 @@
 #include "s7k/S7kParser.hpp"
 #include "../utils/StringUtils.hpp"
 #include "../utils/Exception.hpp"
+#include "DatagramEventHandler.hpp"
 
 /*!
 * \brief Datagram parser factory class

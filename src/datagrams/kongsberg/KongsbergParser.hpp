@@ -45,7 +45,7 @@ public:
 
   std::string getName(int tag);
 
-private:
+protected:
 
   /**
   * Processes the datagram depending on the type of the Kongsberg Header
@@ -126,7 +126,7 @@ private:
   * @param datagramDate the datagram date
   * @param datagramTime the datagram time
   */
-  long convertTime(long datagramDate,long datagramTime);
+  uint64_t convertTime(uint32_t datagramDate,uint32_t datagramTime);
 
   /**
   * Returns a human readable name for a given datagram tag

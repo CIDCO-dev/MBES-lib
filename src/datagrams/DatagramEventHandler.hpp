@@ -41,6 +41,14 @@ public:
             delete properties;
         }
         
+        /**
+         * Process a map of channel-specific properties
+         * @param properties
+         */
+        virtual void processChannelProperties(unsigned int channelNumber,std::string channelName,std::map<std::string,std::string> * properties){
+            delete properties;
+        }        
+        
 	/**
 	* Convention for attitude angles (in degrees)
 	*

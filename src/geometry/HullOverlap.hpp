@@ -629,7 +629,20 @@ public:
     }
 
 
+    const Eigen::Vector3d & getVector1()
+    {
+        return vector1;
+    }
 
+    const Eigen::Vector3d & getVector2()
+    {
+        return vector2;
+    }
+
+    const pcl::PointXYZ & getRefPoint()
+    {
+        return refPoint;
+    }
 
 //---------------------------------------------------------------------------------------------------------------------
 

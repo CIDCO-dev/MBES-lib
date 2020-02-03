@@ -12,7 +12,7 @@ doc_dir=build/doc
 
 test_exec_dir=build/test/bin
 test_work_dir=build/test/work
-test_result_dir=build/test-report
+test_result_dir=build/reports
 coverage_dir=build/coverage
 coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
@@ -39,16 +39,12 @@ datagram-dump: prepare
 datagram-list: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp $(FILES)
 
-sidescan-dump: prepare
-	$(CC) $(OPTIONS) $(pkg-config --cflags opencv) $(INCLUDES) src/examples/sidescan-dump.cpp $(FILES) `pkg-config --libs opencv` -o $(exec_dir)/sidescan-dump
-
 
 test: default
 	mkdir -p $(test_exec_dir)
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp $(FILES)
 	mkdir -p $(test_result_dir)
 	mkdir -p $(test_work_dir)
-	cd $(test_work_dir)
 	$(root)/$(test_exec_dir)/tests -r junit -o $(test_result_dir)/mbes-lib-test-report.xml
 
 test-quick: default
@@ -72,6 +68,8 @@ coverage: default
 	mkdir -p $(coverage_dir)
 	mkdir -p $(coverage_report_dir)
 	mkdir -p $(coverage_exec_dir)
+	mkdir -p $(test_work_dir)
+	mkdir -p $(test_result_dir)
 	cppcheck --xml --xml-version=2 --enable=all --inconclusive --language=c++ src 2> $(coverage_report_dir)/cppcheck.xml
 	$(CC) $(OPTIONS) $(INCLUDES) -fprofile-arcs -ftest-coverage -fPIC -O0 test/main.cpp $(FILES) -o $(coverage_exec_dir)/tests
 	$(root)/$(coverage_exec_dir)/tests || true

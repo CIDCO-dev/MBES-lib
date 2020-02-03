@@ -12,7 +12,7 @@
 #ifndef DISTANCE_HPP
 #define DISTANCE_HPP
 
-#define D2R (M_PI / 180)
+#include "../utils/Constants.hpp"
 
 class Distance{
 public:

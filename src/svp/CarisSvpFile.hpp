@@ -61,6 +61,7 @@ private:
                     std::to_string(second);
 
             timestamp = TimeUtils::convertCarisSvpDate2EpochMicro(carisSvpTime.c_str());
+            //timestamp = TimeUtils::build_time(year, yday, hour, minute, second*1000000);
 
             return true;
         }
