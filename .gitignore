@@ -11,6 +11,9 @@ src/examples/gui-georef/build-MBES-lib-georefGUI-Desktop-Debug
 src/examples/gui-georef/build-MBES-lib-georefGUI-Desktop-Debug/*
 src/examples/gui-georef/MBES-lib-georefGUI/MBES-lib-georefGUI.pro.user
 
+*.pro.user*
+build*
+
 
 src/examples/viewer/build
 
