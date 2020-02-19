@@ -501,8 +501,7 @@ void XtfParser::processChanInfo(XtfChanInfo * c){
     properties->insert(std::pair<std::string,std::string>("Beams Per Array",std::to_string(channel->BeamsPerArray)));
     properties->insert(std::pair<std::string,std::string>("Sample Format",std::to_string(channel->SampleFormat)));
     
-    
-    processor.processChannelProperties(channel->SubChannelNumber,channel->ChannelName,properties);
+    processor.processChannelProperties(channel->SubChannelNumber,channel->ChannelName,channel->TypeOfChannel,properties);
 }
 
 /**
