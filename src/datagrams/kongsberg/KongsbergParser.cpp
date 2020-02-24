@@ -257,6 +257,9 @@ void KongsbergParser::processWaterHeight(KongsbergHeader & hdr,unsigned char * d
 void KongsbergParser::processAttitudeDatagram(KongsbergHeader & hdr,unsigned char * datagram){
   uint64_t microEpoch = convertTime(hdr.date,hdr.time);
 
+
+
+
   uint16_t nEntries = ((uint16_t*)datagram)[0];
 
   KongsbergAttitudeEntry * p = (KongsbergAttitudeEntry*) ((unsigned char*)datagram + sizeof(uint16_t));
@@ -265,6 +268,10 @@ void KongsbergParser::processAttitudeDatagram(KongsbergHeader & hdr,unsigned cha
     double heading = (double)p[i].heading/(double)100;
     double pitch   = (double)p[i].pitch/(double)100;
     double roll    = (double)p[i].roll/(double)100;
+
+
+  std::cout << "processAttitudeDatagram: microEpoch: " << microEpoch << ", microEpoch + p[i].deltaTime * 1000: " << microEpoch + p[i].deltaTime * 1000 << std::endl;
+
 
     processor.processAttitude(
       microEpoch + p[i].deltaTime * 1000,
@@ -279,11 +286,16 @@ void KongsbergParser::processSoundSpeedProfile(KongsbergHeader & hdr,unsigned ch
   SoundVelocityProfile * svp = new SoundVelocityProfile();
   uint64_t microEpoch = convertTime(hdr.date,hdr.time);
 
+  std::cout << "processSoundSpeedProfile: microEpoch: " << microEpoch << std::endl;
+
+
   KongsbergSoundSpeedProfile * ssp = (KongsbergSoundSpeedProfile*) datagram;
 
   if((ssp->profileDate != 0)&&(ssp->profileTime != 0))
   {
     microEpoch = convertTime(ssp->profileDate,ssp->profileTime);
+      std::cout << "processSoundSpeedProfile: inside if, microEpoch: " << microEpoch << std::endl;
+
   }
 
   svp->setTimestamp(microEpoch);
@@ -313,6 +325,8 @@ void KongsbergParser::processPositionDatagram(KongsbergHeader & hdr,unsigned cha
   KongsbergPositionDatagram * p = (KongsbergPositionDatagram*) datagram;
 
   uint64_t microEpoch = convertTime(hdr.date,hdr.time);
+
+  std::cout << "processPositionDatagram: microEpoch: " << microEpoch << std::endl;
 
   //printf("%s",p->inputDatagram);
 
@@ -353,6 +367,9 @@ void KongsbergParser::processRawRangeAndBeam78(KongsbergHeader & hdr,unsigned ch
   KongsbergRangeAndBeam78 * data = (KongsbergRangeAndBeam78*)datagram;
 
   uint64_t microEpoch = convertTime(hdr.date,hdr.time);
+
+  std::cout << "processRawRangeAndBeam78: microEpoch: " << microEpoch << std::endl;
+
 
   processor.processSwathStart((double)data->surfaceSoundSpeed / (double)10);
 
