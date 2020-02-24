@@ -143,6 +143,23 @@ public:
         fprintf(stderr, "[+] Attitude data points: %ld [%lu to %lu]\n", attitudes.size(), attitudes[0].getTimestamp(), attitudes[attitudes.size() - 1].getTimestamp());
         fprintf(stderr, "[+] Ping data points: %ld [%lu to %lu]\n", pings.size(), (pings.size() > 0) ? pings[0].getTimestamp() : 0, (pings.size() > 0) ? pings[pings.size() - 1].getTimestamp() : 0);
 
+
+        std::cerr <<  "[+] Position data points: " << positions.size() << " [" << positions[0].getTimestamp() << " to " 
+                << positions[positions.size() - 1].getTimestamp() << "]\n";
+        std::cerr <<  "[+] Attitude data points: " << attitudes.size() << " [" << attitudes[0].getTimestamp() << " to " 
+                << attitudes[attitudes.size() - 1].getTimestamp() << "]\n";      
+        std::cerr <<  "[+] Ping data points: " << pings.size() << " [" << ( (pings.size() > 0) ? pings[0].getTimestamp() : 0 ) << " to " 
+                << ( (pings.size() > 0) ? pings[pings.size() - 1].getTimestamp() : 0 ) << "]\n";                            
+
+        std::cout <<  "[+] Position data points: " << positions.size() << " [" << positions[0].getTimestamp() << " to " 
+                << positions[positions.size() - 1].getTimestamp() << "]\n";
+        std::cout <<  "[+] Attitude data points: " << attitudes.size() << " [" << attitudes[0].getTimestamp() << " to " 
+                << attitudes[attitudes.size() - 1].getTimestamp() << "]\n";      
+        std::cout <<  "[+] Ping data points: " << pings.size() << " [" << ( (pings.size() > 0) ? pings[0].getTimestamp() : 0 ) << " to " 
+                << ( (pings.size() > 0) ? pings[pings.size() - 1].getTimestamp() : 0 ) << "]\n"; 
+
+
+
         //interpolate attitudes and positions around pings
         unsigned int attitudeIndex = 0;
         unsigned int positionIndex = 0;
