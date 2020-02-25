@@ -232,7 +232,18 @@ public:
     }
 
     static bool sortByTimestamp(Ping & p1, Ping & p2) {
-        return p1.getTimestamp() < p2.getTimestamp();
+        // return p1.getTimestamp() < p2.getTimestamp();
+
+        if ( p1.getTimestamp() < p2.getTimestamp() ) {
+            return true;
+        } else {
+            if ( p1.getTimestamp() > p2.getTimestamp() ) {
+                return false;
+            }
+            else {
+                return p1.acrossTrackAngle < p2.acrossTrackAngle;
+            }    
+        }
     }
 
     /**

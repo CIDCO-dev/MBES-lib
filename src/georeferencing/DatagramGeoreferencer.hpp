@@ -139,9 +139,17 @@ public:
         std::sort(attitudes.begin(), attitudes.end(), &Attitude::sortByTimestamp);
         std::sort(pings.begin(), pings.end(), &Ping::sortByTimestamp);
 
-        fprintf(stderr, "[+] Position data points: %ld [%lu to %lu]\n", positions.size(), positions[0].getTimestamp(), positions[positions.size() - 1].getTimestamp());
-        fprintf(stderr, "[+] Attitude data points: %ld [%lu to %lu]\n", attitudes.size(), attitudes[0].getTimestamp(), attitudes[attitudes.size() - 1].getTimestamp());
-        fprintf(stderr, "[+] Ping data points: %ld [%lu to %lu]\n", pings.size(), (pings.size() > 0) ? pings[0].getTimestamp() : 0, (pings.size() > 0) ? pings[pings.size() - 1].getTimestamp() : 0);
+        // fprintf(stderr, "[+] Position data points: %ld [%lu to %lu]\n", positions.size(), positions[0].getTimestamp(), positions[positions.size() - 1].getTimestamp());
+        // fprintf(stderr, "[+] Attitude data points: %ld [%lu to %lu]\n", attitudes.size(), attitudes[0].getTimestamp(), attitudes[attitudes.size() - 1].getTimestamp());
+        // fprintf(stderr, "[+] Ping data points: %ld [%lu to %lu]\n", pings.size(), (pings.size() > 0) ? pings[0].getTimestamp() : 0, (pings.size() > 0) ? pings[pings.size() - 1].getTimestamp() : 0);
+
+        // For correct display of timestamps on Windows
+        std::cerr <<  "[+] Position data points: " << positions.size() << " [" << positions[0].getTimestamp() << " to " 
+                << positions[positions.size() - 1].getTimestamp() << "]\n";
+        std::cerr <<  "[+] Attitude data points: " << attitudes.size() << " [" << attitudes[0].getTimestamp() << " to " 
+                << attitudes[attitudes.size() - 1].getTimestamp() << "]\n";      
+        std::cerr <<  "[+] Ping data points: " << pings.size() << " [" << ( (pings.size() > 0) ? pings[0].getTimestamp() : 0 ) << " to " 
+                << ( (pings.size() > 0) ? pings[pings.size() - 1].getTimestamp() : 0 ) << "]\n";                            
 
         //interpolate attitudes and positions around pings
         unsigned int attitudeIndex = 0;
