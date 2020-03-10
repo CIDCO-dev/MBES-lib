@@ -19,3 +19,6 @@
 #include "TimeUtilsTest.hpp"
 #include "KongsbergTypesTest.hpp"
 #include "KongsbergParserTest.hpp"
+#include "DistanceTest.hpp"
+
+
