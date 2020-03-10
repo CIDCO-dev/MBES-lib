@@ -27,14 +27,49 @@ public:
      */
     static double haversine(double longitude1, double latitude1, double longitude2, double latitude2){
 
-	double dx, dy, dz;
-	latitude1 -= latitude2;
-	latitude1 *= D2R, longitude1 *= D2R, longitude2 *= D2R;
- 
-	dz = sin(longitude1) - sin(longitude2);
-	dx = cos(latitude1) * cos(longitude1) - cos(longitude2);
-	dy = sin(latitude1) * cos(longitude1);
-	return asin(sqrt(dx * dx + dy * dy + dz * dz) / 2) * 2 * 6371000;    
+/*
+        double dx, dy, dz;
+        latitude1 -= latitude2;
+        latitude1 *= D2R, longitude1 *= D2R, longitude2 *= D2R;
+    
+        dz = sin(longitude1) - sin(longitude2);
+        dx = cos(latitude1) * cos(longitude1) - cos(longitude2);
+        dy = sin(latitude1) * cos(longitude1);
+        return asin(sqrt(dx * dx + dy * dy + dz * dz) / 2) * 2 * 6371000;    
+*/
+
+
+
+        // From https://en.wikipedia.org/wiki/Haversine_formula
+
+        // What is inside the square root is called "h" on Wikipedia
+        // From https://en.wikipedia.org/wiki/Haversine_formula
+        // "When using these formulae, one must ensure that h does not exceed 1 due to a 
+        // floating point error (d is only real for h from 0 to 1). h only approaches 1 for 
+        // antipodal points (on opposite sides of the sphere)—in this region, relatively 
+        // large numerical errors tend to arise in the formula when finite precision is used. 
+        // Because d is then large (approaching πR, half the circumference) a small error is 
+        // often not a major concern in this unusual case (although there are other great-circle 
+        // distance formulas that avoid this problem).
+
+        longitude1 *= D2R;
+        latitude1 *= D2R;
+        longitude2 *= D2R;
+        latitude2 *= D2R;
+
+        double sin2LatDiffOver2 = pow( sin( ( latitude2 - latitude1 ) / 2 ), 2 );
+
+        double sin2LongDiffOver2 = pow( sin( ( longitude2 - longitude1 ) / 2 ), 2 );
+
+        double insideSqrt = sin2LatDiffOver2 + cos( latitude1 ) * cos( latitude2 ) * sin2LongDiffOver2;
+
+        if ( insideSqrt > 1.0 )
+            std::cerr << "\n\n--- Distance::haversine(): the calculation inside the square root is "
+            << insideSqrt << ".\n"
+            << "This must be a floating point error as it should be between 0 and 1 inclusively.\n" << std::endl;
+
+        return 2 * 6371000 * asin( sqrt( insideSqrt ) );
+
     }
 };
 
