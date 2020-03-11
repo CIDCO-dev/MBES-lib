@@ -71,7 +71,7 @@ public:
   /**
   * Gets the longitude, latitude and elevation of an ECEF position
   *
-  * @param positionInNavigationFrame the position we need to get the latitude, longitude and elevation
+  * @param positionEcef the position we need to get the latitude, longitude and elevation
   * @param positionGeographic the position where the latitude, longitude et elevation will be put in
   */
   static void convertECEFToLongitudeLatitudeElevation(Eigen::Vector3d & positionEcef, Position & positionGeographic) {
