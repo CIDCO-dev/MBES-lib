@@ -71,13 +71,13 @@ public:
   /**
   * Gets the longitude, latitude and elevation of an ECEF position
   *
-  * @param positionInNavigationFrame the position we need to get the latitude, longitude and elevation
+  * @param positionEcef the position we need to get the latitude, longitude and elevation
   * @param positionGeographic the position where the latitude, longitude et elevation will be put in
   */
-  static void convertECEFToLongitudeLatitudeElevation(Eigen::Vector3d & positionInNavigationFrame, Position & positionGeographic) {
-    double x = positionInNavigationFrame(0);
-    double y = positionInNavigationFrame(1);
-    double z = positionInNavigationFrame(2);
+  static void convertECEFToLongitudeLatitudeElevation(Eigen::Vector3d & positionEcef, Position & positionGeographic) {
+    double x = positionEcef(0);
+    double y = positionEcef(1);
+    double z = positionEcef(2);
 
     // Bowring (1985) algorithm
     double p2 = x * x + y*y;

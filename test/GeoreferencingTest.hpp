@@ -12,13 +12,18 @@
 
 
 #include "catch.hpp"
+#include <Eigen/Dense>
+#include "../src/Position.hpp"
 #include "../src/georeferencing/Georeferencing.hpp"
 #include "../src/math/Boresight.hpp"
+#include "../src/math/CoordinateTransform.hpp"
 #include "../src/utils/Constants.hpp"
 #include "../src/svp/SoundVelocityProfileFactory.hpp"
 #include "../src/svp/CarisSvpFile.hpp"
 
 #define POSITION_PRECISION 0.00000001
+
+
 
 TEST_CASE("Georeferencing LGF test") {
 
