@@ -4,7 +4,7 @@
 
 /* 
  * File:   SidescanPing.hpp
- * Author: glm
+ * Author: glm, jordan
  *
  * Created on August 28, 2019, 5:34 PM
  */
@@ -15,6 +15,7 @@
 #include <vector>
 #include <cstdint>
 #include "../Position.hpp"
+#include "../Attitude.hpp"
 
 
 class SidescanPing {
@@ -39,6 +40,9 @@ public:
     uint64_t getTimestamp() {return timestamp;};
     void setTimestamp(uint64_t newTimestamp){ timestamp=newTimestamp;};
     
+    Attitude * getAttitude(){ return attitude;};
+    void       setAttitude(Attitude * newAttitude){attitude=newAttitude;};
+    
     Position * getPosition(){ return position;};
     void       setPosition(Position * newPosition){position=newPosition;};
     
@@ -48,6 +52,7 @@ private:
     double      distancePerSample;
     int         channelNumber;
     uint64_t    timestamp;
+    Attitude *  attitude;
     Position *  position;
 };
 
