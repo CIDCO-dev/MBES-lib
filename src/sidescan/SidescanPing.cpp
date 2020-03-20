@@ -3,20 +3,21 @@
 */
 /* 
  * File:   SidescanPing.cpp
- * Author: glm
+ * Author: glm, jordan
  * 
  * Created on August 28, 2019, 5:34 PM
  */
 
 #include "SidescanPing.hpp"
 
-SidescanPing::SidescanPing() : position(NULL) {
+SidescanPing::SidescanPing() : attitude(NULL), position(NULL) {
 }
 
 SidescanPing::SidescanPing(const SidescanPing& orig) {
 }
 
 SidescanPing::~SidescanPing() {
+    if(attitude) delete attitude;
     if(position) delete position;
 }
 
