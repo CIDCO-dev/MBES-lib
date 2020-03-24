@@ -749,6 +749,10 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
                     pingHdr.SensorPrimaryAltitude
             )
         );
+        
+        //also get layback and sensor depth
+        ping->setLayback(pingHdr.Layback);
+        ping->setSensorDepth(pingHdr.SensorDepth);
     }
     
     ping->setChannelNumber(pingChanHdr.ChannelNumber);

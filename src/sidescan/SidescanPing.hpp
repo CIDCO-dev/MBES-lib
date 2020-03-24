@@ -46,6 +46,11 @@ public:
     Position * getPosition(){ return position;};
     void       setPosition(Position * newPosition){position=newPosition;};
     
+    double getLayback(){return layback;}
+    void setLayback(double layback){this->layback = layback;}
+
+    double getSensorDepth(){return sensorDepth;}
+    void setSensorDepth(double sensorDepth){this->sensorDepth = sensorDepth;}
     
 private:
     std::vector<double> samples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
@@ -54,6 +59,8 @@ private:
     uint64_t    timestamp;
     Attitude *  attitude;
     Position *  position;
+    double      layback;
+    double      sensorDepth;
 };
 
 #endif /* SIDESCANPING_HPP */
