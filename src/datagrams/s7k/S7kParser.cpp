@@ -55,14 +55,6 @@ void S7kParser::parse(std::string & filename) {
                                 //Attitude
                                 processAttitudeDatagram(drf, data);
                             }
-                            else if(drf.RecordTypeIdentifier == 1012) {
-                                //roll pitch heave
-                                //processRollPitchHeaveDatagram(drf, data);
-                            }
-                            else if(drf.RecordTypeIdentifier == 1013) {
-                                //heading
-                                //processHeadingDatagram(drf, data);
-                            }
 			    else if (drf.RecordTypeIdentifier == 1003) {
                                 //Position
                                 processPositionDatagram(drf, data);
@@ -82,9 +74,6 @@ void S7kParser::parse(std::string & filename) {
                             //TODO: process other stuff
 
                         } else {
-                            std::cout << "checksum: " << checksum << std::endl;
-                            std::cout << "computedChecksum: " << computedChecksum << std::endl;
-                            std::cout << "drf.RecordTypeIdentifier: " << drf.RecordTypeIdentifier << std::endl;
                             printf("Checksum error\n");
                             //Checksum error...lets ignore the packet for now
                             //throw new Exception("Checksum error");
