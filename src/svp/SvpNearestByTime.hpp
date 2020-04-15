@@ -50,9 +50,11 @@ public:
         for (unsigned int i = 0; i < svps.size(); i++) {
             SoundVelocityProfile* svp = svps[i];
 
+            /*
             if (svp->getTimestamp() == 0) {
                 throw new Exception("Cannot apply SvpNearestByTime strategy to svp with timestamp==0");
             }
+             * */
 
             //Warning: subtracting uint is dangerous!
             //check which is greater first
