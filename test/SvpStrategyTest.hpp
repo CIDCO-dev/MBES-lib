@@ -60,13 +60,14 @@ TEST_CASE("SVP selection with unknown position") {
     } catch(Exception * error) {
         REQUIRE(true);
     }
-    
+    /*
     try {
         timeStrat->chooseSvp(position, ping);
         REQUIRE(false);
     } catch(Exception * error) {
         REQUIRE(true);
     }
+    */
     
 }
 

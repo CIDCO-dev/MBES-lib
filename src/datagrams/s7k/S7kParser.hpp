@@ -11,7 +11,9 @@
 #include "../../utils/TimeUtils.hpp"
 #include "../../utils/Constants.hpp"
 #include <list>
+#include <queue>
 #include "../../svp/SoundVelocityProfile.hpp"
+#include "../../Attitude.hpp"
 
 /*!
  * \brief S7k parser class extention of Datagram parser
@@ -56,6 +58,22 @@ protected:
      * @param data the datagram
      */
     void processAttitudeDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+    
+    /**
+     * Processes heading data
+     *
+     * @param drf the S7k data record frame
+     * @param data the datagram
+     */
+    void processHeadingDatagram(S7kDataRecordFrame & drf, unsigned char * data);
+    
+    /**
+     * Processes pitch and roll data
+     *
+     * @param drf the S7k data record frame
+     * @param data the datagram
+     */
+    void processPitchRoll(S7kDataRecordFrame & drf, unsigned char * data);
 
     /**
      * Processes the Position
@@ -115,6 +133,14 @@ private:
     //TODO Use a map instead
     /**List of ping settings*/
     std::list<S7kSonarSettings *> pingSettings;
+    
+    std::vector<Attitude> headingV;
+    std::queue<Attitude> pitchRollQ;
+    uint64_t initialHeadingTimestamp;
+    bool foundInitialHeadingTimestamp = false;
+    
+    
+    uint64_t oldestInterpolatedAttitudeTimestamp;
 };
 
 
