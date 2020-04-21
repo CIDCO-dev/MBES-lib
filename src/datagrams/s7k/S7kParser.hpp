@@ -73,7 +73,7 @@ protected:
      * @param drf the S7k data record frame
      * @param data the datagram
      */
-    void processPitchRoll(S7kDataRecordFrame & drf, unsigned char * data);
+    void processPitchRollDatagram(S7kDataRecordFrame & drf, unsigned char * data);
 
     /**
      * Processes the Position
@@ -129,18 +129,20 @@ private:
      * @param drf the S7k data record frame
      */
     uint64_t extractMicroEpoch(S7kDataRecordFrame & drf);
+    
+    
+    void process1012and1013Attiudes();
 
     //TODO Use a map instead
     /**List of ping settings*/
     std::list<S7kSonarSettings *> pingSettings;
     
+    bool foundAttitudePackets1012and1013 = false;
     std::vector<Attitude> headingV;
-    std::queue<Attitude> pitchRollQ;
+    std::vector<Attitude> pitchRollV;
+    
     uint64_t initialHeadingTimestamp;
     bool foundInitialHeadingTimestamp = false;
-    
-    
-    uint64_t oldestInterpolatedAttitudeTimestamp;
 };
 
 

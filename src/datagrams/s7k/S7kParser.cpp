@@ -56,19 +56,11 @@ void S7kParser::parse(std::string & filename) {
                                 //Attitude
                                 processAttitudeDatagram(drf, data);
                             } else if (drf.RecordTypeIdentifier == 1012) {
-                                uint64_t microEpoch = extractMicroEpoch(drf);
-                                //std::cout << "RecordTypeIdentifier: " << drf.RecordTypeIdentifier << std::endl;
-                                //std::cout << "microEpoch: " << microEpoch << std::endl;
-
-                                std::cout << drf.RecordTypeIdentifier << " " << microEpoch << std::endl;
                                 //roll pitch heave
-                                //processRollPitchHeaveDatagram(drf, data);
+                                processPitchRollDatagram(drf, data);
                             } else if (drf.RecordTypeIdentifier == 1013) {
-                                uint64_t microEpoch = extractMicroEpoch(drf);
-
-                                std::cout << drf.RecordTypeIdentifier << " " << microEpoch << std::endl;
                                 //heading
-                                //processHeadingDatagram(drf, data);
+                                processHeadingDatagram(drf, data);
                             } else if (drf.RecordTypeIdentifier == 1003) {
                                 //Position
                                 processPositionDatagram(drf, data);
@@ -105,6 +97,11 @@ void S7kParser::parse(std::string & filename) {
             }
 
             //zero bytes means EOF. Nothing to do
+        }
+
+        if (foundAttitudePackets1012and1013) {
+            //Sort and interpolate attitudes form 1012 and 1013 packets
+            process1012and1013Attiudes();
         }
     } else {
         throw new Exception("File not found");
@@ -435,9 +432,13 @@ void S7kParser::processHeadingDatagram(S7kDataRecordFrame & drf, unsigned char *
         initialHeadingTimestamp = microEpoch;
         foundInitialHeadingTimestamp = true;
     }
+
+    if (!foundAttitudePackets1012and1013) {
+        foundAttitudePackets1012and1013 = true;
+    }
 }
 
-void S7kParser::processPitchRoll(S7kDataRecordFrame & drf, unsigned char * data) {
+void S7kParser::processPitchRollDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
     uint64_t microEpoch = extractMicroEpoch(drf);
 
     S7kRollPitchHeave *entry = (S7kRollPitchHeave*) (data);
@@ -445,58 +446,12 @@ void S7kParser::processPitchRoll(S7kDataRecordFrame & drf, unsigned char * data)
     double roll = (double) entry->roll*R2D;
     double pitch = (double) entry->pitch*R2D;
 
-
     Attitude a(microEpoch, (roll < 0) ? roll + 360 : roll, (pitch < 0) ? pitch + 360 : pitch, 0.0);
-    pitchRollQ.push(a);
+    pitchRollV.push_back(a);
 
-    if (headingV.size() < 2) {
-        //can't interpolate at this moment
-        return;
+    if (!foundAttitudePackets1012and1013) {
+        foundAttitudePackets1012and1013 = true;
     }
-
-    // Clear pitchRoll packets that are older than oldest heading packet
-    // these can't be interpolated
-    if (foundInitialHeadingTimestamp) {
-        while (pitchRollQ.front().getTimestamp() < initialHeadingTimestamp) {
-            pitchRollQ.pop();
-        }
-    }
-
-    while (pitchRollQ.front().getTimestamp() > headingV[0].getTimestamp() && pitchRollQ.front().getTimestamp() < headingV[headingV.size() - 1].getTimestamp()) {
-        //can interpolate
-        Attitude currentPitchRoll = pitchRollQ.front();
-
-        unsigned int indexHeadingAfter = 1;
-        while (indexHeadingAfter < headingV.size() && headingV[indexHeadingAfter].getTimestamp() < currentPitchRoll.getTimestamp()) {
-            indexHeadingAfter++;
-        }
-
-        uint64_t headingTimestampBefore = headingV[indexHeadingAfter-1].getTimestamp();
-        uint64_t headingTimestampAfter = headingV[indexHeadingAfter].getTimestamp();
-        double headingBefore = headingV[indexHeadingAfter-1].getHeading();
-        double headingAfter = headingV[indexHeadingAfter].getHeading();
-        uint64_t pitchRollTimestamp = currentPitchRoll.getTimestamp();
-
-        Attitude attitudeBefore(headingTimestampBefore, currentPitchRoll.getRoll(), currentPitchRoll.getPitch(), headingBefore);
-        Attitude attitudeAfter(headingTimestampAfter, currentPitchRoll.getRoll(), currentPitchRoll.getPitch(), headingAfter);
-
-        Attitude* interpolatedAttitude = Interpolator::interpolateAttitude(attitudeBefore, attitudeAfter, pitchRollTimestamp);
-        oldestInterpolatedAttitudeTimestamp = pitchRollTimestamp;
-
-        processor.processAttitude(
-                interpolatedAttitude->getTimestamp(),
-                interpolatedAttitude->getHeading(),
-                interpolatedAttitude->getPitch(),
-                interpolatedAttitude->getRoll()
-                );
-
-        delete interpolatedAttitude;
-
-        pitchRollQ.pop();
-    }
-    
-    
-    //TODO: trim heading vector
 }
 
 void S7kParser::processSonarSettingsDatagram(S7kDataRecordFrame & drf, unsigned char * data) {
@@ -554,6 +509,36 @@ void S7kParser::processPingDatagram(S7kDataRecordFrame & drf, unsigned char * da
     } else {
         fprintf(stderr, "No settings for ping #%d\n", swath->pingNumber);
     }
+}
+
+void S7kParser::process1012and1013Attiudes() {
+    std::sort(headingV.begin(), headingV.end(), &Attitude::sortByTimestamp);
+    std::sort(pitchRollV.begin(), pitchRollV.end(), &Attitude::sortByTimestamp);
+
+
+    unsigned int headingIndex = 0;
+
+    for (auto pitchRoll = pitchRollV.begin(); pitchRoll != pitchRollV.end(); pitchRoll++) {
+
+        while (headingIndex + 1 < headingV.size() && headingV[headingIndex + 1].getTimestamp() < (*pitchRoll).getTimestamp()) {
+            headingIndex++;
+        }
+
+        //No more headings available
+        if (headingIndex >= headingV.size() - 1) {
+            break;
+        }
+
+        Attitude & beforeHeading = headingV[headingIndex];
+        Attitude & afterHeading = headingV[headingIndex + 1];
+
+        Attitude * interpolatedHeading = Interpolator::interpolateAttitude(beforeHeading, afterHeading, (*pitchRoll).getTimestamp());
+
+        processor.processAttitude((*pitchRoll).getTimestamp(), interpolatedHeading->getHeading(), (*pitchRoll).getPitch(), (*pitchRoll).getRoll());
+
+        delete interpolatedHeading;
+    }
+
 }
 
 uint64_t S7kParser::extractMicroEpoch(S7kDataRecordFrame & drf) {
