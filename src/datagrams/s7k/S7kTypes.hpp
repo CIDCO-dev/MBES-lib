@@ -225,6 +225,20 @@ typedef struct{
 
 #pragma pack(1)
 typedef struct{
+    float  roll; // radians
+    float  pitch; // radians
+    float  heave; // meters
+} S7kRollPitchHeave;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct{
+    float  heading; // radians
+} S7kHeading;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct{
     float    frequency;
     uint8_t  soundVelocitySource;	/* 0=Not computed, 1=CTD,2=User computed*/
     uint8_t  soundVelocityAlgorithm; 	/* 0=Not computed,1=Chen Millero, 2=Del Grosso*/
