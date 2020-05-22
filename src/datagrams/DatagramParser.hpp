@@ -31,7 +31,7 @@ public:
 	*
 	* @param filename name of the file to read
 	*/
-	virtual void parse(std::string & filename){};
+	virtual void parse(std::string & filename, bool ignoreChecksum = false){};
 
 	/**
 	* Returns a human-readable datagram name

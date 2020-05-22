@@ -17,7 +17,7 @@ S7kParser::~S7kParser() {
 
 }
 
-void S7kParser::parse(std::string & filename) {
+void S7kParser::parse(std::string & filename, bool ignoreChecksum) {
     FILE * file = fopen(filename.c_str(), "rb");
 
     if (file) {

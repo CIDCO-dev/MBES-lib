@@ -16,7 +16,7 @@ KongsbergParser::~KongsbergParser(){
 
 }
 
-void KongsbergParser::parse(std::string & filename){
+void KongsbergParser::parse(std::string & filename, bool ignoreChecksum){
   FILE * file = fopen(filename.c_str(),"rb");
 
   if(file){
