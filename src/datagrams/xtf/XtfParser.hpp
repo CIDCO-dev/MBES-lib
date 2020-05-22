@@ -57,7 +57,7 @@ class XtfParser : public DatagramParser{
                  *
                  * @param filename name of the file to read
                  */
-		void parse(std::string & filename);
+		void parse(std::string & filename, bool ignoreChecksum = false);
 
                 std::string getName(int tag);
 

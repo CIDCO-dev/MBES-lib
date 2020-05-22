@@ -33,7 +33,7 @@ XtfParser::~XtfParser(){
  *
  * @param filename name of the file to read
  */
-void XtfParser::parse(std::string & filename){
+void XtfParser::parse(std::string & filename, bool ignoreChecksum){
     
     //TODO: reinit internal structures if called twice
     
