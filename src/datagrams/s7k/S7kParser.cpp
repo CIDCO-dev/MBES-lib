@@ -48,7 +48,7 @@ void S7kParser::parse(std::string & filename, bool ignoreChecksum) {
                         uint32_t checksum = *((uint32_t*) & data[dataSectionSize - sizeof (uint32_t)]);
                         uint32_t computedChecksum = computeChecksum(&drf, data);
 
-                        if (checksum == computedChecksum) {
+                        if (ignoreChecksum || checksum == computedChecksum) {
                             processor.processDatagramTag(drf.RecordTypeIdentifier);
 
                             //Process data according to record type
