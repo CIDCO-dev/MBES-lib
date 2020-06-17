@@ -809,7 +809,6 @@ void XtfParser::processResonSettingsDatagram(XtfPacketHeader & hdr, unsigned cha
 void XtfParser::processReson7027Bathy(XtfPacketHeader & hdr,unsigned char * packet) {
     
     S7kDataRecordFrame * drf = (S7kDataRecordFrame*) packet;
-    std::cout << "drf->RecordTypeIdentifier:"  << drf->RecordTypeIdentifier << std::endl;
     
     if(drf->RecordTypeIdentifier == 7027) { //Reson bathy packet
         
