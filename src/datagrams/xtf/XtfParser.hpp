@@ -18,6 +18,7 @@
 #include <string.h>
 #include <cstdio>
 #include "XtfTypes.hpp"
+#include "../s7k/S7kTypes.hpp"
 #include "../DatagramParser.hpp"
 #include "../../utils/TimeUtils.hpp"
 #include "../../utils/Exception.hpp"
@@ -116,6 +117,21 @@ class XtfParser : public DatagramParser{
                  */
                 void processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & pingChanHdr,void * data);
                 
+                /**
+                 * Process RESON 7027 bathy data
+                 * @param hdr 
+                 * @param packet
+                 */
+                void processReson7027Bathy(XtfPacketHeader & hdr,unsigned char * packet);
+                
+                /**
+                 * Processes the sonar settings s7k
+                 *
+                 * @param hdr
+                 * @param packet
+                 */
+                void processResonSettingsDatagram(XtfPacketHeader & hdr, unsigned char * packet);
+                
                 
                 /**
                  * Process Quinsy R2Sonic packets
@@ -126,6 +142,10 @@ class XtfParser : public DatagramParser{
 		XtfFileHeader fileHeader;
                 
                 std::vector<XtfChanInfo*> channels;
+                
+                //TODO Use a map instead
+                /**List of ping settings*/
+                std::list<S7kSonarSettings *> pingSettings;
                 
 
 };

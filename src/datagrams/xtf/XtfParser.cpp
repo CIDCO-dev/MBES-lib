@@ -643,6 +643,20 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
                         position->RawAltitude
                 );
         }
+        else if(hdr.HeaderType==XTF_HEADER_RESON_REMOTE_CONTROL_SETTINGS) {
+            //Custom raw packets have a header packets that differ
+            XtfRawCustomHeader * rawCustomHeader = (XtfRawCustomHeader*) packet;
+            
+            //ATTENTION: SubChannelNumber is used to define ManufactureID in custom Raw packets
+            if(hdr.SubChannelNumber == XTF_RESON_MANUFACTURE_ID) { 
+                processResonSettingsDatagram(hdr,packet+sizeof(XtfRawCustomHeader));
+            }
+        }
+        else if(hdr.HeaderType==XTF_HEADER_RESON_BATHY) {
+            XtfPingHeader * pingHdr = (XtfPingHeader*) packet;
+            processPingHeader(*pingHdr);
+            processReson7027Bathy(hdr,packet+sizeof(XtfPingHeader));
+        }
         else if(hdr.HeaderType==XTF_HEADER_QUINSY_R2SONIC_BATHY){
 		XtfPingHeader * pingHdr = (XtfPingHeader*) packet;
 		processPingHeader(*pingHdr);
@@ -780,6 +794,68 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
         ping->setDistancePerSample((double)pingChanHdr.SlantRange/(double)rawSamples.size());
         
         processor.processSidescanData(ping);
+    }
+}
+
+void XtfParser::processResonSettingsDatagram(XtfPacketHeader & hdr, unsigned char * data) {
+    //S7kDataRecordFrame * drf = (S7kDataRecordFrame*) data;
+    //skip the Data Record Frame
+    S7kSonarSettings * settings = (S7kSonarSettings*) (data+sizeof(S7kDataRecordFrame));
+    S7kSonarSettings * settingsCopy = (S7kSonarSettings *) malloc(sizeof (S7kSonarSettings));
+    memcpy(settingsCopy, settings, sizeof (S7kSonarSettings));
+    pingSettings.push_back(settingsCopy);
+}
+
+void XtfParser::processReson7027Bathy(XtfPacketHeader & hdr,unsigned char * packet) {
+    
+    S7kDataRecordFrame * drf = (S7kDataRecordFrame*) packet;
+    std::cout << "drf->RecordTypeIdentifier:"  << drf->RecordTypeIdentifier << std::endl;
+    
+    if(drf->RecordTypeIdentifier == 7027) { //Reson bathy packet
+        
+        long microSeconds = drf->Timestamp.Seconds * 1e6;
+        uint64_t microEpoch = TimeUtils::build_time(
+                drf->Timestamp.Year,
+                drf->Timestamp.Day,
+                drf->Timestamp.Hours,
+                drf->Timestamp.Minutes,
+                microSeconds);
+        
+        S7kRawDetectionDataRTH *swath = (S7kRawDetectionDataRTH*) (packet+sizeof(S7kDataRecordFrame));
+        
+        uint32_t nEntries = swath->numberOfDetectionPoints;
+        double tiltAngle = swath->transmissionAngle*R2D;
+        double samplingRate = swath->samplingRate;
+        
+        S7kSonarSettings * settings = NULL;
+        for (auto i = pingSettings.begin(); i != pingSettings.end(); i++) {
+            if ((*i)->sequentialNumber == swath->pingNumber) {
+                settings = (*i);
+                pingSettings.remove((*i));
+                break;
+            }
+        }
+        
+        if (settings) {
+            double surfaceSoundVelocity = settings->soundVelocity;
+
+            processor.processSwathStart(surfaceSoundVelocity);
+
+            for (unsigned int i = 0; i < nEntries; i++) {
+                S7kRawDetectionDataRD *ping = (S7kRawDetectionDataRD*) (packet + sizeof(S7kDataRecordFrame) + sizeof (S7kRawDetectionDataRTH) + i * swath->dataFieldSize);
+                double twoWayTravelTime = (double) ping->detectionPoint / samplingRate; // see Appendix F p. 190
+                double intensity = swath->dataFieldSize > 22 ? ping->signalStrength : 0;
+                processor.processPing(microEpoch, (long) ping->beamDescriptor, (double) ping->receptionAngle*R2D, tiltAngle, twoWayTravelTime, ping->quality, intensity);
+            }
+
+            free(settings);
+        } else {
+            
+            std::cerr << "No settings for ping #" << swath->pingNumber << std::endl;
+        }
+
+    } else {
+        std::cerr << "Unknown packet Type: " << ((S7kDataRecordFrame*)packet)->RecordTypeIdentifier << std::endl;
     }
 }
 

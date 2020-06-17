@@ -216,6 +216,78 @@ typedef struct { //pp 40-41
 #pragma pack()
 
 #pragma pack(1)
+typedef struct { //pp 106-107
+    uint64_t sonarId;
+    uint32_t sequentialNumber;
+    float    frequency;
+    float    sampleRate;
+    float    receiverBandwidth;
+    float    txPulseWidth;
+    uint32_t txPulseTypeIndentifier;
+    uint32_t txPulseEnvelopeIndentifier;
+    float    txPulseEnvelopeParameter;
+    uint16_t txPulseMode;
+    uint16_t txPulseReserved;
+    float    maxPingRate;
+    float    pingPeriod;
+    float    rangeSelection;
+    float    powerSelection;
+    float    gainSelection;
+    uint32_t controlFlags;
+    uint32_t projectorIdentifier;
+    float    projectorBeamSteeringAngleVertical;
+    float    projectorBeamSteeringAngleHorizontal;
+    float    projectorBeam3dbBeamWidthVertical;
+    float    projectorBeam3dbBeamWidthHorizontal;
+    float    projectorBeamFocalPoint;
+    uint32_t projectorBeamWeightingWindowType;
+    float    projectorBeamWeightingWindowParameter;
+    uint32_t transmitFlags;
+    uint32_t hydrophoneIdentifier;
+    uint32_t receiveBeamWeightingWindow;
+    float    receiveBeamWeightingParameter;
+    uint32_t receiveFlags;
+    float    bottomDetectionFilterMinRange;
+    float    bottomDetectionFilterMaxRange;
+    float    bottomDetectionFilterMinDepth;
+    float    bottomDetectionFilterMaxDepth;
+    float    absorption;
+    float    soundVelocity;
+    float    spreading;
+    uint8_t  reserved;
+    uint8_t  automaticFilterWindow;
+    float    txArrayPositionOffsetX;
+    float    txArrayPositionOffsetY;
+    float    txArrayPositionOffsetZ;
+    float    headTiltX;
+    float    headTiltY;
+    float    headTiltZ;
+    uint32_t pingState;
+    uint16_t beamSpacingMode;
+    uint16_t s7kCenterMode;
+    float    AdaptiveGateBottomFilterInformationMinDepth;
+    float    AdaptiveGateBottomFilterInformationMaxDepth;
+    double   TriggerOutWidth;
+    double   TriggerOutOffset;
+    uint16_t series81xxProjectorSelection;
+    uint32_t reserved2[2];
+    float    series81xxAlternateGain;
+    uint8_t  vernierFilter;
+    uint8_t  reserved3;
+    uint16_t customBeams;
+    float    coverageAngle;
+    int8_t   coverageMode;
+    int8_t   qualityFilterFlags;
+    float    horizontalReceiverBeamSteeringAngle;
+    float    flexModeSectorCoverage;
+    float    constantSpacing;
+    uint16_t beamModeSelection;
+    float    depthGateTilt;
+    uint32_t reserved4[2];
+} S7kRemoteControlSonarSettings;
+#pragma pack()
+
+#pragma pack(1)
 typedef struct{
     float  soundVelocity;
     float  temperature;
