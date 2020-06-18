@@ -647,8 +647,8 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
             //Custom raw packets have a header packets that differ
             XtfRawCustomHeader * rawCustomHeader = (XtfRawCustomHeader*) packet;
             
-            //ATTENTION: SubChannelNumber is used to define ManufactureID in custom Raw packets
-            if(hdr.SubChannelNumber == XTF_RESON_MANUFACTURE_ID) { 
+            //ATTENTION: SubChannelNumber is used to define ManufacturerID in custom Raw packets
+            if(hdr.SubChannelNumber == XTF_RESON_MANUFACTURER_ID) { 
                 processResonSettingsDatagram(hdr,packet+sizeof(XtfRawCustomHeader));
             }
         }
