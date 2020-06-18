@@ -247,7 +247,7 @@ public:
     }
 
     /**
-     * Returns the stream in which this ping will be writen
+     * Returns the stream in which this ping will be written
      *
      * @param os the stream in which to write this ping
      * @param obj the ping to write in the stream

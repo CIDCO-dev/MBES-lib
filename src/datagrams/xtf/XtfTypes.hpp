@@ -7,7 +7,7 @@
 /**
  *  Description des datagrammes pour le format XTF
  *  Référence: Triton Imaging, Inc. eXtended Triton Format (XTF) Rev. 40 (9/22/2015)
- *  Auteurs: Jérémy Viau Trudel,Guillaume Morissette
+ *  Auteurs: Jérémy Viau Trudel,Guillaume Morissette, jordan
  */
 
 
@@ -88,11 +88,29 @@ typedef struct{
 typedef struct{
         uint16_t MagicNumber;
         uint8_t HeaderType;
-        uint8_t SubChannelNumber;
-        uint16_t NumChansToFollow;
-        uint16_t Reserved1[2];
+        uint8_t SubChannelNumber; //could be ManufacturerID if custom raw packet
+        uint16_t NumChansToFollow; // could be SonarID if custom raw packet
+        uint16_t Reserved1[2]; // Reserved1[0] could be PacketID if custom raw packet
         uint32_t NumBytesThisRecord;
 } XtfPacketHeader;
+#pragma pack()
+
+#pragma pack(1)
+typedef struct{
+        uint16_t Year;
+	uint8_t Month;
+	uint8_t Day;
+	uint8_t Hour;
+	uint8_t Minute;
+	uint8_t Second;
+	uint8_t HSeconds;
+	uint16_t JulianDay;
+        uint16_t Reserved2[2];
+        uint32_t PingNumber;
+        uint32_t TimeTag;
+        uint32_t NumCustomerBytes;
+        uint8_t Reserved3[24];
+} XtfRawCustomHeader;
 #pragma pack()
 
 #pragma pack(1)
@@ -514,6 +532,9 @@ typedef struct {
 #define XTF_HEADER_POS_RAW_NAVIGATION 42
 #define XTF_HEADER_POSITION 107
 #define XTF_HEADER_QUINSY_R2SONIC_BATHY 65
+#define XTF_HEADER_RESON_REMOTE_CONTROL_SETTINGS 199
+#define XTF_HEADER_RESON_BATHY 61
+#define XTF_RESON_MANUFACTURER_ID 2 
 
 
 const std::string SonarTypes[]{

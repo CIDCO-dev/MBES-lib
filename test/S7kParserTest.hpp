@@ -129,6 +129,7 @@ TEST_CASE("test the S7k parser with a valid file") {
 
 TEST_CASE("test S7k file that has 1012 and 1013 packets for attitude") {
 
+    //file with bad checksums
     std::string file("test/data/s7k/20170529_111841_Seabat.s7k");
 
     class TestHandler : public DatagramEventHandler {
