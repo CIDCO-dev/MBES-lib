@@ -534,7 +534,7 @@ typedef struct {
 #define XTF_HEADER_QUINSY_R2SONIC_BATHY 65
 #define XTF_HEADER_RESON_REMOTE_CONTROL_SETTINGS 199
 #define XTF_HEADER_RESON_BATHY 61
-#define XTF_RESON_MANUFACTURE_ID 2 // 2 is Reson, see XTF doc p. 39
+#define XTF_RESON_MANUFACTURER_ID 2 
 
 
 const std::string SonarTypes[]{
