@@ -21,6 +21,7 @@
 #include "../svp/SvpSelectionStrategy.hpp"
 #include "../svp/SvpNearestByTime.hpp"
 #include "../svp/SvpNearestByLocation.hpp"
+#include "../math/CartesianToGeodeticFukushima.hpp"
 
 using namespace std;
 
@@ -60,6 +61,8 @@ int main (int argc , char ** argv){
     else
     {
         std::string fileName(argv[argc-1]);
+        
+        bool cart2geo = false;
 
         //Lever arm
         double leverArmX = 0.0;
@@ -77,13 +80,14 @@ int main (int argc , char ** argv){
 
         //Georeference method
         Georeferencing * georef = NULL;
+        CartesianToGeodeticFukushima * cartesian2geographic = NULL;
 
 	std::string	     svpFilename;
 	CarisSvpFile svps;
 
         int index;
 
-        while((index=getopt(argc,argv,"x:y:z:r:p:h:s:S:LT"))!=-1)
+        while((index=getopt(argc,argv,"x:y:z:r:p:h:s:S:LTg"))!=-1)
         {
             switch(index)
             {
@@ -167,6 +171,12 @@ int main (int argc , char ** argv){
                 case 'T':
                     georef = new GeoreferencingTRF();
                 break;
+                
+                case 'g':
+                    georef = new GeoreferencingTRF();
+                    cartesian2geographic = new CartesianToGeodeticFukushima(2);
+                    cart2geo=true;
+                break;
             }
         }
 
@@ -184,6 +194,9 @@ int main (int argc , char ** argv){
         {
             DatagramParser * parser = NULL;
             DatagramGeoreferencer  printer(*georef, *svpStrategy);
+            if(cart2geo) {
+                printer.setCart2Geo(cartesian2geographic);
+            }
 
             std::cerr << "[+] Decoding " << fileName << std::endl;
             std::ifstream inFile;
@@ -196,7 +209,7 @@ int main (int argc , char ** argv){
                 throw new Exception("File not found: << fileName");
             }
             parser->parse(fileName);
-            std::cout << std::setprecision(6);
+            std::cout << std::setprecision(12);
             std::cout << std::fixed;
 
             //Lever arm
