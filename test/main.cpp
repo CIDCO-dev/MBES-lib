@@ -22,3 +22,5 @@
 #include "KongsbergTypesTest.hpp"
 #include "KongsbergParserTest.hpp"
 #include "DistanceTest.hpp"
+#include "CartesianToGeodeticConversionTest.hpp"
+#include "PlaneFitAndResidualsTest.hpp"
