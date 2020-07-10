@@ -15,6 +15,8 @@
 #define INF 1.e100
 #define R2D ((double)180/(double)PI)
 #define D2R ((double)PI/(double)180)
+#define a_wgs84 6378137.0
+#define e2_wgs84 (0.081819190842622 * 0.081819190842622)
 
 #ifdef _WIN32
 #include <direct.h>
