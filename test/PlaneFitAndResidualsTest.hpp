@@ -67,9 +67,33 @@ TEST_CASE("plane fit and residual test") {
     Eigen::Vector4d planeParamsGeneralFormEstimation;
     PlaneFitter::fitPlane(xyz, planeParamsGeneralFormEstimation);
     
-    //verify that original plane params or obtained
-    
+    //verify that original plane parameters are obtained
     REQUIRE((planeParamsGeneralFormEstimation-planeParamsGeneralForm).norm() < 0.01);
+    
+    
+    // calculate residual of a point to the plane
+    double a = planeParamsGeneralForm(0);
+    double b = planeParamsGeneralForm(1);
+    double c = planeParamsGeneralForm(2);
+    double d = planeParamsGeneralForm(3);
+    Eigen::Vector3d unitNormal;
+    unitNormal << a,b,c;
+    
+    double p1x = 1.0;
+    double p1y = 1.0;
+    double p1z = (a*p1x + b*p1y + d)*(-1.0/c);
+    Eigen::Vector3d pointOnPlane;
+    pointOnPlane << p1x, p1y, p1z;
+    
+    Eigen::Vector3d pointOutsidePlane = pointOnPlane + unitNormal;
+    
+    Eigen::MatrixXd points(1,3);
+    points.row(0) = pointOutsidePlane;
+    
+    
+    Eigen::VectorXd residuals;
+    PlaneFitter::calculatePlaneResidualsFromMatrix(residuals, points, planeParamsGeneralForm);
+    REQUIRE(std::abs(residuals(0) - 1) < eps);
 }
 
 

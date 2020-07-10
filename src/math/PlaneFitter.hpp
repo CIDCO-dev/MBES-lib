@@ -21,14 +21,7 @@ public:
          * General form is ax + by + cz + d = 0 with (a*a + b*b + c*c = 1 i.e. unit normal vector)
          */
         
-        double x = 1.0;
-        double y = 1.0;
-        double z = zForm(0)*x + zForm(1)*y + zForm(2);
-
-         // could be + or -, need to check if point is still on plane
         double c = 1.0 / zForm.norm();
-        
-        
         double a = -zForm(0) * c;
         double b = -zForm(1) * c;
         double d = -zForm(2) * c;
@@ -37,12 +30,6 @@ public:
         b = b / f;
         c = c / f;
         d = d / f;
-        
-        double testz = (a*x + b*y + d)*(1.0/c);
-        if(z*testz < 0) {
-            //chose the wrong sign
-            c=-c;
-        }
 
         generalForm << a, b, c, d;
     }
@@ -53,9 +40,9 @@ public:
          * General form is ax + by + cz + d = 0 with (a*a + b*b + c*c = 1 i.e. unit normal vector)
          */
         double f = 1.0 / generalForm(2);
-        double A = generalForm(0) * f;
-        double B = generalForm(1) * f;
-        double C = generalForm(3) * f;
+        double A = -generalForm(0) * f;
+        double B = -generalForm(1) * f;
+        double C = -generalForm(3) * f;
         
         zForm << A, B, C;
     }
@@ -64,8 +51,14 @@ public:
         /*
          * General form is ax + by + cz + d = 0 with (a*a + b*b + c*c = 1 i.e. unit normal vector)
          */
+        
+        Eigen::MatrixXd augmentedCloud(cloud.rows(), 4);
+        augmentedCloud.col(0) = cloud.col(0);
+        augmentedCloud.col(1) = cloud.col(1);
+        augmentedCloud.col(2) = cloud.col(2);
+        augmentedCloud.col(3) = Eigen::VectorXd::Ones(cloud.rows());
 
-        residuals = cloud*planarGeneralForm;
+        residuals = augmentedCloud*planarGeneralForm;
     }
     
     static void fitPlane(Eigen::MatrixXd & xyz, Eigen::Vector4d & planeGeneralFormParams) {
