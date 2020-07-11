@@ -13,6 +13,7 @@
 #include "../svp/SvpSelectionStrategy.hpp"
 #include "../datagrams/DatagramEventHandler.hpp"
 #include "../math/Interpolation.hpp"
+#include "../math/CartesianToGeodeticFukushima.hpp"
 
 /*!
  * \brief Datagram Georeferencer class.
@@ -206,11 +207,21 @@ public:
     }
 
     virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing, uint32_t quality, int32_t intensity, int positionIndex, int attitudeIndex) {
-        std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality << " " << intensity << std::endl;
+        if(cart2geo) {
+            Position p(0,0,0,0);
+            cart2geo->ecefToLongitudeLatitudeElevation(georeferencedPing, p);
+            std::cout << p.getLongitude() << " " << p.getLatitude() << " " << p.getEllipsoidalHeight() << " " << quality << " " << intensity << std::endl;
+        } else {
+            std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality << " " << intensity << std::endl;
+        }
     }
 
     void setSvpStrategy(SvpSelectionStrategy& svpStrategy) {
         this->svpStrategy = svpStrategy;
+    }
+    
+    void setCart2Geo(CartesianToGeodeticFukushima * c2g) {
+        cart2geo = c2g;
     }
 
 
@@ -236,6 +247,8 @@ protected:
 
     /**Vector of SoundVelocityProfile*/
     std::vector<SoundVelocityProfile*> svps;
+    
+    CartesianToGeodeticFukushima* cart2geo = NULL;
 };
 
 #endif

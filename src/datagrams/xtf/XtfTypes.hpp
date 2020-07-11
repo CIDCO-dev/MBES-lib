@@ -110,7 +110,7 @@ typedef struct{
         uint32_t TimeTag;
         uint32_t NumCustomerBytes;
         uint8_t Reserved3[24];
-} XtfRawCustomHeader;
+} XtfRawCustomHeaderLastPart;
 #pragma pack()
 
 #pragma pack(1)
