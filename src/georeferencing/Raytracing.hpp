@@ -25,8 +25,6 @@ public:
      * @param svp the SoundVelocityProfile for the raytracing
      */
     static void rayTrace(Eigen::Vector3d & raytracedPing,Ping & ping,SoundVelocityProfile & svp, Eigen::Matrix3d & boresightMatrix,Eigen::Matrix3d & imu2nav){
-	//TODO: do actual raytracing. This is just for quick testing purposes
-	//CoordinateTransform::sonar2cartesian(raytracedPing,ping.getAlongTrackAngle(),ping.getAcrossTrackAngle(), (ping.getTwoWayTravelTime()/(double)2) * (double)1480 );
 
 	/*
 	 * Compute launch vector
@@ -95,8 +93,15 @@ public:
                 cosBnm1 = epsilon*svp.getSpeeds()[N];
                 cosBn   = epsilon*svp.getSpeeds()[N+1];
 
-                if (gradient[N] > 0.0) //FIXME: huehuehue
-                {
+                if (abs(gradient[N]) < 0.000001) //FIXME: use a global epsilon value?
+		{
+                        //celerity gradient is zero so constant celerity in this layer
+                        //delta t, delta z and r for the layer N
+                        DZ = svp.getDepths()[N+1] - svp.getDepths()[N];
+                        dtt = DZ/(svp.getSpeeds()[N]*sinBn);
+                        DR = cosBn*dtt*svp.getSpeeds()[N];
+		}
+                else {
                         // if not null gradient
                         //Radius of curvature
                         radiusOfCurvature = 1.0/(epsilon*gradient[N]);
@@ -105,14 +110,6 @@ public:
                         dtt = abs( (1./abs(gradient[N]))*log( (svp.getSpeeds()[N+1]/svp.getSpeeds()[N])*( (1.0 + sinBnm1)/(1.0 + sinBn) ) ) );
                         DZ = radiusOfCurvature*(cosBn - cosBnm1);
                         DR = radiusOfCurvature*(sinBnm1 - sinBn);
-                }
-                else
-                {
-                        //celerity gradient is zero so constant celerity in this layer
-                        //delta t, delta z and r for the layer N
-                        DZ = svp.getDepths()[N+1] - svp.getDepths()[N];
-                        dtt = DZ/(svp.getSpeeds()[N]*sinBn);
-                        DR = cosBn*dtt*svp.getSpeeds()[N];
                 }
 
                 //To ensure to work with the N-1 cumulated travel time
