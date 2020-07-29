@@ -645,11 +645,11 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
         }
         else if(hdr.HeaderType==XTF_HEADER_RESON_REMOTE_CONTROL_SETTINGS) {
             //Custom raw packets have a header packets that differ
-            XtfRawCustomHeader * rawCustomHeader = (XtfRawCustomHeader*) packet;
+            //XtfRawCustomHeaderLastPart * rawCustomHeader = (XtfRawCustomHeaderLastPart*) packet;
             
             //ATTENTION: SubChannelNumber is used to define ManufacturerID in custom Raw packets
             if(hdr.SubChannelNumber == XTF_RESON_MANUFACTURER_ID) { 
-                processResonSettingsDatagram(hdr,packet+sizeof(XtfRawCustomHeader));
+                processResonSettingsDatagram(hdr,packet+sizeof(XtfRawCustomHeaderLastPart));
             }
         }
         else if(hdr.HeaderType==XTF_HEADER_RESON_BATHY) {
@@ -682,7 +682,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
             }
         }
 	else{
-		printf("Unknown packet type: %d\n",(int)hdr.HeaderType);
+		std::cerr << "Unknown packet type: " << (int)hdr.HeaderType << std::endl;
 	}
 }
 
