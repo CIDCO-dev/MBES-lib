@@ -96,21 +96,36 @@ public:
      * @param boresight boresight (dPhi,dTheta,dPsi)
      */
     virtual void georeference(Eigen::Vector3d & leverArm, Eigen::Matrix3d & boresight, std::vector<SoundVelocityProfile*> & externalSvps) {
+	if(positions.size()==0){
+		std::cerr << "[-] No position data found in file" << std::endl;
+		return;
+	}
 
-        
+        if(attitudes.size()==0){
+                std::cerr << "[-] No attitude data found in file" << std::endl;
+                return;
+        }
+
+        if(pings.size()==0){
+                std::cerr << "[-] No ping data found in file" << std::endl;
+                return;
+        }
+
+
+
         if (externalSvps.size() > 0) {
             //Use svps specified by user
             for (unsigned int i = 0; i < externalSvps.size(); ++i) {
                 svpStrategy.addSvp(externalSvps[i]);
             }
-            
+
             std::cerr << "[+] Using SVP file" << std::endl;
         } else if(svps.size() > 0) {
             //Use svps contained inside sonar file
             for (unsigned int i = 0; i < svps.size(); ++i) {
                 svpStrategy.addSvp(svps[i]);
             }
-            
+
             std::cerr << "[+] Using SVP from sonar file" << std::endl;
         } else {
             //Default to fresh water
