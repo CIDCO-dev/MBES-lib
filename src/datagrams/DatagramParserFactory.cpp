@@ -14,13 +14,13 @@
 DatagramParser * DatagramParserFactory::build(std::string & fileName,DatagramEventHandler & handler){
         DatagramParser * parser;
 
-        if(StringUtils::ends_with(fileName.c_str(),".all")){
+        if(StringUtils::ends_with_ci(fileName.c_str(),".all")){
                 parser = new KongsbergParser(handler);
         }
-        else if(StringUtils::ends_with(fileName.c_str(),".xtf")){
+        else if(StringUtils::ends_with_ci(fileName.c_str(),".xtf")){
                 parser = new XtfParser(handler);
         }
-        else if(StringUtils::ends_with(fileName.c_str(),".s7k")){
+        else if(StringUtils::ends_with_ci(fileName.c_str(),".s7k")){
                 parser = new S7kParser(handler);
         }
         else{

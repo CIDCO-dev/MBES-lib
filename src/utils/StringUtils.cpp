@@ -30,6 +30,45 @@ bool StringUtils::ends_with(const char * str, const char * suffix) {
 
 
 /**
+* Returns if the first text value ends with the second text value is true or false. Case independant
+*
+* @param str first text value
+* @param suffix second text value
+*/
+bool StringUtils::ends_with_ci(const char * str, const char * suffix) {
+
+  if( str == NULL || suffix == NULL )
+  return 0;
+
+  size_t str_len = strlen(str);
+  size_t suffix_len = strlen(suffix);
+
+  if(suffix_len > str_len)
+  return 0;
+
+  return 0 == StringUtils::strcmpi( str + str_len - suffix_len, suffix );
+}
+
+/* Returns true if strings are equal. Case independant
+ * 
+ */
+bool StringUtils::strcmpi(const std::string& a, const std::string& b)
+{
+    if (b.size() != a.size()){
+        return false;
+    }
+    else{
+	for (unsigned int i = 0; i < a.size(); ++i){
+	        if (tolower(a[i]) != tolower(b[i])){
+	            return false;
+		}
+	}
+    }
+
+    return true;
+}
+
+/**
 * Returns a text value without space
 *
 * @param s text that needs to be trimmed
