@@ -27,7 +27,16 @@ public:
     * @param suffix second text value
     */
     static bool ends_with(const char * str, const char * suffix);
-    
+
+    /**
+    * Returns if the first text value ends with the second text value is true or false. Case-independant
+    *
+    * @param str first text value
+    * @param suffix second text value
+    */
+    static bool ends_with_ci(const char * str, const char * suffix);
+
+    static bool strcmpi(const std::string & a, const std::string & b); 
 
     /**
     * Returns a text value without space
