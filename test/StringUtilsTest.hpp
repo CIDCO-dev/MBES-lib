@@ -43,6 +43,9 @@ TEST_CASE("Test the String Utils end with ci function")
     text = "text";
     end = "eXt";
     REQUIRE(StringUtils::ends_with(text,end));
+    text = "TeXt";
+    end = "ExT";
+    REQUIRE(StringUtils::ends_with(text,end));
 }
 
 TEST_CASE("Test the String Utils trim function")
