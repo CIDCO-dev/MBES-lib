@@ -46,7 +46,7 @@ bool StringUtils::ends_with_ci(const char * str, const char * suffix) {
   if(suffix_len > str_len)
   return 0;
 
-  return 0 == StringUtils::strcmpi( str + str_len - suffix_len, suffix );
+  return StringUtils::strcmpi( str + str_len - suffix_len, suffix );
 }
 
 /* Returns true if strings are equal. Case independant
