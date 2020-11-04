@@ -13,7 +13,44 @@
 #include "../src/utils/StringUtils.hpp"
 #include "catch.hpp"
 
-TEST_CASE("Test the String Utils end with function")
+TEST_CASE("Test the String Utils ends_with_ci function") {
+    std::string file_s7k = "file.s7k";
+    std::string file_xtf = "file.xtf";
+    std::string file_all = "file.all";
+    
+    std::string ext_s7k = ".s7k";
+    std::string ext_xtf = ".xtf";
+    std::string ext_all = ".all";
+    
+    REQUIRE(StringUtils::ends_with_ci(file_s7k.c_str(),ext_s7k.c_str())==true);
+    REQUIRE(StringUtils::ends_with_ci(file_s7k.c_str(),ext_xtf.c_str())==false);
+    REQUIRE(StringUtils::ends_with_ci(file_s7k.c_str(),ext_all.c_str())==false);
+    
+    REQUIRE(StringUtils::ends_with_ci(file_xtf.c_str(),ext_s7k.c_str())==false);
+    REQUIRE(StringUtils::ends_with_ci(file_xtf.c_str(),ext_xtf.c_str())==true);
+    REQUIRE(StringUtils::ends_with_ci(file_xtf.c_str(),ext_all.c_str())==false);
+    
+    REQUIRE(StringUtils::ends_with_ci(file_all.c_str(),ext_s7k.c_str())==false);
+    REQUIRE(StringUtils::ends_with_ci(file_all.c_str(),ext_xtf.c_str())==false);
+    REQUIRE(StringUtils::ends_with_ci(file_all.c_str(),ext_all.c_str())==true);
+}
+
+TEST_CASE("Test the String Utils strcmpi function") {
+    std::string upper = "ABCDEF";
+    std::string lower = "abcdef";
+    std::string lower_upper = "abcDEF";
+    std::string different = "uvwxyz";
+    
+    REQUIRE(StringUtils::strcmpi(upper, lower) == true);
+    REQUIRE(StringUtils::strcmpi(upper, lower_upper) == true);
+    REQUIRE(StringUtils::strcmpi(lower, lower_upper) == true);
+    
+    REQUIRE(StringUtils::strcmpi(upper, different) == false);
+    REQUIRE(StringUtils::strcmpi(lower, different) == false);
+    REQUIRE(StringUtils::strcmpi(lower_upper, different) == false);
+}
+
+TEST_CASE("Test the String Utils ends_with function")
 {
     const char* text = NULL;
     const char* end = NULL;
