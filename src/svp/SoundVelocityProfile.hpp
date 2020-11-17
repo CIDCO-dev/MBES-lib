@@ -69,7 +69,7 @@ public:
     }
     
     /**Returns the transducer draft*/
-    double getLongitude() {
+    double getDraft() {
         return draft;
     }
 
@@ -78,7 +78,7 @@ public:
      *
      * @param d the new transducer draft
      */
-    void setLongitude(double d) {
+    void setDraft(double d) {
         draft = d;
     }
 
