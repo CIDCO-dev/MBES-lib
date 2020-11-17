@@ -66,6 +66,25 @@ TEST_CASE("Test the String Utils ends_with function")
     REQUIRE(StringUtils::ends_with(text,end));
 }
 
+TEST_CASE("Test the String Utils end with ci function")
+{
+    const char* text = NULL;
+    const char* end = NULL;
+    REQUIRE(StringUtils::ends_with(text,end)==false);
+    text = "tExT";
+    end = "texte";
+    REQUIRE(StringUtils::ends_with(text,end)==false);
+    text = "text";
+    end = "re";
+    REQUIRE(StringUtils::ends_with(text,end)==false);
+    text = "text";
+    end = "eXt";
+    REQUIRE(StringUtils::ends_with(text,end));
+    text = "TeXt";
+    end = "ExT";
+    REQUIRE(StringUtils::ends_with(text,end));
+}
+
 TEST_CASE("Test the String Utils trim function")
 {
     const std::string text = "             te xt                 ";
