@@ -67,6 +67,20 @@ public:
     void setLongitude(double l) {
         longitude = l;
     }
+    
+    /**Returns the transducer draft*/
+    double getLongitude() {
+        return draft;
+    }
+
+    /**
+     * Sets the transducer draft
+     *
+     * @param d the new transducer draft
+     */
+    void setLongitude(double d) {
+        draft = d;
+    }
 
     /**Return the timestamp of the sound velocity*/
     uint64_t getTimestamp() {
@@ -119,9 +133,43 @@ public:
 
         return speeds;
     }
+    
+    /**Returns the sound speed gradient*/
+    std::vector<double> & getSoundSpeedGradient() {
+        if(gradient.size() != samples.size()) {
+            for (unsigned int k=0; k < samples.size()-1; k++){
+                gradient.push_back( (getSpeeds()[k+1]- getSpeeds()[k])/(getDepths()[k+1]- getDepths()[k]) );
+            }
+        }
+        
+        return gradient;
+    }
+    
+    /**Returns the layer index at specified depth*/
+    unsigned int getLayerIndexForDraft() {
+        if(layerAtDraft > 0) {
+            //Layer already computed, just return it
+            return layerAtDraft;
+        } else if(draft < 0) {
+            //No draft was set
+            return layerAtDraft;
+        }
+        
+        // draft is set, but layer which contains transducer not computed yet
+        for (unsigned int k=0; k < samples.size()-1; k++){
+            if( draft > samples[k].first && draft < samples[k+1].first) {
+                continue;
+            }
+
+            layerAtDraft = k;
+            break;
+        }
+
+        return layerAtDraft;
+    }
 
     /**
-     * Returns the stream in which this ping will be writen
+     * Returns the stream in which this ping will be written
      *
      * @param os the stream in which to write this ping
      * @param obj the ping to write in the stream
@@ -143,12 +191,21 @@ private:
 
     /**longitude value of the SoundVelocityProfile*/
     double longitude;
+    
+    /*transducer draft (distance to water line)*/
+    double draft = -1;
+    
+    /*SVP layer which corresponds to transducer draft*/
+    unsigned int layerAtDraft = 0;
 
     /**vector that contains the dephts of the SoundVelocityProfile*/
     Eigen::VectorXd depths;
 
     /**vector that contain the speeds of the SoundVelocityProfile*/
     Eigen::VectorXd speeds;
+    
+    /**vector that contain sound speed gradient*/
+    std::vector<double> gradient;
 
     /**vector that contain the depths and the speeds*/
     std::vector<std::pair<double, double>> samples;

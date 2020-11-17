@@ -63,15 +63,13 @@ public:
 #endif        
 
         //compute gradient for each layer
-        std::vector<double> gradient;
-        for (unsigned int k=0; k < svp.getSize()-1; k++){
-                gradient.push_back( (svp.getSpeeds()[k+1]- svp.getSpeeds()[k])/(svp.getDepths()[k+1]- svp.getDepths()[k]) );
-        }
+        std::vector<double> gradient = svp.getSoundSpeedGradient();
         
-        //Snell's law's coefficient, using the first layer
-        double epsilon = cos(beta0)/svp.getSpeeds()[0];
+        //Snell's law's coefficient, using sound speed at transducer
+        double epsilon = cos(beta0)/ping.getSurfaceSoundSpeed();
         
-       unsigned int N = 0;
+        //use draft to determine layer in which raytracing starts
+       unsigned int N = svp.getLayerIndexForDraft();
        
        double sinBn     = 0;
        double sinBnm1   = 0;
