@@ -135,10 +135,10 @@ public:
     }
     
     /**Returns the sound speed gradient*/
-    std::vector<double> & getSoundSpeedGradient() {
-        if(gradient.size() != samples.size()) {
+    Eigen::VectorXd & getSoundSpeedGradient() {
+        if( (unsigned int) gradient.size() != samples.size()) {
             for (unsigned int k=0; k < samples.size()-1; k++){
-                gradient.push_back( (getSpeeds()[k+1]- getSpeeds()[k])/(getDepths()[k+1]- getDepths()[k]) );
+                gradient(k) = (getSpeeds()[k+1]- getSpeeds()[k])/(getDepths()[k+1]- getDepths()[k]);
             }
         }
         
@@ -146,26 +146,20 @@ public:
     }
     
     /**Returns the layer index at specified depth*/
-    unsigned int getLayerIndexForDraft() {
-        if(layerAtDraft > 0) {
-            //Layer already computed, just return it
-            return layerAtDraft;
-        } else if(draft < 0) {
-            //No draft was set
-            return layerAtDraft;
+    unsigned int getLayerIndexForDepth(double depth) {
+        
+        if(depth < samples[0].first) {
+            return 0;
         }
         
-        // draft is set, but layer which contains transducer not computed yet
         for (unsigned int k=0; k < samples.size()-1; k++){
-            if( draft > samples[k].first && draft < samples[k+1].first) {
-                continue;
+            if( depth > samples[k].first && depth < samples[k+1].first) {
+                return k+1;
             }
-
-            layerAtDraft = k;
-            break;
         }
-
-        return layerAtDraft;
+        
+        // depth is greater than svp's deepest sample
+        return samples.size();
     }
 
     /**
@@ -205,7 +199,7 @@ private:
     Eigen::VectorXd speeds;
     
     /**vector that contain sound speed gradient*/
-    std::vector<double> gradient;
+    Eigen::VectorXd gradient;
 
     /**vector that contain the depths and the speeds*/
     std::vector<std::pair<double, double>> samples;
