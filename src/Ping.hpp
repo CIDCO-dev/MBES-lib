@@ -41,8 +41,7 @@ private:
 
     /**Value of the angle that passes across the track (degrees)*/
     double acrossTrackAngle; // In degrees, AKA reception angle, beta, zeta, beam angle
-
-
+    
     /*Trigonometry is stored to prevent redundant recalculations*/
     /**Sine value of the along track angle*/
     double sA;
@@ -55,6 +54,9 @@ private:
 
     /**Cosine value of the across track angle*/
     double cB;
+    
+    /**Value of the transducer depth, in practice this varies with vessel motion*/
+    double transducerDepth=0;
 
 
 public:
@@ -229,6 +231,19 @@ public:
      */
     void setIntensity(double intensity) {
         intensity = intensity;
+    }
+    
+    /**Return the transducer depth*/
+    double getTransducerDepth() {
+        return transducerDepth;
+    }
+
+    /**
+     * Set the transducer depth
+     * @param d
+     */
+    void setTransducerDepth(double d) {
+        transducerDepth = d;
     }
 
     static bool sortByTimestamp(Ping & p1, Ping & p2) {
