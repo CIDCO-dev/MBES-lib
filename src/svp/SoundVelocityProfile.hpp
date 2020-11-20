@@ -147,18 +147,20 @@ public:
     
     /**Returns the layer index at specified depth*/
     unsigned int getLayerIndexForDepth(double depth) {
+        // Warning: do not confuse layer with svp sample
+        // a layer is the space above or beneath a sample
         
         if(depth < samples[0].first) {
-            return 0;
+            return 0; // the 0-th layer is shallower than the shallowest svp sample
         }
         
         for (unsigned int k=0; k < samples.size()-1; k++){
-            if( depth > samples[k].first && depth < samples[k+1].first) {
+            if( depth >= samples[k].first && depth < samples[k+1].first) {
                 return k+1;
             }
         }
         
-        // depth is greater than svp's deepest sample
+        // This layer is deeper than the deepest svp sample
         return samples.size();
     }
 

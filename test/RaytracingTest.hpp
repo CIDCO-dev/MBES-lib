@@ -121,7 +121,7 @@ static void oldRayTrace(Eigen::Vector3d & raytracedPing,Ping & ping,SoundVelocit
 
 
 
-TEST_CASE("describe this test") {
+TEST_CASE("Launch vector straight down, one way travel time is 1 second, constant c=1500") {
     
     /*Build an svp with a single constant speed layer*/    
     SoundVelocityProfile * svp = new SoundVelocityProfile();
@@ -129,22 +129,19 @@ TEST_CASE("describe this test") {
     double depth1 = 0;
     double speed1 = 1500;
     
-    double depth2 = 10;
+    double depth2 = 10; // svp ends before bottom
     double speed2 = 1500;
     
     svp->add(depth1, speed1);
     svp->add(depth2, speed2);
-    
-    
-    
-    
     
     uint64_t microEpoch = 0;
     long id = 0;
     uint32_t quality = 0;
     double intensity = 0;
     double surfaceSoundSpeed = 1500;
-    double twoWayTravelTime = 2;
+    double twoWayTravelTime = 2; // oneWayTravelTime is 1 second
+    // launch angle is straight down
     double alongTrackAngle = 0.0;
     double acrossTrackAngle = 0.0;
     
@@ -162,20 +159,13 @@ TEST_CASE("describe this test") {
     Eigen::Matrix3d boresightMatrix = Eigen::Matrix3d::Identity();
     Eigen::Matrix3d imu2nav = Eigen::Matrix3d::Identity();
     
-    
-    
-    Eigen::Vector3d raytracedPingOldFunction;
-    oldRayTrace(raytracedPingOldFunction, ping, *svp, boresightMatrix, imu2nav);
-    
-    
     Eigen::Vector3d raytracedPingRefactored;
     Raytracing::rayTrace(raytracedPingRefactored, ping, *svp, boresightMatrix, imu2nav);
     
-    std::cout << "raytracedPingOldFunction:" << std::endl;
-    std::cout << raytracedPingOldFunction << std::endl;
-    
-    std::cout << "raytracedPingRefactored:" << std::endl;
-    std::cout << raytracedPingRefactored << std::endl;
+    double rayTestTreshold = 1e-9;
+    REQUIRE(std::abs(0 - raytracedPingRefactored(0)) < rayTestTreshold);
+    REQUIRE(std::abs(0 - raytracedPingRefactored(1)) < rayTestTreshold);
+    REQUIRE(std::abs(1500 - raytracedPingRefactored(2)) < rayTestTreshold);
 }
 
 

@@ -20,7 +20,7 @@ public:
     
     // gradient inferior to this epsilon is considered 0
     // TODO: find a physically significant value for epsilon
-    static const double gradientEpsilon = 0.000001; 
+    static constexpr double gradientEpsilon = 0.000001; 
     
     static void constantCelerityRayTracing(double z0, double z1, double c, double snellConstant, double & deltaZ, double & deltaR, double & deltaTravelTime) {
         double cosBn   = snellConstant*c;
@@ -42,6 +42,17 @@ public:
         deltaTravelTime = abs((1./abs(gradient))*log((c1/c0)*((1.0 + sinBnm1)/(1.0 + sinBn))));
         deltaZ = radiusOfCurvature*(cosBn - cosBnm1);
         deltaR = radiusOfCurvature*(sinBnm1 - sinBn);
+    }
+    
+    static double soundSpeedGradient(double z0, double c0, double z1, double c1) {
+        if(z1 == z0) {
+            //this happens when svp contains multiple entries at same depth
+            std::stringstream ss;
+            ss << "Can't calculate gradient for svp samples at same depth: z0=" << z0 << " z1=" << z1;
+            throw std::invalid_argument(ss.str());
+        }
+        
+        return (c1 - c0) / (z1 - z0);
     }
     
     /**
@@ -108,7 +119,7 @@ public:
         //Snell's law's coefficient, using sound speed at transducer
         double snellConstant = cos(beta0)/ping.getSurfaceSoundSpeed();
         unsigned int svpCutoffIndex = svp.getLayerIndexForDepth(ping.getTransducerDepth()); //test this
-        double gradientTransducerSvp = (svp.getSpeeds()[svpCutoffIndex]- ping.getSurfaceSoundSpeed())/(svp.getDepths()[svpCutoffIndex]- ping.getTransducerDepth());
+        double gradientTransducerSvp = soundSpeedGradient(ping.getTransducerDepth(), ping.getSurfaceSoundSpeed(), svp.getDepths()[svpCutoffIndex], svp.getSpeeds()[svpCutoffIndex]);
         unsigned int currentLayerIndex = 0;
         
         if(abs(gradientTransducerSvp) < gradientEpsilon) {
