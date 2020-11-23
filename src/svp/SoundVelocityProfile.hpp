@@ -67,20 +67,6 @@ public:
     void setLongitude(double l) {
         longitude = l;
     }
-    
-    /**Returns the transducer draft*/
-    double getDraft() {
-        return draft;
-    }
-
-    /**
-     * Sets the transducer draft
-     *
-     * @param d the new transducer draft
-     */
-    void setDraft(double d) {
-        draft = d;
-    }
 
     /**Return the timestamp of the sound velocity*/
     uint64_t getTimestamp() {
@@ -189,12 +175,6 @@ private:
 
     /**longitude value of the SoundVelocityProfile*/
     double longitude;
-    
-    /*transducer draft (distance to water line)*/
-    double draft = -1;
-    
-    /*SVP layer which corresponds to transducer draft*/
-    unsigned int layerAtDraft = 0;
 
     /**vector that contains the dephts of the SoundVelocityProfile*/
     Eigen::VectorXd depths;

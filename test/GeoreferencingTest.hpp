@@ -96,7 +96,7 @@ TEST_CASE("Georeferencing LGF test") {
     Eigen::Vector3d expectedGeoreferencedPing;
     expectedGeoreferencedPing << -26.8825997032, 7.3549385469, 10.4758625062;
 
-    double georefTestTreshold = 6e-3;
+    double georefTestTreshold = 2e-2; // 2cm
     REQUIRE(std::abs(expectedGeoreferencedPing(0) - georeferencedPing(0)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeoreferencedPing(1) - georeferencedPing(1)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeoreferencedPing(2) - georeferencedPing(2)) < georefTestTreshold);
@@ -109,6 +109,7 @@ TEST_CASE("Georeference TRF with position and downward ping only") {
     Position position(0, 48.4525, -68.5232, 15.401);
     Ping ping(0, 0, 0, 0, 0, 0.01, 0.0, 0.0);
     SoundVelocityProfile * svp = SoundVelocityProfileFactory::buildFreshWaterModel();
+    ping.setSurfaceSoundSpeed(svp->getSpeeds()(0)); //important now that raytracing uses it
     Eigen::Vector3d leverArm(0, 0, 0);
     Eigen::Matrix3d boresight = Eigen::Matrix3d::Identity();
 
@@ -136,6 +137,7 @@ TEST_CASE("Georeference LGF with position and downward ping only") {
     Position position(0, 48.4525, -68.5232, 15.401);
     Ping ping(0, 0, 0, 0, 0, 0.01, 0, 0);
     SoundVelocityProfile * svp = SoundVelocityProfileFactory::buildFreshWaterModel();
+    ping.setSurfaceSoundSpeed(svp->getSpeeds()(0)); //important now that raytracing uses it
     Eigen::Vector3d leverArm(0, 0, 0);
     Eigen::Matrix3d boresight = Eigen::Matrix3d::Identity();
 
@@ -191,6 +193,7 @@ TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and
 
     /*Build SVP*/
     SoundVelocityProfile * svp = SoundVelocityProfileFactory::buildFreshWaterModel();
+    ping.setSurfaceSoundSpeed(svp->getSpeeds()(0)); //important now that raytracing uses it
 
     /*Build lever arm*/
     Eigen::Vector3d leverArm(0, 0, 0);
@@ -268,6 +271,7 @@ TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and
 
     /*Build SVP*/
     SoundVelocityProfile * svp = SoundVelocityProfileFactory::buildFreshWaterModel();
+    ping.setSurfaceSoundSpeed(svp->getSpeeds()(0)); //important now that raytracing uses it
 
     /*Build lever arm*/
     Eigen::Vector3d leverArm(0, 0, 0);
@@ -334,6 +338,7 @@ TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and
 
     /*Build SVP*/
     SoundVelocityProfile * svp = SoundVelocityProfileFactory::buildFreshWaterModel();
+    ping.setSurfaceSoundSpeed(svp->getSpeeds()(0)); //important now that raytracing uses it
 
     /*Build lever arm*/
     Eigen::Vector3d leverArm(1, 2, 3);
@@ -412,6 +417,7 @@ TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and
 
     /*Build SVP*/
     SoundVelocityProfile * svp = SoundVelocityProfileFactory::buildFreshWaterModel();
+    ping.setSurfaceSoundSpeed(svp->getSpeeds()(0)); //important now that raytracing uses it
 
     /*Build lever arm*/
     Eigen::Vector3d leverArm(1, 2, 3);
@@ -478,6 +484,7 @@ TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and
 
     /*Build SVP*/
     SoundVelocityProfile * svp = SoundVelocityProfileFactory::buildFreshWaterModel();
+    ping.setSurfaceSoundSpeed(svp->getSpeeds()(0)); //important now that raytracing uses it
 
     /*Build lever arm*/
     Eigen::Vector3d leverArm(1, 2, 3);
@@ -561,6 +568,7 @@ TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and
 
     /*Build SVP*/
     SoundVelocityProfile * svp = SoundVelocityProfileFactory::buildFreshWaterModel();
+    ping.setSurfaceSoundSpeed(svp->getSpeeds()(0)); //important now that raytracing uses it
 
     /*Build lever arm*/
     Eigen::Vector3d leverArm(1, 2, 3);
@@ -632,6 +640,7 @@ TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and
 
     /*Build SVP*/
     SoundVelocityProfile * svp = SoundVelocityProfileFactory::buildFreshWaterModel();
+    ping.setSurfaceSoundSpeed(svp->getSpeeds()(0)); //important now that raytracing uses it
 
     /*Build lever arm*/
     Eigen::Vector3d leverArm(1, 2, 3);
@@ -715,6 +724,7 @@ TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and
 
     /*Build SVP*/
     SoundVelocityProfile * svp = SoundVelocityProfileFactory::buildFreshWaterModel();
+    ping.setSurfaceSoundSpeed(svp->getSpeeds()(0)); //important now that raytracing uses it
 
     /*Build lever arm*/
     Eigen::Vector3d leverArm(1, 2, 3);
