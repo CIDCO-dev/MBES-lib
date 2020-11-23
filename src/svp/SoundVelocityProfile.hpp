@@ -136,9 +136,11 @@ public:
     
     /**Returns the sound speed gradient*/
     Eigen::VectorXd & getSoundSpeedGradient() {
-        if( (unsigned int) gradient.size() != samples.size()) {
+        if( (unsigned int) gradient.size() != samples.size()-1) {
+            gradient.resize(samples.size() - 1);
+            
             for (unsigned int k=0; k < samples.size()-1; k++){
-                gradient(k) = (getSpeeds()[k+1]- getSpeeds()[k])/(getDepths()[k+1]- getDepths()[k]);
+                gradient(k) = (getSpeeds()(k+1)- getSpeeds()(k))/(getDepths()(k+1)- getDepths()(k));
             }
         }
         

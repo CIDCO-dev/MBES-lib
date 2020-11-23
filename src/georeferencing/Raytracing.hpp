@@ -114,18 +114,22 @@ public:
         double cumulativeRayZ = 0;
         
         double oneWayTravelTime = (ping.getTwoWayTravelTime()/(double)2);
+        
+        Eigen::VectorXd depths = svp.getDepths();
+        Eigen::VectorXd speeds = svp.getSpeeds();
+        Eigen::VectorXd gradient = svp.getSoundSpeedGradient();
 
         //Ray tracing in first layer using sound speed at transducer
         //Snell's law's coefficient, using sound speed at transducer
         double snellConstant = cos(beta0)/ping.getSurfaceSoundSpeed();
         unsigned int svpCutoffIndex = svp.getLayerIndexForDepth(ping.getTransducerDepth()); //test this
-        double gradientTransducerSvp = soundSpeedGradient(ping.getTransducerDepth(), ping.getSurfaceSoundSpeed(), svp.getDepths()[svpCutoffIndex], svp.getSpeeds()[svpCutoffIndex]);
-        unsigned int currentLayerIndex = 0;
+        double gradientTransducerSvp = soundSpeedGradient(ping.getTransducerDepth(), ping.getSurfaceSoundSpeed(), depths(svpCutoffIndex), speeds(svpCutoffIndex));
+        
         
         if(abs(gradientTransducerSvp) < gradientEpsilon) {
             constantCelerityRayTracing(
                 ping.getTransducerDepth(),
-                svp.getDepths()[svpCutoffIndex],
+                depths(svpCutoffIndex),
                 ping.getSurfaceSoundSpeed(),
                 snellConstant,
                 currentLayerDeltaZ,
@@ -135,7 +139,7 @@ public:
         } else {
             constantGradientRayTracing(
                 ping.getSurfaceSoundSpeed(),
-                svp.getSpeeds()[svpCutoffIndex],
+                speeds(svpCutoffIndex),
                 gradientTransducerSvp,
                 snellConstant,
                 currentLayerDeltaZ,
@@ -147,21 +151,21 @@ public:
         //To ensure to work with the currentLayerIndex-1 cumulated travel time
         if (cumulativeRaytraceTime + currentLayerRaytraceTime <= oneWayTravelTime)
         {
-            currentLayerIndex++;
             cumulativeRayX += currentLayerDeltaR;
             cumulativeRayZ += currentLayerDeltaZ;
             cumulativeRaytraceTime += currentLayerRaytraceTime;
         }
         
+        unsigned int currentLayerIndex = svpCutoffIndex;
         while( (cumulativeRaytraceTime + currentLayerRaytraceTime)<=oneWayTravelTime //ray tracing time must be smaller than oneWayTravelTime
                 && (currentLayerIndex<svp.getSize()-1) // stop before last layer
         ) {
-            if (abs(svp.getSoundSpeedGradient()[currentLayerIndex]) < gradientEpsilon)
+            if (abs(gradient(currentLayerIndex)) < gradientEpsilon)
             {
                 constantCelerityRayTracing(
-                    svp.getDepths()[currentLayerIndex],
-                    svp.getDepths()[currentLayerIndex+1],
-                    svp.getSpeeds()[currentLayerIndex],
+                    depths(svpCutoffIndex),
+                    depths(svpCutoffIndex+1),
+                    speeds(svpCutoffIndex),
                     snellConstant,
                     currentLayerDeltaZ,
                     currentLayerDeltaR,
@@ -170,9 +174,9 @@ public:
             }
             else {
                 constantGradientRayTracing(
-                    svp.getSpeeds()[currentLayerIndex],
-                    svp.getSpeeds()[currentLayerIndex+1],
-                    svp.getSoundSpeedGradient()[currentLayerIndex],
+                    speeds(svpCutoffIndex),
+                    speeds(svpCutoffIndex+1),
+                    gradient(currentLayerIndex),
                     snellConstant,
                     currentLayerDeltaZ,
                     currentLayerDeltaR,
@@ -192,7 +196,7 @@ public:
         }
        
         // Last Layer Propagation
-        double c_lastLayer = svp.getSpeeds()[svp.getSize()-1];
+        double c_lastLayer = speeds(svp.getSize()-1);
         double cosBn   = snellConstant*c_lastLayer;
         double sinBn   = sqrt(1 - pow(cosBn, 2));
         double lastLayerTraveTime = oneWayTravelTime - cumulativeRaytraceTime;
