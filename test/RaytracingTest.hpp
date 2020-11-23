@@ -99,7 +99,6 @@ static void oldRayTrace(Eigen::Vector3d & raytracedPing, Ping & ping, SoundVeloc
             zff = zff + DZ;
             DT = DT + dtt;
         }
-
     }
 
     // Last Layer Propagation
@@ -116,7 +115,60 @@ static void oldRayTrace(Eigen::Vector3d & raytracedPing, Ping & ping, SoundVeloc
     raytracedPing(2) = Zf;
 }
 
-TEST_CASE("constant gradient test case") {
+TEST_CASE("ray tracing with transducer depth case") {
+
+    std::string svpFilePath1 = "test/data/rayTracingTestData/SVP-0.svp";
+    CarisSvpFile svps1;
+    svps1.readSvpFile(svpFilePath1);
+    SoundVelocityProfile * svp1 = svps1.getSvps()[0];
+    
+    std::string svpFilePath2 = "test/data/rayTracingTestData/SVP-0_1.svp";
+    CarisSvpFile svps2;
+    svps2.readSvpFile(svpFilePath2);
+    SoundVelocityProfile * svp2 = svps2.getSvps()[0];
+    
+    double depth = svp2->getDepths()(0);
+    double speed = svp2->getSpeeds()(0);
+    
+    Eigen::Matrix3d boresightMatrix = Eigen::Matrix3d::Identity();
+    Eigen::Matrix3d imu2nav = Eigen::Matrix3d::Identity();
+
+    uint64_t microEpoch = 0;
+    long id = 0;
+    uint32_t quality = 0;
+    double intensity = 0;
+    double surfaceSoundSpeed = speed;
+    double oneWayTravelTime = 0.004;
+    double twoWayTravelTime = 2*oneWayTravelTime;
+    double alongTrackAngle = 0.0;
+    double acrossTrackAngle = 45.0; //45 degrees
+
+    Ping ping(
+        microEpoch,
+        id,
+        quality,
+        intensity,
+        surfaceSoundSpeed,
+        twoWayTravelTime,
+        alongTrackAngle,
+        acrossTrackAngle
+    );
+
+    ping.setTransducerDepth(depth); // set ping to svp depth
+    
+    Eigen::Vector3d rayOldRayTraced;
+    oldRayTrace(rayOldRayTraced, ping, *svp2, boresightMatrix, imu2nav);
+
+    Eigen::Vector3d ray;
+    Raytracing::rayTrace(ray, ping, *svp1, boresightMatrix, imu2nav);
+    
+    double rayTestTreshold = 1e-9;
+    REQUIRE(std::abs(rayOldRayTraced(0) - ray(0)) < rayTestTreshold);
+    REQUIRE(std::abs(rayOldRayTraced(1) - ray(1)) < rayTestTreshold);
+    REQUIRE(std::abs(rayOldRayTraced(2) - ray(2)) < rayTestTreshold);
+}
+
+TEST_CASE("ray tracing without transducer depth test case") {
 
     std::string svpFilePath = "test/data/rayTracingTestData/SVP-0.svp";
     CarisSvpFile svps;
@@ -124,16 +176,11 @@ TEST_CASE("constant gradient test case") {
     SoundVelocityProfile * svp = svps.getSvps()[0];
 
     double depth1 = svp->getDepths()(0);
-    std::cout << "depth1:" << std::endl;
-    std::cout << depth1 << std::endl;
     double speed1 = svp->getSpeeds()(0);
-    std::cout << "speed1:" << std::endl;
-    std::cout << speed1 << std::endl;
     
     Eigen::Matrix3d boresightMatrix = Eigen::Matrix3d::Identity();
     Eigen::Matrix3d imu2nav = Eigen::Matrix3d::Identity();
 
-    // create 10 pings which differ only by travel time
     uint64_t microEpoch = 0;
     long id = 0;
     uint32_t quality = 0;
@@ -155,23 +202,21 @@ TEST_CASE("constant gradient test case") {
         acrossTrackAngle
     );
 
+    // By setting the transducer depth to svp first sample depth
+    // we make sure that the refactored ray tracing algorithm
+    // gives the same result as the old raytracing
     ping.setTransducerDepth(depth1); // set ping to svp depth
     
     Eigen::Vector3d rayOldRayTraced;
     oldRayTrace(rayOldRayTraced, ping, *svp, boresightMatrix, imu2nav);
 
-    std::cout << "rayOldRayTraced:" << std::endl;
-    std::cout << rayOldRayTraced << std::endl;
-    std::cout << std::endl;
-
     Eigen::Vector3d ray;
     Raytracing::rayTrace(ray, ping, *svp, boresightMatrix, imu2nav);
-    std::cout << "rayNewRayTraced:" << std::endl;
-    std::cout << ray << std::endl;
-    std::cout << std::endl;
     
-
-    
+    double rayTestTreshold = 1e-9;
+    REQUIRE(std::abs(rayOldRayTraced(0) - ray(0)) < rayTestTreshold);
+    REQUIRE(std::abs(rayOldRayTraced(1) - ray(1)) < rayTestTreshold);
+    REQUIRE(std::abs(rayOldRayTraced(2) - ray(2)) < rayTestTreshold);
 }
 
 TEST_CASE("Launch vector straight down, one way travel time is 1 second, constant c=1500") {
@@ -275,7 +320,7 @@ TEST_CASE("Ray tracing test") {
     Eigen::Vector3d expectedRay;
     expectedRay << -0.6131269227, 8.2028276296, 10.4345279516;
 
-    double rayTestTreshold = 6e-3;
+    double rayTestTreshold = 2e-2; // 2 cm difference
     REQUIRE(std::abs(expectedRay(0) - ray(0)) < rayTestTreshold);
     REQUIRE(std::abs(expectedRay(1) - ray(1)) < rayTestTreshold);
     REQUIRE(std::abs(expectedRay(2) - ray(2)) < rayTestTreshold);

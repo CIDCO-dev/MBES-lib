@@ -78,14 +78,14 @@ public:
 
 #ifdef DEBUG
         std::cerr << "Unit launch vector: " << std::endl << launchVectorSonar << std::endl << std::endl;
-#endif        
+#endif
         
 	//convert to navigation frame where the raytracing occurs
 	Eigen::Vector3d launchVectorNav = imu2nav * (boresightMatrix * launchVectorSonar);
         
 #ifdef DEBUG
         std::cerr << "Launch vector in nav frame: " << std::endl << launchVectorNav << std::endl << std::endl;
-#endif                
+#endif
 
         double vNorm = sqrt(pow(launchVectorNav(0), 2)  + pow(launchVectorNav(1), 2));
         
@@ -97,13 +97,7 @@ public:
         std::cerr << "sinAZ: " << sinAz << std::endl;
         std::cerr << "cosAz: " << cosAz << std::endl;
         std::cerr << "beta0: " << beta0 << std::endl << std::endl;
-#endif        
-
-        
-        
-        
-        
-        
+#endif
         
         double currentLayerRaytraceTime = 0;
         double currentLayerDeltaZ = 0;
@@ -163,9 +157,9 @@ public:
             if (abs(gradient(currentLayerIndex)) < gradientEpsilon)
             {
                 constantCelerityRayTracing(
-                    depths(svpCutoffIndex),
-                    depths(svpCutoffIndex+1),
-                    speeds(svpCutoffIndex),
+                    depths(currentLayerIndex),
+                    depths(currentLayerIndex+1),
+                    speeds(currentLayerIndex),
                     snellConstant,
                     currentLayerDeltaZ,
                     currentLayerDeltaR,
@@ -174,8 +168,8 @@ public:
             }
             else {
                 constantGradientRayTracing(
-                    speeds(svpCutoffIndex),
-                    speeds(svpCutoffIndex+1),
+                    speeds(currentLayerIndex),
+                    speeds(currentLayerIndex+1),
                     gradient(currentLayerIndex),
                     snellConstant,
                     currentLayerDeltaZ,
@@ -191,12 +185,13 @@ public:
                 cumulativeRayX += currentLayerDeltaR;
                 cumulativeRayZ += currentLayerDeltaZ;
                 cumulativeRaytraceTime += currentLayerRaytraceTime;
+            } else {
+                break; // this layer's travel time causes overshoot for onewaytraveltime
             }
-
         }
        
         // Last Layer Propagation
-        double c_lastLayer = speeds(svp.getSize()-1);
+        double c_lastLayer = speeds(currentLayerIndex);
         double cosBn   = snellConstant*c_lastLayer;
         double sinBn   = sqrt(1 - pow(cosBn, 2));
         double lastLayerTraveTime = oneWayTravelTime - cumulativeRaytraceTime;
