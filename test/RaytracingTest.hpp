@@ -326,5 +326,101 @@ TEST_CASE("Ray tracing test") {
     REQUIRE(std::abs(expectedRay(2) - ray(2)) < rayTestTreshold);
 }
 
+TEST_CASE("Ray tracing with transducer depth test") {
+    
+    /*Build an svp with a 3 layers*/
+    SoundVelocityProfile * svp = new SoundVelocityProfile();
+
+    double depth1 = 5;
+    double speed1 = 1500;
+
+    double depth2 = 7;
+    double speed2 = 1550;
+    
+    double transducerDepth1 = 4;
+    double transducerDepth2 = 6;
+    double transducerDepth3 = 8;
+
+    svp->add(depth1, speed1);
+    svp->add(depth2, speed2);
+    
+    /*Build 3 Pings*/
+    uint64_t microEpoch = 0;
+    long id = 0;
+    uint32_t quality = 0;
+    double intensity = 0;
+    double surfaceSoundSpeed1 = 1475;
+    double surfaceSoundSpeed2 = 1525;
+    double surfaceSoundSpeed3 = 1575;
+    double twoWayTravelTime = 0.02 * 2;
+    double alongTrackAngle = 0.0;
+    double acrossTrackAngle = 45.0;
+
+    Ping ping1(
+            microEpoch,
+            id,
+            quality,
+            intensity,
+            surfaceSoundSpeed1,
+            twoWayTravelTime,
+            alongTrackAngle,
+            acrossTrackAngle
+            );
+    
+    Ping ping2(
+            microEpoch,
+            id,
+            quality,
+            intensity,
+            surfaceSoundSpeed2,
+            twoWayTravelTime,
+            alongTrackAngle,
+            acrossTrackAngle
+            );
+    
+    Ping ping3(
+            microEpoch,
+            id,
+            quality,
+            intensity,
+            surfaceSoundSpeed3,
+            twoWayTravelTime,
+            alongTrackAngle,
+            acrossTrackAngle
+            );
+    
+    
+    ping1.setTransducerDepth(transducerDepth1);  // shallower than first SVP sample
+    ping2.setTransducerDepth(transducerDepth2);  // between the 2 SVP samples
+    ping3.setTransducerDepth(transducerDepth3); // deeper than last SVP sample
+    
+    
+    Eigen::Matrix3d boresightMatrix = Eigen::Matrix3d::Identity();
+    Eigen::Matrix3d imu2nav = Eigen::Matrix3d::Identity();
+    
+    /* Perform the ray tracing*/
+    Eigen::Vector3d ray1;
+    Raytracing::rayTrace(ray1, ping1, *svp, boresightMatrix, imu2nav);
+    
+    Eigen::Vector3d ray2;
+    Raytracing::rayTrace(ray2, ping2, *svp, boresightMatrix, imu2nav);
+    
+    Eigen::Vector3d ray3;
+    Raytracing::rayTrace(ray3, ping2, *svp, boresightMatrix, imu2nav);
+    
+    std::cout << "ray1" << std::endl;
+    std::cout << ray1 << std::endl;
+    
+    std::cout << "ray2" << std::endl;
+    std::cout << ray2 << std::endl;
+    
+    std::cout << "ray3" << std::endl;
+    std::cout << ray3 << std::endl;
+    
+    
+}
+
+
+
 #endif /* RAYTRACINGTEST_HPP */
 
