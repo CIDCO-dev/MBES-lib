@@ -113,41 +113,45 @@ public:
         Eigen::VectorXd speeds = svp.getSpeeds();
         Eigen::VectorXd gradient = svp.getSoundSpeedGradient();
 
-        //Ray tracing in first layer using sound speed at transducer
+        
         //Snell's law's coefficient, using sound speed at transducer
         double snellConstant = cos(beta0)/ping.getSurfaceSoundSpeed();
         unsigned int svpCutoffIndex = svp.getLayerIndexForDepth(ping.getTransducerDepth()); //test this
-        double gradientTransducerSvp = soundSpeedGradient(ping.getTransducerDepth(), ping.getSurfaceSoundSpeed(), depths(svpCutoffIndex), speeds(svpCutoffIndex));
         
+        if(svpCutoffIndex < svp.getSize()) {
+            // transducer depth is within svp bounds
+            //Ray tracing in first layer using sound speed at transducer
+            double gradientTransducerSvp = soundSpeedGradient(ping.getTransducerDepth(), ping.getSurfaceSoundSpeed(), depths(svpCutoffIndex), speeds(svpCutoffIndex));
         
-        if(abs(gradientTransducerSvp) < gradientEpsilon) {
-            constantCelerityRayTracing(
-                ping.getTransducerDepth(),
-                depths(svpCutoffIndex),
-                ping.getSurfaceSoundSpeed(),
-                snellConstant,
-                currentLayerDeltaZ,
-                currentLayerDeltaR,
-                currentLayerRaytraceTime
-            );
-        } else {
-            constantGradientRayTracing(
-                ping.getSurfaceSoundSpeed(),
-                speeds(svpCutoffIndex),
-                gradientTransducerSvp,
-                snellConstant,
-                currentLayerDeltaZ,
-                currentLayerDeltaR,
-                currentLayerRaytraceTime
-            );
-        }
-        
-        //To ensure to work with the currentLayerIndex-1 cumulated travel time
-        if (cumulativeRaytraceTime + currentLayerRaytraceTime <= oneWayTravelTime)
-        {
-            cumulativeRayX += currentLayerDeltaR;
-            cumulativeRayZ += currentLayerDeltaZ;
-            cumulativeRaytraceTime += currentLayerRaytraceTime;
+            if(abs(gradientTransducerSvp) < gradientEpsilon) {
+                constantCelerityRayTracing(
+                    ping.getTransducerDepth(),
+                    depths(svpCutoffIndex),
+                    ping.getSurfaceSoundSpeed(),
+                    snellConstant,
+                    currentLayerDeltaZ,
+                    currentLayerDeltaR,
+                    currentLayerRaytraceTime
+                );
+            } else {
+                constantGradientRayTracing(
+                    ping.getSurfaceSoundSpeed(),
+                    speeds(svpCutoffIndex),
+                    gradientTransducerSvp,
+                    snellConstant,
+                    currentLayerDeltaZ,
+                    currentLayerDeltaR,
+                    currentLayerRaytraceTime
+                );
+            }
+
+            //To ensure to work with the currentLayerIndex-1 cumulated travel time
+            if (cumulativeRaytraceTime + currentLayerRaytraceTime <= oneWayTravelTime)
+            {
+                cumulativeRayX += currentLayerDeltaR;
+                cumulativeRayZ += currentLayerDeltaZ;
+                cumulativeRaytraceTime += currentLayerRaytraceTime;
+            }
         }
         
         unsigned int currentLayerIndex = svpCutoffIndex;
@@ -191,7 +195,14 @@ public:
         }
        
         // Last Layer Propagation
-        double c_lastLayer = speeds(currentLayerIndex);
+        double c_lastLayer;
+        if(svpCutoffIndex < svp.getSize()) {
+            c_lastLayer = speeds(currentLayerIndex);
+        } else {
+            // The transducer is deeper than last SVP sample
+            c_lastLayer = ping.getSurfaceSoundSpeed();
+        }
+        
         double cosBn   = snellConstant*c_lastLayer;
         double sinBn   = sqrt(1 - pow(cosBn, 2));
         double lastLayerTraveTime = oneWayTravelTime - cumulativeRaytraceTime;
