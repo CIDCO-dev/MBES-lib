@@ -119,9 +119,41 @@ public:
 
         return speeds;
     }
+    
+    /**Returns the sound speed gradient*/
+    Eigen::VectorXd & getSoundSpeedGradient() {
+        if( (unsigned int) gradient.size() != samples.size()-1) {
+            gradient.resize(samples.size() - 1);
+            
+            for (unsigned int k=0; k < samples.size()-1; k++){
+                gradient(k) = (getSpeeds()(k+1)- getSpeeds()(k))/(getDepths()(k+1)- getDepths()(k));
+            }
+        }
+        
+        return gradient;
+    }
+    
+    /**Returns the layer index at specified depth*/
+    unsigned int getLayerIndexForDepth(double depth) {
+        // Warning: do not confuse layer with svp sample
+        // a layer is the space above or beneath a sample
+        
+        if(depth < samples[0].first) {
+            return 0; // the 0-th layer is shallower than the shallowest svp sample
+        }
+        
+        for (unsigned int k=0; k < samples.size()-1; k++){
+            if( depth >= samples[k].first && depth < samples[k+1].first) {
+                return k+1;
+            }
+        }
+        
+        // This layer is deeper than the deepest svp sample
+        return samples.size();
+    }
 
     /**
-     * Returns the stream in which this ping will be writen
+     * Returns the stream in which this ping will be written
      *
      * @param os the stream in which to write this ping
      * @param obj the ping to write in the stream
@@ -149,6 +181,9 @@ private:
 
     /**vector that contain the speeds of the SoundVelocityProfile*/
     Eigen::VectorXd speeds;
+    
+    /**vector that contain sound speed gradient*/
+    Eigen::VectorXd gradient;
 
     /**vector that contain the depths and the speeds*/
     std::vector<std::pair<double, double>> samples;

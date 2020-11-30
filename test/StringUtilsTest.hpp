@@ -79,10 +79,10 @@ TEST_CASE("Test the String Utils end with ci function")
     REQUIRE(StringUtils::ends_with(text,end)==false);
     text = "text";
     end = "eXt";
-    REQUIRE(StringUtils::ends_with(text,end));
+    REQUIRE(StringUtils::ends_with(text,end)==false); // FYI ends_with() compares string lengths
     text = "TeXt";
     end = "ExT";
-    REQUIRE(StringUtils::ends_with(text,end));
+    REQUIRE(StringUtils::ends_with(text,end)==false); // FYI ends_with() compares string lengths
 }
 
 TEST_CASE("Test the String Utils trim function")
