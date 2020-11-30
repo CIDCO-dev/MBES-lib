@@ -31,6 +31,13 @@ public:
         deltaR = cosBn*deltaTravelTime*c;
     }
     
+    static void lastLayerPropagation(double lastLayerTraveTime, double c_lastLayer, double snellConstant, double & deltaZ, double & deltaR) {
+        double cosBn   = snellConstant*c_lastLayer;
+        double sinBn   = sqrt(1 - pow(cosBn, 2));
+        deltaR = c_lastLayer*lastLayerTraveTime*cosBn;
+        deltaZ = c_lastLayer*lastLayerTraveTime*sinBn;
+    }
+    
     static void constantGradientRayTracing(double c0, double c1, double gradient, double snellConstant, double & deltaZ, double & deltaR, double & deltaTravelTime) {
         double cosBnm1 = snellConstant*c0;
         double cosBn   = snellConstant*c1;
@@ -116,7 +123,7 @@ public:
         
         //Snell's law's coefficient, using sound speed at transducer
         double snellConstant = cos(beta0)/ping.getSurfaceSoundSpeed();
-        unsigned int svpCutoffIndex = svp.getLayerIndexForDepth(ping.getTransducerDepth()); //test this
+        unsigned int svpCutoffIndex = svp.getLayerIndexForDepth(ping.getTransducerDepth());
         
         if(svpCutoffIndex < svp.getSize()) {
             // transducer depth is within svp bounds
@@ -152,6 +159,9 @@ public:
                 cumulativeRayZ += currentLayerDeltaZ;
                 cumulativeRaytraceTime += currentLayerRaytraceTime;
             }
+        } else {
+            // transducer is below deepest SVP sample
+            // do nothing, last layer ray tracing after loop
         }
         
         unsigned int currentLayerIndex = svpCutoffIndex;
@@ -203,16 +213,25 @@ public:
             c_lastLayer = ping.getSurfaceSoundSpeed();
         }
         
+        double lastLayerTraveTime = oneWayTravelTime - cumulativeRaytraceTime;
+        double dxf;
+        double dzf;
+        
+        lastLayerPropagation(lastLayerTraveTime, c_lastLayer, snellConstant, dzf, dxf);
+        
+        /*
         double cosBn   = snellConstant*c_lastLayer;
         double sinBn   = sqrt(1 - pow(cosBn, 2));
         double lastLayerTraveTime = oneWayTravelTime - cumulativeRaytraceTime;
         double dxf = c_lastLayer*lastLayerTraveTime*cosBn;
         double dzf = c_lastLayer*lastLayerTraveTime*sinBn;
+        */
 
         // Output variable computation
         double Xf = cumulativeRayX + dxf;
         double Zf = cumulativeRayZ + dzf;
 
+        // re-orient ray in navigation frame
         raytracedPing(0) = Xf*sinAz;
         raytracedPing(1) = Xf*cosAz;
         raytracedPing(2) = Zf;

@@ -41,6 +41,23 @@ TEST_CASE("SVP test, nul gradient") {
     
 }
 
+TEST_CASE("SVP index of layer for depth") {
+    SoundVelocityProfile * svp = new SoundVelocityProfile();
+
+    double depth1 = 5;
+    double speed1 = 1500;
+
+    double depth2 = 10;
+    double speed2 = 1500;
+    
+    svp->add(depth1, speed1);
+    svp->add(depth2, speed2);
+    
+    REQUIRE(svp->getLayerIndexForDepth(2) == 0); // above first sample
+    REQUIRE(svp->getLayerIndexForDepth(8) == 1); // between the 2 samples
+    REQUIRE(svp->getLayerIndexForDepth(15) == 2); // below last sample
+}
+
 
 TEST_CASE("SVP test, constant gradient") {
     /*Build an svp with a single constant gradient layer*/

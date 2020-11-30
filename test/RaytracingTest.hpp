@@ -326,6 +326,57 @@ TEST_CASE("Ray tracing test") {
     REQUIRE(std::abs(expectedRay(2) - ray(2)) < rayTestTreshold);
 }
 
+TEST_CASE("Ray tracing gradient calculation") {
+    
+    double z0 = 0;
+    double c0 = 1450;
+    double z1 = 50;
+    double c1 = 1500;
+    
+    double gradient = Raytracing::soundSpeedGradient(z0, c0, z1, c1);
+    
+    double eps = 1e-9;
+    REQUIRE(std::abs(gradient - 1) < eps);
+}
+
+TEST_CASE("Last layer constant speed ray tracing") {
+    
+    double c = 1000.0;
+    
+    double angle = 45.0;
+    double snellConstant = cos(angle*D2R)/c;
+    
+    double deltaZ;
+    double deltaR;
+    double travelTime = 0.01;
+    
+    Raytracing::lastLayerPropagation(travelTime, c, snellConstant, deltaZ, deltaR);
+    
+    double eps = 1e-9;
+    REQUIRE(std::abs(deltaZ - (10*sqrt(2)/2)) < eps);
+    REQUIRE(std::abs(deltaR - (10*sqrt(2)/2)) < eps);
+}
+
+TEST_CASE("Constant speed ray tracing") {
+    double z0 = 5;
+    double z1 = 10;
+    
+    double c = 1500.0;
+    
+    double angle = 45.0;
+    double snellConstant = cos(angle*D2R)/c;
+    
+    double deltaZ;
+    double deltaR;
+    double deltaTravelTime;
+    Raytracing::constantCelerityRayTracing(z0, z1, c, snellConstant, deltaZ, deltaR, deltaTravelTime);
+    
+    double eps = 1e-9;
+    REQUIRE(std::abs(deltaZ - (z1-z0)) < eps);
+    REQUIRE(std::abs(deltaR - (z1-z0)) < eps); // because angle is 45 degrees
+    REQUIRE(std::abs(deltaTravelTime - (sqrt(deltaZ*deltaZ + deltaR*deltaR)/c)) < eps); 
+}
+
 TEST_CASE("Gradient calculation") {
     
     double z0 = 0;
@@ -361,20 +412,21 @@ TEST_CASE("Ray tracing constant gradient in layer") {
     
     Raytracing::constantGradientRayTracing(c0, c1, gradient, snellConstant, deltaZ, deltaR, deltaTravelTime);
     
-    double eps = 1e-9;
-    REQUIRE(std::abs(deltaZ - (z1-z0)) < eps);
-    
     Eigen::Vector2d rhombusHalfDiag;
-    rhombusHalfDiag << deltaR/2, deltaZ/2;
+    rhombusHalfDiag << deltaR/2, deltaZ/2; // center of rhombus
     
-    double a = rhombusHalfDiag.norm();
-    double b = sqrt(radiusOfCurvature*radiusOfCurvature - a*a);
+    double a = rhombusHalfDiag.norm(); // rhombus half of first diagonal
+    double b = sqrt(radiusOfCurvature*radiusOfCurvature - a*a); // rhombus half of second diagonal
     
     Eigen::Vector2d otherRhombusHalfDiag;
     otherRhombusHalfDiag << -b*rhombusHalfDiag.normalized()(1), b*rhombusHalfDiag.normalized()(0);
     
-    Eigen::Vector2d center = rhombusHalfDiag + otherRhombusHalfDiag;
+    // center of circle for which ray tracing corresponds to an arc
+    // this center is a vertex of the rhombus
+    Eigen::Vector2d center = rhombusHalfDiag + otherRhombusHalfDiag; 
     
+    double eps = 1e-9;
+    REQUIRE(std::abs(deltaZ - (z1-z0)) < eps);
     REQUIRE(std::abs(center.norm() - radiusOfCurvature) < eps);
 }
 
