@@ -62,6 +62,26 @@ public:
         return (c1 - c0) / (z1 - z0);
     }
     
+    static double launchVectorParameters(Ping & ping, Eigen::Matrix3d & boresightMatrix,Eigen::Matrix3d & imu2nav, double & sinAz, double & cosAz, double & beta0) {
+        /*
+	 * Compute launch vector
+         */
+	Eigen::Vector3d launchVectorSonar; //in sonar frame
+	CoordinateTransform::sonar2cartesian(launchVectorSonar,ping.getAlongTrackAngle(),ping.getAcrossTrackAngle(), 1.0 );
+        
+	launchVectorSonar.normalize();
+        
+	//convert to navigation frame where the raytracing occurs
+	Eigen::Vector3d launchVectorNav = imu2nav * (boresightMatrix * launchVectorSonar);
+
+        double vNorm = sqrt(pow(launchVectorNav(0), 2)  + pow(launchVectorNav(1), 2));
+        
+        //NED convention
+	sinAz = (vNorm >0)?launchVectorNav(0)/ vNorm : 0;
+	cosAz = (vNorm >0)?launchVectorNav(1)/ vNorm : 0;
+	beta0 = asin(launchVectorNav(2));
+    }
+    
     /**
      * Makes a raytracing
      *
@@ -70,41 +90,11 @@ public:
      * @param svp the SoundVelocityProfile for the raytracing
      */
     static void rayTrace(Eigen::Vector3d & raytracedPing,Ping & ping,SoundVelocityProfile & svp, Eigen::Matrix3d & boresightMatrix,Eigen::Matrix3d & imu2nav){
-
-	/*
-	 * Compute launch vector
-         */
-	Eigen::Vector3d launchVectorSonar; //in sonar frame
-	CoordinateTransform::sonar2cartesian(launchVectorSonar,ping.getAlongTrackAngle(),ping.getAcrossTrackAngle(), 1.0 ); 
         
-#ifdef DEBUG
-        std::cerr << "Launch vector: " << std::endl << launchVectorSonar << std::endl << std::endl;
-#endif
-        
-	launchVectorSonar.normalize();
-
-#ifdef DEBUG
-        std::cerr << "Unit launch vector: " << std::endl << launchVectorSonar << std::endl << std::endl;
-#endif
-        
-	//convert to navigation frame where the raytracing occurs
-	Eigen::Vector3d launchVectorNav = imu2nav * (boresightMatrix * launchVectorSonar);
-        
-#ifdef DEBUG
-        std::cerr << "Launch vector in nav frame: " << std::endl << launchVectorNav << std::endl << std::endl;
-#endif
-
-        double vNorm = sqrt(pow(launchVectorNav(0), 2)  + pow(launchVectorNav(1), 2));
-        
-	double sinAz= (vNorm >0)?launchVectorNav(0)/ vNorm : 0;
-	double cosAz= (vNorm >0)?launchVectorNav(1)/ vNorm : 0;
-	double beta0 = asin(launchVectorNav(2));
-        
-#ifdef DEBUG
-        std::cerr << "sinAZ: " << sinAz << std::endl;
-        std::cerr << "cosAz: " << cosAz << std::endl;
-        std::cerr << "beta0: " << beta0 << std::endl << std::endl;
-#endif
+	double sinAz;
+	double cosAz;
+	double beta0;
+        launchVectorParameters(ping, boresightMatrix, imu2nav, sinAz, cosAz, beta0);
         
         double currentLayerRaytraceTime = 0;
         double currentLayerDeltaZ = 0;
@@ -218,14 +208,6 @@ public:
         double dzf;
         
         lastLayerPropagation(lastLayerTraveTime, c_lastLayer, snellConstant, dzf, dxf);
-        
-        /*
-        double cosBn   = snellConstant*c_lastLayer;
-        double sinBn   = sqrt(1 - pow(cosBn, 2));
-        double lastLayerTraveTime = oneWayTravelTime - cumulativeRaytraceTime;
-        double dxf = c_lastLayer*lastLayerTraveTime*cosBn;
-        double dzf = c_lastLayer*lastLayerTraveTime*sinBn;
-        */
 
         // Output variable computation
         double Xf = cumulativeRayX + dxf;

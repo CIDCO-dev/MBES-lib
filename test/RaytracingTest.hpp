@@ -266,7 +266,7 @@ TEST_CASE("Launch vector straight down, one way travel time is 1 second, constan
     REQUIRE(std::abs(1500 - raytracedPingRefactored(2)) < rayTestTreshold);
 }
 
-TEST_CASE("Ray tracing test") {
+TEST_CASE("Ray tracing test compare with Eliott's data cleaning raytracing") {
 
     /*Obtain svp*/
     std::string svpFilePath = "test/data/rayTracingTestData/SVP-0.svp";
@@ -324,6 +324,52 @@ TEST_CASE("Ray tracing test") {
     REQUIRE(std::abs(expectedRay(0) - ray(0)) < rayTestTreshold);
     REQUIRE(std::abs(expectedRay(1) - ray(1)) < rayTestTreshold);
     REQUIRE(std::abs(expectedRay(2) - ray(2)) < rayTestTreshold);
+}
+
+TEST_CASE("Ray tracing launch vector parameters") {
+    
+    
+    /*Build Ping*/
+    uint64_t microEpoch = 0;
+    long id = 0;
+    uint32_t quality = 0;
+    double intensity = 0;
+    double surfaceSoundSpeed1 = 1475;
+    double oneWayTravelTime = 0.02;
+    double twoWayTravelTime = 2 * oneWayTravelTime;
+    double alongTrackAngle = 0.0;
+    double acrossTrackAngle = 45.0;
+
+    Ping ping1(
+            microEpoch,
+            id,
+            quality,
+            intensity,
+            surfaceSoundSpeed1,
+            twoWayTravelTime,
+            alongTrackAngle,
+            acrossTrackAngle
+            );
+    
+    double transducerDepth1 = 4;
+    ping1.setTransducerDepth(transducerDepth1);  // shallower than first SVP sample
+    
+    Eigen::Matrix3d boresightMatrix = Eigen::Matrix3d::Identity();
+    Eigen::Matrix3d imu2nav = Eigen::Matrix3d::Identity();
+    
+    
+    /* Perform the ray tracing*/
+    double sinAz;
+    double cosAz;
+    double beta0;
+    Raytracing::launchVectorParameters(ping1, boresightMatrix, imu2nav, sinAz, cosAz, beta0);
+    
+    double eps = 1e-9;
+    REQUIRE(std::abs(beta0*R2D - acrossTrackAngle) < eps); // no boresight, roll, pitch, heading = 0
+    REQUIRE(std::abs(sinAz - 0) < eps); // no boresight, roll, pitch, heading = 0
+    REQUIRE(std::abs(cosAz - 1) < eps); // no boresight, roll, pitch, heading = 0
+    
+    
 }
 
 TEST_CASE("Ray tracing gradient calculation") {
@@ -444,7 +490,7 @@ TEST_CASE("Ray tracing with transducer depth shallower than svp bounds") {
     svp->add(depth1, speed1);
     svp->add(depth2, speed2);
     
-    /*Build 3 Pings*/
+    /*Build Ping*/
     uint64_t microEpoch = 0;
     long id = 0;
     uint32_t quality = 0;
@@ -473,12 +519,12 @@ TEST_CASE("Ray tracing with transducer depth shallower than svp bounds") {
     Eigen::Matrix3d imu2nav = Eigen::Matrix3d::Identity();
     
     /* Perform the ray tracing*/
-    Eigen::Vector3d launchVectorSonarForRay1; //in sonar frame
-    CoordinateTransform::sonar2cartesian(launchVectorSonarForRay1, ping1.getAlongTrackAngle(), ping1.getAcrossTrackAngle(), 1.0);
-    launchVectorSonarForRay1.normalize();
-    Eigen::Vector3d launchVectorNavForRay1 = imu2nav * (boresightMatrix * launchVectorSonarForRay1);
-    double beta0ForRay1 = asin(launchVectorNavForRay1(2));
-    double snellConstantForRay1 = cos(beta0ForRay1)/ping1.getSurfaceSoundSpeed();
+    double sinAz;
+    double cosAz;
+    double beta0;
+    Raytracing::launchVectorParameters(ping1, boresightMatrix, imu2nav, sinAz, cosAz, beta0);
+    
+    double snellConstantForRay1 = cos(beta0)/ping1.getSurfaceSoundSpeed();
     double gradientForRay1 = Raytracing::soundSpeedGradient(ping1.getTransducerDepth(), ping1.getSurfaceSoundSpeed(), svp->getDepths()(0), svp->getSpeeds()(0));
     
     
@@ -510,6 +556,139 @@ TEST_CASE("Ray tracing with transducer depth shallower than svp bounds") {
     REQUIRE(std::abs(ray1(2) - (dz1Ray1 + dz2Ray1 + dz3Ray1)) < eps);
 }
 
+TEST_CASE("Ray tracing with transducer depth equal to first svp bound") {
+    
+    /*Build an svp with a 3 layers*/
+    SoundVelocityProfile * svp = new SoundVelocityProfile();
+
+    double depth1 = 5;
+    double speed1 = 1500;
+
+    double depth2 = 7;
+    double speed2 = 1550;
+    
+    double transducerDepth = 7;
+
+    svp->add(depth1, speed1);
+    svp->add(depth2, speed2);
+    
+    /*Build Ping*/
+    uint64_t microEpoch = 0;
+    long id = 0;
+    uint32_t quality = 0;
+    double intensity = 0;
+    double surfaceSoundSpeed = 1525;
+    double oneWayTravelTime = 0.02;
+    double twoWayTravelTime = 2 * oneWayTravelTime;
+    double alongTrackAngle = 0.0;
+    double acrossTrackAngle = 25.0;
+    
+    Ping ping(
+            microEpoch,
+            id,
+            quality,
+            intensity,
+            surfaceSoundSpeed,
+            twoWayTravelTime,
+            alongTrackAngle,
+            acrossTrackAngle
+            );
+    
+    ping.setTransducerDepth(transducerDepth);  // between the 2 SVP samples
+    
+    Eigen::Matrix3d boresightMatrix = Eigen::Matrix3d::Identity();
+    Eigen::Matrix3d imu2nav = Eigen::Matrix3d::Identity();
+    
+    Eigen::Vector3d ray;
+    Raytracing::rayTrace(ray, ping, *svp, boresightMatrix, imu2nav);
+    
+    double sinAz;
+    double cosAz;
+    double beta0;
+    Raytracing::launchVectorParameters(ping, boresightMatrix, imu2nav, sinAz, cosAz, beta0);
+    
+    double snellConstant = cos(beta0)/ping.getSurfaceSoundSpeed();
+    
+    double lastLayerTraveTime = oneWayTravelTime;
+    double c_lastLayer = surfaceSoundSpeed;
+    
+    double deltaZ;
+    double deltaR;
+    Raytracing::lastLayerPropagation(lastLayerTraveTime, c_lastLayer, snellConstant, deltaZ, deltaR);
+    
+    double eps = 1e-9;
+    REQUIRE(std::abs(ray(0)-0) < eps);
+    REQUIRE(std::abs(ray(1)-deltaR) < eps);
+    REQUIRE(std::abs(ray(2)-deltaZ) < eps);
+    
+}
+
+TEST_CASE("Ray tracing with transducer depth equal to last svp bound") {
+    /*Build an svp with a 3 layers*/
+    SoundVelocityProfile * svp = new SoundVelocityProfile();
+
+    double depth1 = 5;
+    double speed1 = 1500;
+
+    double depth2 = 7;
+    double speed2 = 1550;
+    
+    double transducerDepth = 7;
+
+    svp->add(depth1, speed1);
+    svp->add(depth2, speed2);
+    
+    /*Build Ping*/
+    uint64_t microEpoch = 0;
+    long id = 0;
+    uint32_t quality = 0;
+    double intensity = 0;
+    double surfaceSoundSpeed = 1525;
+    double oneWayTravelTime = 0.02;
+    double twoWayTravelTime = 2 * oneWayTravelTime;
+    double alongTrackAngle = 0.0;
+    double acrossTrackAngle = 25.0;
+    
+    Ping ping(
+            microEpoch,
+            id,
+            quality,
+            intensity,
+            surfaceSoundSpeed,
+            twoWayTravelTime,
+            alongTrackAngle,
+            acrossTrackAngle
+            );
+    
+    ping.setTransducerDepth(transducerDepth);  // between the 2 SVP samples
+    
+    Eigen::Matrix3d boresightMatrix = Eigen::Matrix3d::Identity();
+    Eigen::Matrix3d imu2nav = Eigen::Matrix3d::Identity();
+    
+    Eigen::Vector3d ray;
+    Raytracing::rayTrace(ray, ping, *svp, boresightMatrix, imu2nav);
+    
+    double sinAz;
+    double cosAz;
+    double beta0;
+    Raytracing::launchVectorParameters(ping, boresightMatrix, imu2nav, sinAz, cosAz, beta0);
+    
+    double snellConstant = cos(beta0)/ping.getSurfaceSoundSpeed();
+    
+    double lastLayerTraveTime = oneWayTravelTime;
+    double c_lastLayer = surfaceSoundSpeed;
+    
+    double deltaZ;
+    double deltaR;
+    Raytracing::lastLayerPropagation(lastLayerTraveTime, c_lastLayer, snellConstant, deltaZ, deltaR);
+    
+    double eps = 1e-9;
+    REQUIRE(std::abs(ray(0)-0) < eps);
+    REQUIRE(std::abs(ray(1)-deltaR) < eps);
+    REQUIRE(std::abs(ray(2)-deltaZ) < eps);
+    
+}
+
 TEST_CASE("Ray tracing with transducer depth within svp bounds") {
     
     /*Build an svp with a 3 layers*/
@@ -526,7 +705,7 @@ TEST_CASE("Ray tracing with transducer depth within svp bounds") {
     svp->add(depth1, speed1);
     svp->add(depth2, speed2);
     
-    /*Build 3 Pings*/
+    /*Build Ping*/
     uint64_t microEpoch = 0;
     long id = 0;
     uint32_t quality = 0;
@@ -556,12 +735,12 @@ TEST_CASE("Ray tracing with transducer depth within svp bounds") {
     /* Perform the ray tracing*/
     // Manually calculate
     
-    Eigen::Vector3d launchVectorSonarForRay2; //in sonar frame
-    CoordinateTransform::sonar2cartesian(launchVectorSonarForRay2, ping2.getAlongTrackAngle(), ping2.getAcrossTrackAngle(), 1.0);
-    launchVectorSonarForRay2.normalize();
-    Eigen::Vector3d launchVectorNavForRay2 = imu2nav * (boresightMatrix * launchVectorSonarForRay2);
-    double beta0ForRay2 = asin(launchVectorNavForRay2(2));
-    double snellConstantForRay2 = cos(beta0ForRay2)/ping2.getSurfaceSoundSpeed();
+    double sinAz;
+    double cosAz;
+    double beta0;
+    Raytracing::launchVectorParameters(ping2, boresightMatrix, imu2nav, sinAz, cosAz, beta0);
+    
+    double snellConstantForRay2 = cos(beta0)/ping2.getSurfaceSoundSpeed();
     double gradientForRay2 = Raytracing::soundSpeedGradient(ping2.getTransducerDepth(), ping2.getSurfaceSoundSpeed(), svp->getDepths()(1), svp->getSpeeds()(1));
     
     // first layer
@@ -601,7 +780,7 @@ TEST_CASE("Ray tracing with transducer depth deeper than svp bounds") {
     svp->add(depth1, speed1);
     svp->add(depth2, speed2);
     
-    /*Build 3 Pings*/
+    /*Build Ping*/
     uint64_t microEpoch = 0;
     long id = 0;
     uint32_t quality = 0;
