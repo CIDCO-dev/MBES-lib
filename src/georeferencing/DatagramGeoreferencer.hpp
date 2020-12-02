@@ -209,6 +209,11 @@ public:
 
             Attitude * interpolatedAttitude = Interpolator::interpolateAttitude(beforeAttitude, afterAttitude, (*i).getTimestamp());
             Position * interpolatedPosition = Interpolator::interpolatePosition(beforePosition, afterPosition, (*i).getTimestamp());
+            
+            // Set the transducer depth to draft
+            // If we have timestamped vertical motion, then this would need to
+            // be processed and interpolated in the same way as Position and Attitude
+            i->setTransducerDepth(transducerDraft); // i is the i-th ping
 
             //georeference
             Eigen::Vector3d georeferencedPing;
@@ -238,6 +243,10 @@ public:
     void setCart2Geo(CartesianToGeodeticFukushima * c2g) {
         cart2geo = c2g;
     }
+    
+    void setTransducerDraft(double d) {
+        transducerDraft = d;
+    }
 
 
 protected:
@@ -262,6 +271,9 @@ protected:
 
     /**Vector of SoundVelocityProfile*/
     std::vector<SoundVelocityProfile*> svps;
+    
+    /**the distance between transducer and water line*/
+    double transducerDraft = 0.0;
     
     CartesianToGeodeticFukushima* cart2geo = NULL;
 };
