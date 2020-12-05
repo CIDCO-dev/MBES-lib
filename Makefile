@@ -18,7 +18,7 @@ coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
 
-default: prepare datagram-dump datagram-list georeference data-cleaning cidco-decoder
+default: prepare datagram-dump datagram-list georeference data-cleaning cidco-decoder bounding-box
 	echo "Building all"
 
 georeference: prepare
@@ -29,9 +29,12 @@ data-cleaning: prepare
 
 debugGeoreference: prepare
 	$(CC) $(OPTIONS) -static $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp $(FILES)
-	
+
 debugDump: prepare
 	$(CC) $(OPTIONS) -static $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp $(FILES)
+
+bounding-box: prepare
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/bounding-box src/examples/bounding-box.cpp $(FILES)
 
 cidco-decoder: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/cidco-decoder src/examples/cidco-decoder.cpp $(FILES)
