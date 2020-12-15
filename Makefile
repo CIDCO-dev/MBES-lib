@@ -4,6 +4,7 @@ INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
 FILES=src/datagrams/DatagramParser.cpp src/datagrams/DatagramParserFactory.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/datagrams/xtf/XtfParser.cpp src/utils/NmeaUtils.cpp src/utils/StringUtils.cpp src/sidescan/SidescanPing.cpp
+EXECUTABLES=georeference data-cleaning datagram-dump datagram-list bounding-box cidco-decoder
 
 root=$(shell pwd)
 
@@ -95,20 +96,15 @@ clean:
 	rm *.gcno || true
 	rm *.gcda || true
 
-datagram-list-test: default
-	./build/bin/datagram-list test/data/s7k/20141016_150519_FJ-Saucier.s7k|sort|uniq -c
-
-pcl-viewer: prepare
-	rm -rf build/tempCMake
-	mkdir -p build/tempCMake
-	cd build/tempCMake && cmake ../../src/examples/viewer/ && make && mv viewer ../bin/
-	rm -rf build/tempCMake
-
 overlap: prepare
 	rm -rf build/tempCMake
 	mkdir -p build/tempCMake
 	cd build/tempCMake && cmake ../../src/examples/overlap/ && make && mv overlap ../bin/
 	rm -rf build/tempCMake
+
+install: default
+	install -s build/bin/georeference /usr/bin/georeference
+	install -s build/bin/bounding-box /usr/bin/bounding-box
 
 prepare:
 	mkdir -p $(exec_dir)

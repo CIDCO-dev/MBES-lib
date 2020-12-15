@@ -35,10 +35,10 @@ class BoundingBoxPrinter : public DatagramEventHandler{
 private:
 
 	double minLongitude = std::numeric_limits<double>::max();
-	double maxLongitude = -std::numeric_limits<double>::max();
+	double maxLongitude = std::numeric_limits<double>::lowest();
 
 	double minLatitude  = std::numeric_limits<double>::max();
-	double maxLatitude  = -std::numeric_limits<double>::max();
+	double maxLatitude  = std::numeric_limits<double>::lowest();
 
 
 public:
@@ -54,14 +54,16 @@ public:
 		if(longitude < minLongitude){
 			minLongitude = longitude;
 		}
-		else if(longitude > maxLongitude){
+
+		if(longitude > maxLongitude){
 			maxLongitude = longitude;
 		}
 
 		if(latitude < minLatitude){
 			minLatitude = latitude;
 		}
-		else if(latitude > maxLatitude){
+
+		if(latitude > maxLatitude){
 			maxLatitude = latitude;
 		}
 	}
@@ -101,7 +103,25 @@ int main (int argc , char ** argv ){
 
 		parser->parse(fileName);
 
-		printf("%.12f %.12f %.12f %.12f\n", printer.getMinimumLatitude(), printer.getMaximumLatitude(), printer.getMinimumLongitude(), printer.getMaximumLongitude());
+		if(
+			printer.getMinimumLatitude()  != std::numeric_limits<double>::max()    &&
+			printer.getMaximumLatitude()  != std::numeric_limits<double>::lowest() &&
+			printer.getMinimumLongitude() != std::numeric_limits<double>::max()    &&
+			printer.getMaximumLongitude() != std::numeric_limits<double>::lowest() 
+		){
+			printf("%.12f %.12f %.12f %.12f\n",
+				printer.getMinimumLatitude(),
+				printer.getMaximumLatitude(),
+				printer.getMinimumLongitude(),
+				printer.getMaximumLongitude()
+			);
+		}
+		else{
+			std::cerr << "No position data found\n";
+			return 1;
+		}
+
+		return 0;
 	}
 	catch(const char * error){
 		std::cerr << "Error whille parsing " << fileName << ": " << error << std::endl;
