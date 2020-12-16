@@ -1,5 +1,5 @@
 CC=g++
-OPTIONS=-Wall -std=c++11 -g
+OPTIONS=-Wall -std=c++11
 INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
@@ -29,10 +29,13 @@ data-cleaning: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/data-cleaning src/examples/data-cleaning.cpp $(FILES)
 
 debugGeoreference: prepare
-	$(CC) $(OPTIONS) -static $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp $(FILES)
+	$(CC) $(OPTIONS) -g -static $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp $(FILES)
 
 debugDump: prepare
-	$(CC) $(OPTIONS) -static $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp $(FILES)
+	$(CC) $(OPTIONS) -g -static $(INCLUDES) -o $(exec_dir)/datagram-dump src/examples/datagram-dump.cpp $(FILES)
+	
+debugList: prepare
+	$(CC) $(OPTIONS) -g -static $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp $(FILES)
 
 bounding-box: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/bounding-box src/examples/bounding-box.cpp $(FILES)
@@ -64,7 +67,7 @@ test-quick: default
 	
 test-debug: default
 	mkdir -p $(test_exec_dir)
-	$(CC) $(OPTIONS) -static $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp $(FILES)
+	$(CC) $(OPTIONS) -g -static $(INCLUDES) -o $(test_exec_dir)/tests test/main.cpp $(FILES)
 
 coverage: default
 	mkdir -p $(coverage_dir)
