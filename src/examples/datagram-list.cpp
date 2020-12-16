@@ -93,7 +93,7 @@ int main (int argc , char ** argv ){
 
 		parser = DatagramParserFactory::build(fileName,printer);
 
-		parser->parse(fileName);
+		parser->parse(fileName, true);
 	}
 	catch(const char * error){
 		std::cerr << "Error whille parsing " << fileName << ": " << error << std::endl;
