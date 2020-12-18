@@ -87,6 +87,7 @@ void XtfParser::parse(std::string & filename, bool ignoreChecksum){
 				}
 
 				//Lire packets
+                                unsigned int count = 0;
 				while(!feof(file)){
 					// parse a packet header
 					XtfPacketHeader packetHeader;
@@ -111,7 +112,7 @@ void XtfParser::parse(std::string & filename, bool ignoreChecksum){
 							free(packet);
 						}
 						else{
-							printf("Invalid packet header\n");
+                                                    std::cerr << "Invalid packet header at byte position:" << ftell(file) << std::endl;
 						}
 					}
 					else{
@@ -974,6 +975,11 @@ void XtfParser::processQuinsyR2SonicBathy(XtfPacketHeader & hdr,unsigned char * 
                     double twtt = (*((float*) &scalingFactor )) * htons(ranges[i]);
                     pings[i].setTwoWayTravelTime( twtt );
                 }
+            } else if(sectionBytes == 0) {
+                std::cerr << "section with 0 byte size in QUINSy R2Sonic section type: " << sectionName << std::endl;
+                
+                // Let us avoid the monsters of infinite regress
+                return;
             }
             else{
                 printf("Unknown QUINSy R2Sonic section type %.4X\n",sectionName);
