@@ -22,17 +22,10 @@ TEST_CASE("bounding-box .s7k test") {
     DatagramParser * parser = DatagramParserFactory::build(fileName,printer);
     parser->parse(fileName);
     
-    REQUIRE(printer.getMinimumLatitude() <= 90);
-    REQUIRE(printer.getMinimumLatitude() >= -90);
-    
-    REQUIRE(printer.getMaximumLatitude() <= 90);
-    REQUIRE(printer.getMaximumLatitude() >= -90);
-    
-    REQUIRE(printer.getMinimumLongitude() <= 180);
-    REQUIRE(printer.getMinimumLongitude() >= -180);
-    
-    REQUIRE(printer.getMaximumLongitude() <= 180);
-    REQUIRE(printer.getMaximumLongitude() >= -180);
+    REQUIRE(printer.getMinimumLatitude() > 50.6);
+    REQUIRE(printer.getMaximumLatitude() < 50.7);
+    REQUIRE(printer.getMinimumLongitude() > -63.3);
+    REQUIRE(printer.getMaximumLongitude() < -63.2);
 }
 
 TEST_CASE("bounding-box .all test") {
@@ -43,17 +36,11 @@ TEST_CASE("bounding-box .all test") {
     DatagramParser * parser = DatagramParserFactory::build(fileName,printer);
     parser->parse(fileName);
     
-    REQUIRE(printer.getMinimumLatitude() <= 90);
-    REQUIRE(printer.getMinimumLatitude() >= -90);
+    REQUIRE(printer.getMinimumLatitude() > 48.3);
+    REQUIRE(printer.getMaximumLatitude() < 48.4);
     
-    REQUIRE(printer.getMaximumLatitude() <= 90);
-    REQUIRE(printer.getMaximumLatitude() >= -90);
-    
-    REQUIRE(printer.getMinimumLongitude() <= 180);
-    REQUIRE(printer.getMinimumLongitude() >= -180);
-    
-    REQUIRE(printer.getMaximumLongitude() <= 180);
-    REQUIRE(printer.getMaximumLongitude() >= -180);
+    REQUIRE(printer.getMinimumLongitude() > -4.5);
+    REQUIRE(printer.getMaximumLongitude() < -4.4);
 }
 
 TEST_CASE("bounding-box .xtf test") {
@@ -64,17 +51,11 @@ TEST_CASE("bounding-box .xtf test") {
     DatagramParser * parser = DatagramParserFactory::build(fileName,printer);
     parser->parse(fileName);
     
-    REQUIRE(printer.getMinimumLatitude() <= 90);
-    REQUIRE(printer.getMinimumLatitude() >= -90);
+    REQUIRE(printer.getMinimumLatitude() > 48.3);
+    REQUIRE(printer.getMaximumLatitude() < 48.4);
     
-    REQUIRE(printer.getMaximumLatitude() <= 90);
-    REQUIRE(printer.getMaximumLatitude() >= -90);
-    
-    REQUIRE(printer.getMinimumLongitude() <= 180);
-    REQUIRE(printer.getMinimumLongitude() >= -180);
-    
-    REQUIRE(printer.getMaximumLongitude() <= 180);
-    REQUIRE(printer.getMaximumLongitude() >= -180);
+    REQUIRE(printer.getMinimumLongitude() > -4.5);
+    REQUIRE(printer.getMaximumLongitude() < -4.4);
 }
 
 TEST_CASE("bounding-box starfish .xtf test") {
@@ -85,17 +66,26 @@ TEST_CASE("bounding-box starfish .xtf test") {
     DatagramParser * parser = DatagramParserFactory::build(fileName,printer);
     parser->parse(fileName);
     
-    REQUIRE(printer.getMinimumLatitude() <= 90);
-    REQUIRE(printer.getMinimumLatitude() >= -90);
+    REQUIRE(printer.getMinimumLatitude() > 46.8);
+    REQUIRE(printer.getMaximumLatitude() < 46.9);
     
-    REQUIRE(printer.getMaximumLatitude() <= 90);
-    REQUIRE(printer.getMaximumLatitude() >= -90);
+    REQUIRE(printer.getMinimumLongitude() > -71.2);
+    REQUIRE(printer.getMaximumLongitude() < -71.1);
+}
+
+TEST_CASE("bounding-box sidescan .xtf test") {
+    BoundingBoxPrinter  printer;
     
-    REQUIRE(printer.getMinimumLongitude() <= 180);
-    REQUIRE(printer.getMinimumLongitude() >= -180);
+    std::string fileName ="test/data/xtf/Line-001-0856.sidescan.xtf";
     
-    REQUIRE(printer.getMaximumLongitude() <= 180);
-    REQUIRE(printer.getMaximumLongitude() >= -180);
+    DatagramParser * parser = DatagramParserFactory::build(fileName,printer);
+    parser->parse(fileName);
+    
+    REQUIRE(printer.getMinimumLatitude() > 48.5);
+    REQUIRE(printer.getMaximumLatitude() < 48.6);
+    
+    REQUIRE(printer.getMinimumLongitude() > -68.5);
+    REQUIRE(printer.getMaximumLongitude() < -68.4);
 }
 
 #endif /* BOUNDINGBOXTEST_HPP */
