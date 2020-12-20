@@ -62,7 +62,7 @@ public:
         return (c1 - c0) / (z1 - z0);
     }
     
-    static double launchVectorParameters(Ping & ping, Eigen::Matrix3d & boresightMatrix,Eigen::Matrix3d & imu2nav, double & sinAz, double & cosAz, double & beta0) {
+    static void launchVectorParameters(Ping & ping, Eigen::Matrix3d & boresightMatrix,Eigen::Matrix3d & imu2nav, double & sinAz, double & cosAz, double & beta0) {
         /*
 	 * Compute launch vector
          */

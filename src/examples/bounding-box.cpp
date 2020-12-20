@@ -6,7 +6,7 @@
 #define MAIN_CPP
 
 #include "../datagrams/DatagramParserFactory.hpp"
-#include "../svp/CarisSvpFile.hpp"
+#include "BoundingBoxPrinter.hpp"
 #include <iostream>
 #include <cstdio>
 #include <string>
@@ -25,54 +25,6 @@ void printUsage(){
 	exit(1);
 }
 
-/*!
-* \brief Datagram printer class.
-* \author Guillaume Labbe-Morissette
-*
-* Extention of Datagram processor class
-*/
-class BoundingBoxPrinter : public DatagramEventHandler{
-private:
-
-	double minLongitude = std::numeric_limits<double>::max();
-	double maxLongitude = std::numeric_limits<double>::lowest();
-
-	double minLatitude  = std::numeric_limits<double>::max();
-	double maxLatitude  = std::numeric_limits<double>::lowest();
-
-
-public:
-	BoundingBoxPrinter(){
-
-	}
-
-	~BoundingBoxPrinter(){
-
-	}
-
-	void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
-		if(longitude < minLongitude){
-			minLongitude = longitude;
-		}
-
-		if(longitude > maxLongitude){
-			maxLongitude = longitude;
-		}
-
-		if(latitude < minLatitude){
-			minLatitude = latitude;
-		}
-
-		if(latitude > maxLatitude){
-			maxLatitude = latitude;
-		}
-	}
-
-	double getMinimumLongitude(){ return minLongitude;}
-	double getMaximumLongitude(){ return maxLongitude;}
-	double getMinimumLatitude() { return minLatitude;}
-	double getMaximumLatitude(){ return maxLatitude;}
-};
 /**
 * declare the parser depending on argument receive
 *
