@@ -32,7 +32,7 @@ void printUsage(){
 *
 * Extention of Datagram processor class
 */
-class DatagramPrinter : public DatagramEventHandler{
+class DatagramPrinter : public DatagramEventHandler {
 public:
 	/**
 	* Creates a datagram printer and open all the files
