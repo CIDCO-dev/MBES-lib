@@ -26,7 +26,7 @@ georeference: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp $(FILES)
 	
 raytrace: prepare
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/raytrace src/examples/raytracer.cpp $(FILES)
+	$(CC) $(OPTIONS) -O3 $(INCLUDES) -o $(exec_dir)/raytrace src/examples/raytracer.cpp $(FILES)
 	
 raytrace-debug: prepare
 	$(CC) $(OPTIONS) -g -static $(INCLUDES) -o $(exec_dir)/raytrace src/examples/raytracer.cpp $(FILES)

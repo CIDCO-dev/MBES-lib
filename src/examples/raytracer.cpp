@@ -171,6 +171,12 @@ int main (int argc , char ** argv ){
             }
         }
         
+        
+        if(svpStrategy == NULL){
+            std::cerr << "[+] Using nearest in time sound velocity profile selection strategy by default" << std::endl;
+            svpStrategy = new SvpNearestByTime();
+        }
+        
         DatagramRayTracer handler(*svpStrategy);
         
         DatagramParser * parser = NULL;
@@ -194,7 +200,7 @@ int main (int argc , char ** argv ){
             Eigen::Matrix3d boresight;
             Boresight::buildMatrix(boresight,boresightAngles);
             
-            //Do the georeference dance
+            //raytracing
             handler.raytrace(leverArm, boresight, svps.getSvps());
             
 	}
