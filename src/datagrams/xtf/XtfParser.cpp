@@ -87,7 +87,7 @@ void XtfParser::parse(std::string & filename, bool ignoreChecksum){
 				}
 
 				//Lire packets
-                                unsigned int count = 0;
+                                
 				while(!feof(file)){
 					// parse a packet header
 					XtfPacketHeader packetHeader;

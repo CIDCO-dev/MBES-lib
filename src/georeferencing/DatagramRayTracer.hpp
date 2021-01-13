@@ -1,79 +1,86 @@
 /*
- * Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+ * Copyright 2020 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
-#ifndef DATAGRAMGEOREFERENCER_HPP
-#define DATAGRAMGEOREFERENCER_HPP
+/* 
+ * File:   DatagramRayTracer.hpp
+ * Author: Jordan McManus
+ */
+
+#ifndef DATAGRAMRAYTRACER_HPP
+#define DATAGRAMRAYTRACER_HPP
 
 #include "../Ping.hpp"
 #include "../Position.hpp"
 #include "../Attitude.hpp"
-#include "Georeferencing.hpp"
-#include "../svp/SoundVelocityProfileFactory.hpp"
-#include "../svp/SoundVelocityProfile.hpp"
-#include "../svp/SvpSelectionStrategy.hpp"
 #include "../datagrams/DatagramEventHandler.hpp"
+#include "../georeferencing/Raytracing.hpp"
+#include "../svp/SvpSelectionStrategy.hpp"
+#include "../svp/SoundVelocityProfileFactory.hpp"
 #include "../math/Interpolation.hpp"
-#include "../math/CartesianToGeodeticFukushima.hpp"
+
 
 /*!
- * \brief Datagram Georeferencer class.
- * \author Guillaume Labbe-Morissette, Jordan McManus, Emile Gagne
- *
- * Extention of the DatagramEventHandler class
- */
-class DatagramGeoreferencer : public DatagramEventHandler {
-public:
+* \brief Datagram ray tracer class.
+*
+* Extention of Datagram processor class
+*/
 
-    /**Create a datagram georeferencer*/
-    DatagramGeoreferencer(Georeferencing & geo, SvpSelectionStrategy & svpStrat) : georef(geo), svpStrategy(svpStrat) {
+class DatagramRayTracer : public DatagramEventHandler {
+    
+    
+public:
+    /**
+    * Creates a datagram ray tracer and open all the files
+    */
+    DatagramRayTracer(SvpSelectionStrategy & svpStrat) : svpStrategy(svpStrat) {
 
     }
 
-    /**Destroy the datagram georeferencer*/
-    ~DatagramGeoreferencer() {
+    /**Destroys the datagram printer and close all the files*/
+    ~DatagramRayTracer(){
 
     }
 
     /**
-     * Add the information of a attitude in the vector attitudes
-     * 
-     * @param microEpoch the attitude timestamp
-     * @param heading the attitude heading
-     * @param pitch the attitude pitch
-     * @param roll the attitude roll
-     */
-    void processAttitude(uint64_t microEpoch, double heading, double pitch, double roll) {
+    * Shows the information of an attitude
+    *
+    * @param microEpoch the attitude timestamp
+    * @param heading the attitude heading
+    * @param pitch the attitude pitch
+    * @param roll the attitude roll
+    */
+    void processAttitude(uint64_t microEpoch,double heading,double pitch,double roll){
         attitudes.push_back(Attitude(microEpoch, roll, pitch, heading));
     };
 
     /**
-     * Add the information of a position in the vector positions
-     * 
-     * @param microEpoch the position timestamp
-     * @param longitude the position longitude
-     * @param latitude the position latitude
-     * @param height the position ellipsoidal height
-     */
-    void processPosition(uint64_t microEpoch, double longitude, double latitude, double height) {
+    * Shows the information of a position
+    *
+    * @param microEpoch the position timestamp
+    * @param longitude the position longitude
+    * @param latitude the position latitude
+    * @param height the position ellipsoidal height
+    */
+    void processPosition(uint64_t microEpoch,double longitude,double latitude,double height){
         positions.push_back(Position(microEpoch, latitude, longitude, height));
     };
 
     /**
-     * Add the information of a ping in the vector pings
-     * 
-     * @param microEpoch the ping timestamp
-     * @param id the ping id
-     * @param beamAngle the ping beam angle
-     * @param tiltAngle the ping tilt angle
-     * @param twoWayTravelTime the ping two way travel time
-     * @param quality the ping quality
-     * @param intensity the ping intensity
-     */
-    void processPing(uint64_t microEpoch, long id, double beamAngle, double tiltAngle, double twoWayTravelTime, uint32_t quality, int32_t intensity) {
+    * Shows the information of a ping
+    *
+    * @param microEpoch the ping timestamp
+    * @param id the ping id
+    * @param beamAngle the ping beam angle
+    * @param tiltAngle the ping tilt angle
+    * @param twoWayTravelTime the ping two way travel time
+    * @param quality the ping quality
+    * @param intensity the ping intensity
+    */
+    void processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,int32_t intensity){
         pings.push_back(Ping(microEpoch, id, quality, intensity, currentSurfaceSoundSpeed, twoWayTravelTime, tiltAngle, beamAngle));
     };
-
+    
     /**
      * Change the current surface sound speed
      * 
@@ -91,13 +98,9 @@ public:
     void processSoundVelocityProfile(SoundVelocityProfile * svp) {
         svps.push_back(svp);
     }
-
-    /**
-     * Georeferences all pings
-     * @param boresight boresight (dPhi,dTheta,dPsi)
-     */
-    virtual void georeference(Eigen::Vector3d & leverArm, Eigen::Matrix3d & boresight, std::vector<SoundVelocityProfile*> & externalSvps) {
-	if(positions.size()==0){
+    
+    void raytrace(Eigen::Vector3d & leverArm, Eigen::Matrix3d & boresight, std::vector<SoundVelocityProfile*> & externalSvps) {
+        if(positions.size()==0){
 		std::cerr << "[-] No position data found in file" << std::endl;
 		return;
 	}
@@ -134,31 +137,10 @@ public:
             std::cerr << "[+] Using default SVP model" << std::endl;
         }
 
-        //If no centroid defined for LGF georeferencing, compute one
-        if (GeoreferencingLGF * lgf = dynamic_cast<GeoreferencingLGF*> (&georef)) {
-            if (lgf->getCentroid() == NULL) {
-                Position centroid(0, 0, 0, 0);
-
-                for (auto i = positions.begin(); i != positions.end(); i++) {
-                    centroid.getVector() += i->getVector();
-                }
-
-                centroid.getVector() /= (double) positions.size();
-
-                lgf->setCentroid(centroid);
-
-                std::cerr << "[+] Centroid: " << centroid << std::endl;
-            }
-        }
-
         //Sort everything
         std::sort(positions.begin(), positions.end(), &Position::sortByTimestamp);
         std::sort(attitudes.begin(), attitudes.end(), &Attitude::sortByTimestamp);
         std::sort(pings.begin(), pings.end(), &Ping::sortByTimestamp);
-
-        // fprintf(stderr, "[+] Position data points: %ld [%lu to %lu]\n", positions.size(), positions[0].getTimestamp(), positions[positions.size() - 1].getTimestamp());
-        // fprintf(stderr, "[+] Attitude data points: %ld [%lu to %lu]\n", attitudes.size(), attitudes[0].getTimestamp(), attitudes[attitudes.size() - 1].getTimestamp());
-        // fprintf(stderr, "[+] Ping data points: %ld [%lu to %lu]\n", pings.size(), (pings.size() > 0) ? pings[0].getTimestamp() : 0, (pings.size() > 0) ? pings[pings.size() - 1].getTimestamp() : 0);
 
         // For correct display of timestamps on Windows
         std::cerr <<  "[+] Position data points: " << positions.size() << " [" << positions[0].getTimestamp() << " to " 
@@ -216,45 +198,28 @@ public:
             // be processed and interpolated in the same way as Position and Attitude
             i->setTransducerDepth(transducerDraft); // i is the i-th ping
 
-            //georeference
-            Eigen::Vector3d georeferencedPing;
-            georef.georeference(georeferencedPing, *interpolatedAttitude, *interpolatedPosition, (*i), *(svpStrategy.chooseSvp(*interpolatedPosition, *i)), leverArm, boresight);
+            //raytracing
+            Eigen::Matrix3d imu2nav;
+            CoordinateTransform::getDCM(imu2nav, *interpolatedAttitude);
+            
+            Eigen::Vector3d rayTracedBeam;
+            Raytracing::rayTrace(rayTracedBeam, (*i), *(svpStrategy.chooseSvp(*interpolatedPosition, *i)), boresight, imu2nav);
+            
 
-            processGeoreferencedPing(georeferencedPing, (*i).getQuality(), (*i).getIntensity(), positionIndex, attitudeIndex);
+            processRayTracedBeam(rayTracedBeam);
 
             delete interpolatedAttitude;
             delete interpolatedPosition;
         }
     }
-
-    virtual void processGeoreferencedPing(Eigen::Vector3d & georeferencedPing, uint32_t quality, int32_t intensity, int positionIndex, int attitudeIndex) {
-        if(cart2geo) {
-            Position p(0,0,0,0);
-            cart2geo->ecefToLongitudeLatitudeElevation(georeferencedPing, p);
-            std::cout << p.getLongitude() << " " << p.getLatitude() << " " << p.getEllipsoidalHeight() << " " << quality << " " << intensity << std::endl;
-        } else {
-            std::cout << georeferencedPing(0) << " " << georeferencedPing(1) << " " << georeferencedPing(2) << " " << quality << " " << intensity << std::endl;
-        }
-    }
-
-    void setSvpStrategy(SvpSelectionStrategy& svpStrategy) {
-        this->svpStrategy = svpStrategy;
+    
+    virtual void processRayTracedBeam( Eigen::Vector3d & rayTracedBeam) {
+        std::cout << rayTracedBeam(0) << " " << rayTracedBeam(1) << " " << rayTracedBeam(2) << std::endl;
     }
     
-    void setCart2Geo(CartesianToGeodeticFukushima * c2g) {
-        cart2geo = c2g;
-    }
-    
-    void setTransducerDraft(double d) {
-        transducerDraft = d;
-    }
-
-
+        
 protected:
 
-    /**the georeferencing method */
-    Georeferencing & georef;
-    
     /** the svp selection strategy*/
     SvpSelectionStrategy & svpStrategy;
 
@@ -275,8 +240,9 @@ protected:
     
     /**the distance between transducer and water line*/
     double transducerDraft = 0.0;
-    
-    CartesianToGeodeticFukushima* cart2geo = NULL;
 };
 
-#endif
+
+
+#endif /* DATAGRAMRAYTRACER_HPP */
+

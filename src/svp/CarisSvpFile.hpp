@@ -50,8 +50,8 @@ private:
         int second;
 
         if (std::sscanf(line.c_str(), "Section %d-%d %d:%d:%d %d:%d:%lf %d:%d:%lf", &year, &yday, &hour, &minute, &second, &latdegrees, &latminute, &latsecond, &londegrees, &lonminute, &lonsecond) == 11) {
-            latitude = latdegrees + latminute * 60 + latsecond * 60 * 60;
-            longitude = londegrees + lonminute * 60 + lonsecond * 60 * 60;
+            latitude = latdegrees + latminute / 60 + latsecond / 3600;
+            longitude = londegrees + lonminute / 60 + lonsecond / 3600;
 
             std::string carisSvpTime =
                     std::to_string(year) + "-" +
