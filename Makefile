@@ -25,11 +25,17 @@ default: prepare datagram-dump datagram-list georeference data-cleaning cidco-de
 georeference: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/georeference src/examples/georeference.cpp $(FILES)
 	
+datagram-raytracer: prepare
+	$(CC) $(OPTIONS) -O3 $(INCLUDES) -o $(exec_dir)/datagram-raytracer src/examples/datagram-raytracer.cpp $(FILES)
+	
+datagram-raytracer-debug: prepare
+	$(CC) $(OPTIONS) -g -static $(INCLUDES) -o $(exec_dir)/datagram-raytracer src/examples/datagram-raytracer.cpp $(FILES)
+	
 raytrace: prepare
-	$(CC) $(OPTIONS) -O3 $(INCLUDES) -o $(exec_dir)/raytrace src/examples/raytracer.cpp $(FILES)
+	$(CC) $(OPTIONS) -O3 $(INCLUDES) -o $(exec_dir)/raytrace src/examples/raytrace.cpp $(FILES)
 	
 raytrace-debug: prepare
-	$(CC) $(OPTIONS) -g -static $(INCLUDES) -o $(exec_dir)/raytrace src/examples/raytracer.cpp $(FILES)
+	$(CC) $(OPTIONS) -g -static $(INCLUDES) -o $(exec_dir)/raytrace src/examples/raytrace.cpp $(FILES)
 
 data-cleaning: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/data-cleaning src/examples/data-cleaning.cpp $(FILES)

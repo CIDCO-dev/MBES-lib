@@ -27,5 +27,5 @@
 #include "SvpTest.hpp"
 #include "BoundingBoxTest.hpp"
 #include "RayTracerAppTest.hpp"
-
+#include "VerticalHorizontalRayTracingBiais.hpp"
 
