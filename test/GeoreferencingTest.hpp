@@ -27,7 +27,7 @@
 
 TEST_CASE("Georeferencing LGF test") {
 
-    GeoreferencingLGF * georef = new GeoreferencingLGF();
+    GeoreferencingLGF georef;
 
     /*Build centroid position*/
     double latitudeCentroidDegrees = 0.859286627204 * R2D;
@@ -35,7 +35,7 @@ TEST_CASE("Georeferencing LGF test") {
     double ellipsoidalCentroidHeight = -25.711914675768;
     Position positionCentroid(0, latitudeCentroidDegrees, longitudeCentroidDegrees, ellipsoidalCentroidHeight);
 
-    georef->setCentroid(positionCentroid);
+    georef.setCentroid(positionCentroid);
 
 
     /*Build attitude*/
@@ -91,7 +91,7 @@ TEST_CASE("Georeferencing LGF test") {
 
     /*Perform georeferencing in LGF*/
     Eigen::Vector3d georeferencedPing;
-    georef->georeference(georeferencedPing, attitude, position, ping, *svp, leverArm, boresightMatrix);
+    georef.georeference(georeferencedPing, attitude, position, ping, *svp, leverArm, boresightMatrix);
 
     Eigen::Vector3d expectedGeoreferencedPing;
     expectedGeoreferencedPing << -26.8825997032, 7.3549385469, 10.4758625062;
@@ -127,6 +127,8 @@ TEST_CASE("Georeference TRF with position and downward ping only") {
     REQUIRE(abs(georefPosition.getLongitude() - position.getLongitude()) < POSITION_PRECISION);
     REQUIRE(abs(georefPosition.getLatitude() - position.getLatitude()) < POSITION_PRECISION);
     REQUIRE(abs(georefPosition.getEllipsoidalHeight() - (position.getEllipsoidalHeight() - 7.4)) < POSITION_PRECISION);
+    
+    delete svp;
 }
 
 TEST_CASE("Georeference LGF with position and downward ping only") {
@@ -140,14 +142,25 @@ TEST_CASE("Georeference LGF with position and downward ping only") {
     ping.setSurfaceSoundSpeed(svp->getSpeeds()(0)); //important now that raytracing uses it
     Eigen::Vector3d leverArm(0, 0, 0);
     Eigen::Matrix3d boresight = Eigen::Matrix3d::Identity();
-
+    
+    /*georef LGF*/
+    /*Build Centroid Position*/
+    double centroidLatitude = 48.4525;
+    double centroidLongitude = -68.5232;
+    double centroidEllipsoidHeight = 15.401;
+    Position centroidPosition(0, centroidLatitude, centroidLongitude, centroidEllipsoidHeight);
+    
     GeoreferencingLGF geo;
+    geo.setCentroid(centroidPosition);
+    
     geo.georeference(georefedPing, attitude, position, ping, *svp, leverArm, boresight);
 
     //std::cerr << "GEOREF LGF: " << std::endl << georefedPing << std::endl << std::endl;
 
     Eigen::Vector3d expectedPosition(0, 0, 7.4);
     REQUIRE(georefedPing.isApprox(expectedPosition, POSITION_PRECISION));
+    
+    delete svp;
 }
 
 TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and non-zero attitude") {
@@ -227,6 +240,8 @@ TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and
     REQUIRE(std::abs(expectedGeorefedPingTRF(0) - georefedPingTRF(0)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPingTRF(1) - georefedPingTRF(1)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPingTRF(2) - georefedPingTRF(2)) < georefTestTreshold);
+    
+    delete svp;
 }
 
 TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and non-zero attitude"){
@@ -293,6 +308,8 @@ TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and
     REQUIRE(std::abs(expectedGeorefedPing(0) - georefedPing(0)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPing(1) - georefedPing(1)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPing(2) - georefedPing(2)) < georefTestTreshold);
+    
+    delete svp;
 }
 
 TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and non-zero attitude and non-zero lever-arm"){
@@ -372,6 +389,8 @@ TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and
     REQUIRE(std::abs(expectedGeorefedPingTRF(0) - georefedPingTRF(0)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPingTRF(1) - georefedPingTRF(1)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPingTRF(2) - georefedPingTRF(2)) < georefTestTreshold);
+    
+    delete svp;
 }
 
 TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and non-zero attitude and non-zero lever arm"){
@@ -440,6 +459,8 @@ TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and
     REQUIRE(std::abs(expectedGeorefedPing(0) - georefedPing(0)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPing(1) - georefedPing(1)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPing(2) - georefedPing(2)) < georefTestTreshold);
+    
+    delete svp;
 }
 
 TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and non-zero attitude and non-zero lever-arm and non-zero boresight"){
@@ -523,6 +544,8 @@ TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and
     REQUIRE(std::abs(expectedGeorefedPingTRF(0) - georefedPingTRF(0)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPingTRF(1) - georefedPingTRF(1)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPingTRF(2) - georefedPingTRF(2)) < georefTestTreshold);
+    
+    delete svp;
 }
 
 TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and non-zero attitude and non-zero lever arm and non-zero boresight"){
@@ -596,6 +619,8 @@ TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and
     REQUIRE(std::abs(expectedGeorefedPing(0) - georefedPing(0)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPing(1) - georefedPing(1)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPing(2) - georefedPing(2)) < georefTestTreshold);
+    
+    delete svp;
 }
 
 TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and non-zero attitude and non-zero lever-arm and non-zero boresight and centroid not colocated with position"){
@@ -679,6 +704,8 @@ TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and
     REQUIRE(std::abs(expectedGeorefedPingTRF(0) - georefedPingTRF(0)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPingTRF(1) - georefedPingTRF(1)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPingTRF(2) - georefedPingTRF(2)) < georefTestTreshold);
+    
+    delete svp;
 }
 
 TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and non-zero attitude and non-zero lever arm and non-zero boresight and centroid not colocated with position"){
@@ -751,8 +778,9 @@ TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and
     REQUIRE(std::abs(expectedGeorefedPing(0) - georefedPing(0)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPing(1) - georefedPing(1)) < georefTestTreshold);
     REQUIRE(std::abs(expectedGeorefedPing(2) - georefedPing(2)) < georefTestTreshold);
+    
+    delete svp;
 }
-
 
 #endif /* GEOREFERENCINGTEST_HPP */
 
