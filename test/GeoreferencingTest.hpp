@@ -229,6 +229,7 @@ TEST_CASE("Georeference TRF with position and perpendicular unit vector ping and
     REQUIRE(std::abs(expectedGeorefedPingTRF(2) - georefedPingTRF(2)) < georefTestTreshold);
 }
 
+
 TEST_CASE("Georeference LGF with position and perpendicular unit vector ping and non-zero attitude"){
     /*Build Centroid Position*/
     double centroidLatitude = 48.4525;
