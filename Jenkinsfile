@@ -34,7 +34,7 @@ pipeline {
           junit 'build/reports/mbes-lib-test-report.xml'
           //sh 'mkdir -p $publishCoberturaDir'
           //sh 'cp -r build/coverage/report/*.html $publishCoberturaDir/'
-          archiveArtifacts('build/doxygen/build/coverage/report/*.html')
+          archiveArtifacts('build/coverage/report/*.html')
         }
       }
     }
