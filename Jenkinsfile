@@ -49,7 +49,7 @@ pipeline {
           //sh 'mkdir -p $publishDocDir'
           //sh 'mkdir -p $publishDoxygenDocDir'
           //sh 'cp -r build/doxygen/* $publishDoxygenDocDir/'
-          archiveArtifacts('build/doxygen/*')
+          archiveArtifacts('build/doxygen/*.*')
         }
       }
     }
