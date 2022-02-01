@@ -49,7 +49,8 @@ pipeline {
           //sh 'mkdir -p $publishDocDir'
           //sh 'mkdir -p $publishDoxygenDocDir'
           //sh 'cp -r build/doxygen/* $publishDoxygenDocDir/'
-          archiveArtifacts('build/doxygen/*.*')
+          sh 'zip -r build/doxygen/doxygen.zip build/doxygen '
+          archiveArtifacts('build/doxygen/*.zip')
         }
       }
     }
