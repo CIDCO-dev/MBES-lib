@@ -21,7 +21,7 @@ pipeline {
   stages {
 
     stage('TEST MASTER'){
-      agent { label 'master'}
+      agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
         sh "make clean"
         sh "make coverage"
@@ -32,22 +32,25 @@ pipeline {
           publishCppcheck pattern:'build/coverage/report/cppcheck.xml'
           step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'build/coverage/report/gcovr-report.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
           junit 'build/reports/mbes-lib-test-report.xml'
-          sh 'mkdir -p $publishCoberturaDir'
-          sh 'cp -r build/coverage/report/*.html $publishCoberturaDir/'
+          //sh 'mkdir -p $publishCoberturaDir'
+          //sh 'cp -r build/coverage/report/*.html $publishCoberturaDir/'
+          archiveArtifacts('build/coverage/report/*.html')
         }
       }
     }
 
     stage('DOCUMENTATION'){
-      agent { label 'master'}
+      agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
         sh "make doc"
       }
       post {
         always {
-          sh 'mkdir -p $publishDocDir'
-          sh 'mkdir -p $publishDoxygenDocDir'
-          sh 'cp -r build/doxygen/* $publishDoxygenDocDir/'
+          //sh 'mkdir -p $publishDocDir'
+          //sh 'mkdir -p $publishDoxygenDocDir'
+          //sh 'cp -r build/doxygen/* $publishDoxygenDocDir/'
+          sh 'zip -r build/doxygen/doxygen.zip build/doxygen '
+          archiveArtifacts('build/doxygen/*.zip')
         }
       }
     }
@@ -82,14 +85,14 @@ pipeline {
     }
 
     stage('BUILD MASTER'){
-      agent { label 'master'}
+      agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
         sh 'make'
       }
     }
-
+/*
     stage('PUBLISH ON SERVER'){
-      agent { label 'master'}
+      agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
         sh 'mkdir -p $binMasterPublishDir'
         sh 'mkdir -p $binWinx64PublishDir'
@@ -104,7 +107,7 @@ pipeline {
         //sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/pcl-viewer.zip  $binWinx64PublishDir/pcl-viewer-$version.zip'
         //sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/overlap.zip  $binWinx64PublishDir/overlap-$version.zip'
       }
-    }
+    }*/
   }
 
 }
