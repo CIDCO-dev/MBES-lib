@@ -81,7 +81,7 @@ pipeline {
     stage('BUILD LINUX AND TEST'){
       agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
-        sh 'Scripts/linuxBuildAndTest'
+        sh 'Scripts/linuxBuildAndTest.bash'
       }
       post {
         always {
