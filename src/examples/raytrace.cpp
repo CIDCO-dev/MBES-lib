@@ -10,7 +10,10 @@
 #define MAIN_CPP
 
 
+#ifdef _WIN32
+#include "../utils/getopt.h"
 #pragma comment(lib, "Ws2_32.lib")
+#endif
 
 #include <Eigen/Dense>
 #include <fstream>
