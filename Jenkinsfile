@@ -19,7 +19,7 @@ pipeline {
 
   agent none
   stages {
-
+/*
     stage('TEST MASTER'){
       agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
@@ -54,10 +54,15 @@ pipeline {
         }
       }
     }
+	*/
 
     stage('BUILD WINDOWS 10 AND TEST'){
       agent { label 'windows10-x64-2'}
       steps {
+	  
+		bat "Scripts\\windowsBuildAndTest.bat
+		
+		/*
         //bat "Scripts\\change_makefile_name.bat"
         bat "echo %cd%"
         bat "make -f MakefileWindows clean"
@@ -68,13 +73,16 @@ pipeline {
         //bat "make -f MakefileWindows"
         //bat "Scripts\\package_pcl-viewer.bat"
         //bat "Scripts\\package_overlap.bat"
+		*/
 
         archiveArtifacts('build\\bin\\datagram-dump.exe')
         archiveArtifacts('build\\bin\\cidco-decoder.exe')
         archiveArtifacts('build\\bin\\datagram-list.exe')
         archiveArtifacts('build\\bin\\georeference.exe')
-        //archiveArtifacts('build\\bin\\pcl-viewer.zip')
-        //archiveArtifacts('build\\bin\\overlap.zip')
+		archiveArtifacts('build\\bin\\bounding-box.exe')
+        archiveArtifacts('build\\bin\\data-cleaning.exe')
+        archiveArtifacts('build\\bin\\raytrace.exe')
+        archiveArtifacts('build\\bin\\datagram-raytracer.exe')
 
       }
       post {
