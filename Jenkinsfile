@@ -54,7 +54,6 @@ pipeline {
         }
       }
     }
-	*/
 
     stage('BUILD WINDOWS 10 AND TEST'){
       agent { label 'windows10-x64-2'}
@@ -91,6 +90,7 @@ pipeline {
         }
       }
     }
+	*/
 
     stage('BUILD MASTER'){
       agent { label 'ubnt20-build-opensidescan-vm'}
@@ -98,7 +98,7 @@ pipeline {
         sh 'make'
       }
     }
-/*
+	
     stage('PUBLISH ON SERVER'){
       agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
@@ -115,7 +115,7 @@ pipeline {
         //sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/pcl-viewer.zip  $binWinx64PublishDir/pcl-viewer-$version.zip'
         //sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/overlap.zip  $binWinx64PublishDir/overlap-$version.zip'
       }
-    }*/
+    }
   }
 
 }
