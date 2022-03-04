@@ -1,7 +1,8 @@
 rmdir /Q /S build
-mkdir build\test\reports
+mkdir build\test
+mkdir build\reports
 cd build
 cmake ..
 cmake --build .
 cd ..
-build\test\tests.exe -r junit -o build/test/reports/mbes-lib-test-report.xml
+build\test\tests.exe -r junit -o build/reports/mbes-lib-test-report.xml
