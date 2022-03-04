@@ -61,18 +61,7 @@ pipeline {
 	  
 		bat "Scripts\\windowsBuildAndTest.bat"
 		
-		/*
-        //bat "Scripts\\change_makefile_name.bat"
-        bat "echo %cd%"
-        bat "make -f MakefileWindows clean"
-        bat "echo %cd%"
-        //compile
-        bat "make -f MakefileWindows test"
-        bat "echo %cd%"
-        //bat "make -f MakefileWindows"
-        //bat "Scripts\\package_pcl-viewer.bat"
         //bat "Scripts\\package_overlap.bat"
-		*/
 
         archiveArtifacts('build\\bin\\datagram-dump.exe')
         archiveArtifacts('build\\bin\\cidco-decoder.exe')
