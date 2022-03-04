@@ -60,7 +60,7 @@ pipeline {
       agent { label 'windows10-x64-2'}
       steps {
 	  
-		bat "Scripts\\windowsBuildAndTest.bat
+		bat "Scripts\\windowsBuildAndTest.bat"
 		
 		/*
         //bat "Scripts\\change_makefile_name.bat"
