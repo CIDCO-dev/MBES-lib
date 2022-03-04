@@ -19,19 +19,17 @@ pipeline {
 
   agent none
   stages {
-/*
-    stage('TEST MASTER'){
+  
+    stage('COVERAGE'){
       agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
         sh "make clean"
         sh "make coverage"
-        sh "make test"
       }
       post {
         always {
           publishCppcheck pattern:'build/coverage/report/cppcheck.xml'
           step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'build/coverage/report/gcovr-report.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
-          junit 'build/reports/mbes-lib-test-report.xml'
           //sh 'mkdir -p $publishCoberturaDir'
           //sh 'cp -r build/coverage/report/*.html $publishCoberturaDir/'
           archiveArtifacts('build/coverage/report/*.html')
@@ -79,12 +77,16 @@ pipeline {
         }
       }
     }
-	*/
 
-    stage('BUILD MASTER'){
+    stage('BUILD LINUX AND TEST'){
       agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
-        sh 'make'
+        sh 'Scripts/linuxBuildAndTest'
+      }
+      post {
+        always {
+          junit 'build/reports/*.xml'
+        }
       }
     }
 	
