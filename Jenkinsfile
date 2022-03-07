@@ -82,29 +82,20 @@ pipeline {
       agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
         sh 'Scripts/linuxBuildAndTest.bash'
+		
+		archiveArtifacts('build/bin/datagram-dump')
+		archiveArtifacts('build/bin/cidco-decoder')
+		archiveArtifacts('build/bin/datagram-list')
+		archiveArtifacts('build/bin/georeference')
+		archiveArtifacts('build/bin/bounding-box')
+		archiveArtifacts('build/bin/data-cleaning')
+		archiveArtifacts('build/bin/raytrace')
+		archiveArtifacts('build/bin/datagram-raytracer')
       }
       post {
         always {
           junit 'build/reports/*.xml'
         }
-      }
-    }
-	
-    stage('PUBLISH ON SERVER'){
-      agent { label 'ubnt20-build-opensidescan-vm'}
-      steps {
-        sh 'mkdir -p $binMasterPublishDir'
-        sh 'mkdir -p $binWinx64PublishDir'
-        sh 'cp -r build/bin/datagram-dump $binMasterPublishDir/$exec_name'
-        sh 'cp -r build/bin/cidco-decoder $binMasterPublishDir/cidco-decoder-$version'
-        sh 'cp -r build/bin/datagram-list $binMasterPublishDir/datagram-list-$version'
-        sh 'cp -r build/bin/georeference $binMasterPublishDir/georeference-$version'
-        sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/datagram-dump.exe  $binWinx64PublishDir/$exec_name.exe'
-        sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/cidco-decoder.exe  $binWinx64PublishDir/cidco-decoder-$version.exe'
-        sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/datagram-list.exe  $binWinx64PublishDir/datagram-list-$version.exe'
-        sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/georeference.exe  $binWinx64PublishDir/georeference-$version.exe'
-        //sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/pcl-viewer.zip  $binWinx64PublishDir/pcl-viewer-$version.zip'
-        //sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/overlap.zip  $binWinx64PublishDir/overlap-$version.zip'
       }
     }
   }
