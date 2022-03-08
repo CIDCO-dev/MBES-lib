@@ -16,10 +16,10 @@
 class BoundingBoxPrinter : public DatagramEventHandler{
 private:
 
-	double minLongitude = std::numeric_limits<double>::max();
+	double minLongitude = (std::numeric_limits<double>::max)();
 	double maxLongitude = std::numeric_limits<double>::lowest();
 
-	double minLatitude  = std::numeric_limits<double>::max();
+	double minLatitude  = (std::numeric_limits<double>::max)();
 	double maxLatitude  = std::numeric_limits<double>::lowest();
 
 

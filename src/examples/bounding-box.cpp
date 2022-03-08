@@ -56,9 +56,9 @@ int main (int argc , char ** argv ){
 		parser->parse(fileName);
 
 		if(
-			printer.getMinimumLatitude()  != std::numeric_limits<double>::max()    &&
+			printer.getMinimumLatitude()  != (std::numeric_limits<double>::max)()    &&
 			printer.getMaximumLatitude()  != std::numeric_limits<double>::lowest() &&
-			printer.getMinimumLongitude() != std::numeric_limits<double>::max()    &&
+			printer.getMinimumLongitude() != (std::numeric_limits<double>::max)()    &&
 			printer.getMaximumLongitude() != std::numeric_limits<double>::lowest() 
 		){
 			printf("%.12f %.12f %.12f %.12f\n",

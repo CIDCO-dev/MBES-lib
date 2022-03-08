@@ -19,19 +19,17 @@ pipeline {
 
   agent none
   stages {
-
-    stage('TEST MASTER'){
+  
+    stage('COVERAGE'){
       agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
         sh "make clean"
         sh "make coverage"
-        sh "make test"
       }
       post {
         always {
           publishCppcheck pattern:'build/coverage/report/cppcheck.xml'
           step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'build/coverage/report/gcovr-report.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
-          junit 'build/reports/mbes-lib-test-report.xml'
           //sh 'mkdir -p $publishCoberturaDir'
           //sh 'cp -r build/coverage/report/*.html $publishCoberturaDir/'
           archiveArtifacts('build/coverage/report/*.html')
@@ -58,23 +56,19 @@ pipeline {
     stage('BUILD WINDOWS 10 AND TEST'){
       agent { label 'windows10-x64-2'}
       steps {
-        //bat "Scripts\\change_makefile_name.bat"
-        bat "echo %cd%"
-        bat "make -f MakefileWindows clean"
-        bat "echo %cd%"
-        //compile
-        bat "make -f MakefileWindows test"
-        bat "echo %cd%"
-        //bat "make -f MakefileWindows"
-        //bat "Scripts\\package_pcl-viewer.bat"
+	  
+		bat "Scripts\\windowsBuildAndTest.bat"
+		
         //bat "Scripts\\package_overlap.bat"
 
         archiveArtifacts('build\\bin\\datagram-dump.exe')
         archiveArtifacts('build\\bin\\cidco-decoder.exe')
         archiveArtifacts('build\\bin\\datagram-list.exe')
         archiveArtifacts('build\\bin\\georeference.exe')
-        //archiveArtifacts('build\\bin\\pcl-viewer.zip')
-        //archiveArtifacts('build\\bin\\overlap.zip')
+		archiveArtifacts('build\\bin\\bounding-box.exe')
+        archiveArtifacts('build\\bin\\data-cleaning.exe')
+        archiveArtifacts('build\\bin\\raytrace.exe')
+        archiveArtifacts('build\\bin\\datagram-raytracer.exe')
 
       }
       post {
@@ -84,30 +78,26 @@ pipeline {
       }
     }
 
-    stage('BUILD MASTER'){
+    stage('BUILD LINUX AND TEST'){
       agent { label 'ubnt20-build-opensidescan-vm'}
       steps {
-        sh 'make'
+        sh 'Scripts/linuxBuildAndTest.bash'
+		
+		archiveArtifacts('build/bin/datagram-dump')
+		archiveArtifacts('build/bin/cidco-decoder')
+		archiveArtifacts('build/bin/datagram-list')
+		archiveArtifacts('build/bin/georeference')
+		archiveArtifacts('build/bin/bounding-box')
+		archiveArtifacts('build/bin/data-cleaning')
+		archiveArtifacts('build/bin/raytrace')
+		archiveArtifacts('build/bin/datagram-raytracer')
+      }
+      post {
+        always {
+          junit 'build/reports/*.xml'
+        }
       }
     }
-/*
-    stage('PUBLISH ON SERVER'){
-      agent { label 'ubnt20-build-opensidescan-vm'}
-      steps {
-        sh 'mkdir -p $binMasterPublishDir'
-        sh 'mkdir -p $binWinx64PublishDir'
-        sh 'cp -r build/bin/datagram-dump $binMasterPublishDir/$exec_name'
-        sh 'cp -r build/bin/cidco-decoder $binMasterPublishDir/cidco-decoder-$version'
-        sh 'cp -r build/bin/datagram-list $binMasterPublishDir/datagram-list-$version'
-        sh 'cp -r build/bin/georeference $binMasterPublishDir/georeference-$version'
-        sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/datagram-dump.exe  $binWinx64PublishDir/$exec_name.exe'
-        sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/cidco-decoder.exe  $binWinx64PublishDir/cidco-decoder-$version.exe'
-        sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/datagram-list.exe  $binWinx64PublishDir/datagram-list-$version.exe'
-        sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/georeference.exe  $binWinx64PublishDir/georeference-$version.exe'
-        //sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/pcl-viewer.zip  $binWinx64PublishDir/pcl-viewer-$version.zip'
-        //sh 'cp  /var/lib/jenkins/jobs/$name/builds/$patch/archive/build/bin/overlap.zip  $binWinx64PublishDir/overlap-$version.zip'
-      }
-    }*/
   }
 
 }
