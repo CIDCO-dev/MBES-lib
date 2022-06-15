@@ -668,8 +668,8 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 
             //sidescan data
             XtfPingHeader * pingHdr = (XtfPingHeader*) packet;
-            
-            processPingHeader(*pingHdr);
+
+	    processPingHeader(*pingHdr);
             
             for(unsigned int i=0;i<hdr.NumChansToFollow;i++){
                 XtfPingChanHeader * pingChanHdr = (XtfPingChanHeader *) (packet+sizeof(XtfPingHeader) + i*sizeof(XtfPingChanHeader) + sampleBytesRead);
@@ -691,12 +691,14 @@ void XtfParser::processPingChanHeader(XtfPingChanHeader & pingChanHdr){
     
 }
 
-void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & pingChanHdr,void * data){   
-    std::vector<double> rawSamples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
-    
+void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & pingChanHdr,void * data){
+
+    // Normalize samples we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
+    std::vector<double> rawSamples;
+
     for(unsigned int i=0;i<pingChanHdr.NumSamples;i++){
         double sample = 0;
-        
+
         if(channels[pingChanHdr.ChannelNumber]->SampleFormat == 0){
             //legacy
             if(channels[pingChanHdr.ChannelNumber]->BytesPerSample == 1){
@@ -736,10 +738,11 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
 
         rawSamples.push_back(sample);
     }
-    
-    
+
+    //Create sidescan ping object
     SidescanPing * ping = new SidescanPing();
     
+    //Get time
     uint64_t microEpoch = TimeUtils::build_time(
                 pingHdr.Year,
                 pingHdr.Month-1,
@@ -753,6 +756,7 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
     
     ping->setTimestamp(microEpoch);
     
+    //Get position
     if(pingHdr.SensorXcoordinate != 0.0 && pingHdr.SensorYcoordinate != 0.0){ //this would cause weird issues at coordinates... (0.0,0.0)
         ping->setPosition(
             new Position(
@@ -764,12 +768,27 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
                     pingHdr.SensorPrimaryAltitude
             )
         );
-        
+
         //also get layback and sensor depth
         ping->setLayback(pingHdr.Layback);
         ping->setSensorDepth(pingHdr.SensorDepth);
     }
-    
+
+
+    //Get attitude
+    if(pingHdr.SensorPitch != 0.0 && pingHdr.SensorRoll != 0.0 && pingHdr.SensorHeading != 0.0){
+	ping->setAttitude(
+            new Attitude(
+		microEpoch,
+		pingHdr.SensorRoll,
+		pingHdr.SensorPitch,
+		pingHdr.SensorHeading
+            )
+        );
+    }
+
+    ping->setSoundVelocity(pingHdr.SoundVelocity);
+
     ping->setChannelNumber(pingChanHdr.ChannelNumber);
     
     if(channels[pingChanHdr.ChannelNumber]->CorrectionFlags == 2){
@@ -777,7 +796,7 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
         ping->setSamples(rawSamples);
         ping->setDistancePerSample(pingChanHdr.GroundRange/(double)rawSamples.size());
     }
-    else{       
+    else{
         //Slant-range image, apply corrections to raw samples
         std::vector<double> correctedSamples;
 
@@ -787,13 +806,13 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
         if(channels[pingChanHdr.ChannelNumber]->TiltAngle > 0){
             beamAngle = channels[pingChanHdr.ChannelNumber]->TiltAngle;
         }
-        
+
         //Apply corrections
         SlantRangeCorrection::correct(rawSamples,pingChanHdr.SlantRange,0,beamAngle,correctedSamples);
-        
+
         ping->setSamples(correctedSamples);
         ping->setDistancePerSample((double)pingChanHdr.SlantRange/(double)rawSamples.size());
-        
+
         processor.processSidescanData(ping);
     }
 }

@@ -52,8 +52,12 @@ public:
     double getSensorDepth(){return sensorDepth;}
     void setSensorDepth(double sensorDepth){this->sensorDepth = sensorDepth;}
     
+    double getSoundVelocity(){ return soundVelocity;}
+    void   setSoundVelocity(double sv){ this->soundVelocity = sv;}
+
 private:
     std::vector<double> samples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
+    double      soundVelocity;
     double      distancePerSample;
     int         channelNumber;
     uint64_t    timestamp;
