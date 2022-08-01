@@ -19,7 +19,7 @@ coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
 
-default: prepare datagram-dump datagram-list georeference data-cleaning cidco-decoder bounding-box
+default: prepare datagram-dump datagram-list georeference data-cleaning cidco-decoder bounding-box hydroblock-parser
 	echo "Building all"
 
 georeference: prepare
@@ -60,6 +60,9 @@ datagram-dump: prepare
 
 datagram-list: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp $(FILES)
+
+hydroblock-parser: prepare
+	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/hb-parser src/hydroblock/main.cpp $(FILES)
 
 
 test: default
