@@ -189,7 +189,6 @@ public:
             while (positionIndex + 1 < positions.size() && positions[positionIndex + 1].getTimestamp() < (*i).getTimestamp()) {
                 positionIndex++;
             }
-
             //No more positions available
             if (positionIndex >= positions.size() - 1) {
                 //std::cerr << "No more positions" << std::endl;

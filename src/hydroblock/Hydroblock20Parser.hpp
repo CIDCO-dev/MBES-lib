@@ -105,7 +105,7 @@ class Hydroblock20Parser : public DatagramParser{
 					fscanf(sonarFile, "%d-%d-%d %d:%d:%d.%d;%lf", &year, &month, &day, &hour, &minute, &second, &microSec, &depth);
 					microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);
 					
-					processor.processPing(microEpoch, 0, 0, 0, (depth/1450.0)/2.0, 3.14159, 1.61803);
+					processor.processPing(microEpoch, 0, 0.0, 0.0, depth/1500.0, 0, 0);
 					
 				}
 				else{

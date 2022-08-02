@@ -41,7 +41,7 @@ int main (int argc , char ** argv ){
 	}
 	
 	CarisSvpFile svps;
-	std::string svpFilename = "../../src/test/data/SVP.txt";
+	std::string svpFilename = "../../test/data/SVP/SVP.txt";
 	svps.readSvpFile(svpFilename);
 	
 	
@@ -53,6 +53,7 @@ int main (int argc , char ** argv ){
 	Georeferencing * georef = new GeoreferencingTRF();
 	
 	DatagramGeoreferencer  printer(*georef, *svpStrategy);
+	printer.processSwathStart(1500.0);
 	
 	Hydroblock20Parser *hbparser = new Hydroblock20Parser(printer);
 
@@ -63,10 +64,10 @@ int main (int argc , char ** argv ){
 	
 	//Lever arm
     Eigen::Vector3d leverArm;
-    leverArm << 0,0,0;
+    leverArm << 0.0,0.0,0.0;
 
     //Boresight
-    Attitude boresightAngles(0,0,0,0);
+    Attitude boresightAngles(0.0,0.0,0.0,0.0);
     Eigen::Matrix3d boresight;
     Boresight::buildMatrix(boresight,boresightAngles);
     
