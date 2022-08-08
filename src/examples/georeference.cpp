@@ -223,7 +223,10 @@ int main (int argc , char ** argv){
 				}
 				
 				Hydroblock20Parser *parser = new Hydroblock20Parser(printer);
+				printer.processSwathStart(1450); //XXX 
 				parser->parse(gnssFilePath, imuFilePath, sonarFilePath);
+				std::cout << std::setprecision(12);
+				std::cout << std::fixed;
 				
 				
 			}

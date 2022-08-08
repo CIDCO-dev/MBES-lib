@@ -21,7 +21,6 @@ Copyright 2022 © Centre Interdisciplinaire de développement en Cartographie de
 */
 
 
-// Writes the usage information about the cidco-decoder
 void printUsage(){
 	std::cerr << "\n\
 	NAME\n\n\
