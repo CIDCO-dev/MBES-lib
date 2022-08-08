@@ -1,5 +1,5 @@
 CC=g++
-OPTIONS=-Wall -std=c++11
+OPTIONS=-Wall -std=c++17
 INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
