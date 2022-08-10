@@ -22,8 +22,6 @@
 #include "../svp/SvpNearestByTime.hpp"
 #include "../svp/SvpNearestByLocation.hpp"
 #include "../math/CartesianToGeodeticFukushima.hpp"
-#include <filesystem>
-#include "../hydroblock/Hydroblock20Parser.hpp"
 
 using namespace std;
 
@@ -199,61 +197,30 @@ int main (int argc , char ** argv){
             if(cart2geo) {
                 printer.setCart2Geo(cartesian2geographic);
             }
+
 			
-			if(std::filesystem::is_directory(std::filesystem::path(fileName))){
-				std::string gnssFilePath, imuFilePath, sonarFilePath;
-				for (auto const& dir_entry : std::filesystem::directory_iterator(std::filesystem::path(fileName))) {
-					//std::cout << dir_entry.path().filename() << '\n';
-					std::string filename = dir_entry.path().filename();
-					
-					std::cerr<<filename.substr(18,3) <<"\n";
-					
-					if(filename.substr(18,3) == "imu"){
-						imuFilePath = dir_entry.path();
-					}
-					else if(filename.substr(18,4) == "gnss"){
-						gnssFilePath = dir_entry.path();
-					}
-					else if(filename.substr(18,5) == "sonar"){
-						sonarFilePath = dir_entry.path();
-					}
-					else{
-						std::cerr<<"invalid file \n";
-					}
-				}
-				
-				Hydroblock20Parser *parser = new Hydroblock20Parser(printer);
-				printer.processSwathStart(1450); //XXX 
-				parser->parse(gnssFilePath, imuFilePath, sonarFilePath);
-				std::cout << std::setprecision(12);
-				std::cout << std::fixed;
-				
-				
-			}
-			else{
+	        std::cerr << "[+] Decoding " << fileName << std::endl;
+	        std::ifstream inFile;
+	        inFile.open(fileName);
+	        if (inFile) {
+	                parser = DatagramParserFactory::build(fileName, printer);
+	        }
+	        else
+	        {
+	            throw new Exception("File not found: << fileName");
+	        }
+		
+			std::cerr<<"georeference parse \n";
+	        parser->parse(fileName);
+	        std::cout << std::setprecision(12);
+	        std::cout << std::fixed;
 			
-		        std::cerr << "[+] Decoding " << fileName << std::endl;
-		        std::ifstream inFile;
-		        inFile.open(fileName);
-		        if (inFile) {
-		                parser = DatagramParserFactory::build(fileName,printer);
-		        }
-		        else
-		        {
-		            throw new Exception("File not found: << fileName");
-		        }
-			
-			
-		        parser->parse(fileName);
-		        std::cout << std::setprecision(12);
-		        std::cout << std::fixed;
-			}
             //Lever arm
             Eigen::Vector3d leverArm;
             leverArm << leverArmX,leverArmY,leverArmZ;
 
             //Boresight
-            Attitude boresightAngles(0,roll,pitch,heading);
+            Attitude boresightAngles(0, roll, pitch, heading);
             Eigen::Matrix3d boresight;
             Boresight::buildMatrix(boresight,boresightAngles);
             

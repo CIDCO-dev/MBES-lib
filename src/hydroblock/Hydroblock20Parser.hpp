@@ -3,9 +3,10 @@
 
 #include "../utils/TimeUtils.hpp"
 #include "../datagrams/DatagramParser.hpp"
-#include "../svp/SvpSelectionStrategy.hpp"
-#include "../svp/SvpNearestByTime.hpp"
+//#include "../svp/SvpSelectionStrategy.hpp"
+//#include "../svp/SvpNearestByTime.hpp"
 #include "../georeferencing/DatagramGeoreferencer.hpp"
+#include <filesystem>
 
 /*
 Copyright 2022 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
@@ -33,15 +34,41 @@ class Hydroblock20Parser : public DatagramParser{
                  *
                  * @param filename name of the file to read
                  */
-		void parse(std::string & gnssFilename, std::string & imuFilename, std::string & sonarFilename ){
+		void parse(std::string & dirPath ){
+		
+			std::string gnssFilePath, imuFilePath, sonarFilePath;
+			
+			std::cerr<<dirPath<<"\n";
+			
+			for (auto const& dir_entry : std::filesystem::directory_iterator(std::filesystem::path(dirPath))) {
+				//std::cout << dir_entry.path().filename() << '\n';
+				std::string filename = dir_entry.path().filename();
+				
+				std::cerr<<filename.substr(18,3) <<"\n";
+				
+				if(filename.substr(18,3) == "imu"){
+					imuFilePath = dir_entry.path();
+				}
+				else if(filename.substr(18,4) == "gnss"){
+					gnssFilePath = dir_entry.path();
+				}
+				else if(filename.substr(18,5) == "sonar"){
+					sonarFilePath = dir_entry.path();
+				}
+				else{
+					std::cerr<<"invalid file \n";
+				}
+			}
+		
+			std::cerr<<gnssFilePath<<" "<<imuFilePath << " " << sonarFilePath <<"\n";
 			
 			FILE *gnssFile, *imuFile, *sonarFile;
 
 			char gnssBuff[70], imuBuff[70], sonarBuff[70];
 			
-			gnssFile = fopen(gnssFilename.c_str(), "r");
-			imuFile = fopen(imuFilename.c_str(), "r");
-			sonarFile = fopen(sonarFilename.c_str(), "r");
+			gnssFile = fopen(gnssFilePath.c_str(), "r");
+			imuFile = fopen(imuFilePath.c_str(), "r");
+			sonarFile = fopen(sonarFilePath.c_str(), "r");
 
 			if (NULL == gnssFile) {
 				std::cerr<<"gnss file can't be opened \n";

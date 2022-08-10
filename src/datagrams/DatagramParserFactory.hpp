@@ -12,6 +12,7 @@
 #include "../utils/StringUtils.hpp"
 #include "../utils/Exception.hpp"
 #include "DatagramEventHandler.hpp"
+#include "../hydroblock/Hydroblock20Parser.hpp"
 
 /*!
 * \brief Datagram parser factory class

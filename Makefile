@@ -4,7 +4,7 @@ INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
 FILES=src/datagrams/DatagramParser.cpp src/datagrams/DatagramParserFactory.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/datagrams/xtf/XtfParser.cpp src/utils/NmeaUtils.cpp src/utils/StringUtils.cpp src/sidescan/SidescanPing.cpp
-EXECUTABLES=georeference data-cleaning datagram-dump datagram-list bounding-box cidco-decoder hydroblock-parser
+EXECUTABLES=georeference data-cleaning datagram-dump datagram-list bounding-box cidco-decoder
 
 root=$(shell pwd)
 
@@ -19,7 +19,7 @@ coverage_exec_dir=build/coverage/bin
 coverage_report_dir=build/coverage/report
 
 
-default: prepare datagram-dump datagram-list georeference data-cleaning cidco-decoder bounding-box hydroblock-parser
+default: prepare datagram-dump datagram-list georeference data-cleaning cidco-decoder bounding-box
 	echo "Building all"
 
 georeference: prepare
@@ -61,8 +61,6 @@ datagram-dump: prepare
 datagram-list: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp $(FILES)
 
-hydroblock-parser: prepare
-	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/hb-parser src/hydroblock/main.cpp $(FILES)
 
 
 test: default
