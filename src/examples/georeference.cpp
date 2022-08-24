@@ -210,7 +210,6 @@ int main (int argc , char ** argv){
 	            throw new Exception("File not found: << fileName");
 	        }
 		
-			std::cerr<<"georeference parse \n";
 	        parser->parse(fileName);
 	        std::cout << std::setprecision(12);
 	        std::cout << std::fixed;

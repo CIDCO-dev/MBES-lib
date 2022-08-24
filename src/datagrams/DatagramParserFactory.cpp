@@ -15,7 +15,7 @@ DatagramParser * DatagramParserFactory::build(std::string & fileName,DatagramEve
         DatagramParser * parser;
 		
 		if(std::filesystem::is_directory(std::filesystem::path(fileName))){
-			std::cerr<<"DatagramParserFactory ok \n";
+		
 			parser = new Hydroblock20Parser(handler);
 		}
 		
