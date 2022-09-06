@@ -47,87 +47,66 @@ void Hydroblock20Parser::parse(std::string & dirPath, bool ignoreChecksum ){
 
 	//std::cerr<<gnssFilePath<<" "<<imuFilePath << " " << sonarFilePath <<"\n";
 	
-	FILE *gnssFile, *imuFile, *sonarFile;
-
-	char gnssBuff[70], imuBuff[70], sonarBuff[70];
-	
-	gnssFile = fopen(gnssFilePath.c_str(), "r");
-	imuFile = fopen(imuFilePath.c_str(), "r");
-	sonarFile = fopen(sonarFilePath.c_str(), "r");
-
-	if (NULL == gnssFile) {
-		std::cerr<<"gnss file can't be opened \n";
-	}
-
-	if (NULL == imuFile) {
-		std::cerr<<"imu file can't be opened \n";
-	}
-	
-	if (NULL == sonarFile) {
-		std::cerr<<"sonar file can't be opened \n";
-	}
-	
-	// skip headers
-	fgets(gnssBuff, 62, gnssFile);
-	fgets(imuBuff, 29, imuFile);
-	fgets(sonarBuff, 16, sonarFile);
-	/*
-	std::string header(gnssBuff);
-	std::cout<<header<<"\n";
-	*/
-	
-	
-
+	std::string row;
 	double lon, lat, ellipsoidalHeight, heading, pitch, roll, depth;
 	int year,month,day,hour,minute,second,microSec,status, service;
 	uint64_t microEpoch;
-	bool gnssDone = false, imuDone = false, sonarDone = false;
+	bool header = true;
 	
-	while(true){
+	std::ifstream gnssFile (gnssFilePath);
+	if (gnssFile.is_open()){
 
-		if(fgets(gnssBuff, 67, gnssFile)){
+		while (std::getline(gnssFile, row)) {
+			if(header){
+				header = false;
+			}
+			else{
+				sscanf(row.c_str(), "%d-%d-%d %d:%d:%d.%d;%lf;%lf;%lf;%d;%d", 
+					&year, &month, &day, &hour, &minute, &second, &microSec, &lon, &lat, &ellipsoidalHeight, &status, &service);
+
+				microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);
 			
-			
-			fscanf(gnssFile, "%d-%d-%d %d:%d:%d.%d;%lf;%lf;%lf;%d;%d", &year, &month, &day, &hour, &minute, &second, &microSec, &lon, &lat, &ellipsoidalHeight, &status, &service);
-			
-			microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);
-			
-			processor.processPosition(microEpoch, lon, lat, ellipsoidalHeight );
-			
+				processor.processPosition(microEpoch, lon, lat, ellipsoidalHeight );
+			}
 		}
-		else{
-			gnssDone = true;
-		}
-		
-		
-		if(fgets(imuBuff, 49, imuFile)){
-		
-			fscanf(imuFile, "%d-%d-%d %d:%d:%d.%d;%lf;%lf;%lf", &year, &month, &day, &hour, &minute, &second, &microSec, &heading, &pitch, &roll);
-			microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);	
-			
-			processor.processAttitude(microEpoch, heading, pitch, roll );
-	
-		}
-		else{
-			imuDone = true;
-		}
-		
-		if(fgets(sonarBuff, 33, sonarFile)){
-				
-			fscanf(sonarFile, "%d-%d-%d %d:%d:%d.%d;%lf", &year, &month, &day, &hour, &minute, &second, &microSec, &depth);
-			microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);
-			processor.processSwathStart(1500);
-			processor.processPing(microEpoch, 0, 0.0, 0.0, depth/1500.0, 0, 0);
-			
-		}
-		else{
-			sonarDone = true;
-		}
-		
-		if(gnssDone && imuDone && sonarDone){
-			break;
-		}
-	
 	}
+	gnssFile.close();
+	
+	std::ifstream imuFile (imuFilePath);
+	if (imuFile.is_open()){
+
+		while (std::getline(imuFile, row)) {
+			if(header){
+				header = false;
+			}
+			else{
+				sscanf(row.c_str(), "%d-%d-%d %d:%d:%d.%d;%lf;%lf;%lf", &year, &month, &day, &hour, &minute, &second, &microSec, &heading, &pitch, &roll);
+				microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);	
+				
+				processor.processAttitude(microEpoch, heading, pitch, roll );
+			}
+		}
+	}
+	imuFile.close();
+	header = true;
+	
+	
+	std::ifstream sonarFile (sonarFilePath);
+	if (sonarFile.is_open()){
+
+		while (std::getline(sonarFile, row)) {
+			if(header){
+				header = false;
+			}
+			else{
+				sscanf(row.c_str(), "%d-%d-%d %d:%d:%d.%d;%lf", &year, &month, &day, &hour, &minute, &second, &microSec, &depth);
+				microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);
+				processor.processSwathStart(1500);
+				processor.processPing(microEpoch, 0, 0.0, 0.0, depth/1500.0, 0, 0);
+			}
+		}
+	}
+	sonarFile.close();
+	
 }
 #endif

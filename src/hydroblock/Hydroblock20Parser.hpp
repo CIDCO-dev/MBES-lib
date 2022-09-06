@@ -7,6 +7,7 @@
 //#include "../svp/SvpNearestByTime.hpp"
 #include "../georeferencing/DatagramGeoreferencer.hpp"
 #include <filesystem>
+#include <fstream>
 
 /*
 Copyright 2022 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
