@@ -10,6 +10,10 @@
 #include "../utils/Constants.hpp"
 #include <Eigen/Dense>
 
+//#include "../../../WorldMagneticModel/WMM2020_Linux/src/GeomagnetismHeader.h"
+//#include "../../../WorldMagneticModel/WMM2020_Linux/src/GeomagnetismLibrary.c"
+//#include "../../../WorldMagneticModel/WMM2020_Linux/src/EGM9615.h"
+//#include "../../../WorldMagneticModel/WMM2020_Linux/src/wmm_calculations.c"
 
 /*!
 * \brief Coordinate transform class
@@ -137,7 +141,18 @@ public:
     m10, m11, m12,
     m20, m21, m22;
   };
-
+  /*
+   * Attitude sign convention comimg from xtf documentation :
+   *  positive pitch = nose up
+   *  positive roll = roll to startboard
+   *  positive yaw = turn to right
+   */
+  /*
+   * Sonar frame convention chosen :
+   *  X : tangent vector forward
+   *  Y : to starboard
+   *  Z : downward
+   */
   /**
   * Sets rotation matrix from neutral/zero position to the given attitude
   *
@@ -145,9 +160,30 @@ public:
   * @param attitude the given attitude
   */
   static void getDCM(Eigen::Matrix3d & outputMatrix,Attitude & attitude){
+
+    /*
     outputMatrix <<         attitude.getCh()*attitude.getCp(),   attitude.getCh()*attitude.getSp()*attitude.getSr()-attitude.getCr()*attitude.getSh(), attitude.getCh()*attitude.getCr()*attitude.getSp()+attitude.getSr()*attitude.getSh(),
     attitude.getCp()*attitude.getSh(),   attitude.getCh()*attitude.getCr()+attitude.getSp()*attitude.getSr()*attitude.getSh(), attitude.getSh()*attitude.getCr()*attitude.getSp()-attitude.getCh()*attitude.getSr(),
-    -attitude.getSp(),          attitude.getCp()*attitude.getSr(),        attitude.getCr()*attitude.getCp();
+    -attitude.getSp(),         attitude.getCp()*attitude.getSr(),        attitude.getCr()*attitude.getCp();
+    */
+
+    Eigen::Matrix3d headingMatrix;
+    headingMatrix <<  attitude.getCh(), -attitude.getSh(), 0,
+                     +attitude.getSh(),  attitude.getCh(), 0,
+                                     0,                 0, 1;
+
+    Eigen::Matrix3d pitchMatrix;
+    pitchMatrix <<  attitude.getCp(), 0, +attitude.getSp(),
+                                   0, 1,                 0,
+                   -attitude.getSp(), 0,  attitude.getCp();
+
+    Eigen::Matrix3d rollMatrix;
+    rollMatrix << 1,                 0,                 0,
+                  0,  attitude.getCr(), -attitude.getSr(),
+                  0, +attitude.getSr(),  attitude.getCr();
+
+    outputMatrix = headingMatrix * pitchMatrix * rollMatrix;
+
   }
 
 
@@ -192,6 +228,32 @@ public:
     outputVector(0)=r * sin(alphaDegrees*D2R);
     outputVector(1)=r * cos(alphaDegrees*D2R) * sin(betaDegrees*D2R);
     outputVector(2)=r * cos(alphaDegrees*D2R) * cos(betaDegrees*D2R);
+  }
+
+  static void magneticNorth2geographicNorth(Eigen::Matrix3d & outputMatrix, double declinationDegree, double inclinationDegree) { // from ned to ned
+
+      // declination Angle between the magnetic field vector and true north, positive east
+      // inclination Angle between the magnetic field vector and the horizontal plane, positive down
+
+      inclinationDegree = 0;
+
+      double cI = cos(inclinationDegree*D2R);
+      double sI = sin(inclinationDegree*D2R);
+      double cD = cos(declinationDegree*D2R);
+      double sD = sin(declinationDegree*D2R);
+
+      // TODO : Check the angles sign convention
+      Eigen::Matrix3d declinationMatrix;
+      declinationMatrix << cD, sD, 0,
+                          -sD, cD, 0,
+                            0,  0, 1;
+
+      Eigen::Matrix3d inclinationMatrix;
+      inclinationMatrix << cI,  0, sI,
+                            0,  1,  0,
+                           -sI, 0, cI;
+
+      outputMatrix = declinationMatrix * inclinationMatrix;
   }
 };
 

@@ -27,11 +27,16 @@ public:
     void setDistancePerSample(double d){distancePerSample = d;};
     double getDistancePerSample(){ return distancePerSample;};
     
+    std::vector<double> & getRawSamples(){ return rawSamples;};
     
     std::vector<double> & getSamples(){ return samples;};
     
     void setSamples(std::vector<double> & s){
         samples = s;
+    }
+
+    void setRawSamples(std::vector<double> & s){
+        rawSamples = s;
     }
     
     int getChannelNumber(){ return channelNumber;};
@@ -55,8 +60,18 @@ public:
     double getSoundVelocity(){ return soundVelocity;}
     void   setSoundVelocity(double sv){ this->soundVelocity = sv;}
 
+    double getSensorPrimaryAltitude(){return sensorPrimaryAltitude;}
+    void setSensorPrimaryAltitude(double sensorPrimaryAltitude){this->sensorPrimaryAltitude = sensorPrimaryAltitude;}
+
+    double getSlantRange(){return slantRange;}
+    void setSlantRange(double slantRange){this->slantRange = slantRange;}
+
+    double getTimeDuration(){return timeDuration;}
+    void setTimeDuration(double timeDuration){this->timeDuration = timeDuration;}
+
 private:
     std::vector<double> samples; //we will boil down all the types to double. This is not a pretty hack, but we need to support every sample type
+    std::vector<double> rawSamples;
     double      soundVelocity;
     double      distancePerSample;
     int         channelNumber;
@@ -65,6 +80,9 @@ private:
     Position *  position;
     double      layback;
     double      sensorDepth;
+    double      sensorPrimaryAltitude;
+    double      slantRange;
+    double      timeDuration;
 };
 
 #endif /* SIDESCANPING_HPP */
