@@ -116,7 +116,7 @@ void Hydroblock20Parser::parse(std::string & dirPath, bool ignoreChecksum ){
 				
 			fscanf(sonarFile, "%d-%d-%d %d:%d:%d.%d;%lf", &year, &month, &day, &hour, &minute, &second, &microSec, &depth);
 			microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);
-			
+			processor.processSwathStart(1500);
 			processor.processPing(microEpoch, 0, 0.0, 0.0, depth/1500.0, 0, 0);
 			
 		}
