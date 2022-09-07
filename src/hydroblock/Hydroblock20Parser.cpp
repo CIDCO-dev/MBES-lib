@@ -51,18 +51,14 @@ void Hydroblock20Parser::parse(std::string & dirPath, bool ignoreChecksum ){
 	double lon, lat, ellipsoidalHeight, heading, pitch, roll, depth;
 	int year,month,day,hour,minute,second,microSec,status, service;
 	uint64_t microEpoch;
-	bool header = true;
 	
 	std::ifstream gnssFile (gnssFilePath);
 	if (gnssFile.is_open()){
 
 		while (std::getline(gnssFile, row)) {
-			if(header){
-				header = false;
-			}
-			else{
-				sscanf(row.c_str(), "%d-%d-%d %d:%d:%d.%d;%lf;%lf;%lf;%d;%d", 
-					&year, &month, &day, &hour, &minute, &second, &microSec, &lon, &lat, &ellipsoidalHeight, &status, &service);
+			if(12 == sscanf(row.c_str(), "%d-%d-%d %d:%d:%d.%d;%lf;%lf;%lf;%d;%d", 
+				&year, &month, &day, &hour, &minute, &second, &microSec, &lon, &lat, &ellipsoidalHeight, &status, &service)
+				){
 
 				microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);
 			
@@ -76,11 +72,7 @@ void Hydroblock20Parser::parse(std::string & dirPath, bool ignoreChecksum ){
 	if (imuFile.is_open()){
 
 		while (std::getline(imuFile, row)) {
-			if(header){
-				header = false;
-			}
-			else{
-				sscanf(row.c_str(), "%d-%d-%d %d:%d:%d.%d;%lf;%lf;%lf", &year, &month, &day, &hour, &minute, &second, &microSec, &heading, &pitch, &roll);
+			if(10 == sscanf(row.c_str(), "%d-%d-%d %d:%d:%d.%d;%lf;%lf;%lf", &year, &month, &day, &hour, &minute, &second, &microSec, &heading, &pitch, &roll)){
 				microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);	
 				
 				processor.processAttitude(microEpoch, heading, pitch, roll );
@@ -88,18 +80,13 @@ void Hydroblock20Parser::parse(std::string & dirPath, bool ignoreChecksum ){
 		}
 	}
 	imuFile.close();
-	header = true;
 	
 	
 	std::ifstream sonarFile (sonarFilePath);
 	if (sonarFile.is_open()){
 
 		while (std::getline(sonarFile, row)) {
-			if(header){
-				header = false;
-			}
-			else{
-				sscanf(row.c_str(), "%d-%d-%d %d:%d:%d.%d;%lf", &year, &month, &day, &hour, &minute, &second, &microSec, &depth);
+			if(8 == sscanf(row.c_str(), "%d-%d-%d %d:%d:%d.%d;%lf", &year, &month, &day, &hour, &minute, &second, &microSec, &depth)){
 				microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);
 				processor.processSwathStart(1500);
 				processor.processPing(microEpoch, 0, 0.0, 0.0, depth/1500.0, 0, 0);
