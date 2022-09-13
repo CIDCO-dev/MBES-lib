@@ -13,19 +13,27 @@
 */
 DatagramParser * DatagramParserFactory::build(std::string & fileName,DatagramEventHandler & handler){
         DatagramParser * parser;
-
-        if(StringUtils::ends_with_ci(fileName.c_str(),".all")){
-                parser = new KongsbergParser(handler);
-        }
-        else if(StringUtils::ends_with_ci(fileName.c_str(),".xtf")){
-                parser = new XtfParser(handler);
-        }
-        else if(StringUtils::ends_with_ci(fileName.c_str(),".s7k")){
-                parser = new S7kParser(handler);
-        }
-        else{
-                throw new Exception("Unknown extension");
-        }
+		
+		if(std::filesystem::is_directory(std::filesystem::path(fileName))){
+		
+			parser = new Hydroblock20Parser(handler);
+		}
+		
+		else{
+		
+			if(StringUtils::ends_with_ci(fileName.c_str(),".all")){
+				    parser = new KongsbergParser(handler);
+			}
+			else if(StringUtils::ends_with_ci(fileName.c_str(),".xtf")){
+				    parser = new XtfParser(handler);
+			}
+			else if(StringUtils::ends_with_ci(fileName.c_str(),".s7k")){
+				    parser = new S7kParser(handler);
+			}
+			else{
+				    throw new Exception("Unknown extension");
+			}
+		}
 
         return parser;
 }

@@ -5,7 +5,10 @@ project("MBES-lib")
 message(STATUS "Eigen3 include dir: ${Eigen3_DIR}")
 
 find_package (Eigen3 3.3 NO_MODULE)
- 
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 if (TARGET Eigen3::Eigen)
 	IF(WIN32)
 		ADD_DEFINITIONS(/bigobj)

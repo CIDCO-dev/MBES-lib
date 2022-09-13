@@ -18,3 +18,5 @@ build*
 src/examples/viewer/build
 
 !CMakeLists.txt
+
+*~

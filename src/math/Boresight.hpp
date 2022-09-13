@@ -7,6 +7,7 @@
 
 
 #include "../Attitude.hpp"
+#include <Eigen/Dense>
 
 
 /*!

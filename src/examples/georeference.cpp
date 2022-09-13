@@ -198,26 +198,28 @@ int main (int argc , char ** argv){
                 printer.setCart2Geo(cartesian2geographic);
             }
 
-            std::cerr << "[+] Decoding " << fileName << std::endl;
-            std::ifstream inFile;
-            inFile.open(fileName);
-            if (inFile) {
-                    parser = DatagramParserFactory::build(fileName,printer);
-            }
-            else
-            {
-                throw new Exception("File not found: << fileName");
-            }
-            parser->parse(fileName);
-            std::cout << std::setprecision(12);
-            std::cout << std::fixed;
-
+			
+	        std::cerr << "[+] Decoding " << fileName << std::endl;
+	        std::ifstream inFile;
+	        inFile.open(fileName);
+	        if (inFile) {
+	                parser = DatagramParserFactory::build(fileName, printer);
+	        }
+	        else
+	        {
+	            throw new Exception("File not found: << fileName");
+	        }
+		
+	        parser->parse(fileName);
+	        std::cout << std::setprecision(12);
+	        std::cout << std::fixed;
+			
             //Lever arm
             Eigen::Vector3d leverArm;
             leverArm << leverArmX,leverArmY,leverArmZ;
 
             //Boresight
-            Attitude boresightAngles(0,roll,pitch,heading);
+            Attitude boresightAngles(0, roll, pitch, heading);
             Eigen::Matrix3d boresight;
             Boresight::buildMatrix(boresight,boresightAngles);
             

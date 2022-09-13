@@ -1,9 +1,9 @@
 CC=g++
-OPTIONS=-Wall -std=c++11
+OPTIONS=-Wall -std=c++17
 INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
-FILES=src/datagrams/DatagramParser.cpp src/datagrams/DatagramParserFactory.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/datagrams/xtf/XtfParser.cpp src/utils/NmeaUtils.cpp src/utils/StringUtils.cpp src/sidescan/SidescanPing.cpp
+FILES=src/datagrams/DatagramParser.cpp src/datagrams/DatagramParserFactory.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/datagrams/xtf/XtfParser.cpp src/utils/NmeaUtils.cpp src/utils/StringUtils.cpp src/sidescan/SidescanPing.cpp src/hydroblock/Hydroblock20Parser.cpp
 EXECUTABLES=georeference data-cleaning datagram-dump datagram-list bounding-box cidco-decoder
 
 root=$(shell pwd)
@@ -60,6 +60,7 @@ datagram-dump: prepare
 
 datagram-list: prepare
 	$(CC) $(OPTIONS) $(INCLUDES) -o $(exec_dir)/datagram-list src/examples/datagram-list.cpp $(FILES)
+
 
 
 test: default

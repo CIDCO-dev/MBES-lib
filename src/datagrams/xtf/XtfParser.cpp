@@ -548,7 +548,8 @@ void XtfParser::processPingHeader(XtfPingHeader & hdr){
 void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 	processor.processDatagramTag(hdr.HeaderType);
 
-	if(hdr.HeaderType==XTF_HEADER_ATTITUDE){
+        if(hdr.HeaderType==XTF_HEADER_ATTITUDE){
+
 		uint64_t microEpoch = 0;
 		XtfAttitudeData* attitude = (XtfAttitudeData*)packet;
 
@@ -570,7 +571,8 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 		);
 
 	}
-	else if(hdr.HeaderType==XTF_HEADER_Q_MULTIBEAM){
+        else if(hdr.HeaderType==XTF_HEADER_Q_MULTIBEAM){
+
 		XtfPingHeader * pingHdr = (XtfPingHeader*) packet;
 
 		processPingHeader(*pingHdr);
@@ -603,6 +605,7 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
 		}
 	}
 	else if(hdr.HeaderType==XTF_HEADER_POSITION){
+
 		XtfPosRawNavigation* position = (XtfPosRawNavigation*)packet;
 
         	uint64_t microEpoch = TimeUtils::build_time(
@@ -622,8 +625,16 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
                         position->RawYcoordinate,
                         position->RawAltitude
                 );
+
+                processor.processAttitude(
+                        microEpoch,
+                        position->Heading,
+                        (position->Pitch < 0) ? position->Pitch + 360 : position->Pitch,
+                        (position->Roll  < 0) ? position->Roll  + 360 : position->Roll
+                );
 	}
         else if(hdr.HeaderType==XTF_HEADER_POS_RAW_NAVIGATION){
+
 		XtfHeaderNavigation_type42 * position = (XtfHeaderNavigation_type42*)packet;
 
         	uint64_t microEpoch = TimeUtils::build_time(
@@ -643,8 +654,10 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
                         position->RawYCoordinate,
                         position->RawAltitude
                 );
+
         }
         else if(hdr.HeaderType==XTF_HEADER_RESON_REMOTE_CONTROL_SETTINGS) {
+
             //Custom raw packets have a header packets that differ
             //XtfRawCustomHeaderLastPart * rawCustomHeader = (XtfRawCustomHeaderLastPart*) packet;
             
@@ -654,20 +667,50 @@ void XtfParser::processPacket(XtfPacketHeader & hdr,unsigned char * packet){
             }
         }
         else if(hdr.HeaderType==XTF_HEADER_RESON_BATHY) {
+
             XtfPingHeader * pingHdr = (XtfPingHeader*) packet;
             processPingHeader(*pingHdr);
             processReson7027Bathy(hdr,packet+sizeof(XtfPingHeader));
         }
         else if(hdr.HeaderType==XTF_HEADER_QUINSY_R2SONIC_BATHY){
+
 		XtfPingHeader * pingHdr = (XtfPingHeader*) packet;
 		processPingHeader(*pingHdr);
                 processQuinsyR2SonicBathy(hdr,packet+sizeof(XtfPingHeader));
         }
         else if(hdr.HeaderType==XTF_HEADER_SONAR){
+
             unsigned int sampleBytesRead = 0;
 
             //sidescan data
             XtfPingHeader * pingHdr = (XtfPingHeader*) packet;
+
+            uint64_t microEpoch = TimeUtils::build_time(
+                    pingHdr->Year,
+                    pingHdr->Month-1,
+                    pingHdr->Day,
+                    pingHdr->Hour,
+                    pingHdr->Minute,
+                    pingHdr->Second,
+                    pingHdr->HSeconds * 10,
+                    0
+            );
+            //std::cout<<pingHdr->SensorXcoordinate << " " <<pingHdr->SensorYcoordinate << " " << pingHdr->SensorPrimaryAltitude << "\n";
+			if(pingHdr->SensorXcoordinate != 0 && pingHdr->SensorYcoordinate != 0 && pingHdr->SensorPrimaryAltitude){ 
+		        processor.processPosition(
+		                microEpoch,
+		                pingHdr->SensorXcoordinate,
+		                pingHdr->SensorYcoordinate,
+		                pingHdr->SensorPrimaryAltitude
+		        );
+		    }
+			
+            processor.processAttitude(
+                    microEpoch,
+                    pingHdr->SensorHeading,
+                    (pingHdr->SensorPitch < 0) ? pingHdr->SensorPitch + 360 : pingHdr->SensorPitch,
+                    (pingHdr->SensorRoll  < 0) ? pingHdr->SensorRoll  + 360 : pingHdr->SensorRoll
+            );
 
 	    processPingHeader(*pingHdr);
             
@@ -776,15 +819,30 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
 
 
     //Get attitude
-    if(pingHdr.SensorPitch != 0.0 && pingHdr.SensorRoll != 0.0 && pingHdr.SensorHeading != 0.0){
+    if(pingHdr.SensorPitch != 0.0 || pingHdr.SensorRoll != 0.0 || pingHdr.SensorHeading != 0.0){
 	ping->setAttitude(
             new Attitude(
 		microEpoch,
 		pingHdr.SensorRoll,
 		pingHdr.SensorPitch,
-		pingHdr.SensorHeading
+                pingHdr.SensorHeading
             )
         );
+    }
+
+    //Get SensorPrimaryAltitude
+    if(pingHdr.SensorPrimaryAltitude != 0.0){
+        ping->setSensorPrimaryAltitude(pingHdr.SensorPrimaryAltitude);
+    }
+
+    //Get SlantRange
+    if(pingChanHdr.SlantRange != 0.0){
+        ping->setSlantRange(pingChanHdr.SlantRange);
+    }
+
+    //Get setTimeDuration
+    if(pingChanHdr.TimeDuration != 0.0){
+        ping->setTimeDuration(pingChanHdr.TimeDuration);
     }
 
     ping->setSoundVelocity(pingHdr.SoundVelocity);
@@ -810,6 +868,7 @@ void XtfParser::processSidescanData(XtfPingHeader & pingHdr,XtfPingChanHeader & 
         //Apply corrections
         SlantRangeCorrection::correct(rawSamples,pingChanHdr.SlantRange,0,beamAngle,correctedSamples);
 
+        ping->setRawSamples(rawSamples);
         ping->setSamples(correctedSamples);
         ping->setDistancePerSample((double)pingChanHdr.SlantRange/(double)rawSamples.size());
 
@@ -826,7 +885,7 @@ void XtfParser::processResonSettingsDatagram(XtfPacketHeader & hdr, unsigned cha
     pingSettings.push_back(settingsCopy);
 }
 
-void XtfParser::processReson7027Bathy(XtfPacketHeader & hdr,unsigned char * packet) {
+void XtfParser::processReson7027Bathy(XtfPacketHeader & hdr, unsigned char * packet) {
     
     S7kDataRecordFrame * drf = (S7kDataRecordFrame*) packet;
     
