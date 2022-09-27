@@ -5,12 +5,6 @@
 #include <sstream>
 #include "../math/CoordinateTransform.hpp"
 #include "../Position.hpp"
-/* compile & exec
-
-	g++ -I /usr/include/eigen3 wgs2enu.cpp -o wgs2enu
-	head ~/Documents/Cap-Rouge_to_Lac-St-Pierre_epsg8254-decimal.txt | ./wgs2enu
-	
-*/
 
 int main(int argc, const char* argv[]) {
      
