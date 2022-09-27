@@ -53,6 +53,9 @@ if (TARGET Eigen3::Eigen)
 	add_executable(data-cleaning src/examples/data-cleaning.cpp ${SOURCES})
 	target_link_libraries (data-cleaning Eigen3::Eigen)
 	
+	#wgs2lgf
+	add_executable(wgs2lgf src/examples/wgs2lgf.cpp ${source})
+	
 	set (CMAKE_CURRENT_BINARY_DIR "bin")
 
 	set_target_properties(georeference bounding-box datagram-dump cidco-decoder "datagram-list" data-cleaning raytrace datagram-raytracer PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
