@@ -1,3 +1,7 @@
+/*
+*  Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+ */
+
 #include <iostream>
 #include <vector>
 #include <numeric>
@@ -6,6 +10,7 @@
 #include "../math/CoordinateTransform.hpp"
 #include "../Position.hpp"
 
+
 int main(int argc, const char* argv[]) {
      
     if (argc != 2) {
@@ -13,7 +18,7 @@ int main(int argc, const char* argv[]) {
     	if(argc >=2 && (strcasecmp(argv[1], "enu") != 0 && strcasecmp(argv[1], "ned") != 0)){
     		std::cerr<<"Frame must be NED or ENU"<<std::endl;
     	}
-		std::cerr << "cat FILE | ./wgs2enu [ned|enu]"<<std::endl;
+		std::cerr << "cat FILE | ./wgs2lgf [ned|enu]"<<std::endl;
 		return -1;
 	}
 	
@@ -53,12 +58,12 @@ int main(int argc, const char* argv[]) {
 	}
 	std::cerr << "[+] " << lats.size() << " lines read \n"; 
 
-
+	// Calculate centroid
 	latsMean /= (double)lats.size();
 	lonsMean /=  (double)lons.size();
 	ellipsoidalHeightsMean /= (double)ellipsoidalHeights.size();
 	
-	
+	// Create Matrix of ecef points
 	Eigen::MatrixXd ecefPoints(3, lats.size());
 	for(int i = 0; i<lats.size(); ++i){
 	
@@ -71,14 +76,17 @@ int main(int argc, const char* argv[]) {
 		ecefPoints(2, i) = positionECEF(2);
 	}
 	
+	lats.clear();
+	lons.clear();
+	ellipsoidalHeights.clear();
 	
+	// Create ecef centroid vector
 	Eigen::Vector3d positionECEF(0,0,0);
 	Position position(0,latsMean, lonsMean, ellipsoidalHeightsMean);
 	CoordinateTransform::getPositionECEF(positionECEF, position);
-	
 	Eigen::Vector3d centroid(positionECEF(0), positionECEF(1), positionECEF(2));
 
-	
+	// Create ENU rotation matrix 
 	Eigen::Matrix3d ecef2lgf;
 	if(strcasecmp(argv[1], "enu") == 0 ){
 	
@@ -86,6 +94,7 @@ int main(int argc, const char* argv[]) {
 					-sin(latsMean*D2R)*cos(lonsMean*D2R), -sin(latsMean*D2R)*sin(lonsMean*D2R), cos(latsMean*D2R),
 					cos(latsMean*D2R)*cos(lonsMean*D2R), cos(latsMean*D2R)*sin(lonsMean*D2R), sin(latsMean*D2R);
 	}
+	// Create NED rotation matrix
 	else if(strcasecmp(argv[1], "ned") == 0 ){
 		ecef2lgf << -sin(latsMean*D2R)*cos(lonsMean*D2R), -sin(latsMean*D2R) * sin(lonsMean*D2R), cos(latsMean*D2R),
 					-sin(lonsMean*D2R), cos(lonsMean*D2R), 0,
@@ -95,7 +104,7 @@ int main(int argc, const char* argv[]) {
 		std::cerr<<"Frame must be NED or ENU"<<std::endl;
 		return -1;
 	}
-	
+	// Apply magic
 	Eigen::MatrixXd lgfPoints = ecef2lgf * (ecefPoints.colwise() - centroid);
 	
 	std::cout.precision(20);
