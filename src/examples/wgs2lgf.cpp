@@ -1,5 +1,5 @@
 /*
-*  Copyright 2019 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
+*  Copyright 2022 © Centre Interdisciplinaire de développement en Cartographie des Océans (CIDCO), Tous droits réservés
  */
 
 #include <iostream>
@@ -112,6 +112,7 @@ int main(int argc, const char* argv[]) {
 		std::cout<<lgfPoints(0, i)<<" "<<lgfPoints(1, i)<<" "<<lgfPoints(2, i)<< std::endl;
 	}
 	
+	std::cerr<<"centroid lat lon ellipsoidalHeight : "<<latsMean<<" "<<lonsMean<<" "<<ellipsoidalHeightsMean <<std::endl;
 	
 	return 0;
 }
