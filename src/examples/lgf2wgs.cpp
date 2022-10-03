@@ -19,7 +19,7 @@ int main(int argc, const char* argv[]) {
     	if(argc >=5 && (strcasecmp(argv[1], "enu") != 0 && strcasecmp(argv[1], "ned") != 0)){
     		std::cerr<<"Frame must be NED or ENU"<<std::endl;
     	}
-		std::cerr << "cat FILE | ./lgf2wgs [ned|enu]"<<std::endl;
+		std::cerr << "cat FILE | ./lgf2wgs [ned|enu] x y z"<<std::endl;
 		return -1;
 	}
 	
@@ -99,20 +99,22 @@ int main(int argc, const char* argv[]) {
 	Eigen::MatrixXd ecefPoints = lgf2ecef * lgfPoints;
 	ecefPoints = ecefPoints.colwise() + centroid;
 	
-	CartesianToGeodeticFukushima ecef2wgs(100);
+	CartesianToGeodeticFukushima ecef2wgs(2);
 	Eigen::Vector3d ecefPosition(0,0,0);
 	Position positionGeographic(0,0,0,0);
 	
 	std::cout.precision(20);
-	for(int i =0; i<lgfPoints.cols(); ++i){
+	for(int i =0; i<ecefPoints.cols(); ++i){
 		
-		ecefPosition[0] = lgfPoints(0, i);
-		ecefPosition[1] = lgfPoints(1, i);
-		ecefPosition[2] = lgfPoints(2, i);
+		ecefPosition[0] = ecefPoints(0, i);
+		ecefPosition[1] = ecefPoints(1, i);
+		ecefPosition[2] = ecefPoints(2, i);
+		
 		ecef2wgs.ecefToLongitudeLatitudeElevation(ecefPosition , positionGeographic);
 		
 		std::cout<< positionGeographic.getVector()(0) << " " << positionGeographic.getVector()(1) << " " << 
 					positionGeographic.getVector()(2) << std::endl;
+		
 	}
 	
 	
