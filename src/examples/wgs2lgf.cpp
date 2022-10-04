@@ -111,7 +111,7 @@ int main(int argc, const char* argv[]) {
 	for(int i =0; i<lgfPoints.cols(); ++i){
 		std::cout<<lgfPoints(0, i)<<" "<<lgfPoints(1, i)<<" "<<lgfPoints(2, i)<< std::endl;
 	}
-	
+	std::cerr.precision(20);
 	std::cerr<<"centroid lat lon ellipsoidalHeight : "<<latsMean<<" "<<lonsMean<<" "<<ellipsoidalHeightsMean <<std::endl;
 	
 	return 0;
