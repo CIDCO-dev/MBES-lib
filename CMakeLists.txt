@@ -56,6 +56,10 @@ if (TARGET Eigen3::Eigen)
 	add_executable(wgs2lgf src/examples/wgs2lgf.cpp ${SOURCES})
 	target_link_libraries (wgs2lgf Eigen3::Eigen)
 	
+	#lgf2wgs
+	add_executable(lgf2wgs src/examples/lgf2wgs.cpp ${SOURCES})
+	target_link_libraries (lgf2wgs Eigen3::Eigen)
+	
 	set (CMAKE_CURRENT_BINARY_DIR "bin")
 	
 	set_target_properties(georeference bounding-box datagram-dump cidco-decoder "datagram-list" data-cleaning raytrace datagram-raytracer PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})

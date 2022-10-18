@@ -13,22 +13,22 @@
 
 int main(int argc, const char* argv[]) {
      
-    if (argc != 2) {
+    if (argc != 5) {
     
-    	if(argc >=2 && (strcasecmp(argv[1], "enu") != 0 && strcasecmp(argv[1], "ned") != 0)){
+    	if(argc >=5 && (strcasecmp(argv[1], "enu") != 0 && strcasecmp(argv[1], "ned") != 0)){
     		std::cerr<<"Frame must be NED or ENU"<<std::endl;
     	}
 		std::cerr << "cat FILE | ./wgs2lgf [ned|enu]"<<std::endl;
 		return -1;
 	}
 	
-	
+	double centroidLat = std::stod(argv[2]);
+	double centroidLon = std::stod(argv[3]);
+	double CentroidEllipsoidalHeight = std::stod(argv[4]);
+		
 	double lon;
 	double lat;
 	double ellipsoidalHeight;
-	double latsMean;
-	double lonsMean;
-	double ellipsoidalHeightsMean;
 	std::string line;
 	std::vector<double> lats, lons, ellipsoidalHeights;
 	
@@ -36,14 +36,11 @@ int main(int argc, const char* argv[]) {
 		
 	    std::istringstream stream( line );
 
-	    if ( stream >> lon >> lat >> ellipsoidalHeight) { // 3 == sscanf(line.c_str(), "%f %f %f", &valueX, &valueY, &valueZ
+	    if ( stream >> lat >> lon >> ellipsoidalHeight) { 
 			try{
 				lats.push_back(lat);
 				lons.push_back(lon);
-				ellipsoidalHeights.push_back(ellipsoidalHeight);
-				latsMean += lat;
-				lonsMean += lon;
-				ellipsoidalHeightsMean += ellipsoidalHeight;		
+				ellipsoidalHeights.push_back(ellipsoidalHeight);		
 				
 			}
 			catch(std::exception & e){
@@ -52,23 +49,18 @@ int main(int argc, const char* argv[]) {
 		}
 	}
 	
-	if(lats.size() != lons.size() || lons.size() != ellipsoidalHeights.size() ){
+	if(lats.size() != lons.size() ){
 	std::cerr<<"parsing error \n";
 	return -1;
 	}
-	std::cerr << "[+] " << lats.size() << " lines read \n"; 
-
-	// Calculate centroid
-	latsMean /= (double)lats.size();
-	lonsMean /=  (double)lons.size();
-	ellipsoidalHeightsMean /= (double)ellipsoidalHeights.size();
+	std::cerr << "[+] " << lats.size() << " lines read \n";
 	
 	// Create Matrix of ecef points
 	Eigen::MatrixXd ecefPoints(3, lats.size());
 	for(int i = 0; i<lats.size(); ++i){
 	
 		Eigen::Vector3d positionECEF(0,0,0);
-		Position position(0,lats.at(i), lons.at(i), ellipsoidalHeights.at(i));
+		Position position(0,lats.at(i), lons.at(i), 0.0);
 		CoordinateTransform::getPositionECEF(positionECEF, position);
 		
 		ecefPoints(0, i) = positionECEF(0);
@@ -78,11 +70,11 @@ int main(int argc, const char* argv[]) {
 	
 	lats.clear();
 	lons.clear();
-	ellipsoidalHeights.clear();
+	//ellipsoidalHeights.clear();
 	
 	// Create ecef centroid vector
 	Eigen::Vector3d positionECEF(0,0,0);
-	Position position(0,latsMean, lonsMean, ellipsoidalHeightsMean);
+	Position position(0, centroidLat, centroidLon, CentroidEllipsoidalHeight);
 	CoordinateTransform::getPositionECEF(positionECEF, position);
 	Eigen::Vector3d centroid(positionECEF(0), positionECEF(1), positionECEF(2));
 
@@ -90,15 +82,15 @@ int main(int argc, const char* argv[]) {
 	Eigen::Matrix3d ecef2lgf;
 	if(strcasecmp(argv[1], "enu") == 0 ){
 	
-		ecef2lgf << -sin(lonsMean*D2R), cos(lonsMean*D2R), 0,
-					-sin(latsMean*D2R)*cos(lonsMean*D2R), -sin(latsMean*D2R)*sin(lonsMean*D2R), cos(latsMean*D2R),
-					cos(latsMean*D2R)*cos(lonsMean*D2R), cos(latsMean*D2R)*sin(lonsMean*D2R), sin(latsMean*D2R);
+		ecef2lgf << -sin(centroidLon*D2R), cos(centroidLon*D2R), 0,
+					-sin(centroidLat*D2R)*cos(centroidLon*D2R), -sin(centroidLat*D2R)*sin(centroidLon*D2R), cos(centroidLat*D2R),
+					cos(centroidLat*D2R)*cos(centroidLon*D2R), cos(centroidLat*D2R)*sin(centroidLon*D2R), sin(centroidLat*D2R);
 	}
 	// Create NED rotation matrix
 	else if(strcasecmp(argv[1], "ned") == 0 ){
-		ecef2lgf << -sin(latsMean*D2R)*cos(lonsMean*D2R), -sin(latsMean*D2R) * sin(lonsMean*D2R), cos(latsMean*D2R),
-					-sin(lonsMean*D2R), cos(lonsMean*D2R), 0,
-					-cos(latsMean*D2R)*cos(lonsMean*D2R), -cos(latsMean*D2R)*sin(lonsMean*D2R), -sin(latsMean*D2R); 
+		ecef2lgf << -sin(centroidLat*D2R)*cos(centroidLon*D2R), -sin(centroidLat*D2R) * sin(centroidLon*D2R), cos(centroidLat*D2R),
+					-sin(centroidLon*D2R), cos(centroidLon*D2R), 0,
+					-cos(centroidLat*D2R)*cos(centroidLon*D2R), -cos(centroidLat*D2R)*sin(centroidLon*D2R), -sin(centroidLat*D2R); 
 	}
 	else{
 		std::cerr<<"Frame must be NED or ENU"<<std::endl;
@@ -109,10 +101,10 @@ int main(int argc, const char* argv[]) {
 	
 	std::cout.precision(20);
 	for(int i =0; i<lgfPoints.cols(); ++i){
-		std::cout<<lgfPoints(0, i)<<" "<<lgfPoints(1, i)<<" "<<lgfPoints(2, i)<< std::endl;
+		std::cout<<lgfPoints(0, i)<<" "<<lgfPoints(1, i)<<" "<<ellipsoidalHeights.at(i)<< std::endl;
 	}
-	std::cerr.precision(20);
-	std::cerr<<"centroid lat lon ellipsoidalHeight : "<<latsMean<<" "<<lonsMean<<" "<<ellipsoidalHeightsMean <<std::endl;
+	
+	
 	
 	return 0;
 }
