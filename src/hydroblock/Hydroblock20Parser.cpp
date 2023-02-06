@@ -29,15 +29,17 @@ void Hydroblock20Parser::parse(std::string & dirPath, bool ignoreChecksum ){
 		//std::cout << dir_entry.path().filename() << '\n';
 		std::string filename = dir_entry.path().filename().string();
 		
-		//std::cerr<<filename.substr(18,3) <<"\n";
+//		std::cerr<<filename.find("gnss") <<"\n";
+//		std::cerr<<filename.find("imu") <<"\n";
+//		std::cerr<<filename.find("sonar") <<"\n";
 		
-		if(filename.substr(18,3) == "imu"){
+		if(filename.find("imu") != std::string::npos){
 			imuFilePath = dir_entry.path().string();
 		}
-		else if(filename.substr(18,4) == "gnss"){
+		else if(filename.find("gnss") != std::string::npos){
 			gnssFilePath = dir_entry.path().string();
 		}
-		else if(filename.substr(18,5) == "sonar"){
+		else if(filename.find("sonar") != std::string::npos){
 			sonarFilePath = dir_entry.path().string();
 		}
 		else{
@@ -62,7 +64,7 @@ void Hydroblock20Parser::parse(std::string & dirPath, bool ignoreChecksum ){
 
 				microEpoch = TimeUtils::build_time(year, month, day, hour, minute, second, microSec, 0);
 			
-				processor.processPosition(microEpoch, lon, lat, ellipsoidalHeight );
+				processor.processPosition(microEpoch, lon, lat, 0);
 			}
 		}
 	}
