@@ -23,7 +23,7 @@ Hydroblock20Parser::~Hydroblock20Parser(){
 
 void Hydroblock20Parser::parse(std::string & dirPath, bool ignoreChecksum ){
 
-	std::string gnssFilePath, imuFilePath, sonarFilePath;
+	std::string gnssFilePath = "", imuFilePath = "", sonarFilePath = "";
 	
 	for (auto const& dir_entry : std::filesystem::directory_iterator(std::filesystem::path(dirPath))) {
 		//std::cout << dir_entry.path().filename() << '\n';
@@ -45,6 +45,10 @@ void Hydroblock20Parser::parse(std::string & dirPath, bool ignoreChecksum ){
 		else{
 			std::cerr<<"invalid file \n";
 		}
+	}
+	
+	if(gnssFilePath == "" || imuFilePath == "" || sonarFilePath == ""){
+		throw new Exception("Invalid directory");
 	}
 
 	//std::cerr<<gnssFilePath<<" "<<imuFilePath << " " << sonarFilePath <<"\n";
