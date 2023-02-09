@@ -29,3 +29,4 @@
 #include "BoundingBoxTest.hpp"
 #include "RayTracerAppTest.hpp"
 #include "VerticalHorizontalRayTracingBiais.hpp"
+#include "Hydroblock20ParserTest.hpp"
