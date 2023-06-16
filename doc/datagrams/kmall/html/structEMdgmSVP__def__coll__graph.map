@@ -1,0 +1,5 @@
+<map id="EMdgmSVP_def" name="EMdgmSVP_def">
+<area shape="rect" id="node1" title="#SVP &#45; Sound Velocity Profile. Data from sound velocity profile or from CTD profile...." alt="" coords="101,95,219,121"/>
+<area shape="rect" id="node2" href="$structEMdgmSVPpoint__def.html" title="#SVP &#45; Sound Velocity Profile. Data from one depth point contains information specified in this struc..." alt="" coords="5,5,152,32"/>
+<area shape="rect" id="node3" href="$structEMdgmHeader__def.html" title="Definition of general datagram header." alt="" coords="177,5,309,32"/>
+</map>

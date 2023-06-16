@@ -1,0 +1,13 @@
+digraph "EMdgmFCF_def"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="EMdgmFCF_def",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="#FCF - Backscatter calibration file     Contains the text file containing the backscatter corrections..."];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" partition" ,fontname="Helvetica"];
+  Node2 [label="EMdgmMpartition_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMpartition__def.html",tooltip="Multibeam (M) datagrams - data partition information. General for all M datagrams."];
+  Node3 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" cmnPart" ,fontname="Helvetica"];
+  Node3 [label="EMdgmFcommon_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmFcommon__def.html",tooltip="File (F) output datagram - common all file datagrams."];
+  Node4 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" header" ,fontname="Helvetica"];
+  Node4 [label="EMdgmHeader_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmHeader__def.html",tooltip="Definition of general datagram header."];
+}

@@ -30,8 +30,11 @@ DatagramParser * DatagramParserFactory::build(std::string & fileName,DatagramEve
 			else if(StringUtils::ends_with_ci(fileName.c_str(),".s7k")){
 				    parser = new S7kParser(handler);
 			}
+			else if(StringUtils::ends_with_ci(fileName.c_str(),".kmall")){
+				parser = new KmallParser(handler);
+			}
 			else{
-				    throw new Exception("Unknown extension");
+				throw new Exception("Unknown extension");
 			}
 		}
 

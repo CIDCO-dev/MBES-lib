@@ -1,0 +1,5 @@
+<map id="EMdgmSDE_def" name="EMdgmSDE_def">
+<area shape="rect" id="node2" href="$structEMdgmSDEdataFromSensor__def.html" title="Part of depth datagram giving depth as used, offsets, scale factor and data as received from sensor (..." alt="" coords="5,5,220,32"/>
+<area shape="rect" id="node3" href="$structEMdgmScommon__def.html" title="Sensor (S) output datagram &#45; common part for all external sensors. " alt="" coords="244,5,395,32"/>
+<area shape="rect" id="node4" href="$structEMdgmHeader__def.html" title="Definition of general datagram header. " alt="" coords="419,5,551,32"/>
+</map>

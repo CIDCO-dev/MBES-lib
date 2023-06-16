@@ -1,0 +1,10 @@
+<map id="EMdgmMWC_def" name="EMdgmMWC_def">
+<area shape="rect" id="node1" title="#MWC &#45; Multibeam Water Column Datagram. Entire datagram containing several sub structs." alt="" coords="331,157,455,184"/>
+<area shape="rect" id="node2" href="$structEMdgmMpartition__def.html" title="Multibeam (M) datagrams &#45; data partition information. General for all M datagrams." alt="" coords="31,5,179,32"/>
+<area shape="rect" id="node3" href="$structEMdgmMWCrxInfo__def.html" title="#MWC &#45; data block 2: receiver, general info" alt="" coords="28,56,183,83"/>
+<area shape="rect" id="node4" href="$structEMdgmMWCtxInfo__def.html" title="#MWC &#45; data block 1: transmit sectors, general info for all sectors" alt="" coords="28,107,183,133"/>
+<area shape="rect" id="node5" href="$structEMdgmMWCrxBeamData__def.html" title="#MWC &#45; data block 2: receiver, specific info for each beam." alt="" coords="7,157,203,184"/>
+<area shape="rect" id="node6" href="$structEMdgmHeader__def.html" title="Definition of general datagram header." alt="" coords="39,208,171,235"/>
+<area shape="rect" id="node7" href="$structEMdgmMbody__def.html" title="Multibeam (M) datagrams &#45; body part. Start of body of all M datagrams." alt="" coords="40,259,171,285"/>
+<area shape="rect" id="node8" href="$structEMdgmMWCtxSectorData__def.html" title="#MWC &#45; data block 1: transmit sector data, loop for all i = numTxSectors." alt="" coords="5,309,205,336"/>
+</map>

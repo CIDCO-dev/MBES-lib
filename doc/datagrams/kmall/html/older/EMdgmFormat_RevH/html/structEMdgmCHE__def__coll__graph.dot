@@ -1,0 +1,13 @@
+digraph "EMdgmCHE_def"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="EMdgmCHE_def",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="#CHE - Struct of compatibility heave sensor datagram.     Used for backward compatibility with ...."];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" header" ,fontname="Helvetica"];
+  Node2 [label="EMdgmHeader_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmHeader__def.html",tooltip="Definition of general datagram header."];
+  Node3 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" cmnPart" ,fontname="Helvetica"];
+  Node3 [label="EMdgmMbody_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMbody__def.html",tooltip="Multibeam (M) datagrams - body part. Start of body of all M datagrams."];
+  Node4 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" data" ,fontname="Helvetica"];
+  Node4 [label="EMdgmCHEdata_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmCHEdata__def.html",tooltip="#CHE - Heave compatibility data part. Heave reference point is at transducer instead of at vessel ref..."];
+}

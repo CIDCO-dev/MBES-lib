@@ -1,0 +1,6 @@
+<map id="EMdgmSPO_def" name="EMdgmSPO_def">
+<area shape="rect" id="node1" title="#SPO &#45; Struct of position sensor datagram. &#160;&#160;&#160;&#160;Data from active sensor will be motion corrected if in..." alt="" coords="187,95,305,121"/>
+<area shape="rect" id="node2" href="$structEMdgmScommon__def.html" title="Sensor (S) output datagram &#45; common part for all external sensors." alt="" coords="5,5,156,32"/>
+<area shape="rect" id="node3" href="$structEMdgmHeader__def.html" title="Definition of general datagram header." alt="" coords="180,5,312,32"/>
+<area shape="rect" id="node4" href="$structEMdgmSPOdataBlock__def.html" title="#SPO &#45; Sensor position data block. Data from active sensor is corrected data for position system inst..." alt="" coords="336,5,513,32"/>
+</map>

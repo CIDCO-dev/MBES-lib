@@ -1,0 +1,13 @@
+digraph "EMdgmSPO_def"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="EMdgmSPO_def",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="#SPO - Struct of position sensor datagram.     Data from active sensor will be motion corrected if in..."];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" cmnPart" ,fontname="Helvetica"];
+  Node2 [label="EMdgmScommon_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmScommon__def.html",tooltip="Sensor (S) output datagram - common part for all external sensors."];
+  Node3 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" header" ,fontname="Helvetica"];
+  Node3 [label="EMdgmHeader_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmHeader__def.html",tooltip="Definition of general datagram header."];
+  Node4 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" sensorData" ,fontname="Helvetica"];
+  Node4 [label="EMdgmSPOdataBlock_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmSPOdataBlock__def.html",tooltip="#SPO - Sensor position data block. Data from active sensor is corrected data for position system inst..."];
+}

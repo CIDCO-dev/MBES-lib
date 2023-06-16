@@ -1,0 +1,4 @@
+<map id="EMdgmSKMsample_def" name="EMdgmSKMsample_def">
+<area shape="rect" id="node2" href="$structKMbinary__def.html" title="#SKM &#45; Sensor attitude data block. Data given timestamped, not corrected. " alt="" coords="5,5,107,32"/>
+<area shape="rect" id="node3" href="$structKMdelayedHeave__def.html" title="#SKM &#45; delayed heave. Included if available from sensor. " alt="" coords="131,5,277,32"/>
+</map>

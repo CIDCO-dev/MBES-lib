@@ -1,0 +1,5 @@
+<map id="EMdgmMHC_def" name="EMdgmMHC_def">
+<area shape="rect" id="node2" href="$structEMdgmHeader__def.html" title="Definition of general datagram header. " alt="" coords="5,5,137,32"/>
+<area shape="rect" id="node3" href="$structEMdgmMbody__def.html" title="Multibeam (M) datagrams &#45; body part. Start of body of all M datagrams. " alt="" coords="162,5,293,32"/>
+<area shape="rect" id="node4" href="$structEMdgmMHCdata__def.html" title="#MHC &#45; Heave compatibility data part. Heave reference point is at transducer instead of at vessel ref..." alt="" coords="317,5,463,32"/>
+</map>

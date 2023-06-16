@@ -1,0 +1,8 @@
+<map id="EMdgmSKM_def" name="EMdgmSKM_def">
+<area shape="rect" id="node1" title="#SKM &#45; data from attitude and attitude velocity sensors." alt="" coords="245,184,365,211"/>
+<area shape="rect" id="node2" href="$structEMdgmSKMsample__def.html" title="#SKM &#45; all available data." alt="" coords="48,95,211,121"/>
+<area shape="rect" id="node3" href="$structKMbinary__def.html" title="#SKM &#45; Sensor attitude data block. Data given timestamped, not corrected." alt="" coords="5,5,107,32"/>
+<area shape="rect" id="node4" href="$structKMdelayedHeave__def.html" title="#SKM &#45; delayed heave. Included if available from sensor." alt="" coords="131,5,277,32"/>
+<area shape="rect" id="node5" href="$structEMdgmSKMinfo__def.html" title="Sensor (S) output datagram &#45; info of KMB datagrams." alt="" coords="235,95,375,121"/>
+<area shape="rect" id="node6" href="$structEMdgmHeader__def.html" title="Definition of general datagram header." alt="" coords="399,95,531,121"/>
+</map>

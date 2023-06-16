@@ -1,0 +1,24 @@
+digraph "EMdgmMRZ_def"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="EMdgmMRZ_def",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="#MRZ - Multibeam Raw Range and Depth datagram. The datagram also contains seabed image data."];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" pingInfo" ,fontname="Helvetica"];
+  Node2 [label="EMdgmMRZ_pingInfo_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMRZ__pingInfo__def.html",tooltip="#MRZ - ping info. Information on vessel/system level, i.e. information common to all beams in the cur..."];
+  Node3 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" partition" ,fontname="Helvetica"];
+  Node3 [label="EMdgmMpartition_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMpartition__def.html",tooltip="Multibeam (M) datagrams - data partition information. General for all M datagrams."];
+  Node4 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" sounding" ,fontname="Helvetica"];
+  Node4 [label="EMdgmMRZ_sounding_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMRZ__sounding__def.html",tooltip="#MRZ - Data for each sounding, e.g. XYZ, reflectivity, two way travel time etc."];
+  Node5 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" sectorInfo" ,fontname="Helvetica"];
+  Node5 [label="EMdgmMRZ_txSectorInfo_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMRZ__txSectorInfo__def.html",tooltip="#MRZ - sector information."];
+  Node6 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" rxInfo" ,fontname="Helvetica"];
+  Node6 [label="EMdgmMRZ_rxInfo_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMRZ__rxInfo__def.html",tooltip="#MRZ - receiver specific information."];
+  Node7 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" header" ,fontname="Helvetica"];
+  Node7 [label="EMdgmHeader_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmHeader__def.html",tooltip="Definition of general datagram header."];
+  Node8 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" extraDetClassInfo" ,fontname="Helvetica"];
+  Node8 [label="EMdgmMRZ_extraDetClassInfo_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMRZ__extraDetClassInfo__def.html",tooltip="#MRZ - Extra detection class information."];
+  Node9 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" cmnPart" ,fontname="Helvetica"];
+  Node9 [label="EMdgmMbody_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMbody__def.html",tooltip="Multibeam (M) datagrams - body part. Start of body of all M datagrams."];
+}

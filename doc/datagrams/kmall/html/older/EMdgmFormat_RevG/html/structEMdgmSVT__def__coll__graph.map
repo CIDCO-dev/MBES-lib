@@ -1,0 +1,6 @@
+<map id="EMdgmSVT_def" name="EMdgmSVT_def">
+<area shape="rect" id="node1" title="#SVT &#45; Sound Velocity at Transducer. Data for sound velocity and temperature are measured directely o..." alt="" coords="172,95,288,121"/>
+<area shape="rect" id="node2" href="$structEMdgmHeader__def.html" title="Definition of general datagram header." alt="" coords="5,5,137,32"/>
+<area shape="rect" id="node3" href="$structEMdgmSVTinfo__def.html" title="Part of Sound Velocity at Transducer datagram." alt="" coords="162,5,298,32"/>
+<area shape="rect" id="node4" href="$structEMdgmSVTsample__def.html" title="#SVT &#45; Sound Velocity at Transducer. Data sample." alt="" coords="323,5,481,32"/>
+</map>
