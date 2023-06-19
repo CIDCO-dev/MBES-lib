@@ -41,6 +41,10 @@ public:
   * @param filename name of the file to read
   */
   void parse(std::string & filename, bool ignoreChecksum = false);
+  
+  void processDatagram(EMdgmHeader & header, unsigned char * datagram);
+  
+  void processDatagramIIP(EMdgmHeader & header, EMdgmIIP_def & iip);
 
 protected:
 
