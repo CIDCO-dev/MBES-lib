@@ -50,6 +50,16 @@ protected:
   
   void processSPO(EMdgmHeader & header, unsigned char * datagram);
   
+  void processSKM(EMdgmHeader & header, unsigned char * datagram);
+  
+  void processSCL(EMdgmHeader & header, unsigned char * datagram);
+  
+  void processSVT(EMdgmHeader & header, unsigned char * datagram);
+  
+  void processSDE(EMdgmHeader & header, unsigned char * datagram);
+  
+  void processSHI(EMdgmHeader & header, unsigned char * datagram);
+  
   void processMRZ(EMdgmHeader & header, unsigned char * datagram);
   
   

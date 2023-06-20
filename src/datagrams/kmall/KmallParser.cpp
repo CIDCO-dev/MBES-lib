@@ -25,13 +25,13 @@ void KmallParser::parse(std::string & filename, bool ignoreChecksum){
 			int elementsRead = fread (&header,sizeof(EMdgmHeader),1,file);
 			
 			if(elementsRead == 1){
-				
+				/*
 				std::cerr<<"header.numBytesDgm: " << (unsigned int)header.numBytesDgm <<"\n";
 				std::cerr<<"header.dgmType: " << header.dgmType <<"\n";
 				std::cerr<<"header.dgmVersion: " << (unsigned int)header.dgmVersion <<"\n";
 				std::cerr<<"header.echoSounderID: " << header.echoSounderID <<"\n";
 				std::cerr<<"header.time_sec: " << header.time_sec <<"\n";
-				
+				*/
 				
 				if(header.dgmType[0] != '#'){
 					throw new Exception("Parsing error : Datagram type should start with : # ");
@@ -48,7 +48,7 @@ void KmallParser::parse(std::string & filename, bool ignoreChecksum){
 				
 			}
 			else{
-				std::cerr<<"Not enoug bytes to read header" << std::endl;
+				std::cerr<<"Not enough bytes to read header" << std::endl;
 			}
 		} // while loop end of file
 	}
@@ -60,47 +60,46 @@ void KmallParser::parse(std::string & filename, bool ignoreChecksum){
 void KmallParser::processDatagram(EMdgmHeader & header, unsigned char * datagram){
 		
 	std::string datagramType(reinterpret_cast<char *>(header.dgmType), sizeof(header.dgmType));
-	std::cerr<< datagramType << "\n";
+	//std::cerr<< datagramType << "\n";
 
 	if(datagramType == "#IIP"){
-
+		//meh
 	}
 	
 	else if(datagramType == "#IOP"){
 		//meh
 	}
 	
-	else if(datagramType == "#SPO"){
-			
+	else if(datagramType == "#SPO"){	
 		processSPO(header, datagram);
-		
 	}
+	
 	else if(datagramType == "#SKM"){
-		exit(1);
+		processSKM(header, datagram);
 	}
+	
 	else if(datagramType == "#SVP"){
 		processSVP(header, datagram);		
 	}
 	
 	else if(datagramType == "#SVT"){
-		exit(1);
+		processSVT(header, datagram);
 	}
 	
 	else if(datagramType == "#SCL"){
-		exit(1);
+		processSCL(header, datagram);
 	}
 	
 	else if(datagramType == "#SDE"){
-		
+		processSDE(header, datagram);
 	}
 	
 	else if(datagramType == "#SHI"){
-		exit(1);
+		processSHI(header, datagram);
 	}
 	
 	else if(datagramType == "#MRZ"){
 		processMRZ(header, datagram);
-		exit(1);
 	}
 	
 	else if(datagramType == "#MWC"){
@@ -138,7 +137,7 @@ void KmallParser::processSVP(EMdgmHeader & header, unsigned char * datagram){
 	
 	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
 	
-	std::cerr << svp.numBytesCmnPart <<"\n";
+	//std::cerr << svp.numBytesCmnPart <<"\n";
 	
 	for(int i = 0; i < svp.numBytesCmnPart; i++){
 		EMdgmSVPpoint_def svpPoint = svp.sensorData[i];
@@ -195,5 +194,103 @@ void KmallParser::processMRZ(EMdgmHeader & header, unsigned char * datagram){
 	//TODO
 
 }
+
+void KmallParser::processSKM(EMdgmHeader & header, unsigned char * datagram){
+
+	EMdgmSKM_def skm;	
+	unsigned char *p;
+	
+	memset(&skm, 0, sizeof(EMdgmSKM_def)); // XXX not sure if essential
+	
+	p = (unsigned char*)&skm;
+	
+	memcpy(p, (char*)&header, sizeof(header));
+	p+=sizeof(EMdgmHeader);
+	
+	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
+	
+	
+	//TODO
+	/*
+	std::cerr<< skm.infoPart.numBytesInfoPart <<"\n";
+	std::cerr<< skm.sample[0].KMdefault.roll_deg <<"\n";
+	*/
+}
+
+void KmallParser::processSCL(EMdgmHeader & header, unsigned char * datagram){
+
+	EMdgmSCL_def scl;	
+	unsigned char *p;
+	
+	memset(&scl, 0, sizeof(EMdgmSCL_def)); // XXX not sure if essential
+	
+	p = (unsigned char*)&scl;
+	
+	memcpy(p, (char*)&header, sizeof(header));
+	p+=sizeof(EMdgmHeader);
+	
+	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
+	
+	//TODO
+	/*
+	std::cerr<<scl.cmnPart.numBytesCmnPart<<"\n";
+	std::cerr<<scl.sensData.offset_sec<<"\n";
+	*/
+}
+
+
+void KmallParser::processSVT(EMdgmHeader & header, unsigned char * datagram){
+	EMdgmSVT_def svt;	
+	unsigned char *p;
+	
+	memset(&svt, 0, sizeof(EMdgmSVT_def)); // XXX not sure if essential
+	
+	p = (unsigned char*)&svt;
+	
+	memcpy(p, (char*)&header, sizeof(header));
+	p+=sizeof(EMdgmHeader);
+	
+	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
+	
+	
+	//TODO
+	/*
+	std::cerr<<svt.infoPart.numBytesCmnPart<<"\n";
+	std::cerr<<svt.sensorData[0].time_sec<<"\n";
+	*/
+}
+
+void KmallParser::processSDE(EMdgmHeader & header, unsigned char * datagram){
+	EMdgmSDE_def sde;	
+	unsigned char *p;
+	
+	memset(&sde, 0, sizeof(EMdgmSDE_def)); // XXX not sure if essential
+	
+	p = (unsigned char*)&sde;
+	
+	memcpy(p, (char*)&header, sizeof(header));
+	p+=sizeof(EMdgmHeader);
+	
+	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
+	
+	//TODO
+}
+
+void KmallParser::processSHI(EMdgmHeader & header, unsigned char * datagram){
+	EMdgmSHI_def shi;	
+	unsigned char *p;
+	
+	memset(&shi, 0, sizeof(EMdgmSHI_def)); // XXX not sure if essential
+	
+	p = (unsigned char*)&shi;
+	
+	memcpy(p, (char*)&header, sizeof(header));
+	p+=sizeof(EMdgmHeader);
+	
+	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
+	
+	//TODO
+}
+
 
 #endif
