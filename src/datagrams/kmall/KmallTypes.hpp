@@ -456,9 +456,9 @@
          double latitude_deg; 
          double longitude_deg; 
          float ellipsoidHeightReRefPoint_m; 
-     float bsCorrectionOffset_dB; 
-     uint8_t lambertsLawApplied; 
-     uint8_t iceWindow; 
+		 float bsCorrectionOffset_dB; 
+		 uint8_t lambertsLawApplied; 
+		 uint8_t iceWindow; 
          uint16_t activeModes; 
  };
   
