@@ -50,6 +50,8 @@ protected:
   
   void processSPO(EMdgmHeader & header, unsigned char * datagram);
   
+  void processMRZ(EMdgmHeader & header, unsigned char * datagram);
+  
   
 };
 

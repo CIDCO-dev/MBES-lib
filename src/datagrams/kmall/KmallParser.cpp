@@ -38,6 +38,8 @@ void KmallParser::parse(std::string & filename, bool ignoreChecksum){
 				}
 
 				unsigned char * buffer = (unsigned char*)malloc(header.numBytesDgm - sizeof(EMdgmHeader));
+				//unsigned char *buffer;
+				
 				if( fread(buffer, header.numBytesDgm-sizeof(EMdgmHeader), 1, file) == 1){
 					processDatagram(header, buffer);
 				}
@@ -58,29 +60,10 @@ void KmallParser::parse(std::string & filename, bool ignoreChecksum){
 void KmallParser::processDatagram(EMdgmHeader & header, unsigned char * datagram){
 		
 	std::string datagramType(reinterpret_cast<char *>(header.dgmType), sizeof(header.dgmType));
-
-	//std::cerr<< header.dgmType <<"\n";
-	//std::cerr<< header.dgmType[5] <<"\n"; 
 	std::cerr<< datagramType << "\n";
 
 	if(datagramType == "#IIP"){
-		/*
-		unsigned char * buffer = (unsigned char*)malloc(sizeof(EMdgmIIP_def));
-		memcpy(buffer, (char*)&header, sizeof(EMdgmHeader));
-		buffer += sizeof(EMdgmHeader);
-		
-		std::cerr<<"\n" << sizeof(EMdgmHeader) <<"\n";
-		std::cerr<< header.numBytesDgm <<"\n";
-		std::cerr<<sizeof(EMdgmIIP_def) <<"\n\n";
-		
-		memcpy(buffer, (char*)&datagram, header.numBytesDgm-sizeof(EMdgmHeader)+4);
-		
-		//memcpy(buffer, (char*)&datagram, sizeof(EMdgmIIP_def));
-		
-		//EMdgmIIP_def *iip = (EMdgmIIP_def*)buffer;
-		
-		free(buffer);
-		*/
+
 	}
 	
 	else if(datagramType == "#IOP"){
@@ -90,7 +73,6 @@ void KmallParser::processDatagram(EMdgmHeader & header, unsigned char * datagram
 	else if(datagramType == "#SPO"){
 			
 		processSPO(header, datagram);
-		exit(1);
 		
 	}
 	else if(datagramType == "#SKM"){
@@ -117,6 +99,7 @@ void KmallParser::processDatagram(EMdgmHeader & header, unsigned char * datagram
 	}
 	
 	else if(datagramType == "#MRZ"){
+		processMRZ(header, datagram);
 		exit(1);
 	}
 	
@@ -143,38 +126,74 @@ void KmallParser::processDatagram(EMdgmHeader & header, unsigned char * datagram
 
 void KmallParser::processSVP(EMdgmHeader & header, unsigned char * datagram){
 	
-	unsigned int nbByte = 0;
-	EMdgmSVPpoint *svp = new EMdgmSVPpoint;
-	while(nbByte < header.numBytesDgm){
-		memcpy(svp, (char*)&datagram, sizeof(EMdgmSVPpoint));
-		
-		// TODO do something with the datagram
-		//std::cerr<<svp->depth_m<<"\n";
-		
-		nbByte += sizeof(EMdgmSVPpoint);
-		datagram += sizeof(EMdgmSVPpoint);
-	}
+	EMdgmSVP_def svp;	
+	unsigned char *p;
 	
-	delete svp;
+	memset(&svp, 0, sizeof(EMdgmSVP_def)); // XXX not sure if essential
+	
+	p = (unsigned char*)&svp;
+	
+	memcpy(p, (char*)&header, sizeof(header));
+	p+=sizeof(EMdgmHeader);
+	
+	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
+	
+	std::cerr << svp.numBytesCmnPart <<"\n";
+	
+	for(int i = 0; i < svp.numBytesCmnPart; i++){
+		EMdgmSVPpoint_def svpPoint = svp.sensorData[i];
+		
+		//TODO
+		//std::cerr<<svpPoint.depth_m<<"\n";
+	}
 }
 
 void KmallParser::processSPO(EMdgmHeader & header, unsigned char * datagram){
+
+	EMdgmSPO_def spo;	
+	unsigned char *p;
 	
-	EMdgmScommon *common = new EMdgmScommon;
-	memcpy(common, (uint32_t*)&datagram, sizeof(EMdgmScommon));
+	memset(&spo, 0, sizeof(EMdgmSPO_def)); // XXX not sure if essential
 	
-	std::cerr<<"common->numBytesInfoPart: " << common->numBytesCmnPart <<"\n";
-	std::cerr<<"common->sensorStatus: " << common->sensorStatus <<"\n";
-	std::cerr<<"common->padding: " << common->padding <<"\n";
+	p = (unsigned char*)&spo;
 	
-	datagram += sizeof(EMdgmScommon);
-	EMdgmSPOdataBlock_def *data = new EMdgmSPOdataBlock_def;
-	memcpy(data, (char*)&datagram, header.numBytesDgm - sizeof(EMdgmScommon));
+	memcpy(p, (char*)&header, sizeof(header));
+	p+=sizeof(EMdgmHeader);
 	
-	std::cerr<<"timeFromSensor_sec: " << data->timeFromSensor_sec <<"\n";
-	std::cerr<<"posFixQuality_m: " << data->posFixQuality_m <<"\n";
-	std::cerr<<"correctedLat_deg: " << data->correctedLat_deg <<"\n";
-	std::cerr<<"correctedLong_deg: " << data->correctedLong_deg <<"\n";
+	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
+	
+	//TODO
+	
+	/*
+	std::cerr<<spo.cmnPart.numBytesCmnPart <<"\n";
+	
+	std::cerr<<"timeFromSensor_sec: " << spo.sensorData.timeFromSensor_sec <<"\n";
+	std::cerr<<"posFixQuality_m: " << spo.sensorData.posFixQuality_m <<"\n";
+	std::cerr<<"correctedLat_deg: " << spo.sensorData.correctedLat_deg <<"\n";
+	std::cerr<<"correctedLong_deg: " << spo.sensorData.correctedLong_deg <<"\n";
+	
+	std::cerr<< spo.header.numBytesDgm <<"\n";
+	std::cerr<< header.numBytesDgm <<"\n";
+	*/
 
 }
+
+void KmallParser::processMRZ(EMdgmHeader & header, unsigned char * datagram){
+
+	EMdgmMRZ_def mrz;	
+	unsigned char *p;
+	
+	memset(&mrz, 0, sizeof(EMdgmMRZ_def)); // XXX not sure if essential
+	
+	p = (unsigned char*)&mrz;
+	
+	memcpy(p, (char*)&header, sizeof(header));
+	p+=sizeof(EMdgmHeader);
+	
+	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
+	
+	//TODO
+
+}
+
 #endif
