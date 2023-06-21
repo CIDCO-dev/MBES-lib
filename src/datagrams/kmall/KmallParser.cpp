@@ -7,6 +7,195 @@
 
 #include "KmallParser.hpp"
 
+char * getMRZPingInfo(void * tgm)
+{
+   char *pData = NULL;
+
+   // If this record is not empty
+   if (tgm != NULL)
+   {
+      pEMdgmMRZ dgm = (pEMdgmMRZ)tgm;
+      int sizeCommon = dgm->cmnPart.numBytesCmnPart;
+
+      // Find rxInfo. Must take account of number of TX sectors.
+      int numTxSectors = dgm->pingInfo.numTxSectors;
+
+      //Get PingInfo
+      char* pPI = (char*)(&(dgm->partition.dgmNum));
+      pPI += 2;
+      pPI += sizeCommon;
+
+      pEMdgmMRZ_pingInfo pPingInfo = (pEMdgmMRZ_pingInfo)pPI;
+
+      pData = pPI;
+
+      // end of datagram for safety testing
+      char *pSOD = (char*)dgm;
+      char *pEOD = pSOD + dgm->header.numBytesDgm; // first byte past end of data
+
+                                                   // safety check - verify pointer is valid
+      if (pData >= pEOD)
+      {
+         pData = NULL;
+      }
+   }
+
+   return pData;
+}
+
+char * getMRZSectorInfo(void * tgm)
+{
+   char *pData = NULL;
+
+   // if this record is not empty
+   if (tgm != NULL)
+   {
+      pEMdgmMRZ dgm = (pEMdgmMRZ)tgm;
+      int sizeCommon = dgm->cmnPart.numBytesCmnPart;
+
+      // Find rxInfo. Must take account of number of TX sectors.
+      int numTxSectors = dgm->pingInfo.numTxSectors;
+
+      //Get PingInfo
+      char* pPI = (char*)(&(dgm->partition.dgmNum));
+      pPI += 2;
+      pPI += sizeCommon;
+
+      pEMdgmMRZ_pingInfo pPingInfo = (pEMdgmMRZ_pingInfo)pPI;
+
+      //Move to end of pingInfo
+      char* pch = pPI + pPingInfo->numBytesInfoData; //At start of txsectors
+      int nSkip = 0;
+      pch += nSkip;
+
+      //Get sector
+      int nBytesTx = pPingInfo->numBytesPerTxSector;
+      pEMdgmMRZ_txSectorInfo pSect = (pEMdgmMRZ_txSectorInfo)pch;
+
+      pData = pch;
+
+      // end of datagram for safety testing
+      char *pSOD = (char*)dgm;
+      char *pEOD = pSOD + dgm->header.numBytesDgm; // first byte past end of data
+
+                                                   // safety check - verify pointer is valid
+      if (pData >= pEOD)
+      {
+         pData = NULL;
+      }
+   }
+
+   return pData;
+}
+
+char *getMRZRxInfo(void* tgm)
+{
+   char *pData = NULL;
+
+   // if this record is not empty
+   if (tgm != NULL)
+   {
+      pEMdgmMRZ dgm = (pEMdgmMRZ)tgm;
+      int sizeCommon = dgm->cmnPart.numBytesCmnPart;
+
+      // Find rxInfo. Must take account of number of TX sectors.
+      int numTxSectors = dgm->pingInfo.numTxSectors;
+
+      //Get PingInfo
+      char* pPI = (char*)(&(dgm->partition.dgmNum));
+      pPI += 2;
+      pPI += sizeCommon;
+
+      pEMdgmMRZ_pingInfo pPingInfo = (pEMdgmMRZ_pingInfo)pPI;
+
+      //Move to end of pingInfo
+      char* pch = pPI + pPingInfo->numBytesInfoData; //At start of txsectors
+      int nSkip = 0;
+      pch += nSkip;
+
+      //Get sector
+      int nBytesTx = pPingInfo->numBytesPerTxSector;
+      pEMdgmMRZ_txSectorInfo pSect = (pEMdgmMRZ_txSectorInfo)pch;
+
+      //Move to start of rxInfo
+      pch = (char*)pSect;
+      pch += (nBytesTx * numTxSectors);
+      EMdgmMRZ_rxInfo* pRxInfo = (EMdgmMRZ_rxInfo*)pch;
+
+      pData = pch;
+
+      // end of datagram for safety testing
+      char *pSOD = (char*)dgm;
+      char *pEOD = pSOD + dgm->header.numBytesDgm; // first byte past end of data
+
+                                                   // safety check - verify pointer is valid
+      if (pData >= pEOD)
+      {
+         pData = NULL;
+      }
+   }
+
+   return pData;
+}
+
+char *getMRZSoundings(void* tgm)
+{
+   char *pData = NULL;
+
+   // if this record is not empty
+   if (tgm != NULL)
+   {
+      pEMdgmMRZ dgm = (pEMdgmMRZ)tgm;
+      int sizeCommon = dgm->cmnPart.numBytesCmnPart;
+
+      // Find rxInfo. Must take account of number of TX sectors.
+      int numTxSectors = dgm->pingInfo.numTxSectors;
+
+      //Get PingInfo
+      char* pPI = (char*)(&(dgm->partition.dgmNum));
+      pPI += 2;
+      pPI += sizeCommon;
+
+      pEMdgmMRZ_pingInfo pPingInfo = (pEMdgmMRZ_pingInfo)pPI;
+
+      //Move to end of pingInfo
+      char* pch = pPI + pPingInfo->numBytesInfoData; //At start of txsectors
+      int nSkip = 0;
+      pch += nSkip;
+
+      //Get sector
+      int nBytesTx = pPingInfo->numBytesPerTxSector;
+      pEMdgmMRZ_txSectorInfo pSect = (pEMdgmMRZ_txSectorInfo)pch;
+
+      //Move to start of rxInfo
+      pch = (char*)pSect;
+      pch += (nBytesTx * numTxSectors);
+      EMdgmMRZ_rxInfo* pRxInfo = (EMdgmMRZ_rxInfo*)pch;
+      int nSizeRXInfo = pRxInfo->numBytesRxInfo;
+
+      // Now, find soundings.
+      int numExtraDet = pRxInfo->numExtraDetectionClasses;
+      pch += nSizeRXInfo;
+      pch += numExtraDet * sizeof(EMdgmMRZ_extraDetClassInfo);
+      EMdgmMRZ_sounding* pSoundings = (EMdgmMRZ_sounding*)pch;
+
+      pData = pch;
+
+      // end of datagram for safety testing
+      char *pSOD = (char*)dgm;
+      char *pEOD = pSOD + dgm->header.numBytesDgm; // first byte past end of data
+
+                                                   // safety check - verify pointer is valid
+      if (pData >= pEOD)
+      {
+         pData = NULL;
+      }
+   }
+
+   return pData;
+}
+
+
 
 KmallParser::KmallParser(DatagramEventHandler & processor):DatagramParser(processor){
 
@@ -24,7 +213,7 @@ void KmallParser::parse(std::string & filename, bool ignoreChecksum){
 			EMdgmHeader header;
 			int elementsRead = fread (&header,sizeof(EMdgmHeader),1,file);
 			
-			if(elementsRead == 1){
+			if(elementsRead == 1){ //
 				/*
 				std::cerr<<"header.numBytesDgm: " << (unsigned int)header.numBytesDgm <<"\n";
 				std::cerr<<"header.dgmType: " << header.dgmType <<"\n";
@@ -47,9 +236,13 @@ void KmallParser::parse(std::string & filename, bool ignoreChecksum){
 				free(buffer);
 				
 			}
+			
 			else{
-				std::cerr<<"Not enough bytes to read header" << std::endl;
+				if(!feof(file)){
+					std::cerr<<"Not enough bytes to read header" << std::endl;
+				}
 			}
+			
 		} // while loop end of file
 	}
 	else{
@@ -70,11 +263,13 @@ void KmallParser::processDatagram(EMdgmHeader & header, unsigned char * datagram
 		//meh
 	}
 	
-	else if(datagramType == "#SPO"){	
+	else if(datagramType == "#SPO"){
+		// position
 		processSPO(header, datagram);
 	}
 	
 	else if(datagramType == "#SKM"){
+		// attitude
 		processSKM(header, datagram);
 	}
 	
@@ -99,11 +294,12 @@ void KmallParser::processDatagram(EMdgmHeader & header, unsigned char * datagram
 	}
 	
 	else if(datagramType == "#MRZ"){
+		// mbes ping
 		processMRZ(header, datagram);
+		exit(1);
 	}
 	
 	else if(datagramType == "#MWC"){
-		exit(1);
 	}
 	
 	else if(datagramType == "#CPO"){
@@ -163,13 +359,23 @@ void KmallParser::processSPO(EMdgmHeader & header, unsigned char * datagram){
 	
 	//TODO
 	
-	/*
-	std::cerr<<spo.cmnPart.numBytesCmnPart <<"\n";
+	processor.processPosition(
+		TimeUtils::buildTimeStamp(spo.header.time_sec, spo.header.time_nanosec),
+		spo.sensorData.correctedLong_deg,
+		spo.sensorData.correctedLat_deg,
+		spo.sensorData.ellipsoidHeightReRefPoint_m
+	);
 	
+	
+	/*
+	std::cerr<< TimeUtils::buildTimeStamp(spo.header.time_sec, spo.header.time_nanosec) <<"\n";
+	std::cerr<<spo.cmnPart.numBytesCmnPart <<"\n";
+	std::cerr<<"header.time_sec: " << spo.header.time_sec <<"\n";
 	std::cerr<<"timeFromSensor_sec: " << spo.sensorData.timeFromSensor_sec <<"\n";
 	std::cerr<<"posFixQuality_m: " << spo.sensorData.posFixQuality_m <<"\n";
 	std::cerr<<"correctedLat_deg: " << spo.sensorData.correctedLat_deg <<"\n";
 	std::cerr<<"correctedLong_deg: " << spo.sensorData.correctedLong_deg <<"\n";
+	std::cerr<<"ellipsoidHeightReRefPoint_m: " << spo.sensorData.ellipsoidHeightReRefPoint_m <<"\n";
 	
 	std::cerr<< spo.header.numBytesDgm <<"\n";
 	std::cerr<< header.numBytesDgm <<"\n";
@@ -191,7 +397,77 @@ void KmallParser::processMRZ(EMdgmHeader & header, unsigned char * datagram){
 	
 	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
 	
-	//TODO
+	//processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,int32_t intensity)
+	
+	/*
+	std::cerr<< "mrz.cmnPart.numBytesCmnPart: " << mrz.cmnPart.numBytesCmnPart <<"\n";
+	std::cerr<< "mrz.cmnPart.pingCnt: " << mrz.cmnPart.pingCnt <<"\n";
+	std::cerr<< "mrz.header.numBytesDgm: " << mrz.cmnPart.pingCnt <<"\n";
+	*/
+	
+	p = (unsigned char*)(&(mrz.partition.dgmNum));
+	
+	int sizeCommon = mrz.cmnPart.numBytesCmnPart;
+	
+	//skip partition
+	p+=2; // i guess thats for bytes alligment
+	p+=sizeCommon;
+	
+	EMdgmMRZ_pingInfo *pingInfo = (EMdgmMRZ_pingInfo*)p;
+	
+	//std::cerr<< pingInfo->numBytesInfoData <<"\n";
+	
+	// skip to end of ping info
+	p+=pingInfo->numBytesInfoData;
+	
+	//Get sector
+	int nBytesTx = pingInfo->numBytesPerTxSector;
+	int numTxSectors = mrz.pingInfo.numTxSectors;
+	//EMdgmMRZ_txSectorInfo *sect = (EMdgmMRZ_txSectorInfo)p;
+	
+	p += (nBytesTx * numTxSectors);
+	
+	EMdgmMRZ_rxInfo *rxInfo = (EMdgmMRZ_rxInfo*)p;
+	
+	std::cerr<<"numSoundingsMaxMain: " << rxInfo->numSoundingsMaxMain << "\n";
+	
+	uint32_t nbSoundings = rxInfo->numSoundingsMaxMain;
+	
+	EMdgmMRZ_sounding_def soundings[MAX_NUM_BEAMS+MAX_EXTRA_DET] = {mrz.sounding};
+	
+	for(uint32_t i = 0; i<nbSoundings; i++){
+		
+		std::cerr<<"index: " << soundings[i]->soundingIndex <<"\n";
+		std::cerr<<"twoWayTravelTime_sec: " << soundings[i]->twoWayTravelTime_sec <<"\n";
+		std::cerr<<"twoWayTravelTimeCorrection_sec: " << soundings[i]->twoWayTravelTimeCorrection_sec <<"\n";
+		std::cerr<<"beamAngleReRx_deg: " << soundings[i]->beamAngleReRx_deg <<"\n";
+		std::cerr<<"qualityFactor: " << soundings[i]->qualityFactor <<"\n";
+		break;
+	}
+	
+	//__________________________________________________________________
+	
+	/*
+	p = (unsigned char*)&mrz;
+	
+	//Structs above rxinfo can grow in newer datagram version. Use getMRZRxInfo to move to the correct location
+    pEMdgmMRZ_rxInfo rxInfo = (pEMdgmMRZ_rxInfo)getMRZRxInfo(p);
+	char* pData = (char*)(&(mrz.sectorInfo[mrz.pingInfo.numTxSectors]));
+	
+    //Structs above sounding can grow in newer datagram version. Use getMRZSoundings to move to the correct location
+	pEMdgmMRZ_sounding depthList = (pEMdgmMRZ_sounding)getMRZSoundings(p);
+	
+	std::cerr<< "rxInfo->numSoundingsMaxMain: " << rxInfo->numSoundingsMaxMain <<"\n";
+	
+	for (int i = 0; i < rxInfo->numSoundingsMaxMain; i++) 
+	{
+		std::cerr<<"soundingIndex: " << (depthList+i)->soundingIndex <<"\n";
+		std::cerr<<"qualityFactor: " << (depthList+i)->qualityFactor <<"\n";
+		std::cerr<<"beamAngleReRx_deg: " << (depthList+i)->beamAngleReRx_deg <<"\n";
+		std::cerr<<"twoWayTravelTime_sec: " << (depthList+i)->twoWayTravelTime_sec <<"\n";
+		std::cerr<<"beamIncAngleAdj_deg: " << (depthList+i)->beamIncAngleAdj_deg <<"\n\n";
+	}
+	*/
 
 }
 
@@ -210,11 +486,33 @@ void KmallParser::processSKM(EMdgmHeader & header, unsigned char * datagram){
 	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
 	
 	
-	//TODO
-	/*
-	std::cerr<< skm.infoPart.numBytesInfoPart <<"\n";
-	std::cerr<< skm.sample[0].KMdefault.roll_deg <<"\n";
-	*/
+	uint8_t status = skm.infoPart.sensorStatus;
+	uint8_t mask = 0x10;
+	status = status & mask;
+	
+	//std::cerr<< (int)(status) << "\n"; 
+	
+	if(status == 16){
+		//invalid data
+	}
+	else{
+		
+		int32_t nbSamples = (header.numBytesDgm-sizeof(EMdgmHeader) - sizeof(EMdgmSKMinfo_def)) / sizeof(EMdgmSKMsample_def);
+		
+		for(int i = 0; i < nbSamples; i++){
+			processor.processAttitude(
+				TimeUtils::buildTimeStamp(skm.sample[i].KMdefault.time_sec, skm.sample[i].KMdefault.time_nanosec),
+				skm.sample[i].KMdefault.heading_deg,
+				skm.sample[i].KMdefault.pitch_deg,
+				skm.sample[i].KMdefault.roll_deg
+			);
+			
+			/*
+			std::cerr<<"skm.sample[i].KMdefault.heading_deg: " << skm.sample[i].KMdefault.roll_deg <<"\n";
+			std::cerr<<"skm.sample[i].KMdefault.time_sec: " << (uint32_t)skm.sample[i].KMdefault.time_sec <<"\n";
+			*/	
+		}
+	}
 }
 
 void KmallParser::processSCL(EMdgmHeader & header, unsigned char * datagram){
@@ -272,8 +570,6 @@ void KmallParser::processSDE(EMdgmHeader & header, unsigned char * datagram){
 	p+=sizeof(EMdgmHeader);
 	
 	memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
-	
-	//TODO
 }
 
 void KmallParser::processSHI(EMdgmHeader & header, unsigned char * datagram){
