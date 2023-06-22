@@ -6,14 +6,8 @@
 #define KMALL_HPP
 
 
-//#include <string>
-//#include <cstdio>
 #include <iostream>
-//#include <cmath>
-//#include <map>
-
 #include "../DatagramParser.hpp"
-//#include "../../utils/NmeaUtils.hpp"
 #include "../../utils/TimeUtils.hpp"
 #include "../../utils/Exception.hpp"
 #include "KmallTypes.hpp"
