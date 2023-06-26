@@ -86,7 +86,7 @@ void KmallParser::processDatagram(EMdgmHeader & header, unsigned char * datagram
 	}
 	
 	else if(datagramType == "#SVT"){
-		//processSVT(header, datagram);
+		processSVT(header, datagram);
 	}
 	
 	else if(datagramType == "#SCL"){
@@ -104,6 +104,7 @@ void KmallParser::processDatagram(EMdgmHeader & header, unsigned char * datagram
 	else if(datagramType == "#MRZ"){
 		// mbes ping
 		processMRZ(header, datagram);
+		//exit(1);
 	}
 	
 	else if(datagramType == "#MWC"){
@@ -125,25 +126,22 @@ void KmallParser::processDatagram(EMdgmHeader & header, unsigned char * datagram
 
 void KmallParser::processSVP(EMdgmHeader & header, unsigned char * datagram){
 	if(header.dgmVersion == SVP_VERSION){
-		EMdgmSVP_def svp;	
-		unsigned char *p;
 		
-		memset(&svp, 0, sizeof(EMdgmSVP_def)); // XXX not sure if essential
+		EMdgmSVPpoint_def * sensorData = (EMdgmSVPpoint_def *) (datagram + 2*sizeof(uint16_t) + 4*sizeof(uint8_t) + sizeof(uint32_t) + 2*sizeof(double));
 		
-		p = (unsigned char*)&svp;
-		
-		memcpy(p, (char*)&header, sizeof(header));
-		p+=sizeof(EMdgmHeader);
-		
-		memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
-		
-		//std::cerr << svp.numBytesCmnPart <<"\n";
+		double lat = *((double *)(datagram + 2*sizeof(uint16_t) + 4*sizeof(uint8_t) + sizeof(uint32_t)));
+		double lon = *((double *)(datagram + 2*sizeof(uint16_t) + 4*sizeof(uint8_t) + sizeof(uint32_t) + sizeof(double)));
 		
 		SoundVelocityProfile * SVP = new SoundVelocityProfile();
-		SVP->setTimestamp(TimeUtils::buildTimeStamp(svp.header.time_sec, svp.header.time_nanosec));
+		SVP->setTimestamp(TimeUtils::buildTimeStamp(header.time_sec, header.time_nanosec));
 		
-		for(int i = 0; i < svp.numBytesCmnPart; i++){
-			SVP->add(svp.sensorData[i].depth_m, svp.sensorData[i].soundVelocity_mPerSec);
+		if(lat != UNAVAILABLE_LATITUDE && lon != UNAVAILABLE_LONGITUDE){
+			SVP->setLatitude(lat);
+			SVP->setLongitude(lon);
+		}
+		
+		for(int i = 0; i < *((uint16_t*)(datagram+sizeof(uint16_t))); i++){
+			SVP->add(sensorData[i].depth_m, sensorData[i].soundVelocity_mPerSec);
 		}
 	}
 	else{
@@ -153,39 +151,15 @@ void KmallParser::processSVP(EMdgmHeader & header, unsigned char * datagram){
 
 void KmallParser::processSPO(EMdgmHeader & header, unsigned char * datagram){
 	if(header.dgmVersion == SPO_VERSION){
-		EMdgmSPO_def spo;	
-		unsigned char *p;
 		
-		memset(&spo, 0, sizeof(EMdgmSPO_def)); // XXX not sure if essential
-		
-		p = (unsigned char*)&spo;
-		
-		memcpy(p, (char*)&header, sizeof(header));
-		p+=sizeof(EMdgmHeader);
-		
-		memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
+		EMdgmSPOdataBlock_def * sensorData = (EMdgmSPOdataBlock_def *)(datagram + sizeof(EMdgmScommon_def));
 		
 		processor.processPosition(
-			TimeUtils::buildTimeStamp(spo.header.time_sec, spo.header.time_nanosec),
-			spo.sensorData.correctedLong_deg,
-			spo.sensorData.correctedLat_deg,
-			spo.sensorData.ellipsoidHeightReRefPoint_m
+			TimeUtils::buildTimeStamp(header.time_sec, header.time_nanosec),
+			sensorData->correctedLong_deg,
+			sensorData->correctedLat_deg,
+			sensorData->ellipsoidHeightReRefPoint_m
 		);
-		
-		
-		/*
-		std::cerr<< TimeUtils::buildTimeStamp(spo.header.time_sec, spo.header.time_nanosec) <<"\n";
-		std::cerr<<spo.cmnPart.numBytesCmnPart <<"\n";
-		std::cerr<<"header.time_sec: " << spo.header.time_sec <<"\n";
-		std::cerr<<"timeFromSensor_sec: " << spo.sensorData.timeFromSensor_sec <<"\n";
-		std::cerr<<"posFixQuality_m: " << spo.sensorData.posFixQuality_m <<"\n";
-		std::cerr<<"correctedLat_deg: " << spo.sensorData.correctedLat_deg <<"\n";
-		std::cerr<<"correctedLong_deg: " << spo.sensorData.correctedLong_deg <<"\n";
-		std::cerr<<"ellipsoidHeightReRefPoint_m: " << spo.sensorData.ellipsoidHeightReRefPoint_m <<"\n";
-		
-		std::cerr<< spo.header.numBytesDgm <<"\n";
-		std::cerr<< header.numBytesDgm <<"\n";
-		*/
 	}
 	else{
 		throw new Exception("Datagram version read != Datagram version in code");
@@ -196,72 +170,32 @@ void KmallParser::processSPO(EMdgmHeader & header, unsigned char * datagram){
 void KmallParser::processMRZ(EMdgmHeader & header, unsigned char * datagram){
 
 	if(header.dgmVersion == MRZ_VERSION){
+	
+		unsigned int size = *(uint16_t*)(datagram + sizeof(EMdgmMpartition_def));
 		
-		EMdgmMRZ_def mrz;	
-		unsigned char *p;
-		
-		memset(&mrz, 0, sizeof(EMdgmMRZ_def)); // XXX not sure if essential
-		
-		p = (unsigned char*)&mrz;
-		
-		memcpy(p, (char*)&header, sizeof(header));
-		p+=sizeof(EMdgmHeader);
-		
-		memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
-		
-		//processPing(uint64_t microEpoch,long id, double beamAngle,double tiltAngle,double twoWayTravelTime,uint32_t quality,int32_t intensity)
-		
-		/*
-		std::cerr<< "mrz.cmnPart.numBytesCmnPart: " << mrz.cmnPart.numBytesCmnPart <<"\n";
-		std::cerr<< "mrz.cmnPart.pingCnt: " << mrz.cmnPart.pingCnt <<"\n";
-		std::cerr<< "mrz.header.numBytesDgm: " << mrz.cmnPart.pingCnt <<"\n";
-		*/
-		
-		p = (unsigned char*)(&(mrz.partition.dgmNum));
-		
-		int sizeCommon = mrz.cmnPart.numBytesCmnPart;
-		
-		//skip partition
-		p+=2; // i guess thats for bytes alligment
-		p+=sizeCommon;
-		
-		EMdgmMRZ_pingInfo *pingInfo = (EMdgmMRZ_pingInfo*)p;
-		
-		//std::cerr<< pingInfo->numBytesInfoData <<"\n";
-		
-		// skip to end of ping info
-		p+=pingInfo->numBytesInfoData;
-		
+		EMdgmMRZ_pingInfo *pingInfo = (EMdgmMRZ_pingInfo*)(datagram + sizeof(EMdgmMpartition_def) + sizeof(EMdgmMbody_def));
+
 		//Get sector
 		int nBytesTx = pingInfo->numBytesPerTxSector;
-		int numTxSectors = mrz.pingInfo.numTxSectors;
+		int numTxSectors = pingInfo->numTxSectors;	
+		EMdgmMRZ_txSectorInfo_def * sectors = (EMdgmMRZ_txSectorInfo_def*)(datagram + sizeof(EMdgmMpartition_def) + sizeof(EMdgmMbody_def) +
+		sizeof(EMdgmMRZ_pingInfo_def));
 		
 		float tiltAngles[numTxSectors];
 		
 		for(int i = 0; i<numTxSectors; i++){
-			//EMdgmMRZ_txSectorInfo_def sector = mrz.sectorInfo[i];
-			//std::cerr<<"tiltAngleReTx_deg: " << sector.tiltAngleReTx_deg<<"\n";
-			tiltAngles[i] = mrz.sectorInfo[i].tiltAngleReTx_deg;
+			tiltAngles[i] = sectors[i].tiltAngleReTx_deg;
 		}
-		
-		
-		p += (nBytesTx * numTxSectors);
-		
-		//std::cerr<<"numTxSectors: " << numTxSectors <<"\n";
-		
-		EMdgmMRZ_rxInfo *rxInfo = (EMdgmMRZ_rxInfo*)p;
-		//std::cerr<<"numSoundingsMaxMain: " << rxInfo->numSoundingsMaxMain << "\n";
-		uint32_t nbSoundings = rxInfo->numSoundingsMaxMain;
-		
+				
+		EMdgmMRZ_rxInfo *rxInfo = (EMdgmMRZ_rxInfo*)(datagram + sizeof(EMdgmMpartition_def) + sizeof(EMdgmMbody_def) +
+		sizeof(EMdgmMRZ_pingInfo_def) +  (nBytesTx * numTxSectors) );
 
-		int nSizeRXInfo = rxInfo->numBytesRxInfo;
-		p += nSizeRXInfo;
-		int numExtraDet = rxInfo->numExtraDetectionClasses;
-		p += numExtraDet * sizeof(EMdgmMRZ_extraDetClassInfo);
-		EMdgmMRZ_sounding* soundings = (EMdgmMRZ_sounding*)p;
-		
-		
-		for(uint32_t i = 0; i<nbSoundings; i++){
+	
+		EMdgmMRZ_sounding* soundings = (EMdgmMRZ_sounding*)(datagram + sizeof(EMdgmMpartition_def) + sizeof(EMdgmMbody_def) +
+		sizeof(EMdgmMRZ_pingInfo_def) +  (nBytesTx * numTxSectors) + rxInfo->numBytesRxInfo + 
+		(rxInfo->numExtraDetectionClasses * sizeof(EMdgmMRZ_extraDetClassInfo)));
+				
+		for(uint32_t i = 0; i<rxInfo->numSoundingsMaxMain; i++){
 			/*
 			std::cerr<<"soundingIndex: " << (soundings+i)->soundingIndex <<"\n";
 			std::cerr<<"qualityFactor: " << (soundings+i)->qualityFactor <<"\n";
@@ -272,19 +206,19 @@ void KmallParser::processMRZ(EMdgmHeader & header, unsigned char * datagram){
 			*/
 			
 			processor.processPing(
-				TimeUtils::buildTimeStamp(mrz.header.time_sec, mrz.header.time_nanosec),
+				TimeUtils::buildTimeStamp(header.time_sec, header.time_nanosec),
 				( long )( (soundings+i)->soundingIndex),
 				(double)( (soundings+i)->beamAngleReRx_deg),
 				(double)( tiltAngles[(soundings+i)->txSectorNumb]),
 				(double)( (soundings+i)->twoWayTravelTime_sec),
-				static_cast<uint32_t>( ( (soundings+i)->qualityFactor) * 100 ), //XXX
-				static_cast<uint32_t>(66.6) //XXX
+				static_cast<uint32_t>( ( (soundings+i)->qualityFactor) * 100), //XXX Quality Factor = Est(dz)/z=100*10^-IQF 
+				static_cast<uint32_t>(100.0) //XXX
 			);
+			
 			//XXX
 			/*
 			possible intensity : (soundings+i)->receiverSensitivityApplied_dB
 							(soundings+i)->rangeFactor
-				
 				
 				beamIncAngleAdj_deg ???
 			*/
@@ -298,44 +232,22 @@ void KmallParser::processMRZ(EMdgmHeader & header, unsigned char * datagram){
 
 void KmallParser::processSKM(EMdgmHeader & header, unsigned char * datagram){
 	if(header.dgmVersion == SKM_VERSION){
-		EMdgmSKM_def skm;	
-		unsigned char *p;
+			
+		EMdgmSKMinfo_def * infoPart = (EMdgmSKMinfo_def*)datagram;
 		
-		memset(&skm, 0, sizeof(EMdgmSKM_def)); // XXX not sure if essential
-		
-		p = (unsigned char*)&skm;
-		
-		memcpy(p, (char*)&header, sizeof(header));
-		p+=sizeof(EMdgmHeader);
-		
-		memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
-		
-		
-		uint8_t status = skm.infoPart.sensorStatus;
-		uint8_t mask = 0x10;
-		status = status & mask;
-		
-		//std::cerr<< (int)(status) << "\n"; 
-		
-		if(status == 16){
-			//invalid data
-		}
-		else{
+		if(!(infoPart->sensorStatus & 0x10)){
 			
 			int32_t nbSamples = (header.numBytesDgm-sizeof(EMdgmHeader) - sizeof(EMdgmSKMinfo_def)) / sizeof(EMdgmSKMsample_def);
 			
+			EMdgmSKMsample_def * sample = (EMdgmSKMsample_def *)(datagram + sizeof(EMdgmSKMinfo_def));
+			
 			for(int i = 0; i < nbSamples; i++){
 				processor.processAttitude(
-					TimeUtils::buildTimeStamp(skm.sample[i].KMdefault.time_sec, skm.sample[i].KMdefault.time_nanosec),
-					skm.sample[i].KMdefault.heading_deg,
-					skm.sample[i].KMdefault.pitch_deg,
-					skm.sample[i].KMdefault.roll_deg
-				);
-				
-				/*
-				std::cerr<<"skm.sample[i].KMdefault.heading_deg: " << skm.sample[i].KMdefault.roll_deg <<"\n";
-				std::cerr<<"skm.sample[i].KMdefault.time_sec: " << (uint32_t)skm.sample[i].KMdefault.time_sec <<"\n";
-				*/	
+					TimeUtils::buildTimeStamp(sample[i].KMdefault.time_sec, sample[i].KMdefault.time_nanosec), //XXX
+					sample[i].KMdefault.heading_deg,
+					sample[i].KMdefault.pitch_deg,
+					sample[i].KMdefault.roll_deg				
+					);
 			}
 		}
 	}
@@ -371,21 +283,13 @@ void KmallParser::processSCL(EMdgmHeader & header, unsigned char * datagram){
 
 void KmallParser::processSVT(EMdgmHeader & header, unsigned char * datagram){
 	if(header.dgmVersion == SVT_VERSION){
-		EMdgmSVT_def svt;	
-		unsigned char *p;
 		
-		memset(&svt, 0, sizeof(EMdgmSVT_def)); // XXX not sure if essential
+		EMdgmSVTsample_def * sensorData = (EMdgmSVTsample_def *)(datagram + sizeof(EMdgmSVTinfo_def));
 		
-		p = (unsigned char*)&svt;
+		//std::cerr<<"sensor data: " << sensorData->soundVelocity_mPerSec << std::endl;
 		
-		memcpy(p, (char*)&header, sizeof(header));
-		p+=sizeof(EMdgmHeader);
+		processor.processSwathStart((double)(sensorData->soundVelocity_mPerSec));
 		
-		memcpy(p, datagram, header.numBytesDgm-sizeof(EMdgmHeader));
-		/*
-		std::cerr<<svt.infoPart.numBytesCmnPart<<"\n";
-		std::cerr<<svt.sensorData[0].time_sec<<"\n";
-		*/
 	}
 	else{
 		throw new Exception("Datagram version read != Datagram version in code");

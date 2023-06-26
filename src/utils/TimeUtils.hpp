@@ -326,7 +326,7 @@ public:
     }
     
     //returns timestamp in microseconds
-	static uint64_t buildTimeStamp(int sec, int nsec){
+	static uint64_t buildTimeStamp(unsigned int sec, unsigned int nsec){
 		uint64_t timestamp;
 		timestamp = sec;
 		timestamp = (timestamp * 1000000)+nsec/1000;
