@@ -1,0 +1,5 @@
+<map id="EMdgmSPC_def" name="EMdgmSPC_def">
+<area shape="rect" id="node2" href="$structEMdgmSPCdataBlock__def.html" title="#SPC &#45; Sensor position compatibility data block. Data from active sensor is referenced to position at..." alt="" coords="5,5,181,32"/>
+<area shape="rect" id="node3" href="$structEMdgmScommon__def.html" title="Sensor (S) output datagram &#45; common part for all external sensors. " alt="" coords="206,5,357,32"/>
+<area shape="rect" id="node4" href="$structEMdgmHeader__def.html" title="Definition of general datagram header. " alt="" coords="381,5,513,32"/>
+</map>

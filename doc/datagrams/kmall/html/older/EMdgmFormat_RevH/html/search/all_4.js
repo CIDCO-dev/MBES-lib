@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['datafromsensor_27',['dataFromSensor',['../structEMdgmSCLdataFromSensor__def.html#ada8853d96583da89e89db684d63ca49c',1,'EMdgmSCLdataFromSensor_def']]],
+  ['delayedheave_5fm_28',['delayedHeave_m',['../structKMdelayedHeave__def.html#a0946a06edcb54d772c175e9c8829ef1c',1,'KMdelayedHeave_def']]],
+  ['deltalatitude_5fdeg_29',['deltaLatitude_deg',['../structEMdgmMRZ__sounding__def.html#a20c3b3563afa67e0447e56b8ff12fcdb',1,'EMdgmMRZ_sounding_def']]],
+  ['deltalongitude_5fdeg_30',['deltaLongitude_deg',['../structEMdgmMRZ__sounding__def.html#a3c473bfea980d5573d3e5073b3ce64b5',1,'EMdgmMRZ_sounding_def']]],
+  ['depth_5fm_31',['depth_m',['../structEMdgmSVPpoint__def.html#a94dcb1125cbf58cdfa2ada62680b20e3',1,'EMdgmSVPpoint_def']]],
+  ['depthmode_32',['depthMode',['../structEMdgmMRZ__pingInfo__def.html#a7e69840a0847f4e9875a39a146027fbb',1,'EMdgmMRZ_pingInfo_def']]],
+  ['depthused_5fm_33',['depthUsed_m',['../structEMdgmSDEdataFromSensor__def.html#af4ae099fa4a2bb3df403c11c022bb562',1,'EMdgmSDEdataFromSensor_def']]],
+  ['detectedrangeinsamples_34',['detectedRangeInSamples',['../structEMdgmMWCrxBeamData__def.html#a2c34c0e0d04bf5919fff774d187ac5ec',1,'EMdgmMWCrxBeamData_def']]],
+  ['detectedrangeinsampleshighresolution_35',['detectedRangeInSamplesHighResolution',['../structEMdgmMWCrxBeamData__def.html#ad9e54dcbcdb8badcc93f16fc1b02c2e4',1,'EMdgmMWCrxBeamData_def']]],
+  ['detectionclass_36',['detectionClass',['../structEMdgmMRZ__sounding__def.html#aeff1439df2fa48da8b0d7b3f1c447b68',1,'EMdgmMRZ_sounding_def']]],
+  ['detectionconfidencelevel_37',['detectionConfidenceLevel',['../structEMdgmMRZ__sounding__def.html#a11a1a84a16e16f36286ec60c5c87050b',1,'EMdgmMRZ_sounding_def']]],
+  ['detectionmethod_38',['detectionMethod',['../structEMdgmMRZ__sounding__def.html#a0dd7518a98487c4c5f3ce57b1621a8b8',1,'EMdgmMRZ_sounding_def']]],
+  ['detectionmode_39',['detectionMode',['../structEMdgmMRZ__pingInfo__def.html#a09c2da3d55f2640a2666d8b61bc04d9e',1,'EMdgmMRZ_pingInfo_def']]],
+  ['detectiontype_40',['detectionType',['../structEMdgmMRZ__sounding__def.html#a9699fbb094e406d7232fc1d1e7bb5d0b',1,'EMdgmMRZ_sounding_def']]],
+  ['detectionuncertaintyhor_5fm_41',['detectionUncertaintyHor_m',['../structEMdgmMRZ__sounding__def.html#a9fe58ffb7df75fef34060601a95340a6',1,'EMdgmMRZ_sounding_def']]],
+  ['detectionuncertaintyver_5fm_42',['detectionUncertaintyVer_m',['../structEMdgmMRZ__sounding__def.html#a1794c9079a8e760daa03a44202fd472d',1,'EMdgmMRZ_sounding_def']]],
+  ['detectionwindowlength_5fsec_43',['detectionWindowLength_sec',['../structEMdgmMRZ__sounding__def.html#a82d28e37475cea96508d1445aef61ab6',1,'EMdgmMRZ_sounding_def']]],
+  ['dgmnum_44',['dgmNum',['../structEMdgmMpartition__def.html#a34849d4a65ef9a7466fa244b95193246',1,'EMdgmMpartition_def']]],
+  ['dgmtype_45',['dgmType',['../structEMdgmHeader__def.html#a1d3924c9ceae5b1485b336927732b964',1,'EMdgmHeader_def::dgmType()'],['../structKMbinary__def.html#a1d3924c9ceae5b1485b336927732b964',1,'KMbinary_def::dgmType()']]],
+  ['dgmversion_46',['dgmVersion',['../structEMdgmHeader__def.html#a887a157aef54df2694d06ea692c4539d',1,'EMdgmHeader_def::dgmVersion()'],['../structKMbinary__def.html#ac81f6537952f30b0e961e1e346fa9fff',1,'KMbinary_def::dgmVersion()']]],
+  ['distancebtwswath_47',['distanceBtwSwath',['../structEMdgmMRZ__pingInfo__def.html#a22a01eaf76da04fa28e31edeea9bba46',1,'EMdgmMRZ_pingInfo_def']]],
+  ['document_20information_48',['Document information',['../documentInformation.html',1,'']]],
+  ['downacceleration_49',['downAcceleration',['../structKMbinary__def.html#a61779eab831e1318356818ef5d8ae9a6',1,'KMbinary_def']]],
+  ['datagram_20format_20philosophy_50',['Datagram format philosophy',['../philosophy.html',1,'']]]
+];

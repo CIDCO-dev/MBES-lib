@@ -324,6 +324,14 @@ public:
         resultMonth = monthIndex+1;
         resultDayOfMonth = dayCounter;
     }
+    
+    //returns timestamp in microseconds
+	static uint64_t buildTimeStamp(unsigned int sec, unsigned int nsec){
+		uint64_t timestamp;
+		timestamp = sec;
+		timestamp = (timestamp * 1000000)+nsec/1000;
+		return timestamp;
+	}
 
 };
 #endif

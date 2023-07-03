@@ -1,0 +1,22 @@
+digraph "EMdgmMWC_def"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="EMdgmMWC_def",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="#MWC - Multibeam Water Column Datagram. Entire datagram containing several sub structs."];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" partition" ,fontname="Helvetica"];
+  Node2 [label="EMdgmMpartition_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMpartition__def.html",tooltip="Multibeam (M) datagrams - data partition information. General for all M datagrams."];
+  Node3 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" rxInfo" ,fontname="Helvetica"];
+  Node3 [label="EMdgmMWCrxInfo_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMWCrxInfo__def.html",tooltip="#MWC - data block 2: receiver, general info"];
+  Node4 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" txInfo" ,fontname="Helvetica"];
+  Node4 [label="EMdgmMWCtxInfo_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMWCtxInfo__def.html",tooltip="#MWC - data block 1: transmit sectors, general info for all sectors"];
+  Node5 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" beamData_p" ,fontname="Helvetica"];
+  Node5 [label="EMdgmMWCrxBeamData_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMWCrxBeamData__def.html",tooltip="#MWC - data block 2: receiver, specific info for each beam."];
+  Node6 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" header" ,fontname="Helvetica"];
+  Node6 [label="EMdgmHeader_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmHeader__def.html",tooltip="Definition of general datagram header."];
+  Node7 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" cmnPart" ,fontname="Helvetica"];
+  Node7 [label="EMdgmMbody_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMbody__def.html",tooltip="Multibeam (M) datagrams - body part. Start of body of all M datagrams."];
+  Node8 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" sectorData" ,fontname="Helvetica"];
+  Node8 [label="EMdgmMWCtxSectorData_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmMWCtxSectorData__def.html",tooltip="#MWC - data block 1: transmit sector data, loop for all i = numTxSectors."];
+}

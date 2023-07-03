@@ -1,0 +1,13 @@
+digraph "EMdgmSVT_def"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="EMdgmSVT_def",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip="#SVT - Sound Velocity at Transducer. Data for sound velocity and temperature are measured directely o..."];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" header" ,fontname="Helvetica"];
+  Node2 [label="EMdgmHeader_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmHeader__def.html",tooltip="Definition of general datagram header."];
+  Node3 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" infoPart" ,fontname="Helvetica"];
+  Node3 [label="EMdgmSVTinfo_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmSVTinfo__def.html",tooltip="Part of Sound Velocity at Transducer datagram."];
+  Node4 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" sensorData" ,fontname="Helvetica"];
+  Node4 [label="EMdgmSVTsample_def",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structEMdgmSVTsample__def.html",tooltip="#SVT - Sound Velocity at Transducer. Data sample."];
+}

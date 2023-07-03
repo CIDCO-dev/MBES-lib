@@ -1,0 +1,6 @@
+<map id="EMdgmFCF_def" name="EMdgmFCF_def">
+<area shape="rect" id="node1" title="#FCF &#45; Backscatter calibration file &#160;&#160;&#160;&#160;The backscatter calibration file contains the measured backsc..." alt="" coords="195,95,311,121"/>
+<area shape="rect" id="node2" href="$structEMdgmMpartition__def.html" title="Multibeam (M) datagrams &#45; data partition information. General for all M datagrams." alt="" coords="5,5,153,32"/>
+<area shape="rect" id="node3" href="$structEMdgmFcommon__def.html" title="File (F) output datagram &#45; common all for file datagrams." alt="" coords="178,5,327,32"/>
+<area shape="rect" id="node4" href="$structEMdgmHeader__def.html" title="Definition of general datagram header." alt="" coords="352,5,484,32"/>
+</map>

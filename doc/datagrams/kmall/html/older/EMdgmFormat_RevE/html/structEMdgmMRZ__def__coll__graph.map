@@ -1,0 +1,10 @@
+<map id="EMdgmMRZ_def" name="EMdgmMRZ_def">
+<area shape="rect" id="node2" href="$structEMdgmMRZ__pingInfo__def.html" title="#MRZ &#45; ping info. Information on vessel/system level, i.e. information common to all beams in the cur..." alt="" coords="34,5,203,32"/>
+<area shape="rect" id="node3" href="$structEMdgmMpartition__def.html" title="Multibeam (M) datagrams &#45; data partition information. General for all M datagrams. " alt="" coords="45,56,193,83"/>
+<area shape="rect" id="node4" href="$structEMdgmMRZ__sounding__def.html" title="#MRZ &#45; Data for each sounding, e.g. XYZ, reflectivity, two way travel time etc. " alt="" coords="30,107,207,133"/>
+<area shape="rect" id="node5" href="$structEMdgmMRZ__txSectorInfo__def.html" title="#MRZ &#45; sector information. " alt="" coords="21,157,216,184"/>
+<area shape="rect" id="node6" href="$structEMdgmMRZ__rxInfo__def.html" title="#MRZ &#45; receiver specific information. " alt="" coords="41,208,197,235"/>
+<area shape="rect" id="node7" href="$structEMdgmHeader__def.html" title="Definition of general datagram header. " alt="" coords="53,259,185,285"/>
+<area shape="rect" id="node8" href="$structEMdgmMRZ__extraDetClassInfo__def.html" title="#MRZ &#45; Extra detection class information. " alt="" coords="5,309,232,336"/>
+<area shape="rect" id="node9" href="$structEMdgmMbody__def.html" title="Multibeam (M) datagrams &#45; body part. Start of body of all M datagrams. " alt="" coords="53,360,184,387"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="EMdgmSHI_def" name="EMdgmSHI_def">
+<area shape="rect" id="node1" title="#SHI &#45; Height datagram." alt="" coords="257,95,369,121"/>
+<area shape="rect" id="node2" href="$structEMdgmSHIdataFromSensor__def.html" title="Part of Height datagram, giving corrected and uncorrected data as received from sensor." alt="" coords="5,5,213,32"/>
+<area shape="rect" id="node3" href="$structEMdgmScommon__def.html" title="Sensor (S) output datagram &#45; common part for all external sensors." alt="" coords="238,5,389,32"/>
+<area shape="rect" id="node4" href="$structEMdgmHeader__def.html" title="Definition of general datagram header." alt="" coords="413,5,545,32"/>
+</map>

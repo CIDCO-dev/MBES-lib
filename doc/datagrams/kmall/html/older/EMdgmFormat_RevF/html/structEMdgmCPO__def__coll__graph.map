@@ -1,0 +1,5 @@
+<map id="EMdgmCPO_def" name="EMdgmCPO_def">
+<area shape="rect" id="node2" href="$structEMdgmCPOdataBlock__def.html" title="#CPO &#45; Compatibility sensor position compatibility data block. Data from active sensor is referenced ..." alt="" coords="5,5,183,32"/>
+<area shape="rect" id="node3" href="$structEMdgmScommon__def.html" title="Sensor (S) output datagram &#45; common part for all external sensors. " alt="" coords="207,5,357,32"/>
+<area shape="rect" id="node4" href="$structEMdgmHeader__def.html" title="Definition of general datagram header. " alt="" coords="381,5,513,32"/>
+</map>

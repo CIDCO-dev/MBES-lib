@@ -18,7 +18,7 @@ if (TARGET Eigen3::Eigen)
 		SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /bigobj")
 	ENDIF(WIN32)
 
-	set(SOURCES src/getopt.c src/datagrams/DatagramParser.cpp src/datagrams/DatagramParserFactory.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/datagrams/xtf/XtfParser.cpp src/utils/NmeaUtils.cpp src/utils/StringUtils.cpp src/sidescan/SidescanPing.cpp src/hydroblock/Hydroblock20Parser.cpp)
+	set(SOURCES src/getopt.c src/datagrams/DatagramParser.cpp src/datagrams/DatagramParserFactory.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/datagrams/xtf/XtfParser.cpp src/utils/NmeaUtils.cpp src/utils/StringUtils.cpp src/sidescan/SidescanPing.cpp src/hydroblock/Hydroblock20Parser.cpp src/datagrams/kmall/KmallParser.cpp)
 	
 	#georeference
 	add_executable(georeference src/examples/georeference.cpp ${SOURCES})

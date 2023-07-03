@@ -92,11 +92,10 @@ int main (int argc , char ** argv ){
 		std::cerr << "Decoding " << fileName << std::endl;
 
 		parser = DatagramParserFactory::build(fileName,printer);
-
 		parser->parse(fileName, true);
 	}
-	catch(const char * error){
-		std::cerr << "Error whille parsing " << fileName << ": " << error << std::endl;
+	catch(Exception * error){
+		std::cerr << "Error whille parsing " << fileName << ": " << error->what() << std::endl;
 	}
 
 
