@@ -15,6 +15,7 @@
 #include "../datagrams/DatagramEventHandler.hpp"
 #include "../math/Interpolation.hpp"
 #include "../math/CartesianToGeodeticFukushima.hpp"
+#include "../sbet/SbetProcessor.hpp"
 
 /*!
  * \brief Datagram Georeferencer class.
@@ -22,11 +23,11 @@
  *
  * Extention of the DatagramEventHandler class
  */
-class DatagramGeoreferencer : public DatagramEventHandler {
+class DatagramGeoreferencer : public DatagramEventHandler, public SbetProcessor {
 public:
 
     /**Create a datagram georeferencer*/
-    DatagramGeoreferencer(Georeferencing & geo, SvpSelectionStrategy & svpStrat) : georef(geo), svpStrategy(svpStrat) {
+    DatagramGeoreferencer(Georeferencing & geo, SvpSelectionStrategy & svpStrat, std::string & sbetFile) : georef(geo), svpStrategy(svpStrat), sbetFilePath(sbetFile) {
 
     }
 
@@ -91,12 +92,30 @@ public:
     void processSoundVelocityProfile(SoundVelocityProfile * svp) {
         svps.push_back(svp);
     }
+    
+    void processEntry(SbetEntry * entry){
+			
+		Position position(static_cast<uint64_t>(entry->time * 1000000), entry->latitude*R2D, entry->longitude*R2D, entry->altitude);			
+		this->positions.push_back(position);
+			
+		Attitude attitude(static_cast<uint64_t>(entry->time * 1000000), entry->roll, entry->pitch, entry->heading );
+		this->attitudes.push_back(attitude);
+		std::cerr<<"entry->roll: " << entry->roll <<"\n";
+		
+    }
 
     /**
      * Georeferences all pings
      * @param boresight boresight (dPhi,dTheta,dPsi)
      */
     virtual void georeference(Eigen::Vector3d & leverArm, Eigen::Matrix3d & boresight, std::vector<SoundVelocityProfile*> & externalSvps) {
+    
+    if(this->sbetFilePath.size() > 0){
+    	positions.clear();
+    	attitudes.clear();
+    	readFile(this->sbetFilePath);
+    }
+    
 	if(positions.size()==0){
 		std::cerr << "[-] No position data found in file" << std::endl;
 		return;
@@ -276,6 +295,8 @@ protected:
     double transducerDraft = 0.0;
     
     CartesianToGeodeticFukushima* cart2geo = NULL;
+    
+    std::string sbetFilePath = "";
 };
 
 #endif
