@@ -86,7 +86,7 @@ int main (int argc , char ** argv){
 		std::string svpFilename;
 		CarisSvpFile svps;
 
-		std::string sbetFilePath;
+		std::string sbetFilePath = "";
 
         int index;
 

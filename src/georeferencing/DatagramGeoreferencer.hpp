@@ -27,7 +27,7 @@ class DatagramGeoreferencer : public DatagramEventHandler, public SbetProcessor 
 public:
 
     /**Create a datagram georeferencer*/
-    DatagramGeoreferencer(Georeferencing & geo, SvpSelectionStrategy & svpStrat, std::string & sbetFile) : georef(geo), svpStrategy(svpStrat), sbetFilePath(sbetFile) {
+    DatagramGeoreferencer(Georeferencing & geo, SvpSelectionStrategy & svpStrat, std::string sbetFile = "") : georef(geo), svpStrategy(svpStrat), sbetFilePath(sbetFile) {
 
     }
 

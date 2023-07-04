@@ -143,6 +143,9 @@ void KmallParser::processSVP(EMdgmHeader & header, unsigned char * datagram){
 		for(int i = 0; i < *((uint16_t*)(datagram+sizeof(uint16_t))); i++){
 			SVP->add(sensorData[i].depth_m, sensorData[i].soundVelocity_mPerSec);
 		}
+		
+		processor.processSoundVelocityProfile(SVP);
+		
 	}
 	else{
 		throw new Exception("Datagram version read != Datagram version in code");
