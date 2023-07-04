@@ -211,17 +211,9 @@ void KmallParser::processMRZ(EMdgmHeader & header, unsigned char * datagram){
 				(double)( (soundings+i)->beamAngleReRx_deg),
 				(double)( tiltAngles[(soundings+i)->txSectorNumb]),
 				(double)( (soundings+i)->twoWayTravelTime_sec),
-				static_cast<uint32_t>( ( (soundings+i)->qualityFactor) * 100), //XXX Quality Factor = Est(dz)/z=100*10^-IQF 
-				static_cast<uint32_t>(100.0) //XXX
+				static_cast<uint32_t>( ( (soundings+i)->qualityFactor) ), 
+				static_cast<uint32_t>((soundings+i)->reflectivity1_dB)
 			);
-			
-			//XXX
-			/*
-			possible intensity : (soundings+i)->receiverSensitivityApplied_dB
-							(soundings+i)->rangeFactor
-				
-				beamIncAngleAdj_deg ???
-			*/
 		}
 	}
 	else{
