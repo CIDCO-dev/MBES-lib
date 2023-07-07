@@ -28,9 +28,9 @@ typedef struct{
 	double xSpeed;    	//velocity in x direction
 	double ySpeed;    	//velocity in y direction
 	double zSpeed;    	//velocity in z direction
-	double roll;    	//roll angle
-	double pitch;    	//pitch angle
-	double heading;    	//heading angle
+	double roll;    	//roll radian
+	double pitch;    	//pitch radian
+	double heading;    	//heading radian
 	double wander;    	//wander
 	double xForce;    	//force in x direction
 	double yForce;    	//force in y direction
