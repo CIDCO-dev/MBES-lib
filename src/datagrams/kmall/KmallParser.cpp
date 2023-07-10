@@ -215,7 +215,7 @@ void KmallParser::processMRZ(EMdgmHeader & header, unsigned char * datagram){
 				(double)( tiltAngles[(soundings+i)->txSectorNumb]),
 				(double)( (soundings+i)->twoWayTravelTime_sec),
 				static_cast<uint32_t>( ( (soundings+i)->qualityFactor) ), 
-				static_cast<uint32_t>((soundings+i)->reflectivity1_dB)
+				static_cast<uint32_t>((soundings+i)->reflectivity1_dB) // reflectivity1_dB is corrected according to the footprint on the sea floor and reflectivity2_dB is not
 			);
 		}
 	}

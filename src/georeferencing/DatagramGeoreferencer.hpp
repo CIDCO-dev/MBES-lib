@@ -258,9 +258,6 @@ public:
             Attitude * interpolatedAttitude = Interpolator::interpolateAttitude(beforeAttitude, afterAttitude, (*i).getTimestamp());
             Position * interpolatedPosition = Interpolator::interpolatePosition(beforePosition, afterPosition, (*i).getTimestamp());
             
-            //std::cerr<<"interpolatedAttitude: "<< *interpolatedAttitude <<"\n";
-            //std::cerr<<"interpolatedPosition: "<< *interpolatedPosition <<"\n";
-            
             // Set the transducer depth to draft
             // If we have timestamped vertical motion, then this would need to
             // be processed and interpolated in the same way as Position and Attitude
