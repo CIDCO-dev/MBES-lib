@@ -49,14 +49,14 @@ void KmallParser::parse(std::string & filename, bool ignoreChecksum){
 			
 			else{
 				if(!feof(file)){
-					std::cerr<<"Not enough bytes to read header" << std::endl;
+					throw new Exception("Not enough bytes to read header");
 				}
 			}
 			
 		} // while loop end of file
 	}
 	else{
-		std::cerr<<"Cannot open file"<< std::endl;
+		throw new Exception("Couldn't open file " + filename);
 	}
 }
 

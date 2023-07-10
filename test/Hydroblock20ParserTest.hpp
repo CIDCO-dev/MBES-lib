@@ -1,20 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /* 
  * File:   XtfParserTest.hpp
- * Author: emile
+ * Author: Patrick Charron-Morneau
  *
- * Created on May 3, 2019, 2:03 PM
  */
 #include "catch.hpp"
 #include "../src/datagrams/DatagramEventHandler.hpp"
 #include "../src/hydroblock/Hydroblock20Parser.hpp"
 
-TEST_CASE("test invalid directory")
+TEST_CASE("test invalid hydroblock2.0 directory")
 {
     DatagramEventHandler handler;
     Hydroblock20Parser parser(handler);
@@ -32,7 +25,7 @@ TEST_CASE("test invalid directory")
     }
 }
 
-TEST_CASE ("test the XTF parser with a valid datagram")
+TEST_CASE ("test the hydroblock2.0 parser with a valid datagram")
 {
     DatagramEventHandler handler;
     Hydroblock20Parser parser(handler);
