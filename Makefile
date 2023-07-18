@@ -3,7 +3,7 @@ OPTIONS=-Wall -std=c++17
 INCLUDES=-I/usr/include/eigen3
 VERSION=0.1.0
 
-FILES=src/datagrams/DatagramParser.cpp src/datagrams/DatagramParserFactory.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/datagrams/xtf/XtfParser.cpp src/utils/NmeaUtils.cpp src/utils/StringUtils.cpp src/sidescan/SidescanPing.cpp src/hydroblock/Hydroblock20Parser.cpp
+FILES=src/datagrams/DatagramParser.cpp src/datagrams/DatagramParserFactory.cpp src/datagrams/s7k/S7kParser.cpp src/datagrams/kongsberg/KongsbergParser.cpp src/datagrams/xtf/XtfParser.cpp src/utils/NmeaUtils.cpp src/utils/StringUtils.cpp src/sidescan/SidescanPing.cpp src/hydroblock/Hydroblock20Parser.cpp src/datagrams/kmall/KmallParser.cpp src/sbet/SbetProcessor.cpp
 EXECUTABLES=georeference data-cleaning datagram-dump datagram-list bounding-box cidco-decoder
 
 root=$(shell pwd)

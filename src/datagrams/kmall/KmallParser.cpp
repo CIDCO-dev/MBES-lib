@@ -49,14 +49,14 @@ void KmallParser::parse(std::string & filename, bool ignoreChecksum){
 			
 			else{
 				if(!feof(file)){
-					std::cerr<<"Not enough bytes to read header" << std::endl;
+					throw new Exception("Not enough bytes to read header");
 				}
 			}
 			
 		} // while loop end of file
 	}
 	else{
-		std::cerr<<"Cannot open file"<< std::endl;
+		throw new Exception("Couldn't open file " + filename);
 	}
 }
 
@@ -143,6 +143,9 @@ void KmallParser::processSVP(EMdgmHeader & header, unsigned char * datagram){
 		for(int i = 0; i < *((uint16_t*)(datagram+sizeof(uint16_t))); i++){
 			SVP->add(sensorData[i].depth_m, sensorData[i].soundVelocity_mPerSec);
 		}
+		
+		processor.processSoundVelocityProfile(SVP);
+		
 	}
 	else{
 		throw new Exception("Datagram version read != Datagram version in code");
@@ -211,17 +214,9 @@ void KmallParser::processMRZ(EMdgmHeader & header, unsigned char * datagram){
 				(double)( (soundings+i)->beamAngleReRx_deg),
 				(double)( tiltAngles[(soundings+i)->txSectorNumb]),
 				(double)( (soundings+i)->twoWayTravelTime_sec),
-				static_cast<uint32_t>( ( (soundings+i)->qualityFactor) * 100), //XXX Quality Factor = Est(dz)/z=100*10^-IQF 
-				static_cast<uint32_t>(100.0) //XXX
+				static_cast<uint32_t>( ( (soundings+i)->qualityFactor) ), 
+				static_cast<uint32_t>((soundings+i)->reflectivity1_dB) // reflectivity1_dB is corrected according to the footprint on the sea floor and reflectivity2_dB is not
 			);
-			
-			//XXX
-			/*
-			possible intensity : (soundings+i)->receiverSensitivityApplied_dB
-							(soundings+i)->rangeFactor
-				
-				beamIncAngleAdj_deg ???
-			*/
 		}
 	}
 	else{

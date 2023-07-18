@@ -15,18 +15,19 @@
 #include "../datagrams/DatagramEventHandler.hpp"
 #include "../math/Interpolation.hpp"
 #include "../math/CartesianToGeodeticFukushima.hpp"
+#include "../sbet/SbetProcessor.hpp"
 
 /*!
  * \brief Datagram Georeferencer class.
- * \author Guillaume Labbe-Morissette, Jordan McManus, Emile Gagne
+ * \author Guillaume Labbe-Morissette, Jordan McManus, Emile Gagne, Patrick Charron-Morneau
  *
  * Extention of the DatagramEventHandler class
  */
-class DatagramGeoreferencer : public DatagramEventHandler {
+class DatagramGeoreferencer : public DatagramEventHandler, public SbetProcessor {
 public:
 
     /**Create a datagram georeferencer*/
-    DatagramGeoreferencer(Georeferencing & geo, SvpSelectionStrategy & svpStrat) : georef(geo), svpStrategy(svpStrat) {
+    DatagramGeoreferencer(Georeferencing & geo, SvpSelectionStrategy & svpStrat, std::string sbetFile = "") : georef(geo), svpStrategy(svpStrat), sbetFilePath(sbetFile) {
 
     }
 
@@ -91,12 +92,28 @@ public:
     void processSoundVelocityProfile(SoundVelocityProfile * svp) {
         svps.push_back(svp);
     }
+    
+    void processEntry(SbetEntry * entry){
+			
+		Position position(static_cast<uint64_t>(entry->time * 1000000), entry->latitude*R2D, entry->longitude*R2D, entry->altitude);			
+		this->positions.push_back(position);
+			
+		Attitude attitude(static_cast<uint64_t>(entry->time * 1000000), entry->roll*R2D, entry->pitch*R2D, entry->heading*R2D);
+		this->attitudes.push_back(attitude);
+    }
 
     /**
      * Georeferences all pings
      * @param boresight boresight (dPhi,dTheta,dPsi)
      */
     virtual void georeference(Eigen::Vector3d & leverArm, Eigen::Matrix3d & boresight, std::vector<SoundVelocityProfile*> & externalSvps) {
+    
+    if(this->sbetFilePath.size() > 0){
+    	positions.clear();
+    	attitudes.clear();
+    	readFile(this->sbetFilePath);   	
+    }
+    
 	if(positions.size()==0){
 		std::cerr << "[-] No position data found in file" << std::endl;
 		return;
@@ -159,6 +176,37 @@ public:
         // fprintf(stderr, "[+] Position data points: %ld [%lu to %lu]\n", positions.size(), positions[0].getTimestamp(), positions[positions.size() - 1].getTimestamp());
         // fprintf(stderr, "[+] Attitude data points: %ld [%lu to %lu]\n", attitudes.size(), attitudes[0].getTimestamp(), attitudes[attitudes.size() - 1].getTimestamp());
         // fprintf(stderr, "[+] Ping data points: %ld [%lu to %lu]\n", pings.size(), (pings.size() > 0) ? pings[0].getTimestamp() : 0, (pings.size() > 0) ? pings[pings.size() - 1].getTimestamp() : 0);
+
+
+		if(this->sbetFilePath.size() > 0){
+			uint64_t attitudeTimestamp = attitudes.at(0).getTimestamp();
+			uint64_t positionTimestamp = positions.at(0).getTimestamp();
+			uint64_t pingTimestamp = pings.at(0).getTimestamp();
+			
+			std::cerr << "First ping timestamp : " << pingTimestamp <<"\n";
+			
+			if( attitudeTimestamp == positionTimestamp ){
+				
+				// unix time 1st jan 1970 is a thursday
+				// gps first day of the week starts on sundays
+				// 4 day difference : 60 *60 *24 *4 = 345600 seconds
+				uint64_t offset = 345600000000;
+				
+				uint64_t nbMicroSecondsPerWeek = 604800000000; // microseconds per week
+				
+				//std::cerr<<"micro sec per week : " << nbMicroSecondsPerWeek <<"\n";
+				
+				uint64_t nbWeek = (pingTimestamp + (nbMicroSecondsPerWeek - offset)) / nbMicroSecondsPerWeek; //nb week unix time
+				
+				//std::cerr<<"nb week : " << nbWeek << "\n";
+				
+				uint64_t startOfWeek = (nbMicroSecondsPerWeek * nbWeek) - offset; // micro sec from unix time to start of week
+				
+				for (auto i = pings.begin(); i != pings.end(); i++) {
+					(*i).setTimestamp((*i).getTimestamp() - startOfWeek);
+				}
+			}
+		}
 
         // For correct display of timestamps on Windows
         std::cerr <<  "[+] Position data points: " << positions.size() << " [" << positions[0].getTimestamp() << " to " 
@@ -276,6 +324,8 @@ protected:
     double transducerDraft = 0.0;
     
     CartesianToGeodeticFukushima* cart2geo = NULL;
+    
+    std::string sbetFilePath = "";
 };
 
 #endif

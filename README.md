@@ -4,6 +4,7 @@ Multibeam echosounder function library
 
 ## Supported datagram types
 * Kongsberg EM series (.all)
+* Kongsberg (.kmall)
 * Reson (.s7k)
 * Triton (.xtf)
 

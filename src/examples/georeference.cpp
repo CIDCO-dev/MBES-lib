@@ -22,6 +22,7 @@
 #include "../svp/SvpNearestByTime.hpp"
 #include "../svp/SvpNearestByLocation.hpp"
 #include "../math/CartesianToGeodeticFukushima.hpp"
+#include <filesystem>
 
 using namespace std;
 
@@ -31,7 +32,7 @@ void printUsage(){
 NAME\n\n\
 	georeference - Produces a georeferenced point cloud from binary multibeam echosounder datagrams files\n\n\
 SYNOPSIS\n \
-	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] [-s svp_file] [-S svpStrategy] file\n\n\
+	georeference [-x lever_arm_x] [-y lever_arm_y] [-z lever_arm_z] [-r roll_angle] [-p pitch_angle] [-h heading_angle] [-s svp_file] [-S svpStrategy] [-b sbet_file] file\n\n\
 DESCRIPTION\n \
 	-L Use a local geographic frame (NED)\n \
 	-T Use a terrestrial geographic frame (WGS84 ECEF)\n \
@@ -82,12 +83,14 @@ int main (int argc , char ** argv){
         Georeferencing * georef = NULL;
         CartesianToGeodeticFukushima * cartesian2geographic = NULL;
 
-	std::string	     svpFilename;
-	CarisSvpFile svps;
+		std::string svpFilename;
+		CarisSvpFile svps;
+
+		std::string sbetFilePath = "";
 
         int index;
 
-        while((index=getopt(argc,argv,"x:y:z:r:p:h:s:S:LTg"))!=-1)
+        while((index=getopt(argc,argv,"x:y:z:r:p:h:s:S:b:LTg"))!=-1)
         {
             switch(index)
             {
@@ -139,30 +142,30 @@ int main (int argc , char ** argv){
                     }
                 break;
 
-		case 's':
-			svpFilename = optarg;
-			if(!svps.readSvpFile(svpFilename)){
-				std::cerr << "Invalid SVP file (-s)" << std::endl;
-				printUsage();
-			}
-                        break;
-                        
-                case 'S':
-			userSelectedStrategy = optarg;
-                        if(userSelectedStrategy == "nearestLocation") {
-                            std::cerr << "[+] Using nearest location sound velocity profile selection strategy" << std::endl;
-                            svpStrategy = new SvpNearestByLocation();
-                        } else if(userSelectedStrategy == "nearestTime") {
-                            std::cerr << "[+] Using nearest location sound velocity profile selection strategy" << std::endl;
-                            svpStrategy = new SvpNearestByTime();
-                        } else {
-                            std::cerr << "Invalid SVP strategy (-S): " << userSelectedStrategy << std::endl;
-                            std::cerr << "Possible choices are:" << std::endl;
-                            std::cerr << "-S nearestTime" << std::endl;
-                            std::cerr << "-S nearestLocation" << std::endl;
-                            printUsage();
-                        }
-                        break;
+				case 's':
+					svpFilename = optarg;
+					if(!svps.readSvpFile(svpFilename)){
+						std::cerr << "Invalid SVP file (-s)" << std::endl;
+						printUsage();
+					}
+				break;
+
+				case 'S':
+					userSelectedStrategy = optarg;
+					if(userSelectedStrategy == "nearestLocation") {
+						std::cerr << "[+] Using nearest location sound velocity profile selection strategy" << std::endl;
+						svpStrategy = new SvpNearestByLocation();
+					} else if(userSelectedStrategy == "nearestTime") {
+						std::cerr << "[+] Using nearest location sound velocity profile selection strategy" << std::endl;
+						svpStrategy = new SvpNearestByTime();
+					} else {
+						std::cerr << "Invalid SVP strategy (-S): " << userSelectedStrategy << std::endl;
+						std::cerr << "Possible choices are:" << std::endl;
+						std::cerr << "-S nearestTime" << std::endl;
+						std::cerr << "-S nearestLocation" << std::endl;
+						printUsage();
+					}
+				break;
 
                 case 'L':
                     georef = new GeoreferencingLGF();
@@ -177,6 +180,15 @@ int main (int argc , char ** argv){
                     cartesian2geographic = new CartesianToGeodeticFukushima(2);
                     cart2geo=true;
                 break;
+                
+                case 'b':
+					sbetFilePath = optarg;
+					std::filesystem::path f{sbetFilePath};
+					if(!std::filesystem::exists(f)){
+						std::cerr << "Sbet file path provided does not exists" << std::endl;
+						printUsage();
+					}
+				break;
             }
         }
 
@@ -193,7 +205,7 @@ int main (int argc , char ** argv){
         try
         {
             DatagramParser * parser = NULL;
-            DatagramGeoreferencer  printer(*georef, *svpStrategy);
+            DatagramGeoreferencer  printer(*georef, *svpStrategy, sbetFilePath);
             if(cart2geo) {
                 printer.setCart2Geo(cartesian2geographic);
             }
