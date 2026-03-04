@@ -7,15 +7,30 @@
 #include <numeric>
 #include <string.h>
 #include <sstream>
+#include <cctype>
 #include "../math/CoordinateTransform.hpp"
 #include "../Position.hpp"
+
+namespace {
+bool equalsIgnoreCase(const char* lhs, const char* rhs) {
+	while (*lhs != '\0' && *rhs != '\0') {
+		if (std::tolower(static_cast<unsigned char>(*lhs)) !=
+			std::tolower(static_cast<unsigned char>(*rhs))) {
+			return false;
+		}
+		++lhs;
+		++rhs;
+	}
+	return *lhs == '\0' && *rhs == '\0';
+}
+}
 
 
 int main(int argc, const char* argv[]) {
      
     if (argc != 2) {
     
-    	if(argc >=2 && (strcasecmp(argv[1], "enu") != 0 && strcasecmp(argv[1], "ned") != 0)){
+    	if(argc >=2 && (!equalsIgnoreCase(argv[1], "enu") && !equalsIgnoreCase(argv[1], "ned"))){
     		std::cerr<<"Frame must be NED or ENU"<<std::endl;
     	}
 		std::cerr << "cat FILE | ./wgs2lgf [ned|enu]"<<std::endl;
@@ -88,14 +103,14 @@ int main(int argc, const char* argv[]) {
 
 	// Create ENU rotation matrix 
 	Eigen::Matrix3d ecef2lgf;
-	if(strcasecmp(argv[1], "enu") == 0 ){
+	if(equalsIgnoreCase(argv[1], "enu")){
 	
 		ecef2lgf << -sin(lonsMean*D2R), cos(lonsMean*D2R), 0,
 					-sin(latsMean*D2R)*cos(lonsMean*D2R), -sin(latsMean*D2R)*sin(lonsMean*D2R), cos(latsMean*D2R),
 					cos(latsMean*D2R)*cos(lonsMean*D2R), cos(latsMean*D2R)*sin(lonsMean*D2R), sin(latsMean*D2R);
 	}
 	// Create NED rotation matrix
-	else if(strcasecmp(argv[1], "ned") == 0 ){
+	else if(equalsIgnoreCase(argv[1], "ned")){
 		ecef2lgf << -sin(latsMean*D2R)*cos(lonsMean*D2R), -sin(latsMean*D2R) * sin(lonsMean*D2R), cos(latsMean*D2R),
 					-sin(lonsMean*D2R), cos(lonsMean*D2R), 0,
 					-cos(latsMean*D2R)*cos(lonsMean*D2R), -cos(latsMean*D2R)*sin(lonsMean*D2R), -sin(latsMean*D2R); 

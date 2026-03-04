@@ -7,16 +7,31 @@
 #include <numeric>
 #include <string.h>
 #include <sstream>
+#include <cctype>
 #include "../math/CoordinateTransform.hpp"
 #include "../math/CartesianToGeodeticFukushima.hpp"
 #include "../Position.hpp"
+
+namespace {
+bool equalsIgnoreCase(const char* lhs, const char* rhs) {
+	while (*lhs != '\0' && *rhs != '\0') {
+		if (std::tolower(static_cast<unsigned char>(*lhs)) !=
+			std::tolower(static_cast<unsigned char>(*rhs))) {
+			return false;
+		}
+		++lhs;
+		++rhs;
+	}
+	return *lhs == '\0' && *rhs == '\0';
+}
+}
 
 
 int main(int argc, const char* argv[]) {
      
     if (argc != 5) {
     
-    	if(argc >=5 && (strcasecmp(argv[1], "enu") != 0 && strcasecmp(argv[1], "ned") != 0)){
+    	if(argc >=5 && (!equalsIgnoreCase(argv[1], "enu") && !equalsIgnoreCase(argv[1], "ned"))){
     		std::cerr<<"Frame must be NED or ENU"<<std::endl;
     	}
 		std::cerr << "cat FILE | ./lgf2wgs [ned|enu] x y z"<<std::endl;
@@ -77,7 +92,7 @@ int main(int argc, const char* argv[]) {
 
 	// Create ENU rotation matrix 
 	Eigen::Matrix3d lgf2ecef;
-	if(strcasecmp(argv[1], "enu") == 0 ){
+	if(equalsIgnoreCase(argv[1], "enu")){
 		
 		lgf2ecef << -sin(centroidLon*D2R), -sin(centroidLat*D2R)*cos(centroidLon*D2R), cos(centroidLat*D2R)*cos(centroidLon*D2R),
 					cos(centroidLon*D2R), -sin(centroidLat*D2R)*sin(centroidLon*D2R), cos(centroidLat*D2R)*sin(centroidLon*D2R),
@@ -85,7 +100,7 @@ int main(int argc, const char* argv[]) {
 	}
 	
 	// Create NED rotation matrix
-	else if(strcasecmp(argv[1], "ned") == 0 ){
+	else if(equalsIgnoreCase(argv[1], "ned")){
 	
 		lgf2ecef << -sin(centroidLat*D2R)*cos(centroidLon*D2R), -sin(centroidLon*D2R), -cos(centroidLat*D2R)*cos(centroidLon*D2R),
 					-sin(centroidLat*D2R) * sin(centroidLon*D2R), cos(centroidLon*D2R), -cos(centroidLat*D2R)*sin(centroidLon*D2R),

@@ -5,6 +5,8 @@
 #ifndef KMALL_CPP
 #define KMALL_CPP
 
+#include <vector>
+
 #include "KmallParser.hpp"
 
 
@@ -184,7 +186,7 @@ void KmallParser::processMRZ(EMdgmHeader & header, unsigned char * datagram){
 		EMdgmMRZ_txSectorInfo_def * sectors = (EMdgmMRZ_txSectorInfo_def*)(datagram + sizeof(EMdgmMpartition_def) + sizeof(EMdgmMbody_def) +
 		sizeof(EMdgmMRZ_pingInfo_def));
 		
-		float tiltAngles[numTxSectors];
+		std::vector<float> tiltAngles(numTxSectors);
 		
 		for(int i = 0; i<numTxSectors; i++){
 			tiltAngles[i] = sectors[i].tiltAngleReTx_deg;

@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage:
+    name: Coverage (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libeigen3-dev cppcheck python3-pip
+          python3 -m pip install --user gcovr
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Run coverage
+        run: |
+          make clean
+          make coverage
+
+      - name: Upload coverage artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            build/coverage/report/cppcheck.xml
+            build/coverage/report/gcovr-report.xml
+            build/coverage/report/gcovr-report.html
+          if-no-files-found: error
+
+  documentation:
+    name: Documentation (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz zip
+
+      - name: Build documentation
+        run: make doc
+
+      - name: Archive doxygen output
+        run: zip -r build/doxygen/doxygen.zip build/doxygen
+
+      - name: Upload documentation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: doxygen-zip
+          path: build/doxygen/doxygen.zip
+          if-no-files-found: error
+
+  build_test_linux:
+    name: Build and Test (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libeigen3-dev
+
+      - name: Build and run tests
+        run: bash Scripts/linuxBuildAndTest.bash
+
+      - name: Upload Linux binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-binaries
+          path: |
+            build/bin/datagram-dump
+            build/bin/cidco-decoder
+            build/bin/datagram-list
+            build/bin/georeference
+            build/bin/bounding-box
+            build/bin/data-cleaning
+            build/bin/raytrace
+            build/bin/datagram-raytracer
+          if-no-files-found: error
+
+      - name: Upload Linux test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-junit-report
+          path: build/reports/*.xml
+          if-no-files-found: error
+
+  build_test_windows:
+    name: Build and Test (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Eigen3 via vcpkg
+        shell: pwsh
+        run: |
+          if (-not $env:VCPKG_INSTALLATION_ROOT) {
+            throw "VCPKG_INSTALLATION_ROOT is not defined on this runner."
+          }
+          & "$env:VCPKG_INSTALLATION_ROOT\vcpkg.exe" install eigen3:x64-windows
+
+      - name: Configure CMake
+        shell: pwsh
+        run: |
+          $toolchain = "$env:VCPKG_INSTALLATION_ROOT\scripts\buildsystems\vcpkg.cmake"
+          cmake -S . -B build -A x64 -DCMAKE_TOOLCHAIN_FILE="$toolchain" -DVCPKG_TARGET_TRIPLET=x64-windows
+
+      - name: Build
+        shell: pwsh
+        run: cmake --build build --config Release --parallel
+
+      - name: Run tests
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path build\reports | Out-Null
+          $candidates = @(
+            "build\test\tests.exe",
+            "build\test\Release\tests.exe",
+            "build\Release\test\tests.exe"
+          )
+          $testExe = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $testExe) {
+            throw "Unable to locate tests.exe in expected output folders."
+          }
+          & $testExe -r junit -o build/reports/mbes-lib-test-report.xml
+
+      - name: Upload Windows binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-binaries
+          path: |
+            build/**/datagram-dump.exe
+            build/**/cidco-decoder.exe
+            build/**/datagram-list.exe
+            build/**/georeference.exe
+            build/**/bounding-box.exe
+            build/**/data-cleaning.exe
+            build/**/raytrace.exe
+            build/**/datagram-raytracer.exe
+          if-no-files-found: error
+
+      - name: Upload Windows test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-junit-report
+          path: build/reports/*.xml
+          if-no-files-found: error
